@@ -129,31 +129,24 @@ def remote_bayes_factor_calculation(
         port_number=port_number,
     )
 
-    # By default, use times the other model trained on, up to t_idx given.
-    if num_times_to_use == 'all':
-        first_t_idx = 0
-    else:
-        first_t_idx = len(model_a.times_learned_over) - num_times_to_use
-
-    update_times_model_a = model_b.times_learned_over[first_t_idx:]
-    update_times_model_b = model_a.times_learned_over[first_t_idx:]
-
     # Take a copy of each updater before updates (for plotting later)
     updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
     updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
 
     # Update the models with the times trained by the other model.
-    log_l_a = updated_log_likelihood(
-        model_a,
-        update_times_model_a,
-        log_file=log_file,
+    log_l_a = model_a.update_log_likelihood(
+        new_times = model_b.times_learned_over
     )
-    log_l_b = updated_log_likelihood(
-        model_b,
-        update_times_model_b,
-        log_file=log_file,
+    log_l_b = model_b.update_log_likelihood(
+        new_times = model_a.times_learned_over
     )
-    bayes_factor = np.exp(log_l_a - log_l_b)
+    bayes_factor = np.exp( log_l_a - log_l_b )
+
+    diff_in_bf_times = (
+        list ( set(model_a.bf_times) - set(model_b.bf_times) ) 
+        + list (set(model_b.bf_times) - set(model_a.bf_times) )
+    ) # should be empty if same experiments were used for A and B
+    log_print(["Difference in times:", diff_in_bf_times])
 
     # Plot the posterior of the true model only
     if (
@@ -179,19 +172,19 @@ def remote_bayes_factor_calculation(
             log_print(["Plotting posterior marginal of true model failed."])
             pass
 
-    # Plot dynamics on which models were compared, if one of the pair is the
-    # true model
+    # Plot dynamics on which models were compared
     if (
         plot_true_mod_post_bayes_factor_dynamics
     ):
         try:
+            times_used = model_a.bf_times + model_b.bf_times
             plot_models_dynamics(
                 model_a,
                 model_b,
                 exp_msmts=qmla_core_info_dict['experimental_measurements'],
                 plot_probes_path=qmla_core_info_dict['probes_plot_file'],
                 bayes_factor=bayes_factor,
-                bf_times=update_times_model_a,
+                bf_times=times_used,
                 qmla_id=qid,
                 log_file=log_file,
                 save_directory=bf_data_folder,
@@ -245,6 +238,9 @@ def remote_bayes_factor_calculation(
     del model_a, model_b
     return bayes_factor
 
+#########
+# Utilities
+#########
 
 def log_print(
     to_print_list,
@@ -259,63 +255,8 @@ def log_print(
     )
 
 
-def updated_log_likelihood(
-    model,
-    times,
-    log_file=None,
-):
-    r"""
-    Get log likelihood of a single model.
-
-    TODO get all aspects of experiments from other model,
-    including time, probe, datum,
-    so that bayes factor is on completely same set D.
-
-    :param QInfer.Model model: Qinfer model instance
-    :param list times: times to update the model with
-    :param str log_file: Path of the log file.
-    """
-
-    updater = model.qinfer_updater
-
-    for t in times:
-        exp = format_experiment(model, [t]) # TODO get exp from heuristic or sample from posterior in likelihood for IQLE
-        params_array = np.array([[model.true_model_params[:]]])
-        datum = updater.model.simulate_experiment(
-            params_array,
-            exp,
-            repeat=1
-        )
-        updater.update(datum, exp)
-
-    log_likelihood = updater.log_total_likelihood
-    return log_likelihood
-
-
-def format_experiment(model, time):
-    r"""
-    Format a single experiment so QInfer can handle it.
-    """
-    gen = model.qinfer_model
-    exp = np.empty(
-        len(time),
-        dtype=gen.expparams_dtype
-    )
-    exp['t'] = time
-
-    particle = model.qinfer_updater.sample()  # generate particle for IQLE
-    # TODO record all experimental parameters instead of just time
-    n_params = particle.shape[1]
-    for i in range(n_params):
-        p = particle[0][i]
-        corresponding_expparam = model.qinfer_model.modelparam_names[i]
-        exp[corresponding_expparam] = p
-
-    return exp
-
-
 #########
-# Functions for rescaling times to be used during Bayes factor calculation
+# Plotting
 #########
 
 def plot_models_dynamics(
@@ -372,7 +313,7 @@ def plot_models_dynamics(
         ax1.plot(
             times,
             mod_exp_vals,
-            label=str(mod.model_id)
+            label=str("({}) {}".format(mod.model_id, mod.model_name_latex ))
         )
     try:
         # in background, show how often that time was considered

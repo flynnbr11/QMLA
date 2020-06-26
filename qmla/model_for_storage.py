@@ -142,9 +142,6 @@ class ModelInstanceForStorage():
         """
 
         if self.values_updated:
-            self.log_print([
-                "Attempting to update values for storage, but already stored."
-            ])
             return
 
         self.values_updated = True

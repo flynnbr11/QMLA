@@ -474,10 +474,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 '\n_a = {}, _b={}'.format(self._a, self._b),
                 '\nprobe counter:', self.probe_counter,
                 '\nexp:', expparams,
-                '\nOutcomes:', outcomes[:10],
-                '\nparticles:', params[:10],
-                "\nPr0: ", pr0[:10], 
-                "\nLikelihood: ", likelihood_array[0][:10],
+                '\nOutcomes:', outcomes[:3],
+                '\nparticles:', params[:3],
+                "\nPr0: ", pr0[:3], 
+                "\nLikelihood: ", likelihood_array[0][:3],
                 "\nexpparams_sampled_particle:", expparams_sampled_particle
             ]
         )
