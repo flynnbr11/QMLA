@@ -20,16 +20,7 @@ class NVCentreRevivalsSimulated(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        # self.true_model = qmla.utilities.n_qubit_nv_gali_model(
-        #     n_qubits = 2, 
-        #     rotation_terms = ['x', 'y', 'z' ], 
-        #     coupling_terms = ['z']
-        # )
-        # self.true_model = 'pauliSet_1_z_d2+pauliSet_1J2_zJz_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2'
-        # self.true_model = qmla.construct_models.alph(self.true_model) 
-    
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
-        # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse # as experiment
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
@@ -46,58 +37,35 @@ class NVCentreRevivalsSimulated(
 
         self.min_param = 0
         self.max_param = 20
-        self.gaussian_prior_means_and_widths = {
-            'pauliSet_1J3_zJz_d3' : (0.5, 0.2),
-            'pauliSet_1J3_zJz_d4' : (0.5, 0.2),
-            'pauliSet_1J4_zJz_d4' : (0.5, 0.2),
-        }
 
-        short_data_rotation_x_term =  0.92450565
-        short_data_rotation_y_term = 6.00664336
-        short_data_rotation_z_term = 1.65998543
-        short_data_coupling_z = 0.76546868
-
-        self.max_time_to_consider = 50e-6
+        self.max_time_to_consider = 150e-6
         self.plot_time_increment = 0.5e-6
 
-        n_qubits = 5
+        n_qubits = 2
         self.true_model_terms_params = {
             # spin
-            # 'pauliSet_1_x_d{}'.format(n_qubits) : 1.94e9,
-            # 'pauliSet_1_y_d{}'.format(n_qubits) : 1.94e9,
-            'pauliSet_1_z_d{}'.format(n_qubits) : 1.94e9,
+            'pauliSet_1_z_d{}'.format(n_qubits) : 2e9,
             
-            # # coupling
-            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J3_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J4_zJz_d{}'.format(n_qubits) : 2.14e6, 
-            'pauliSet_1J5_zJz_d{}'.format(n_qubits) : 2.14e6, 
+            # coupling with 2nd qubit
+            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 0.2e6, 
+            'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 0.4e6, 
+            'pauliSet_1J2_xJx_d{}'.format(n_qubits) : 0.2e6, 
 
-            # 'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 2.14e6, 
-            # 'pauliSet_1J3_yJy_d{}'.format(n_qubits) : 2.14e6, 
-            # 'pauliSet_1J4_yJy_d{}'.format(n_qubits) : 2.14e6, 
-            # 'pauliSet_1J5_yJy_d{}'.format(n_qubits) : 2.14e6, 
+            # carbon nuclei - 2nd qubit
+            'pauliSet_2_x_d{}'.format(n_qubits) : 66e3,
+            'pauliSet_2_y_d{}'.format(n_qubits) : 66e3,
+            'pauliSet_2_z_d{}'.format(n_qubits) : 15e3,
+        }
+        self.gaussian_prior_means_and_widths = {
+            'pauliSet_1_z_d{}'.format(n_qubits) : (5e9, 2e5),
+            
+            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : (5e5, 2e5), 
+            'pauliSet_1J2_yJy_d{}'.format(n_qubits) : (5e5, 2e5), 
+            'pauliSet_1J2_xJx_d{}'.format(n_qubits) : (5e5, 2e5), 
 
-            # # nuclear 
-            # 'pauliSet_2_x_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_2_y_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_2_z_d{}'.format(n_qubits) : 3.5e9,
-
-            # # nuclear 3rd qubit
-            # 'pauliSet_3_x_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_3_y_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_3_z_d{}'.format(n_qubits) : 3.5e9,
-
-            # # nuclear 3rd qubit
-            # 'pauliSet_4_x_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_4_y_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_4_z_d{}'.format(n_qubits) : 3.5e9,
-
-            # # nuclear 3rd qubit
-            # 'pauliSet_5_x_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_5_y_d{}'.format(n_qubits) : 3.5e9,
-            # 'pauliSet_5_z_d{}'.format(n_qubits) : 3.5e9,
-
+            'pauliSet_2_x_d{}'.format(n_qubits) : (5e4, 2e4),
+            'pauliSet_2_y_d{}'.format(n_qubits) : (5e4, 2e4),
+            'pauliSet_2_z_d{}'.format(n_qubits) : (5e4, 2e4),
         }
 
         self.true_model = '+'.join(
@@ -121,7 +89,6 @@ class NVCentreRevivals(
         )
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
 
-
     def get_true_parameters(
         self,
     ):        
@@ -143,10 +110,19 @@ class NVCentreRevivals(
         self.log_print([
             "Getting experimental data from {}".format(data_path)
         ])
-        self.measurements = pickle.load(
+        measurements = pickle.load(
             open(
                 data_path,
                 'rb'
             )
         )
+        # rescale times from microseconds -> absolute seconds
+        meas_times = list(measurements.keys())
+        for t in meas_times: 
+            new_t = t*1e-6 # in absolute seconds
+            measurements[new_t] = measurements[t]
+            measurements.pop(t)
+
+
+        self.measurements = measurements
         return self.measurements

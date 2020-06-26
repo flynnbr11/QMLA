@@ -85,7 +85,7 @@ class GrowthRuleTree():
                 "Initial models not set; retrieving from generate_models"
             ])
             self.initial_models = self.growth_class.generate_models(
-                model_list=None
+                model_list=[]
             )
         else:
             self.initial_models = self.growth_class.initial_models
