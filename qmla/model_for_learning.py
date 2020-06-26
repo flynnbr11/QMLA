@@ -1193,7 +1193,6 @@ class ModelInstanceForLearning():
                      )
 
         # Save
-        self.log_print(["min/max contour values:{}/{}".format(vmin, vmax)])
         fig.text(0.5, 0.04, 'Posterior mesh', ha='center')
         fig.savefig(
             os.path.join(self.model_learning_plots_directory,

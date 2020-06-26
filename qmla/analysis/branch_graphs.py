@@ -88,7 +88,6 @@ def plot_qmla_branches(q, return_graphs=False):
     max_seen_bf = 0
 
     for branch in branches:
-        q.log_print(["getting r,c={},{}".format(row, col)])
         ax = fig.add_subplot(gs[row, col])
         
         models = branch.models.keys()

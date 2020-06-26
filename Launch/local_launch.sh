@@ -9,7 +9,7 @@ printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
 # Running QMD essentials
 ### ---------------------------------------------------###
 num_tests=1
-qhl_test=1 # don't perform QMLA; perform QHL on known correct model
+qhl_test=0 # don't perform QMLA; perform QHL on known correct model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 exp_data=0
@@ -20,7 +20,7 @@ q_id=0 # can start from other ID if desired
 # QHL parameters
 ### --------------------------------------------------###
 exp=10
-prt=30
+prt=15
 pgh=1.0
 pgh_exponent=1.0
 pgh_increase=0 # whether to add to time found by PGH (bool)
@@ -47,14 +47,14 @@ bf_all_times=0
 # growth_rule='IsingGeneticTest'
 # growth_rule='IsingGeneticSingleLayer'
 # growth_rule='NVCentreRevivals'
-growth_rule='NVCentreRevivalsSimulated'
+# growth_rule='NVCentreRevivalsSimulated'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'
 # growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
-# growth_rule='NVCentreNQubitBath'
+growth_rule='NVCentreNQubitBath'
 
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'

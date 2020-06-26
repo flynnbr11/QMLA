@@ -10,6 +10,7 @@ import redis
 import pickle
 import matplotlib.colors
 
+import qmla.construct_models
 
 class StorageUnit():
     r"""
@@ -157,3 +158,31 @@ def n_qubit_nv_gali_model(
         terms.extend(new_terms)
     terms = sorted(terms)
     return '+'.join(terms)
+
+
+def ensure_consisten_num_qubits_pauli_set(initial_model, new_dimension=None):
+    individual_terms = qmla.construct_models.get_constituent_names_from_name(initial_model)
+    
+    if new_dimension is None: 
+        max_dimension = max([
+            qmla.construct_models.get_num_qubits(term)
+            for term in individual_terms            
+        ])
+        new_dimension = max_dimension
+
+    separate_terms = []
+    for model in individual_terms:
+        components = model.split('_')
+
+        for c in components:
+            if c[0] == 'd':
+                # remove the dimension indicator from model
+                components.remove(c)
+
+        new_component = "d{}".format(new_dimension)
+        components.append(new_component)
+        new_mod = '_'.join(components)
+        separate_terms.append(new_mod)
+
+    full_model = '+'.join(separate_terms)
+    return full_model
