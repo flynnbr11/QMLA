@@ -110,8 +110,8 @@ def remote_bayes_factor_calculation(
     log_print(["True name:", true_mod_name])
 
     # Whether to build plots
-    save_plots_of_posteriors = True
-    plot_true_mod_post_bayes_factor_dynamics = True
+    save_plots_of_posteriors = False
+    plot_true_mod_post_bayes_factor_dynamics = False
 
     # Get model instances
     model_a = qmla.model_for_comparison.ModelInstanceForComparison(

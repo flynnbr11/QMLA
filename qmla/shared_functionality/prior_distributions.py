@@ -101,14 +101,6 @@ def gaussian_prior(
         means,
         cov_mtx
     )
-    log_print(
-        [
-            "means:", means,
-            "cov mt:", cov_mtx,
-            "\ndist:", dist
-        ],
-        log_file, log_identifier
-    )
 
     return dist
 
