@@ -93,6 +93,26 @@ class NVCentreNQubitBath(
         self.num_processes_to_parallelise_over = 6
         self.timing_insurance_factor = 1
 
+        # Test: a few hand picked models to see if true model wins
+        self.initial_models = [
+            'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+            'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
+            'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+            'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
+            'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
+            # 3 qubits
+            'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
+            'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
+
+        ]
+        self.initial_models = [
+            qmla.construct_models.alph(m) for m in self.initial_models
+        ]
+        self.tree_completed_initially = True
+        if self.tree_completed_initially:
+            self.max_spawn_depth = 1
+        self.num_processes_to_parallelise_over = len(self.initial_models)
+
 
     # Model generation / QMLA progression
 
