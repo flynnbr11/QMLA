@@ -438,8 +438,8 @@ class BranchQMLA():
             }
         else:
             self.log_print([
-                "Reconsidering branch {} champion with pairs {}".format(
-                    self.branch_id, pair_list)
+                "Reconsidering branch {} [{} considerations so far] champion with pairs {}".format(
+                    self.branch_id, self.result_counter, pair_list)
             ])
 
         # Inspect the pairwise comparisons;
@@ -478,7 +478,7 @@ class BranchQMLA():
                 # Set joint champions so QMLA can re-compare the subset
                 self.joint_branch_champions = models_with_max_points
                 self.is_branch_champion_set = False
-                return
+                # return
             else:
                 # champion is model with most points
                 self.ranked_models = sorted(
@@ -500,7 +500,7 @@ class BranchQMLA():
             self.log_print(["Champion set by ratings"])
             self.is_branch_champion_set = True
 
-        if not self.is_branch_champion_set and self.result_counter > 1:
+        if self.result_counter > 1 and not self.is_branch_champion_set:
             self.log_print([
                 "On branch {}, no outright champion after {} considerations. \
                     Forcing selection.".format(
