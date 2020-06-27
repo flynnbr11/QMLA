@@ -35,11 +35,12 @@ class NVCentreNQubitBath(
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
         # True model configuration        
-        self.true_model = 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_1J2_zJz_d2'
+        self.true_model = 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2'
         self.true_model_terms_params = {
             'pauliSet_1_x_d2': 0.92450565,
             'pauliSet_1_y_d2': 6.00664336,
             'pauliSet_1_z_d2': 1.65998543,
+            'pauliSet_2_y_d2' : 2, 
             'pauliSet_1J2_zJz_d2': 0.76546868,
         }
 
@@ -80,9 +81,9 @@ class NVCentreNQubitBath(
         self.probe_maximum_number_qubits = 5
         self.include_transverse_terms = True
 
-        self.fraction_opponents_experiments_for_bf = 0
+        self.fraction_opponents_experiments_for_bf = 0.5
         self.fraction_own_experiments_for_bf = 0.5
-        self.fraction_particles_for_bf = 1
+        self.fraction_particles_for_bf = 0.5
 
         # Logistics
         self.max_num_models_by_shape = {

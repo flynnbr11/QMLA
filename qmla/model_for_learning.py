@@ -933,7 +933,6 @@ class ModelInstanceForLearning():
             try:
                 term_latex = self.growth_class.latex_name(term)
                 ax.set_title(term_latex)
-                self.log_print(["Latex for this term:", term_latex])
             except BaseException:
                 self.log_print(["Failed to get latex name"])
                 raise
@@ -1142,8 +1141,6 @@ class ModelInstanceForLearning():
                 vmin = np.min(post_mesh[2])
             if np.max(post_mesh[2]) > vmax:
                 vmax = np.max(post_mesh[2])
-                self.log_print(
-                    ["Setting vmax={} for i,j={},{}".format(vmax, i, j)])
 
         for i in range(n_param):
             for j in range(n_param):

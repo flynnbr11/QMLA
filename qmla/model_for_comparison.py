@@ -261,12 +261,6 @@ class ModelInstanceForComparison():
             self.qinfer_updater.update(datum, experiment)
             epoch_id += 1
 
-        self.log_print([
-            "Final norm record has length {}. LL:{}".format(
-            len(self.qinfer_updater.normalization_record),
-            self.qinfer_updater.log_total_likelihood
-            )
-        ])
         return self.qinfer_updater.log_total_likelihood
 
     ##########
