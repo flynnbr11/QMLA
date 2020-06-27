@@ -28,7 +28,7 @@ class NVCentreNQubitBath(
 
         
         # Choose functions 
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
@@ -52,7 +52,7 @@ class NVCentreNQubitBath(
 
         self.min_param = 0
         self.max_param = 10
-        self.num_probes = 1 # |++'>
+        self.num_probes = 25 # |++'>
         self.champion_models_by_spawn_stage = {}
 
         non_spin_qubit_contributions = ['rotation', 'coupling']
