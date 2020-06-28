@@ -454,10 +454,9 @@ class ModelInstanceForLearning():
         ])
 
         self.log_print([
-            "End of learning. LL={}. Renorm record: \n{} \n times:\n{}".format(
+            "End of learning. LL={}. Renorm record: \n{}".format(
                 self.qinfer_updater.log_total_likelihood, 
                 self.qinfer_updater.normalization_record,
-                self.track_experimental_times
             )
         ])
 
