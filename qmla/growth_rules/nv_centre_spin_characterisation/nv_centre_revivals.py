@@ -38,7 +38,7 @@ class NVCentreRevivalsSimulated(
         self.min_param = 0
         self.max_param = 20
 
-        self.max_time_to_consider = 150e-6
+        self.max_time_to_consider = 50e-6
         self.plot_time_increment = 0.5e-6
 
         n_qubits = 2

@@ -74,8 +74,9 @@ class NVCentreNQubitBath(
         
         self.substage_layer_champions =  { i : {} for i in range(1, self.max_num_qubits+1) }
         self.substage_champions_by_stage = { i : [] for i in range(1, self.max_num_qubits+1) }
-        self.substage = 'rotation'
+        self.stage_champions = {}
 
+        self.substage = 'rotation'
         self.spawn_stage = [None]        
         self.probe_maximum_number_qubits = 5
         self.include_transverse_terms = True

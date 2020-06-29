@@ -196,6 +196,8 @@ class QuantumModelLearningAgent():
                 'branch_id': [],
                 'f_score': [],
                 'model_storage_instance': [],
+                'branches_present_on' : [], 
+                'terms' : []
             }
         )
         self.model_lists = {
@@ -1555,6 +1557,8 @@ class QuantumModelLearningAgent():
                 model_name=model_name,
                 growth_class=growth_tree.growth_class
             ), 2)
+            terms = qmla.construct_models.get_constituent_names_from_name(model_name)
+
             running_db_new_row = pd.Series({
                 'model_id': int(model_id),
                 'model_name': model_name,
@@ -1562,6 +1566,8 @@ class QuantumModelLearningAgent():
                 'branch_id': int(branch_id),
                 'f_score': f_score,
                 'model_storage_instance': model_storage_instance,
+                'branches_present_on' : [int(branch_id)], 
+                'terms' : terms
             })
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
@@ -1591,6 +1597,10 @@ class QuantumModelLearningAgent():
                 self.log_print([
                     "Previously considered as model ID ", model_id
                 ])
+                self.model_database[ 
+                    self.model_database.model_id == model_id 
+                ].branches_present_on.item().append(int(branch_id))
+                
                 if model_id == self.true_model_id:
                     self.true_model_on_branhces.append(model_id)
             except BaseException:
