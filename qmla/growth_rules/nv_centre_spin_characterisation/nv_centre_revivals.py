@@ -57,7 +57,7 @@ class NVCentreRevivalsSimulated(
             'pauliSet_2_z_d{}'.format(n_qubits) : 15e3,
         }
         self.gaussian_prior_means_and_widths = {
-            'pauliSet_1_z_d{}'.format(n_qubits) : (5e9, 2e5),
+            'pauliSet_1_z_d{}'.format(n_qubits) : (5e9, 2e9),
             
             'pauliSet_1J2_zJz_d{}'.format(n_qubits) : (5e5, 2e5), 
             'pauliSet_1J2_yJy_d{}'.format(n_qubits) : (5e5, 2e5), 

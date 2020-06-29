@@ -30,7 +30,6 @@ class NVCentreNQubitBath(
             **kwargs
         )
 
-        
         # Choose functions 
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
