@@ -65,7 +65,7 @@ class NVCentreNQubitBath(
         self.stages_by_num_qubits = {
             1 : iter(['rotation']),
             2 : iter( non_spin_qubit_contributions ),
-            # 3 : iter( non_spin_qubit_contributions ),            
+            3 : iter( non_spin_qubit_contributions ),            
             # 4 : iter( non_spin_qubit_contributions )
         }
 
