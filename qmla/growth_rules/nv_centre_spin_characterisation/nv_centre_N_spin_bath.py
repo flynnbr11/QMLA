@@ -15,6 +15,10 @@ __all__ = [
 class NVCentreNQubitBath(
     GrowthRule
 ):
+    r"""
+    Staged greedy term addition for NV centre in spin bath.
+    """
+
     def __init__(
         self,
         growth_generation_rule,
@@ -53,33 +57,27 @@ class NVCentreNQubitBath(
         self.min_param = 0
         self.max_param = 10
         self.num_probes = 25 # |++'>
-        self.champion_models_by_spawn_stage = {}
-        self.initial_models = [
-            'pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1', 
+
+        non_spin_qubit_contributions = [
+            'rotation', 
+            'coupling',
+            # 'transverserse'
         ]
-        non_spin_qubit_contributions = ['rotation', 'coupling']
         self.stages_by_num_qubits = {
             1 : iter(['rotation']),
             2 : iter( non_spin_qubit_contributions ),
-            # 3 : iter( non_spin_qubit_contributions ),            
+            3 : iter( non_spin_qubit_contributions ),            
+            # 4 : iter( non_spin_qubit_contributions )
         }
 
         self.max_num_qubits = int(max( self.stages_by_num_qubits ))
-        self.all_layer_champions_by_num_qubits = {
-            i : []
-            for i in range(1, self.max_num_qubits+1)
-        }
-        self.layer_champions = {
-            num_qubits :  {}
-            for num_qubits in range(1, self.max_num_qubits+1)
-        }
-        self.num_qubits_champion = {}
-        self.stage_champions = {
-            i : {} for i in range(1, self.max_num_qubits+1)
-        }
-        self.current_stage = 'rotation'
-        self.spawn_stage = ['stage_complete']
+        self.log_print(["Max num qubits:", self.max_num_qubits])
         
+        self.substage_layer_champions =  { i : {} for i in range(1, self.max_num_qubits+1) }
+        self.substage_champions_by_stage = { i : [] for i in range(1, self.max_num_qubits+1) }
+        self.substage = 'rotation'
+
+        self.spawn_stage = [None]        
         self.probe_maximum_number_qubits = 5
         self.include_transverse_terms = True
 
@@ -96,7 +94,7 @@ class NVCentreNQubitBath(
         self.timing_insurance_factor = 1
 
         # Test: a few hand picked models to see if true model wins
-        self.test_preset_models = 1
+        self.test_preset_models = False
         if self.test_preset_models:
 
             self.initial_models = [
@@ -126,115 +124,18 @@ class NVCentreNQubitBath(
 
     # Model generation / QMLA progression
 
-    def generate_models(self, model_list, **kwargs):
-
-        self.log_print([
-            "Generating models. \nModel list={} \nSpawn stage:{}\n Current stage={}".format(model_list, self.spawn_stage[-1], self.current_stage)
-        ])
-
-        try:
-            top_model = model_list[0]
-            num_qubits = qmla.construct_models.get_num_qubits(top_model)
-            present_terms = top_model.split('+')
-        except:
-            top_model = None
-            num_qubits = 1
-            present_terms = []        
-
-        # Move to next major stage if finished this one
-        if '_qubit_champion_selection' in self.spawn_stage[-1]:
-            # Record the previous round champion as that qubit-number champ
-            # increase num qubits for this round
-            self.log_print([""])
-            self.num_qubits_champion[num_qubits] = top_model
-            self.stage_champions[num_qubits]['overall'] = top_model
-            
-            if self.max_num_qubits == num_qubits:
-                self.log_print(["Spawning complete"])
-                self.spawn_stage.append('Complete')
-
-                new_models = [
-                    self.stage_champions[num_qubits]['overall']
-                    for num_qubits in self.stage_champions
-                ] # all champions by num qubits
-                return new_models
-            else:              
-                num_qubits += 1
-                self.spawn_stage.append('stage_complete')
-        
-        elif '_qubit_stages_complete' in self.spawn_stage[-1]:
-            new_models = list(self.stage_champions[num_qubits].values())
-            self.log_print([
-                "Stages all complete for {} qubits: {}".format(
-                    num_qubits, new_models
-                )
-            ])
-            self.spawn_stage.append(
-                "{}_qubit_champion_selection".format(num_qubits)
-            )
-            return new_models
-
-        else:
-            # record previous round champion as a layer champion 
-            # within this number of qubits
-            # and within this stage
-            if top_model is not None:
-                self.all_layer_champions_by_num_qubits[num_qubits].append(top_model)
-                try:
-                    self.layer_champions[num_qubits][self.current_stage].append(top_model)
-                except:
-                    self.layer_champions[num_qubits][self.current_stage] = [top_model]
-            self.log_print([
-                "Stage champion[{}][{}] : {}".format(
-                    num_qubits, self.current_stage, 
-                    self.stage_champions[num_qubits][self.current_stage]
-                )
-            ])
-                
-        if self.spawn_stage[-1] == 'stage_complete':
-
-            self.stage_champions[num_qubits][self.current_stage] = top_model
-            self.log_print([
-                "Stage complete. num qubits={} current stage={}".format(
-                    num_qubits, 
-                    self.current_stage
-                )
-            ])
-            
-            # competition between models of this stage to be stage champion
-            try:
-                new_models = self.layer_champions[num_qubits][self.current_stage]
-            except:
-                self.log_print(["Can't find layer champs -> ", self.layer_champions])
-                raise
-
-            try:
-                # Check if a new stage for this number of qubits is available
-                self.current_stage = next(self.stages_by_num_qubits[num_qubits])
-                new_spawn_stage = "{N}_qubit_{S}".format(N=num_qubits, S=self.current_stage)
-                self.spawn_stage.append(new_spawn_stage)
-                self.log_print(["New spawn stage:", new_spawn_stage])
-
-            except:
-                # No stages left for this number of qubits
-                # -> tell next  call to generate_models to return stage champions for this N qubits
-                # -> get layer champions from this stage
-                self.spawn_stage.append('{}_qubit_stages_complete'.format(num_qubits))
-
-            return new_models
-
-        # Greedily add terms from batch of available terms, determined by stage of GR
-        if 'rotation' in self.spawn_stage[-1]:
+    def greedy_add(self, top_model,  num_qubits, substage):
+        self.log_print(["Greedily adding terms. N qubits = {}, substage={}".format(num_qubits, substage)])
+        if substage == 'rotation':
             self.log_print(["Available: rotation terms"])
-            num_qubits = int(self.spawn_stage[-1].strip('_qubit_rotation'))
             available_terms = [
                 'pauliSet_{N}_{p}_d{N}'.format(p=pauli_term, N=num_qubits)
                 for pauli_term in 
+                # ['x', 'y']
                 ['x', 'y', 'z']
             ]
-        elif 'coupling' in self.spawn_stage[-1]:
+        elif substage == 'coupling':
             self.log_print(["Available: coupling terms"])
-            num_qubits = int(self.spawn_stage[-1].strip('_qubit_coupling'))
             available_terms = [ # coupling electron with this qubit
                 'pauliSet_1J{q}_{p}J{p}_d{N}'.format(
                     q = num_qubits, 
@@ -245,7 +146,6 @@ class NVCentreNQubitBath(
             ]
         elif 'transverse' in self.spawn_stage[-1]:
             self.log_print(["Available: transverse terms"])
-            num_qubits = int(self.spawn_stage[-1].strip('_qubit_transverse'))
             available_terms =  [
                 'pauliSet_1J{N}_xJy_d{N}'.format(N = num_qubits),
                 'pauliSet_1J{N}_xJz_d{N}'.format(N = num_qubits),
@@ -253,6 +153,12 @@ class NVCentreNQubitBath(
             ]
 
         # Select new models
+        
+        if top_model is not None: 
+            present_terms = top_model.split('+')
+        else:
+            present_terms = []
+
         unused_terms = list(
             set(available_terms) - set(present_terms)
         )
@@ -284,108 +190,104 @@ class NVCentreNQubitBath(
         ]
         return new_models
 
+    def get_layer_champions_by_substage(self, num_qubits, substage):
+        self.log_print(["Getting layer champions for {} qubits by substage {}".format(num_qubits, substage)])
+        self.log_print(["Substage layer champions:", self.substage_layer_champions])
+        return self.substage_layer_champions[num_qubits][substage]
+
+    def get_substage_champions_by_stage(self, num_qubits):
+        self.log_print(["Getting substage champions for {} qubits".format(num_qubits)])
+        return self.substage_champions_by_stage[num_qubits]
+    
+    def get_all_stage_champions(self):
+        self.log_print(["Getting all stage champions"])
+        return list(self.stage_champions.values())
 
 
-    def alt_generate_models(self, model_list, **kwargs):
-
-        self.log_print([
-            "Generating models. \nModel list={} \nSpawn stage:{}\n kwargs:{}".format(model_list, self.spawn_stage[-1], kwargs)
-        ])
-
+    def generate_models(self, model_list, **kwargs):
         try:
             top_model = model_list[0]
             num_qubits = qmla.construct_models.get_num_qubits(top_model)
-            present_terms = top_model.split('+')
         except:
             top_model = None
-            present_terms = []
+            num_qubits = 1
+        self.log_print([
+            "Generating models. \nModel list={} \nSpawn stage:{}\n N qubits={} \nsub stage={}".format(
+                model_list, self.spawn_stage[-1], num_qubits, self.substage)
+        ])
 
-        if self.spawn_stage[-1] is None:
-            self.spawn_stage.append('1_qubit_rotation')
+        signal = self.spawn_stage[-1]
+        
+        if signal is None:
+            # very start
+            self.log_print(["No signal - at start of generate models lifecycle"])
+            num_qubits = 1
+            self.substage = next(self.stages_by_num_qubits[num_qubits])
+            self.log_print(["New stage found for {} qubits: {}. Retuning to greedy add".format(num_qubits, self.substage)])
+            self.spawn_stage.append('default')
+        
+        elif signal == 'finding_substage_champion':
+            self.substage_champions_by_stage[num_qubits].append( top_model )
+            top_model = None # so it isn't recorded in the next substage
+            try:
+                self.substage = next(self.stages_by_num_qubits[num_qubits])
+                self.log_print(["New stage found for {} qubits: {}. Retuning to greedy add".format(num_qubits, self.substage)])
+                self.spawn_stage.append('default')
+            except:
+                # no substage left for this num qubits
+                self.log_print(["No further stage found for {} qubits. Declaring stage complete".format(num_qubits)])
+                self.spawn_stage.append('stage_complete')
 
-        if '_qubit_champion_selection' in self.spawn_stage[-1]:
-            self.num_qubits_champion[num_qubits] = top_model
-            
-            # Move to next spawn stage
+        elif signal == 'finding_stage_champion':
+            self.stage_champions[num_qubits] = top_model 
+            top_model = None # so it isn't recorded in the next substage
+
             if num_qubits == self.max_num_qubits:
-                self.log_print(["Spawning complete"])
-                self.spawn_stage.append('Complete')
+                self.log_print('Num qubits already maximum so not increasing.')
+                self.spawn_stage.append('all_stages_complete')
+            else: 
+                # increase number of qubits
+                num_qubits += 1
+                self.log_print(["Trying to get first substage of {} qubits. Stages: {}".format(
+                    num_qubits, self.stages_by_num_qubits)])
+                self.substage = next(self.stages_by_num_qubits[num_qubits])
+                self.log_print(["Increasing # qubits. Now {} with substage {}".format(num_qubits, self.substage)])
+                self.spawn_stage.append('default')
 
-                new_models = list(self.num_qubits_champion.values()) # all champions by num qubits
-                return new_models
-            else:
-                new_num_qubits = num_qubits + 1
-                new_spawn_stage = "{N}_qubit_coupling".format(N=new_num_qubits)
-                self.spawn_stage.append(new_spawn_stage)
-        else:
+        signal = self.spawn_stage[-1]
+        if signal == 'default':
             if top_model is not None:
-                self.all_layer_champions_by_num_qubits[num_qubits].append(top_model)
-
-
-        # Process spawn stages
-        if '_qubit_complete' in self.spawn_stage[-1]:
-            num_qubits = int(self.spawn_stage[-1].strip('_qubit_complete'))
-
-        elif 'qubit_rotation' in self.spawn_stage[-1]:
-            num_qubits = int(self.spawn_stage[-1].strip('_qubit_rotation'))
-            available_terms = [
-                'pauliSet_1_{p}_d{N}'.format(p=pauli_term, N=num_qubits)
-                for pauli_term in ['x', 'y', 'z']
-            ]
-        elif 'coupling' in self.spawn_stage[-1]:
-            num_qubits = int(self.spawn_stage[-1].strip('_qubit_coupling'))
-            available_terms = [ # coupling electron with this qubit
-                'pauliSet_1J{q}_{p}J{p}_d{N}'.format(
-                    q = num_qubits, 
-                    p = pauli_term, 
-                    N = num_qubits
-                )
-                for pauli_term in ['x', 'y', 'z']
-            ]
-        elif 'transverse' in self.spawn_stage[-1]:
-            num_qubits = int(self.spawn_stage[-1].strip('_qubit_transverse'))
-            available_terms =  [
-                'pauliSet_1J{N}_xJy_d{N}'.format(N = num_qubits),
-                'pauliSet_1J{N}_xJz_d{N}'.format(N = num_qubits),
-                'pauliSet_1J{N}_yJz_d{N}'.format(N = num_qubits)
-            ]
-
-        # Select new models
-        if '_qubit_complete' in self.spawn_stage[-1]:
-            new_models = self.all_layer_champions_by_num_qubits[num_qubits]
-            
-            new_spawn_stage = "{}_qubit_champion_selection".format(num_qubits)
-            self.spawn_stage.append(new_spawn_stage)        
-
-        else:
-            unused_terms = list(
-                set(available_terms) - set(present_terms)
+                try:
+                    self.substage_layer_champions[num_qubits][self.substage].append(top_model)
+                except:
+                    self.substage_layer_champions[num_qubits][self.substage] = [top_model]
+            new_models = self.greedy_add(
+                top_model = top_model, num_qubits = num_qubits, 
+                substage = self.substage
             )
+            if len(new_models) == 1:
+                self.spawn_stage.append('substage_complete')
+        
+        elif signal == 'substage_complete':
+            try:
+                self.substage_layer_champions[num_qubits][self.substage].append(top_model)
+            except:
+                self.substage_layer_champions[num_qubits][self.substage] = [top_model]
 
-            new_models = []
-            for term in unused_terms:
-                new_model_terms = list(
-                    set(present_terms + [term] )
-                )
-                new_model = '+'.join(new_model_terms)
-                new_models.append(new_model)
+            new_models = self.get_layer_champions_by_substage(num_qubits=num_qubits, substage = self.substage) 
+            self.spawn_stage.append('finding_substage_champion')
 
-            if len(new_models) <= 1:
-                # Greedy addition of terms exhausted
-                # -> move to next stage
-                self.spawn_stage.append('{N}_qubit_complete'.format(N=num_qubits))
+        
+        elif signal == 'stage_complete':
+            new_models = self.get_substage_champions_by_stage(num_qubits)
 
-
-        self.log_print(["Models before correcting dimension:", new_models])
-        new_models = [
-            qmla.utilities.ensure_consisten_num_qubits_pauli_set(
-                model
-            ) for model in new_models
-        ]
-        self.log_print(["Models after correcting dimension:", new_models])
+            self.spawn_stage.append('finding_stage_champion')
+            
+        elif signal == 'all_stages_complete':
+            new_models = self.get_all_stage_champions()
+            self.spawn_stage.append('Complete')
 
         return new_models
-
             
     def check_tree_completed(
         self,
