@@ -29,7 +29,7 @@ class NVCentreNQubitBath(
         
         # Choose functions 
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
@@ -54,12 +54,14 @@ class NVCentreNQubitBath(
         self.max_param = 10
         self.num_probes = 25 # |++'>
         self.champion_models_by_spawn_stage = {}
-
+        self.initial_models = [
+            'pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1', 
+        ]
         non_spin_qubit_contributions = ['rotation', 'coupling']
         self.stages_by_num_qubits = {
             1 : iter(['rotation']),
             2 : iter( non_spin_qubit_contributions ),
-            3 : iter( non_spin_qubit_contributions ),            
+            # 3 : iter( non_spin_qubit_contributions ),            
         }
 
         self.max_num_qubits = int(max( self.stages_by_num_qubits ))
@@ -75,7 +77,7 @@ class NVCentreNQubitBath(
         self.stage_champions = {
             i : {} for i in range(1, self.max_num_qubits+1)
         }
-        self.current_stage = None
+        self.current_stage = 'rotation'
         self.spawn_stage = ['stage_complete']
         
         self.probe_maximum_number_qubits = 5
@@ -94,29 +96,32 @@ class NVCentreNQubitBath(
         self.timing_insurance_factor = 1
 
         # Test: a few hand picked models to see if true model wins
-        self.initial_models = [
-            'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-            'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
-            'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-            'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
-            'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
-            # 3 qubits
-            'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
-            'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
+        self.test_preset_models = 1
+        if self.test_preset_models:
 
-        ]
-        self.initial_models = [
-            qmla.construct_models.alph(m) for m in self.initial_models
-        ]
-        self.tree_completed_initially = True
-        if self.tree_completed_initially:
-            self.max_spawn_depth = 1
-        self.max_num_models_by_shape = {
-            2 : 6,
-            'other': 0
-        }
-        self.num_processes_to_parallelise_over = len(self.initial_models)
-        self.timing_insurance_factor = 0.25
+            self.initial_models = [
+                'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+                'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
+                'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+                'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
+                'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
+                # 3 qubits
+                'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
+                'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
+
+            ]
+            self.initial_models = [
+                qmla.construct_models.alph(m) for m in self.initial_models
+            ]
+            self.tree_completed_initially = True
+            if self.tree_completed_initially:
+                self.max_spawn_depth = 1
+            self.max_num_models_by_shape = {
+                2 : 6,
+                'other': 0
+            }
+            self.num_processes_to_parallelise_over = len(self.initial_models)
+            self.timing_insurance_factor = 0.3
 
 
     # Model generation / QMLA progression
@@ -134,7 +139,7 @@ class NVCentreNQubitBath(
         except:
             top_model = None
             num_qubits = 1
-            present_terms = []
+            present_terms = []        
 
         # Move to next major stage if finished this one
         if '_qubit_champion_selection' in self.spawn_stage[-1]:
@@ -156,6 +161,19 @@ class NVCentreNQubitBath(
             else:              
                 num_qubits += 1
                 self.spawn_stage.append('stage_complete')
+        
+        elif '_qubit_stages_complete' in self.spawn_stage[-1]:
+            new_models = list(self.stage_champions[num_qubits].values())
+            self.log_print([
+                "Stages all complete for {} qubits: {}".format(
+                    num_qubits, new_models
+                )
+            ])
+            self.spawn_stage.append(
+                "{}_qubit_champion_selection".format(num_qubits)
+            )
+            return new_models
+
         else:
             # record previous round champion as a layer champion 
             # within this number of qubits
@@ -166,22 +184,29 @@ class NVCentreNQubitBath(
                     self.layer_champions[num_qubits][self.current_stage].append(top_model)
                 except:
                     self.layer_champions[num_qubits][self.current_stage] = [top_model]
-
-
-        if self.spawn_stage[-1] == 'stage_complete':
-            self.log_print([
-                "Stage complete. num qubits={} current stage={}".format(
-                    num_qubits, 
-                    self.current_stage
-                )
-            ])
-            self.stage_champions[num_qubits][self.current_stage] = top_model
             self.log_print([
                 "Stage champion[{}][{}] : {}".format(
                     num_qubits, self.current_stage, 
                     self.stage_champions[num_qubits][self.current_stage]
                 )
             ])
+                
+        if self.spawn_stage[-1] == 'stage_complete':
+
+            self.stage_champions[num_qubits][self.current_stage] = top_model
+            self.log_print([
+                "Stage complete. num qubits={} current stage={}".format(
+                    num_qubits, 
+                    self.current_stage
+                )
+            ])
+            
+            # competition between models of this stage to be stage champion
+            try:
+                new_models = self.layer_champions[num_qubits][self.current_stage]
+            except:
+                self.log_print(["Can't find layer champs -> ", self.layer_champions])
+                raise
 
             try:
                 # Check if a new stage for this number of qubits is available
@@ -192,17 +217,11 @@ class NVCentreNQubitBath(
 
             except:
                 # No stages left for this number of qubits
+                # -> tell next  call to generate_models to return stage champions for this N qubits
                 # -> get layer champions from this stage
-                new_models = self.layer_champions[num_qubits][self.current_stage]
-                self.log_print([
-                    "Setting new models as selecting champion for {} qubits: {}".format(
-                        num_qubits, new_models
-                    )
-                ])
-                self.spawn_stage.append(
-                    "{}_qubit_champion_selection".format(num_qubits)
-                )
-                return new_models
+                self.spawn_stage.append('{}_qubit_stages_complete'.format(num_qubits))
+
+            return new_models
 
         # Greedily add terms from batch of available terms, determined by stage of GR
         if 'rotation' in self.spawn_stage[-1]:
@@ -237,7 +256,11 @@ class NVCentreNQubitBath(
         unused_terms = list(
             set(available_terms) - set(present_terms)
         )
-        self.log_print(["Available terms:", unused_terms])
+        
+        self.log_print([
+            "Present terms:", present_terms, 
+            "\nAvailable terms:", unused_terms
+        ])
         new_models = []
         for term in unused_terms:
             new_model_terms = list(
