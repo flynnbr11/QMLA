@@ -65,7 +65,7 @@ class NVCentreNQubitBath(
         self.stages_by_num_qubits = {
             1 : iter(['rotation']),
             2 : iter( non_spin_qubit_contributions ),
-            3 : iter( non_spin_qubit_contributions ),            
+            # 3 : iter( non_spin_qubit_contributions ),            
             # 4 : iter( non_spin_qubit_contributions )
         }
 
@@ -94,7 +94,7 @@ class NVCentreNQubitBath(
         self.timing_insurance_factor = 1
 
         # Test: a few hand picked models to see if true model wins
-        self.test_preset_models = False
+        self.test_preset_models = 0
         if self.test_preset_models:
 
             self.initial_models = [
@@ -124,7 +124,12 @@ class NVCentreNQubitBath(
 
     # Model generation / QMLA progression
 
-    def greedy_add(self, top_model,  num_qubits, substage):
+    def greedy_add(self, model_list,  num_qubits, substage):
+        try:
+            top_model = model_list[0]
+        except:
+            top_model = None
+        
         self.log_print(["Greedily adding terms. N qubits = {}, substage={}".format(num_qubits, substage)])
         if substage == 'rotation':
             self.log_print(["Available: rotation terms"])
@@ -262,7 +267,8 @@ class NVCentreNQubitBath(
                 except:
                     self.substage_layer_champions[num_qubits][self.substage] = [top_model]
             new_models = self.greedy_add(
-                top_model = top_model, num_qubits = num_qubits, 
+                model_list = model_list, 
+                num_qubits = num_qubits, 
                 substage = self.substage
             )
             if len(new_models) == 1:

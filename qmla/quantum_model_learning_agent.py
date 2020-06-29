@@ -197,7 +197,8 @@ class QuantumModelLearningAgent():
                 'f_score': [],
                 'model_storage_instance': [],
                 'branches_present_on' : [], 
-                'terms' : []
+                'terms' : [],
+                'latex_terms' : []
             }
         )
         self.model_lists = {
@@ -1567,7 +1568,8 @@ class QuantumModelLearningAgent():
                 'f_score': f_score,
                 'model_storage_instance': model_storage_instance,
                 'branches_present_on' : [int(branch_id)], 
-                'terms' : terms
+                'terms' : terms,
+                'latex_terms' : [self.growth_class.latex_name(t) for t in terms]
             })
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
@@ -2870,3 +2872,106 @@ class QuantumModelLearningAgent():
             )
         else:
             bloch.show()
+
+
+    def _plot_model_terms(self, colour_by = 'binary'):
+        
+        # Prepare dataframes
+        unique_terms = list(set(qmla.utilities.flatten(list(self.model_database.latex_terms))))
+
+        unique_branches = list(set(qmla.utilities.flatten(list(self.model_database.branches_present_on))))
+        unique_branches = [
+            "branch_{}".format(int(b)) for b in unique_branches
+        ]
+
+        database_columns = ['model_id', 'f_score'] + unique_terms
+        model_reference_database = pd.DataFrame(
+            columns = database_columns
+        )
+
+        branch_cols = ['model_id', 'f_score'] + unique_branches
+        models_branches = pd.DataFrame(columns=branch_cols)
+
+
+        for model_id in self.model_database.model_id:
+
+            model_data = self.model_database[
+                 self.model_database.model_id == model_id]
+            model_id = int(model_id)
+            f_score = model_data['f_score'].item()
+
+            if colour_by == 'binary':
+                terms_in_model = {
+                    term : int(1) # for binary representation
+                    for term in model_data.latex_terms.item()
+                }
+            elif colour_by == 'f_score' : 
+                terms_in_model = {
+                    term : f_score # to colour by f_score
+                    for term in model_data.latex_terms.item()
+                }
+                
+            terms_in_model['model_id'] = int(model_id)
+            terms_in_model['f_score'] = model_data.f_score.item()
+            model_reference_database.loc[ len(model_reference_database) ] = pd.Series(terms_in_model)
+
+            branches = {
+                "branch_{}".format(int(b)) : 1
+                for b in model_data.branches_present_on.item()
+            }
+            branches['model_id'] = int(model_id)
+
+            models_branches.loc[len(models_branches)] = pd.Series(branches)
+
+        if colour_by == 'binary':
+            models_branches.fillna(0, inplace=True)
+            model_reference_database.fillna(0, inplace=True)
+
+        piv_table = pd.pivot_table(    
+            columns = ['model_id'], 
+            values = unique_terms, 
+            data = model_reference_database    
+        ).transpose()
+
+
+        # Plot as heatmap
+        fig, ax = plt.subplots(figsize=(15,10))
+
+
+        if colour_by == 'f_score':
+            sns.heatmap(
+                piv_table,
+                cmap=f_score_cmap, 
+                ax = ax,
+                cbar_kws={'label': 'F-score', }
+            )
+        elif colour_by == 'binary':
+            sns.heatmap(
+                piv_table,
+                cmap='binary',
+                cbar=False,
+                ax = ax,
+            )
+
+
+        ax.tick_params(which='y', rotation=0)
+        f_score_cmap = self.growth_class.f_score_cmap
+        fontsize = 20
+        ax.tick_params(
+            top=True, 
+            bottom=False,
+            labeltop=True,
+            labelbottom=False,
+            labelrotation=0,
+            labelsize=fontsize
+        )
+
+        ax.set_ylabel('Model ID', fontsize=2*fontsize)
+
+        fig.savefig(
+            os.path.join(
+                self.qmla_controls.plots_directory, "composition_of_models.png".format(
+                    self.qmla_controls.long_id)
+            )
+
+        )

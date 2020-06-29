@@ -388,6 +388,8 @@ def model_generation_probability(
     # one which occurs 5 times and the other 3 times, 
     # the total probability of that f-score is 8/20 = 40%
     # so just average
+    # TODO use jittering with stripplot or countsplot
+    # https://www.machinelearningplus.com/plots/top-50-matplotlib-visualizations-the-master-plots-python/
     plt.clf()
     fig, ax = plt.subplots(figsize=(17, 7))
 

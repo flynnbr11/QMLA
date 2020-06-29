@@ -5,6 +5,8 @@ import pickle
 import numpy as np
 import itertools
 
+import matplotlib
+
 import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
@@ -442,6 +444,7 @@ class GrowthRule():
         }
         self.num_processes_to_parallelise_over = 6
         self.timing_insurance_factor = 1
+        self.f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"])
 
 
 

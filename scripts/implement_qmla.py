@@ -490,6 +490,13 @@ else:
         with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmla_instance, pkl_file, protocol=4)
 
+# Plots common to all 
+# TODO put in qmla wrap up method
+
+qmla_instance._plot_model_terms()
+qmla_instance.plot_one_qubit_probes_bloch_sphere()
+
+
 #########################
 # Wrap up
 #########################
