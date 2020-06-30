@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 import sys
 import os
+import itertools
 
 from qmla.growth_rules.growth_rule import GrowthRule
 import qmla.shared_functionality.experiment_design_heuristics
@@ -64,8 +65,8 @@ class NVCentreNQubitBath(
         ]
         self.stages_by_num_qubits = {
             1 : iter(['rotation']),
-            # 2 : iter( non_spin_qubit_contributions ),
-            # 3 : iter( non_spin_qubit_contributions ),            
+            2 : iter( non_spin_qubit_contributions ),
+            3 : iter( non_spin_qubit_contributions ),            
             # 4 : iter( non_spin_qubit_contributions )
         }
 
@@ -75,6 +76,8 @@ class NVCentreNQubitBath(
         self.substage_layer_champions =  { i : {} for i in range(1, self.max_num_qubits+1) }
         self.substage_champions_by_stage = { i : [] for i in range(1, self.max_num_qubits+1) }
         self.stage_champions = {}
+        # self.greedy_mechanism = 'greedy_single_terms'
+        self.greedy_mechanism = 'all_combinations'
 
         self.substage = 'rotation'
         self.spawn_stage = [None]        
@@ -94,7 +97,7 @@ class NVCentreNQubitBath(
         self.timing_insurance_factor = 0.4
 
         # Test: a few hand picked models to see if true model wins
-        self.test_preset_models = True
+        self.test_preset_models = False
         if self.test_preset_models:
 
             self.initial_models = [
@@ -182,19 +185,36 @@ class NVCentreNQubitBath(
             "\nAvailable terms:", unused_terms
         ])
         new_models = []
-        for term in unused_terms:
-            new_model_terms = list(
-                set(present_terms + [term] )
-            )
-            new_model = '+'.join(new_model_terms)
-            new_models.append(new_model)
-
-        if len(new_models) <= 1:
-            # Greedy addition of terms exhausted
-            # -> move to next stage
-            self.log_print(["Few new models - completing stage"])
-            self.spawn_stage.append('stage_complete')
         
+        if self.greedy_mechanism == 'greedy_single_terms':
+            for term in unused_terms:
+                new_model_terms = list(
+                    set(present_terms + [term] )
+                )
+                new_model = '+'.join(new_model_terms)
+                new_models.append(new_model)
+
+            if len(new_models) <= 1:
+                # Greedy addition of terms exhausted
+                # -> move to next stage
+                self.log_print(["Few new models - completing stage"])
+                self.spawn_stage.append('stage_complete')
+
+        elif self.greedy_mechanism == 'all_combinations':
+            new_models = []
+
+            for i in range(1, len(available_terms) + 1 ):
+                combinations = list(itertools.combinations(available_terms, i))
+                model_lists = [ present_terms + list(a) for a in combinations ]
+
+                # these_models = [qmla.utilities.flatten(ml) for ml in model_lists]
+                # self.log_print([
+                #     "Model lists to generate", these_models
+                # ])
+                these_models = ['+'.join(m) for m in model_lists]
+                
+                new_models.extend(these_models)
+
         self.log_print(["Designed new models:", new_models])
 
         new_models = [
@@ -257,7 +277,7 @@ class NVCentreNQubitBath(
             top_model = None # so it isn't recorded in the next substage
 
             if num_qubits == self.max_num_qubits:
-                self.log_print('Num qubits already maximum so not increasing.')
+                self.log_print(['Num qubits already maximum so not increasing.'])
                 self.spawn_stage.append('all_stages_complete')
             else: 
                 # increase number of qubits
@@ -280,7 +300,7 @@ class NVCentreNQubitBath(
                 num_qubits = num_qubits, 
                 substage = self.substage
             )
-            if len(new_models) == 1:
+            if len(new_models) == 1 or self.greedy_mechanism == 'all_combinations':
                 self.spawn_stage.append('substage_complete')
         
         elif signal == 'substage_complete':

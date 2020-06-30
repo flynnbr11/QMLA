@@ -2948,6 +2948,7 @@ class QuantumModelLearningAgent():
         elif colour_by == 'binary':
             sns.heatmap(
                 piv_table,
+                linewidths=.5,
                 cmap='binary',
                 cbar=False,
                 ax = ax,

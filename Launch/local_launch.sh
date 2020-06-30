@@ -225,7 +225,7 @@ python3 ../../../../scripts/generate_results_pdf.py \
 chmod a+x $analyse_script
 
 
-
+# Run instances
 for prt in  "${particle_counts[@]}";
 do
     for i in `seq 1 $max_qmd_id`;

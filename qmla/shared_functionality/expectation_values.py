@@ -3,22 +3,6 @@ import numpy as np
 from scipy import linalg
 import qmla.logging
 
-# use_linalg = False
-# use_sparse = False
-
-# try:
-#     import hamiltonian_exponentiation as h
-#     # TODO set to true after testing
-#     ham_exp_installed = True
-
-# except BaseException:
-#     ham_exp_installed = False
-
-# if (use_linalg):
-#     # override and use linalg.expm even if hamiltonian_exponentiation is
-#     # installed
-#     ham_exp_installed = False
-
 
 def log_print(
     to_print_list, 
