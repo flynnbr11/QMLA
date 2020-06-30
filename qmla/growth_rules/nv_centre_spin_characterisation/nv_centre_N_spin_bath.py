@@ -127,7 +127,7 @@ class NVCentreNQubitBath(
                 'other': 0
             }
             self.num_processes_to_parallelise_over = len(self.initial_models)
-            self.timing_insurance_factor = 0.3
+            self.timing_insurance_factor = 1
 
 
     # Model generation / QMLA progression
