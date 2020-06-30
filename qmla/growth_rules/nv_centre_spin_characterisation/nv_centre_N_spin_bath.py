@@ -127,7 +127,7 @@ class NVCentreNQubitBath(
                 1 : 7,
                 'other': 0
             }
-            self.num_processes_to_parallelise_over = len(self.initial_models)
+            self.num_processes_to_parallelise_over = len(self.initial_models)+1
             self.timing_insurance_factor = 0.25
 
 
