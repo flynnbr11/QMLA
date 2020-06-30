@@ -124,7 +124,7 @@ class NVCentreNQubitBath(
                 self.max_spawn_depth = 1
             self.max_num_models_by_shape = {
                 2 : 6,
-                1 : 7
+                1 : 7,
                 'other': 0
             }
             self.num_processes_to_parallelise_over = len(self.initial_models)
