@@ -78,6 +78,7 @@ class NVCentreNQubitBath(
         self.stage_champions = {}
         # self.greedy_mechanism = 'greedy_single_terms'
         self.greedy_mechanism = 'all_combinations'
+        self.num_processes_to_parallelise_over = 7
 
         self.substage = 'rotation'
         self.spawn_stage = [None]        
