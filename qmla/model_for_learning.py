@@ -453,13 +453,6 @@ class ModelInstanceForLearning():
             "\nTimings:\n", self.timings
         ])
 
-        self.log_print([
-            "End of learning. LL={}. Renorm record: \n{}".format(
-                self.qinfer_updater.log_total_likelihood, 
-                self.qinfer_updater.normalization_record,
-            )
-        ])
-
         # Final results
         self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
         self.posterior_marginal = [

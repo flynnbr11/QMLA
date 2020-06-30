@@ -94,18 +94,26 @@ class NVCentreNQubitBath(
         self.timing_insurance_factor = 0.4
 
         # Test: a few hand picked models to see if true model wins
-        self.test_preset_models = 0
+        self.test_preset_models = True
         if self.test_preset_models:
 
             self.initial_models = [
-                'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-                'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
-                'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-                'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
-                'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
+                'pauliSet_1_x_d1', 
+                'pauliSet_1_y_d1', 
+                'pauliSet_1_z_d1', 
+                'pauliSet_1_x_d1+pauliSet_1_y_d1', 
+                'pauliSet_1_x_d1+pauliSet_1_z_d1', 
+                'pauliSet_1_y_d1+pauliSet_1_z_d1', 
+                'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1', 
+
+                # 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+                # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
+                # 'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+                # 'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
+                # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
                 # 3 qubits
-                'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
-                'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
+                # 'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
+                # 'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
 
             ]
             self.initial_models = [
