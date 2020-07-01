@@ -102,6 +102,7 @@ class NVCentreRevivals(
             **kwargs
         )
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
 
     def get_true_parameters(
         self,
