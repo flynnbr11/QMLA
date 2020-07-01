@@ -65,7 +65,7 @@ class NVCentreNQubitBath(
         ]
         self.stages_by_num_qubits = {
             1 : iter(['rotation']),
-            2 : iter( non_spin_qubit_contributions ),
+            # 2 : iter( non_spin_qubit_contributions ),
             # 3 : iter( non_spin_qubit_contributions ),            
             # 4 : iter( non_spin_qubit_contributions )
         }
@@ -149,8 +149,8 @@ class NVCentreNQubitBath(
             available_terms = [
                 'pauliSet_{N}_{p}_d{N}'.format(p=pauli_term, N=num_qubits)
                 for pauli_term in 
-                # ['x', 'y']
-                ['x', 'y', 'z']
+                ['x', 'y']
+                # ['x', 'y', 'z']
             ]
         elif substage == 'coupling':
             self.log_print(["Available: coupling terms"])

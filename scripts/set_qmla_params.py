@@ -25,12 +25,12 @@ parser.add_argument(
     type=str,
     default=None
 )
-parser.add_argument(
-    '-rand_t', '--random_true_params',
-    help="Bool: use random true parameters or those defined in this file.",
-    type=int,
-    default=0
-)
+# parser.add_argument(
+#     '-rand_t', '--random_true_params',
+#     help="Bool: use random true parameters or those defined in this file.",
+#     type=int,
+#     default=0
+# )
 
 parser.add_argument(
     '-prior', '--prior_file',
@@ -39,19 +39,19 @@ parser.add_argument(
     default=None
 )
 
-parser.add_argument(
-    '-rand_p', '--random_prior_terms',
-    help="Bool: use random true parameters or those defined in this file.",
-    type=int,
-    default=0
-)
+# parser.add_argument(
+#     '-rand_p', '--random_prior_terms',
+#     help="Bool: use random true parameters or those defined in this file.",
+#     type=int,
+#     default=0
+# )
 
-parser.add_argument(
-    '-exp', '--use_experimental_data',
-    help="Bool: use experimental data or not.",
-    type=int,
-    default=0
-)
+# parser.add_argument(
+#     '-exp', '--use_experimental_data',
+#     help="Bool: use experimental data or not.",
+#     type=int,
+#     default=0
+# )
 
 parser.add_argument(
     '-ggr', '--growth_generation_rule',
@@ -63,7 +63,6 @@ parser.add_argument(
 parser.add_argument(
     '-agr', '--alternative_growth_rules',
     help='Growth rules to form other trees.',
-    # type=str,
     action='append',
     default=[],
 )
@@ -89,64 +88,64 @@ parser.add_argument(
     default=None
 )
 
-parser.add_argument(
-    '-sp', '--special_probe',
-    help="Special type of probe, e.g. |+>, or ideal (sum of eigenstates).",
-    type=str,
-    default=None
-)
+# parser.add_argument(
+#     '-sp', '--special_probe',
+#     help="Special type of probe, e.g. |+>, or ideal (sum of eigenstates).",
+#     type=str,
+#     default=None
+# )
 
-parser.add_argument(
-    '-plus', '--force_plus_probe',
-    help="Whether to enforce plots to use |+>^n as probe.",
-    type=int,
-    default=0
-)
+# parser.add_argument(
+#     '-plus', '--force_plus_probe',
+#     help="Whether to enforce plots to use |+>^n as probe.",
+#     type=int,
+#     default=0
+# )
 
-parser.add_argument(
-    '-g', '--gaussian',
-    help="Whether to use normal (Gaussian) distribution. If False: uniform.",
-    type=int,
-    default=1
-)
+# parser.add_argument(
+#     '-g', '--gaussian',
+#     help="Whether to use normal (Gaussian) distribution. If False: uniform.",
+#     type=int,
+#     default=1
+# )
 parser.add_argument(
     '-true_expec_path', '--true_expec_path',
     help='Path to save true params to.',
     type=str,
     default="{}/true_model_terms_params.p".format(os.getcwd())
 )
-parser.add_argument(
-    '-min', '--param_min',
-    help="Minimum valid parameter value",
-    type=float,
-    default=0.0
-)
-parser.add_argument(
-    '-max', '--param_max',
-    help="Maximum valid parameter value",
-    type=float,
-    default=1.0
-)
+# parser.add_argument(
+#     '-min', '--param_min',
+#     help="Minimum valid parameter value",
+#     type=float,
+#     default=0.0
+# )
+# parser.add_argument(
+#     '-max', '--param_max',
+#     help="Maximum valid parameter value",
+#     type=float,
+#     default=1.0
+# )
 
-parser.add_argument(
-    '-mean', '--param_mean',
-    help="Default mean of normal distribution for unspecified parameters.",
-    type=float,
-    default=0.5
-)
-parser.add_argument(
-    '-sigma', '--param_sigma',
-    help="Default sigma of normal distribution for unspecified parameters.",
-    type=float,
-    default=0.25
-)
+# parser.add_argument(
+#     '-mean', '--param_mean',
+#     help="Default mean of normal distribution for unspecified parameters.",
+#     type=float,
+#     default=0.5
+# )
+# parser.add_argument(
+#     '-sigma', '--param_sigma',
+#     help="Default sigma of normal distribution for unspecified parameters.",
+#     type=float,
+#     default=0.25
+# )
 
-parser.add_argument(
-    '-pnoise', '--probe_noise_level',
-    help='Noise level to add to probe for learning',
-    type=float,
-    default=0.03
-)
+# parser.add_argument(
+#     '-pnoise', '--probe_noise_level',
+#     help='Noise level to add to probe for learning',
+#     type=float,
+#     default=0.03
+# )
 
 parser.add_argument(
     '-prt', '--particle_number',
@@ -155,11 +154,16 @@ parser.add_argument(
     default=100
 )
 
-print("Set QMLA Params script")
+print("Setting QMLA parameters.")
 
 arguments = parser.parse_args()
-random_true_params = bool(arguments.random_true_params)
-random_prior = bool(arguments.random_prior_terms)
+
+# REMOVING:
+# random_true_params = bool(arguments.random_true_params)
+# random_prior = bool(arguments.random_prior_terms)
+# force_plus_probe = bool(arguments.force_plus_probe)
+# probe_noise_level = arguments.probe_noise_level
+
 num_particles = arguments.particle_number
 growth_generation_rule = arguments.growth_generation_rule
 log_file = arguments.log_file
@@ -167,7 +171,6 @@ probes_plot_file = arguments.probes_plot_file
 results_directory = arguments.results_directory
 
 growth_class_attributes = {
-    # 'use_experimental_data': exp_data,
     'true_params_path' : arguments.true_params_file,
     'plot_probes_path' : probes_plot_file,
     'log_file': log_file
@@ -186,38 +189,11 @@ unique_growth_classes = {
 }
 
 growth_class = unique_growth_classes[growth_generation_rule]
-probe_max_num_qubits_all_growth_rules = max( 
-    [
-        gr.max_num_probe_qubits for gr in unique_growth_classes.values()
-    ]
-)
+probe_max_num_qubits_all_growth_rules = max([
+    gr.max_num_probe_qubits for gr in unique_growth_classes.values()
+])
 
 true_model = growth_class.true_model
-force_plus_probe = bool(arguments.force_plus_probe)
-probe_noise_level = arguments.probe_noise_level
-
-# true_prior_plot_file = str(
-#     results_directory +
-#     '/prior_true_params.png'
-# )
-
-# true_prior = growth_class.get_prior(
-#     model_name=true_model,
-#     log_file=log_file,
-#     log_identifier='[Set QMLA params script]'
-# )
-# prior_data = {
-#     'true_prior': true_prior
-# }
-
-# pickle_file = arguments.prior_file
-# if pickle_file is not None:
-#     import pickle
-#     pickle.dump(
-#         prior_data,
-#         open(pickle_file, 'wb')
-#     )
-
 
 if arguments.true_params_file is not None:
     qmla.set_shared_parameters(
@@ -228,8 +204,6 @@ if arguments.true_params_file is not None:
         num_particles = num_particles,
         generate_evaluation_experiments = True, 
         probe_max_num_qubits_all_growth_rules = probe_max_num_qubits_all_growth_rules, 
-        # true_prior=true_prior,
-        # true_prior_plot_file=true_prior_plot_file
     )
 
 
