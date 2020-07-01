@@ -62,34 +62,27 @@ done
 ###############
 # Parameters from here downwards uses the parameters
 # defined above to run QMLA. 
+# e.g. to create filepaths to use during QMLA.
 ###############
 
 let max_qmd_id="$num_tests + $q_id"
 
-# Files where output will be stored
 running_dir="$(pwd)"
 day_time=$(date +%b_%d/%H_%M)
-full_path_to_results="$running_dir/Results/$day_time/"
-# qmd_dir="${running_dir%/ExperimentalSimulations}"
-# lib_dir="$qmd_dir/Libraries/QML_lib"
-bayes_csv="$full_path_to_results/cumulative.csv"
-true_expec_filename="true_expec_vals.p"
-true_expec_path="$full_path_to_results/system_measurements.p"
-prior_pickle_file="$full_path_to_results/prior.p"
-true_params_pickle_file="$full_path_to_results/true_params.p"
-plot_probe_file="$full_path_to_results/plot_probes.p"
-latex_mapping_filename='LatexMapping.txt'
-latex_mapping_file=$full_path_to_results$latex_mapping_filename
-analyse_filename='analyse.sh'
-analyse_script="$full_path_to_results$analyse_filename"
-this_log="$full_path_to_results/qmd.log"
-further_qhl_log="$full_path_to_results/qhl_further.log"
-mkdir -p $full_path_to_results
-# Copy some files into results directory
-copied_launch_file="$full_path_to_results/launched_script.txt"
-cp $(pwd)/local_launch.sh $copied_launch_file
-git_commit=$(git rev-parse HEAD)
+this_run_results_folder="$running_dir/Results/$day_time/"
+mkdir -p $this_run_results_folder
 
+bayes_csv="$this_run_results_folder/cumulative.csv"
+true_expec_path="$this_run_results_folder/system_measurements.p"
+prior_pickle_file="$this_run_results_folder/prior.p"
+system_parameters_file="$this_run_results_folder/system_parameters.p"
+plot_probe_file="$this_run_results_folder/plot_probes.p"
+latex_mapping_file="$this_run_results_folder/latex_mapping.txt"
+analysis_script="$this_run_results_folder/analyse.sh"
+this_log="$this_run_results_folder/qmla.log"
+further_qhl_log="$this_run_results_folder/qhl_further.log"
+cp $(pwd)/local_launch.sh "$this_run_results_folder/launched_script.txt"
+git_commit=$(git rev-parse HEAD)
 
 ###############
 # First set up parameters/data to be used by all instances of QMD for this run. 
@@ -97,11 +90,11 @@ git_commit=$(git rev-parse HEAD)
 
 python3 ../scripts/set_qmla_params.py \
     -prt=$prt \
-    -true=$true_params_pickle_file \
+    -true=$system_parameters_file \
     -prior=$prior_pickle_file \
     -probe=$plot_probe_file \
     -ggr=$growth_rule \
-    -dir=$full_path_to_results \
+    -dir=$this_run_results_folder \
     -log=$this_log \
     -true_expec_path=$true_expec_path \
     $growth_rules_command 
@@ -114,9 +107,9 @@ echo "Generated configuration."
 ###############
 
 echo "
-cd $full_path_to_results
+cd $this_run_results_folder
 python3 ../../../../scripts/analyse_qmla.py \
-    -dir=$full_path_to_results \
+    -dir=$this_run_results_folder \
     --bayes_csv=$bayes_csv \
     -log=$this_log \
     -top=$number_best_models_further_qhl \
@@ -125,13 +118,13 @@ python3 ../../../../scripts/analyse_qmla.py \
     -true_expec=$true_expec_path \
     -ggr=$growth_rule \
     -plot_probes=$plot_probe_file \
-    -params=$true_params_pickle_file \
+    -params=$system_parameters_file \
     -latex=$latex_mapping_file \
     -gs=1
 
 python3 ../../../../scripts/generate_results_pdf.py \
     -t=$num_tests \
-    -dir=$full_path_to_results \
+    -dir=$this_run_results_folder \
     -p=$prt \
     -e=$exp \
     -log=$this_log \
@@ -142,9 +135,9 @@ python3 ../../../../scripts/generate_results_pdf.py \
     -mqhl=$multiple_qhl \
     -cb=$bayes_csv \
 
-" > $analyse_script
+" > $analysis_script
 
-chmod a+x $analyse_script
+chmod a+x $analysis_script
 
 ###############
 # Run instances
@@ -163,18 +156,18 @@ do
         -e=$exp \
         -qid=$q_id \
         -log=$this_log \
-        -dir=$full_path_to_results \
+        -dir=$this_run_results_folder \
         -pt=$plots \
         -pkl=1 \
         -cb=$bayes_csv \
         -prior_path=$prior_pickle_file \
-        -true_params_path=$true_params_pickle_file \
+        -true_params_path=$system_parameters_file \
         -true_expec_path=$true_expec_path \
         -plot_probes=$plot_probe_file \
         -latex=$latex_mapping_file \
         -ggr=$growth_rule \
         $growth_rules_command \
-        > $full_path_to_results/output.txt
+        > $this_run_results_folder/output.txt
 done
 
 echo "
@@ -187,17 +180,17 @@ echo "
 
 if (( $do_further_qhl == 1 )) 
 then
-    sh $analyse_script
+    sh $analysis_script
 
     further_analyse_filename='analyse_further_qhl.sh'
-    further_analyse_script="$full_path_to_results$further_analyse_filename"
+    further_analysis_script="$this_run_results_folder$further_analyse_filename"
     let particles="$further_qhl_factor * $prt"
     let experiments="$further_qhl_factor * $exp"
     echo "------ Launching further QHL instance(s) ------"
     let max_qmd_id="$num_tests + 1"
 
     # write to a script so we can recall analysis later.
-    cd $full_path_to_results
+    cd $this_run_results_folder
     cd ../../../
 
     for i in \`seq 1 $max_qmd_id\`;
@@ -211,14 +204,14 @@ then
             -e=$experiments \
             -rq=$use_rq \
             -qhl=0 \
-            -dir=$full_path_to_results \
+            -dir=$this_run_results_folder \
             -qid=$q_id \
             -pt=$plots \
             -pkl=1 \
             -log=$this_log \
             -cb=$bayes_csv \
             -prior_path=$prior_pickle_file \
-            -true_params_path=$true_params_pickle_file \
+            -true_params_path=$system_parameters_file \
             -true_expec_path=$true_expec_path \
             -plot_probes=$plot_probe_file \
             -latex=$latex_mapping_file \
@@ -227,9 +220,9 @@ then
             $growth_rules_command 
     done
     echo "
-    cd $full_path_to_results
+    cd $this_run_results_folder
     python3 ../../../../scripts/AnalyseMultipleQMD.py \
-        -dir=$full_path_to_results \
+        -dir=$this_run_results_folder \
         --bayes_csv=$bayes_csv \
         -log=$this_log \
         -top=$number_best_models_further_qhl \
@@ -238,13 +231,13 @@ then
         -true_expec=$true_expec_path \
         -ggr=$growth_rule \
         -plot_probes=$plot_probe_file \
-        -params=$true_params_pickle_file \
+        -params=$system_parameters_file \
         -latex=$latex_mapping_file
-    " > $further_analyse_script
+    " > $further_analysis_script
 
-    chmod a+x $further_analyse_script
+    chmod a+x $further_analysis_script
     echo "------ Launching analyse further QHL ------"
-    # sh $further_analyse_script
+    # sh $further_analysis_script
 fi
 
 
