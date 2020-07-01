@@ -69,19 +69,19 @@ let max_qmd_id="$num_tests + $q_id"
 
 running_dir="$(pwd)"
 day_time=$(date +%b_%d/%H_%M)
-this_run_results_folder="$running_dir/Results/$day_time/"
-mkdir -p $this_run_results_folder
+this_run_directory="$running_dir/Results/$day_time/"
+mkdir -p $this_run_directory
 
-bayes_csv="$this_run_results_folder/cumulative.csv"
-true_expec_path="$this_run_results_folder/system_measurements.p"
-prior_pickle_file="$this_run_results_folder/prior.p"
-system_parameters_file="$this_run_results_folder/system_parameters.p"
-plot_probe_file="$this_run_results_folder/plot_probes.p"
-latex_mapping_file="$this_run_results_folder/latex_mapping.txt"
-analysis_script="$this_run_results_folder/analyse.sh"
-this_log="$this_run_results_folder/qmla.log"
-further_qhl_log="$this_run_results_folder/qhl_further.log"
-cp $(pwd)/local_launch.sh "$this_run_results_folder/launched_script.txt"
+bayes_csv="$this_run_directory/bayes_factors.csv"
+system_measurements_file="$this_run_directory/system_measurements.p"
+prior_pickle_file="$this_run_directory/prior.p"
+system_info_file="$this_run_directory/system_parameters.p"
+plot_probe_file="$this_run_directory/plot_probes.p"
+latex_mapping_file="$this_run_directory/latex_mapping.txt"
+analysis_script="$this_run_directory/analyse.sh"
+run_log="$this_run_directory/qmla.log"
+further_qhl_log="$this_run_directory/qhl_further.log"
+cp $(pwd)/local_launch.sh "$this_run_directory/launched_script.txt"
 git_commit=$(git rev-parse HEAD)
 
 ###############
@@ -89,14 +89,13 @@ git_commit=$(git rev-parse HEAD)
 ###############
 
 python3 ../scripts/set_qmla_params.py \
-    -prt=$prt \
-    -true=$system_parameters_file \
-    -prior=$prior_pickle_file \
-    -probe=$plot_probe_file \
+    -dir=$this_run_directory \
     -ggr=$growth_rule \
-    -dir=$this_run_results_folder \
-    -log=$this_log \
-    -true_expec_path=$true_expec_path \
+    -prt=$prt \
+    -sysinfo=$system_info_file \
+    -sysmeas=$system_measurements_file \
+    -plotprobes=$plot_probe_file \
+    -log=$run_log \
     $growth_rules_command 
 
 echo "Generated configuration."
@@ -107,27 +106,27 @@ echo "Generated configuration."
 ###############
 
 echo "
-cd $this_run_results_folder
+cd $this_run_directory
 python3 ../../../../scripts/analyse_qmla.py \
-    -dir=$this_run_results_folder \
+    -dir=$this_run_directory \
     --bayes_csv=$bayes_csv \
-    -log=$this_log \
+    -log=$run_log \
     -top=$number_best_models_further_qhl \
     -qhl=$qhl_test \
     -fqhl=0 \
-    -true_expec=$true_expec_path \
+    -true_expec=$system_measurements_file \
     -ggr=$growth_rule \
     -plot_probes=$plot_probe_file \
-    -params=$system_parameters_file \
+    -params=$system_info_file \
     -latex=$latex_mapping_file \
     -gs=1
 
 python3 ../../../../scripts/generate_results_pdf.py \
     -t=$num_tests \
-    -dir=$this_run_results_folder \
+    -dir=$this_run_directory \
     -p=$prt \
     -e=$exp \
-    -log=$this_log \
+    -log=$run_log \
     -ggr=$growth_rule \
     -run_desc=\"localdevelopemt\" \
     -git_commit=$git_commit \
@@ -155,19 +154,19 @@ do
         -p=$prt \
         -e=$exp \
         -qid=$q_id \
-        -log=$this_log \
-        -dir=$this_run_results_folder \
+        -log=$run_log \
+        -dir=$this_run_directory \
         -pt=$plots \
         -pkl=1 \
         -cb=$bayes_csv \
         -prior_path=$prior_pickle_file \
-        -true_params_path=$system_parameters_file \
-        -true_expec_path=$true_expec_path \
+        -true_params_path=$system_info_file \
+        -true_expec_path=$system_measurements_file \
         -plot_probes=$plot_probe_file \
         -latex=$latex_mapping_file \
         -ggr=$growth_rule \
         $growth_rules_command \
-        > $this_run_results_folder/output.txt
+        > $this_run_directory/output.txt
 done
 
 echo "
@@ -175,7 +174,7 @@ echo "
 "
 
 ###############
-# Furhter QHL, optionally
+# Furhter QHL (optional)
 ###############
 
 if (( $do_further_qhl == 1 )) 
@@ -183,14 +182,14 @@ then
     sh $analysis_script
 
     further_analyse_filename='analyse_further_qhl.sh'
-    further_analysis_script="$this_run_results_folder$further_analyse_filename"
+    further_analysis_script="$this_run_directory$further_analyse_filename"
     let particles="$further_qhl_factor * $prt"
     let experiments="$further_qhl_factor * $exp"
     echo "------ Launching further QHL instance(s) ------"
     let max_qmd_id="$num_tests + 1"
 
     # write to a script so we can recall analysis later.
-    cd $this_run_results_folder
+    cd $this_run_directory
     cd ../../../
 
     for i in \`seq 1 $max_qmd_id\`;
@@ -204,15 +203,15 @@ then
             -e=$experiments \
             -rq=$use_rq \
             -qhl=0 \
-            -dir=$this_run_results_folder \
+            -dir=$this_run_directory \
             -qid=$q_id \
             -pt=$plots \
             -pkl=1 \
-            -log=$this_log \
+            -log=$run_log \
             -cb=$bayes_csv \
             -prior_path=$prior_pickle_file \
-            -true_params_path=$system_parameters_file \
-            -true_expec_path=$true_expec_path \
+            -true_params_path=$system_info_file \
+            -true_expec_path=$system_measurements_file \
             -plot_probes=$plot_probe_file \
             -latex=$latex_mapping_file \
             -ggr=$growth_rule \
@@ -220,18 +219,18 @@ then
             $growth_rules_command 
     done
     echo "
-    cd $this_run_results_folder
+    cd $this_run_directory
     python3 ../../../../scripts/AnalyseMultipleQMD.py \
-        -dir=$this_run_results_folder \
+        -dir=$this_run_directory \
         --bayes_csv=$bayes_csv \
-        -log=$this_log \
+        -log=$run_log \
         -top=$number_best_models_further_qhl \
         -qhl=0 \
         -fqhl=1 \
-        -true_expec=$true_expec_path \
+        -true_expec=$system_measurements_file \
         -ggr=$growth_rule \
         -plot_probes=$plot_probe_file \
-        -params=$system_parameters_file \
+        -params=$system_info_file \
         -latex=$latex_mapping_file
     " > $further_analysis_script
 

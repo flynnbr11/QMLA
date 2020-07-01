@@ -4,8 +4,11 @@ import pickle
 import argparse
 import sys
 import os
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import pickle
+
+# Find QMLA and import it
 p = os.path.abspath(os.path.realpath(__file__))
 elements = p.split('/')[:-2]
 qmla_root = os.path.abspath('/'.join(elements))
@@ -20,46 +23,23 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    '-true', '--true_params_file',
-    help="File to pickle true params list to.",
+    '-dir', '--run_directory',
+    help='Absolute path of directory for this run.',
     type=str,
-    default=None
+    default=os.getcwd()
 )
-# parser.add_argument(
-#     '-rand_t', '--random_true_params',
-#     help="Bool: use random true parameters or those defined in this file.",
-#     type=int,
-#     default=0
-# )
-
 parser.add_argument(
-    '-prior', '--prior_file',
-    help="File to pickle prior specific terms to.",
-    type=str,
-    default=None
+    '-prt', '--particle_number',
+    help='Number of particles used during training',
+    type=float,
+    default=100
 )
-
-# parser.add_argument(
-#     '-rand_p', '--random_prior_terms',
-#     help="Bool: use random true parameters or those defined in this file.",
-#     type=int,
-#     default=0
-# )
-
-# parser.add_argument(
-#     '-exp', '--use_experimental_data',
-#     help="Bool: use experimental data or not.",
-#     type=int,
-#     default=0
-# )
-
 parser.add_argument(
     '-ggr', '--growth_generation_rule',
-    help="Generator of new models",
+    help="Growth rule of new models",
     type=str,
     default=0
 )
-
 parser.add_argument(
     '-agr', '--alternative_growth_rules',
     help='Growth rules to form other trees.',
@@ -68,110 +48,47 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-log', '--log_file',
-    help='File to log RQ workers.',
+    '-sysinfo', '--system_info_file',
+    help="File to pickle true params list to.",
     type=str,
-    default='qmd.log'
+    default=None
+)
+parser.add_argument(
+    '-sysmeas', '--system_measurements_file',
+    help='Path to which to save true parameters.',
+    type=str,
+    default="{}/true_model_terms_params.p".format(os.getcwd())
 )
 
 parser.add_argument(
-    '-dir', '--results_directory',
-    help='Relative directory to store results in.',
-    type=str,
-    default=os.getcwd()
-)
-
-parser.add_argument(
-    '-probe', '--probes_plot_file',
-    help="File to pickle probes against which to plot expectation values.",
+    '-plotprobes', '--probes_plot_file',
+    help="File to pickle probes, against which to plot expectation values.",
     type=str,
     default=None
 )
 
-# parser.add_argument(
-#     '-sp', '--special_probe',
-#     help="Special type of probe, e.g. |+>, or ideal (sum of eigenstates).",
-#     type=str,
-#     default=None
-# )
-
-# parser.add_argument(
-#     '-plus', '--force_plus_probe',
-#     help="Whether to enforce plots to use |+>^n as probe.",
-#     type=int,
-#     default=0
-# )
-
-# parser.add_argument(
-#     '-g', '--gaussian',
-#     help="Whether to use normal (Gaussian) distribution. If False: uniform.",
-#     type=int,
-#     default=1
-# )
 parser.add_argument(
-    '-true_expec_path', '--true_expec_path',
-    help='Path to save true params to.',
+    '-log', '--log_file',
+    help='File to log QMLA run.',
     type=str,
-    default="{}/true_model_terms_params.p".format(os.getcwd())
-)
-# parser.add_argument(
-#     '-min', '--param_min',
-#     help="Minimum valid parameter value",
-#     type=float,
-#     default=0.0
-# )
-# parser.add_argument(
-#     '-max', '--param_max',
-#     help="Maximum valid parameter value",
-#     type=float,
-#     default=1.0
-# )
-
-# parser.add_argument(
-#     '-mean', '--param_mean',
-#     help="Default mean of normal distribution for unspecified parameters.",
-#     type=float,
-#     default=0.5
-# )
-# parser.add_argument(
-#     '-sigma', '--param_sigma',
-#     help="Default sigma of normal distribution for unspecified parameters.",
-#     type=float,
-#     default=0.25
-# )
-
-# parser.add_argument(
-#     '-pnoise', '--probe_noise_level',
-#     help='Noise level to add to probe for learning',
-#     type=float,
-#     default=0.03
-# )
-
-parser.add_argument(
-    '-prt', '--particle_number',
-    help='Number of particles used during training',
-    type=float,
-    default=100
+    default='qmla_run.log'
 )
 
-print("Setting QMLA parameters.")
+###############
+# Set shared QMLA parameters for this run
+###############
 
 arguments = parser.parse_args()
-
-# REMOVING:
-# random_true_params = bool(arguments.random_true_params)
-# random_prior = bool(arguments.random_prior_terms)
-# force_plus_probe = bool(arguments.force_plus_probe)
-# probe_noise_level = arguments.probe_noise_level
 
 num_particles = arguments.particle_number
 growth_generation_rule = arguments.growth_generation_rule
 log_file = arguments.log_file
 probes_plot_file = arguments.probes_plot_file
-results_directory = arguments.results_directory
+run_directory = arguments.run_directory
 
+# Generate GR instances
 growth_class_attributes = {
-    'true_params_path' : arguments.true_params_file,
+    'true_params_path' : arguments.system_info_file,
     'plot_probes_path' : probes_plot_file,
     'log_file': log_file
 }
@@ -193,46 +110,32 @@ probe_max_num_qubits_all_growth_rules = max([
     gr.max_num_probe_qubits for gr in unique_growth_classes.values()
 ])
 
+# Use setup so far to generate parameters 
 true_model = growth_class.true_model
 
-if arguments.true_params_file is not None:
-    qmla.set_shared_parameters(
-        growth_class = growth_class,
-        pickle_file = arguments.true_params_file,
-        all_growth_rules = all_growth_rules,
-        results_directory = results_directory,
-        num_particles = num_particles,
-        generate_evaluation_experiments = True, 
-        probe_max_num_qubits_all_growth_rules = probe_max_num_qubits_all_growth_rules, 
-    )
-
-
-###
-# Now generate a probe dict to be used by all instances
-# of QMD within this run, when plotting results.
-# Store it in the provided argument, plot_probe_dict.
-###
-
-print("Generating probe dict for plotting")
-
-# TODO
-plot_probe_dict = growth_class.plot_probe_generator(
-    true_model=true_model,
-    growth_generator=growth_generation_rule,
-    probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
-    noise_level=0,
+qmla.set_shared_parameters(
+    growth_class = growth_class,
+    system_info_file = arguments.system_info_file,
+    all_growth_rules = all_growth_rules,
+    run_directory = run_directory,
+    num_particles = num_particles,
+    generate_evaluation_experiments = True, 
+    probe_max_num_qubits_all_growth_rules = probe_max_num_qubits_all_growth_rules, 
 )
 
-if probes_plot_file is not None:
-    import pickle
-    pickle.dump(
-        plot_probe_dict,
-        open(probes_plot_file, 'wb')
-    )
 
-# store growth rule config to share with all instances in this run
+# Probes used for plotting by all instances in this run, for consistency.
+plot_probe_dict = growth_class.plot_probe_generator(
+    probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
+)
+pickle.dump(
+    plot_probe_dict,
+    open(probes_plot_file, 'wb')
+)
+
+# Store growth rule config to share with all instances in this run
 path_to_store_configs = os.path.join(
-    results_directory, 
+    run_directory, 
     'growth_rule_configs.p'
 )
 growth_rule_configurations = {
@@ -243,32 +146,30 @@ pickle.dump(
     growth_rule_configurations,
     open(path_to_store_configs, 'wb')
 )
-# get measurements of the true system
-## work them out only once and share with all instances
+
+# Get system measurements
+# i.e. compute them only once and share with all instances
 true_system_measurements = growth_class.get_measurements_by_time()
 pickle.dump(
     true_system_measurements,
     open(
-        arguments.true_expec_path,
-        'wb'
+        arguments.system_measurements_file, 'wb'
     )
 )
 
-# store an example of the probes used
+# Store an example of the probes used
 growth_class.generate_probes(
     probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
-    # noise_level=growth_class.probe_noise_level,
     noise_level=0, # TODO get directly in GR
     minimum_tolerable_noise=0.0,
 )
 
 probes_dir = str(
-    results_directory
+    run_directory
     + 'training_probes/'
 )
 try:
     os.makedirs(probes_dir)
-    print("QMLA SETTINGS - storing probes sample to ", probes_dir)
     system_probes_path = os.path.join(
         probes_dir
         + 'system_probes.p'
@@ -286,5 +187,5 @@ try:
         open(simulator_probes_path, 'wb')
     )
 except:
-    # something already stored as example
+    # Something already stored as example
     pass
