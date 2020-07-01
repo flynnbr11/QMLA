@@ -58,11 +58,11 @@ class BaseHeuristicQMLA(qi.Heuristic):
         self._log_file = log_file
 
         # storage infrastructure
+        self.heuristic_data = {} # to be stored by model instance
         self._resample_epochs = []
         self._volumes = []
         self.effective_sample_size = []
         self._times_suggested = []
-        self.heuristic_data = {} # to be stored by model instance
         self._label_fontsize = 10 # consistency when plotting
 
     def _get_exp_params_array(self):
@@ -424,15 +424,22 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         new_time = 1 / d
         experiment[self._t] = new_time
 
-        print("Available orders of magnitude:", orders_of_magnitude)
-        print("Selected order = ", selected_order)    
-        print("x= {}".format(x))
-        print("x'={}".format(xp))
-        print("Distance = ", d)
-        print("Distance order mag=", np.log10(d))
-        print("=> time=", new_time)
+        # print("Available orders of magnitude:", orders_of_magnitude)
+        # print("Selected order = ", selected_order)    
+        # print("x= {}".format(x))
+        # print("x'={}".format(xp))
+        # print("Distance = ", d)
+        # print("Distance order mag=", np.log10(d))
+        # print("=> time=", new_time)
         
         return experiment
+
+    def finalise_heuristic(self):
+        super().finalise_heuristic()
+
+        self.log_print([
+            "count_order_of_magnitudes:", self.count_order_of_magnitudes
+        ])
 
 
 class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):

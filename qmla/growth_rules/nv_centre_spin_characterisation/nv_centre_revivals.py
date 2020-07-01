@@ -21,7 +21,8 @@ class NVCentreRevivalsSimulated(
             **kwargs
         )
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         self.simulator_probe_generation_function = self.probe_generation_function
@@ -57,6 +58,19 @@ class NVCentreRevivalsSimulated(
             'pauliSet_2_z_d{}'.format(n_qubits) : 15e3,
         }
         self.gaussian_prior_means_and_widths = {
+            # 'pauliSet_1_z_d{}'.format(n_qubits) : (2e9, 0.02e9),
+            
+            # 'pauliSet_1J2_zJz_d{}'.format(n_qubits) : (2e5, 0.02e5), 
+            # 'pauliSet_1J2_yJy_d{}'.format(n_qubits) : (4e5, 0.02e5), 
+            # 'pauliSet_1J2_xJx_d{}'.format(n_qubits) : (2e5, 0.02e5), 
+            # # 'pauliSet_1J2_zJz_d{}'.format(n_qubits) : (2e5, 0.02e5), 
+            # # 'pauliSet_1J2_yJy_d{}'.format(n_qubits) : (4e5, 0.02e5), 
+            # # 'pauliSet_1J2_xJx_d{}'.format(n_qubits) : (2e5, 0.02e5), 
+
+            # 'pauliSet_2_x_d{}'.format(n_qubits) : (6.6e4, 0.02e4),
+            # 'pauliSet_2_y_d{}'.format(n_qubits) : (6.6e4, 0.02e4),
+            # 'pauliSet_2_z_d{}'.format(n_qubits) : (3e4, 0.02e4),
+
             'pauliSet_1_z_d{}'.format(n_qubits) : (5e9, 2e9),
             
             'pauliSet_1J2_zJz_d{}'.format(n_qubits) : (5e5, 2e5), 
