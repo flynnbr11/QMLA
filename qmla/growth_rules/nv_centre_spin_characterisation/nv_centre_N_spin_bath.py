@@ -33,6 +33,7 @@ class NVCentreNQubitBath(
 
         # Choose functions 
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
