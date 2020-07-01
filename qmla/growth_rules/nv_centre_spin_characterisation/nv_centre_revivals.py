@@ -23,7 +23,7 @@ class NVCentreRevivalsSimulated(
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         self.simulator_probe_generation_function = self.probe_generation_function
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
