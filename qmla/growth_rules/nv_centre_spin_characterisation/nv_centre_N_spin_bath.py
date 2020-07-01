@@ -66,7 +66,7 @@ class NVCentreNQubitBath(
         self.stages_by_num_qubits = {
             1 : iter(['rotation']),
             2 : iter( non_spin_qubit_contributions ),
-            3 : iter( non_spin_qubit_contributions ),            
+            # 3 : iter( non_spin_qubit_contributions ),            
             # 4 : iter( non_spin_qubit_contributions )
         }
 
@@ -94,7 +94,7 @@ class NVCentreNQubitBath(
             1 : 3,
             'other': 6
         }
-        self.num_processes_to_parallelise_over = 6
+        self.num_processes_to_parallelise_over = 8
         self.timing_insurance_factor = 0.2
 
         # Test: a few hand picked models to see if true model wins

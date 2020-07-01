@@ -173,9 +173,7 @@ def remote_bayes_factor_calculation(
             pass
 
     # Plot dynamics on which models were compared
-    if (
-        plot_true_mod_post_bayes_factor_dynamics
-    ):
+    if plot_true_mod_post_bayes_factor_dynamics:
         try:
             times_used = model_a.bf_times + model_b.bf_times
             plot_models_dynamics(
