@@ -1,47 +1,32 @@
 #!/bin/bash
 
-test_description="development"
-printf "$day_time: \t $test_description \n" >> QMD_Results_directories.log
-
-
 # redis-server
-### ---------------------------------------------------###
-# Running QMD essentials
-### ---------------------------------------------------###
+
+###############
+# QMLA run configuration
+###############
 num_tests=1
-qhl_test=0 # don't perform QMLA; perform QHL on known correct model
+exp=5 # number of experiments
+prt=10 # number of particles
+qhl_test=0 # perform QHL on known (true) model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-# exp_data=0
-# simulate_experiment=0
 q_id=0 # can start from other ID if desired
 
-### ---------------------------------------------------###
-# QHL parameters
-### --------------------------------------------------###
-exp=5
-prt=10
-# pgh=1.0
-# pgh_exponent=1.0
-# pgh_increase=0 # whether to add to time found by PGH (bool)
-# ra=0.98
-# rt=0.5
 
-### ---------------------------------------------------###
-# QMD settings
-### ---------------------------------------------------###
+###############
+# QMLA settings
+###############
 use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_tests
 plots=0
 number_best_models_further_qhl=5
-# custom_prior=1
-# bintimes=1
-# bf_all_times=0
 
+###############
 # Choose a growth rule This will determine how QMD proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
-
+###############
 
 # growth_rule='TestSimulatedNVCentre'
 # growth_rule='IsingGeneticTest'
@@ -66,15 +51,6 @@ growth_rule='NVCentreNQubitBath'
 
 alt_growth_rules=(
     # 'GeneticTest'
-    # 'HeisenbergLatticeSet'
-    # 'IsingPredetermined'
-    # 'IsingProbabilistic'
-    # 'HeisenbergXYZProbabilistic'
-    # 'HeisenbergXYZPredetermined'
-    # 'FermiHubbardPredetermined' 
-    # 'FermiHubbardProbabilistic' 
-    # 'ExperimentReducedNV'
-    # 'ExperimentNVCentre'
 )
 
 growth_rules_command=""
@@ -83,23 +59,22 @@ do
     growth_rules_command+=" -agr $item" 
 done
 
-### ---------------------------------------------------###
-# Everything from here downwards uses the parameters
-# defined above to run QMD. 
-### ---------------------------------------------------###
+###############
+# Parameters from here downwards uses the parameters
+# defined above to run QMLA. 
+###############
+
 let max_qmd_id="$num_tests + $q_id"
 
 # Files where output will be stored
-cwd=$(pwd)
-day_time=$(date +%b_%d/%H_%M)
-full_path_to_results="$cwd/Results/$day_time/"
 running_dir="$(pwd)"
-qmd_dir="${running_dir%/ExperimentalSimulations}"
-lib_dir="$qmd_dir/Libraries/QML_lib"
-bcsv="cumulative.csv"
-bayes_csv="$full_path_to_results$bcsv"
+day_time=$(date +%b_%d/%H_%M)
+full_path_to_results="$running_dir/Results/$day_time/"
+# qmd_dir="${running_dir%/ExperimentalSimulations}"
+# lib_dir="$qmd_dir/Libraries/QML_lib"
+bayes_csv="$full_path_to_results/cumulative.csv"
 true_expec_filename="true_expec_vals.p"
-true_expec_path="$full_path_to_results$true_expec_filename"
+true_expec_path="$full_path_to_results/system_measurements.p"
 prior_pickle_file="$full_path_to_results/prior.p"
 true_params_pickle_file="$full_path_to_results/true_params.p"
 plot_probe_file="$full_path_to_results/plot_probes.p"
@@ -116,51 +91,10 @@ cp $(pwd)/local_launch.sh $copied_launch_file
 git_commit=$(git rev-parse HEAD)
 
 
-# TO REMOVE:
-# num_probes=10
-# probe_noise=0.01
-# reallocate_resources=0
-# store_prt_wt=0 # store all particles and weights after learning
-# special_probe='random'
-# special_probe_plot='plus'
-
-# force_plot_plus=0
-# gaussian=1
-# param_min=0
-# param_max=10
-# param_mean=0.5
-# param_sigma=3
-# rand_true_params=0
-# updater_from_prior=0
-
-# rand_prior:
-# if set to False (0), then uses any params specically 
-# set in SetQHLParams dictionaries.
-# All undefined params will be random according 
-# to above defined mean/sigmas
-
-# rand_prior=0
-# special_probe='random' #'plus' #'ideal'
-# special_probe_plot='plus' #'random'
-
-# if (( "$exp_data" == 1))  
-# then
-#     special_probe='dec_13_exp'
-#     special_probe_plot='plus'
-# elif (( "$simulate_experiment" == 1)) 
-# then
-# fi
-
-declare -a particle_counts=(
-$prt
-)
-
-let bt="$exp"
-
-# Launch $num_tests instances of QMD 
-
+###############
 # First set up parameters/data to be used by all instances of QMD for this run. 
-# python3 ../qmla/SetQHLParams.py \
+###############
+
 python3 ../scripts/set_qmla_params.py \
     -prt=$prt \
     -true=$true_params_pickle_file \
@@ -174,25 +108,11 @@ python3 ../scripts/set_qmla_params.py \
 
 echo "Generated configuration."
 
-    # -sp=$special_probe_plot \
-    # -min=$param_min \
-    # -max=$param_max \
-    # -mean=$param_mean \
-    # -sigma=$param_sigma \
-    # -g=$gaussian \
-    # -exp=$exp_data \
-    # -plus=$force_plot_plus \
-    # -pnoise=$probe_noise \
-    # -rand_t=$rand_true_params \
-    # -rand_p=$rand_prior \
+###############
+# Write analysis script 
+# before launch in case run stopped before some instances complete.
+###############
 
-
-##
-# Write analysis script (before launch in case run stopped before some instances complete.)
-##
-
-
-# write to a script so we can recall analysis later.
 echo "
 cd $full_path_to_results
 python3 ../../../../scripts/analyse_qmla.py \
@@ -214,78 +134,56 @@ python3 ../../../../scripts/generate_results_pdf.py \
     -dir=$full_path_to_results \
     -p=$prt \
     -e=$exp \
-    -bt=$bt \
     -log=$this_log \
     -ggr=$growth_rule \
-    -run_desc=$test_description \
+    -run_desc=\"localdevelopemt\" \
     -git_commit=$git_commit \
     -qhl=$qhl_test \
     -mqhl=$multiple_qhl \
     -cb=$bayes_csv \
 
 " > $analyse_script
+
 chmod a+x $analyse_script
 
-    # -exp=$exp_data \
-    # -exp=$exp_data
-    # -ra=$ra \
-    # -rt=$rt \
-    # -pgh=$pgh \
-    # -nprobes=$num_probes \
-    # -pnoise=$probe_noise \
-    # -special_probe=$special_probe \
-
-
-
+###############
 # Run instances
-for prt in  "${particle_counts[@]}";
+###############
+for i in `seq 1 $max_qmd_id`;
 do
-    for i in `seq 1 $max_qmd_id`;
-    do
-        redis-cli flushall
-        let q_id="$q_id+1"
-        # python3 -m cProfile -s time \
-        python3 \
-            ../scripts/implement_qmla.py \
-            -qhl=$qhl_test \
-            -mqhl=$multiple_qhl \
-            -rq=$use_rq \
-            -p=$prt \
-            -e=$exp \
-            -qid=$q_id \
-            -log=$this_log \
-            -dir=$full_path_to_results \
-            -pt=$plots \
-            -pkl=1 \
-            -cb=$bayes_csv \
-            -prior_path=$prior_pickle_file \
-            -true_params_path=$true_params_pickle_file \
-            -true_expec_path=$true_expec_path \
-            -plot_probes=$plot_probe_file \
-            -latex=$latex_mapping_file \
-            -ggr=$growth_rule \
-            $growth_rules_command \
-            > $full_path_to_results/output.txt
-    done
+    redis-cli flushall
+    let q_id="$q_id+1"
+    # python3 -m cProfile -s time \
+    python3 \
+        ../scripts/implement_qmla.py \
+        -qhl=$qhl_test \
+        -mqhl=$multiple_qhl \
+        -rq=$use_rq \
+        -p=$prt \
+        -e=$exp \
+        -qid=$q_id \
+        -log=$this_log \
+        -dir=$full_path_to_results \
+        -pt=$plots \
+        -pkl=1 \
+        -cb=$bayes_csv \
+        -prior_path=$prior_pickle_file \
+        -true_params_path=$true_params_pickle_file \
+        -true_expec_path=$true_expec_path \
+        -plot_probes=$plot_probe_file \
+        -latex=$latex_mapping_file \
+        -ggr=$growth_rule \
+        $growth_rules_command \
+        > $full_path_to_results/output.txt
 done
-            # -resource=$reallocate_resources \
-            # -bt=$bt \
-            # -ra=$ra \
-            # -pgh=$pgh \
-            # -pgh_exp=$pgh_exponent \
-            # -pgh_incr=$pgh_increase \
-            # -rt=$rt \
-            # -exp=$exp_data \
-            # -prtwt=$store_prt_wt \
-
-
 
 echo "
-
 ------ QMLA completed ------
-
 "
 
+###############
+# Furhter QHL, optionally
+###############
 
 if (( $do_further_qhl == 1 )) 
 then
@@ -304,17 +202,13 @@ then
 
     for i in \`seq 1 $max_qmd_id\`;
         do
-        # pgh=0.3 # train on different set of data
         redis-cli flushall 
-        # let q_id=\"\$q_id+1\"
-        # q_id=\$((q_id+1))
         let q_id="$q_id + 1"
         echo "QID: $q_id"
         python3 /scripts/implement_qmla.py \
             -fq=1 \
             -p=$particles \
             -e=$experiments \
-            -bt=$bt \
             -rq=$use_rq \
             -qhl=0 \
             -dir=$full_path_to_results \
@@ -352,16 +246,6 @@ then
     echo "------ Launching analyse further QHL ------"
     # sh $further_analyse_script
 fi
-            # -resource=$reallocate_resources \
-
-            # -exp=$exp_data \
-            # -pnoise=$probe_noise \
-        # -exp=$exp_data \
-            # -ra=$ra \
-            # -rt=$rt \
-            # -pgh=1.0 \
-            # -pgh_exp=$pgh_exponent \
-            # -pgh_incr=$pgh_increase \
 
 
 # redis-cli shutdown
