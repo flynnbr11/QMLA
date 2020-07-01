@@ -6,13 +6,12 @@
 # QMLA run configuration
 ###############
 num_tests=1
+qhl_test=0 # perform QHL on known (true) model
 exp=5 # number of experiments
 prt=10 # number of particles
-qhl_test=0 # perform QHL on known (true) model
 multiple_qhl=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # can start from other ID if desired
-
 
 ###############
 # QMLA settings
@@ -75,7 +74,7 @@ mkdir -p $this_run_directory
 bayes_csv="$this_run_directory/bayes_factors.csv"
 system_measurements_file="$this_run_directory/system_measurements.p"
 prior_pickle_file="$this_run_directory/prior.p"
-system_info_file="$this_run_directory/system_parameters.p"
+run_info_file="$this_run_directory/run_info.p"
 plot_probe_file="$this_run_directory/plot_probes.p"
 latex_mapping_file="$this_run_directory/latex_mapping.txt"
 analysis_script="$this_run_directory/analyse.sh"
@@ -92,7 +91,7 @@ python3 ../scripts/set_qmla_params.py \
     -dir=$this_run_directory \
     -ggr=$growth_rule \
     -prt=$prt \
-    -sysinfo=$system_info_file \
+    -runinfo=$run_info_file \
     -sysmeas=$system_measurements_file \
     -plotprobes=$plot_probe_file \
     -log=$run_log \
@@ -114,10 +113,10 @@ python3 ../../../../scripts/analyse_qmla.py \
     -top=$number_best_models_further_qhl \
     -qhl=$qhl_test \
     -fqhl=0 \
-    -true_expec=$system_measurements_file \
+    -runinfo=$run_info_file \
+    -sysmeas=$system_measurements_file \
     -ggr=$growth_rule \
-    -plot_probes=$plot_probe_file \
-    -params=$system_info_file \
+    -plotprobes=$plot_probe_file \
     -latex=$latex_mapping_file \
     -gs=1
 
@@ -148,26 +147,26 @@ do
     # python3 -m cProfile -s time \
     python3 \
         ../scripts/implement_qmla.py \
+        -qid=$q_id \
         -qhl=$qhl_test \
         -mqhl=$multiple_qhl \
-        -rq=$use_rq \
         -p=$prt \
         -e=$exp \
-        -qid=$q_id \
-        -log=$run_log \
-        -dir=$this_run_directory \
+        -rq=$use_rq \
         -pt=$plots \
+        -dir=$this_run_directory \
         -pkl=1 \
+        -log=$run_log \
         -cb=$bayes_csv \
-        -prior_path=$prior_pickle_file \
-        -true_params_path=$system_info_file \
-        -true_expec_path=$system_measurements_file \
-        -plot_probes=$plot_probe_file \
+        -runinfo=$run_info_file \
+        -sysmeas=$system_measurements_file \
+        -plotprobes=$plot_probe_file \
         -latex=$latex_mapping_file \
         -ggr=$growth_rule \
         $growth_rules_command \
         > $this_run_directory/output.txt
 done
+
 
 echo "
 ------ QMLA completed ------
@@ -198,23 +197,21 @@ then
         let q_id="$q_id + 1"
         echo "QID: $q_id"
         python3 /scripts/implement_qmla.py \
+            -dir=$this_run_directory \
             -fq=1 \
             -p=$particles \
             -e=$experiments \
             -rq=$use_rq \
             -qhl=0 \
-            -dir=$this_run_directory \
             -qid=$q_id \
             -pt=$plots \
             -pkl=1 \
             -log=$run_log \
             -cb=$bayes_csv \
-            -prior_path=$prior_pickle_file \
-            -true_params_path=$system_info_file \
-            -true_expec_path=$system_measurements_file \
-            -plot_probes=$plot_probe_file \
+            -runinfo=$run_info_file \
+            -system_measurements_file=$system_measurements_file \
+            -plotprobes=$plot_probe_file \
             -latex=$latex_mapping_file \
-            -ggr=$growth_rule \
             -ggr=$growth_rule \
             $growth_rules_command 
     done
@@ -230,7 +227,7 @@ then
         -true_expec=$system_measurements_file \
         -ggr=$growth_rule \
         -plot_probes=$plot_probe_file \
-        -params=$system_info_file \
+        -params=$run_info_file \
         -latex=$latex_mapping_file
     " > $further_analysis_script
 
@@ -238,6 +235,5 @@ then
     echo "------ Launching analyse further QHL ------"
     # sh $further_analysis_script
 fi
-
 
 # redis-cli shutdown

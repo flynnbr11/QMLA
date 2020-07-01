@@ -18,7 +18,7 @@ __all__ = [
 
 def set_shared_parameters(
     growth_class,
-    system_info_file=None,
+    run_info_file=None,
     all_growth_rules=[],
     run_directory='',
     num_particles=100,
@@ -34,7 +34,7 @@ def set_shared_parameters(
     are shared by all QMLA instances within a given run.
 
     This function does not return anything, but stores data 
-    required for the run to the ``system_info_file`` path.
+    required for the run to the ``run_info_file`` path.
     The data pickled are:
 
     :RunData true_model: 
@@ -56,7 +56,7 @@ def set_shared_parameters(
 
     :param GrowthRule growth_class: growth rule of true model, from
         which to extract key info, e.g. true parameter ranges and prior.
-    :param str system_info_file:
+    :param str run_info_file:
         path to which to store system information
     :param list all_growth_rules: 
         list of instances of :class:`~qmla.growth_rules.GrowthRule`
@@ -206,11 +206,11 @@ def set_shared_parameters(
         'true_model': true_model,
         'growth_generator': growth_class.growth_generation_rule
     }
-    if system_info_file is not None:
+    if run_info_file is not None:
         import pickle
         pickle.dump(
             true_params_info,
-            open(system_info_file, 'wb')
+            open(run_info_file, 'wb')
         )
     else:
         return true_params_info

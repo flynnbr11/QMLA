@@ -238,7 +238,6 @@ class NVCentreNQubitBath(
         self.log_print(["Getting all stage champions"])
         return list(self.stage_champions.values())
 
-
     def generate_models(self, model_list, **kwargs):
         try:
             top_model = model_list[0]

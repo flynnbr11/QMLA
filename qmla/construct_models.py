@@ -56,15 +56,15 @@ class Operator():
     Operator objects for Hamiltonian models.
 
     Translates a model name (string) into:
-    - constituents_names: strings specifying constituents
-    - constituents_operators: whole matrices of constituents
-    - num_qubits: total dimension of operator [number of qubits it acts on]
-    - matrix: total matrix operator
-    - qubits_acted_on: list of qubits which are acted on non-trivially
-      -- e.g. xTiTTz has list [1,3], since qubit 2 is acted on by identity
-    - alph_name: rearranged version of name which follows alphabetical convention
-      -- uniquely identifies equivalent operators for comparison
-            against previously considered models
+        * constituents_names: strings specifying constituents
+        * constituents_operators: whole matrices of constituents
+        * num_qubits: total dimension of operator [number of qubits it acts on]
+        * matrix: total matrix operator
+        * qubits_acted_on: list of qubits which are acted on non-trivially
+        -- e.g. xTiTTz has list [1,3], since qubit 2 is acted on by identity
+        * alph_name: rearranged version of name which follows alphabetical convention
+        -- uniquely identifies equivalent operators for comparison
+                against previously considered models
 
     :param str name: name of model
 

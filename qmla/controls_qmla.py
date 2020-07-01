@@ -15,7 +15,7 @@ __all__ = [
 r"""
 This file provides functionality to parse command line arguments
 passed via the QMLA launch scripts.
-These are gathered into a single class instance which can be probed by
+These are gathered into a single class instance which can be queried by
 the QMLA instance to implement user specifications.
 """
 
@@ -60,7 +60,7 @@ class ControlsQMLA():
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                true_params_path=arguments.true_params_pickle_file,
+                true_params_path=arguments.run_info_file,
                 plot_probes_path=arguments.probes_plot_file,
                 log_file=self.log_file
             )
@@ -79,7 +79,7 @@ class ControlsQMLA():
 
         # Get (or set) true parameters from parameter files shared among
         # instances within the same run.
-        if arguments.true_params_pickle_file is None:
+        if arguments.run_info_file is None:
             try:
                 true_params_info = qmla.set_shared_parameters(
                     growth_class=self.growth_class,
@@ -90,7 +90,7 @@ class ControlsQMLA():
         else:
             true_params_info = pickle.load(
                 open(
-                    arguments.true_params_pickle_file,
+                    arguments.run_info_file,
                     'rb'
                 )
             )
@@ -103,19 +103,15 @@ class ControlsQMLA():
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
         self.true_model_terms_params = true_params_info['params_list']
-        self.true_params_pickle_file = arguments.true_params_pickle_file
+        self.run_info_file = arguments.run_info_file
         self.log_print(["Shared true params set for this instance."])
 
         # Store parameters which were passed as arguments to implement_qmla.py
         self.qmla_id = arguments.qmla_id
-        self.prior_pickle_file = arguments.prior_pickle_file
         self.use_rq = bool(arguments.use_rq)
         self.num_experiments = arguments.num_experiments
         self.num_particles = arguments.num_particles
-        self.bayes_lower = arguments.bayes_lower  # TODO put inside growth rule
-        self.bayes_upper = arguments.bayes_upper
         self.save_plots = bool(arguments.save_plots)
-        self.store_particles_weights = bool(arguments.store_particles_weights)
         self.pickle_qmla_instance = bool(arguments.pickle_qmla_instance)
         self.rq_timeout = arguments.rq_timeout
 
@@ -129,9 +125,8 @@ class ControlsQMLA():
             self.results_directory += '/'
         self.cumulative_csv = arguments.cumulative_csv
 
-        self.true_expec_path = arguments.true_expec_path
+        self.system_measurements_file = arguments.system_measurements_file
         self.probes_plot_file = arguments.probes_plot_file
-        self.probe_noise_level = arguments.probe_noise_level  # TODO put in growth rule
 
         # Create some new paths/parameters for storing results
         self.alt_log_file = os.path.join(
@@ -273,12 +268,6 @@ def parse_cmd_line_args(args):
         type=int,
         default=False
     )
-    parser.add_argument(
-        '-prtwt', '--store_particles_weights',
-        help='True: Store all particles and weights from learning.',
-        type=int,
-        default=0
-    )
 
     # Redis configuration
     parser.add_argument(
@@ -326,25 +315,19 @@ def parse_cmd_line_args(args):
         default='cumulative.csv'
     )
     parser.add_argument(
-        '-prior_path', '--prior_pickle_file',
-        help='Path to save prior to.',
-        type=str,
-        default=None
-    )
-    parser.add_argument(
-        '-true_params_path', '--true_params_pickle_file',
+        '-runinfo', '--run_info_file',
         help='Path to save true params to.',
         type=str,
         default=None
     )
     parser.add_argument(
-        '-true_expec_path', '--true_expec_path',
+        '-sysmeas', '--system_measurements_file',
         help='Path to save true params to.',
         type=str,
         default="{}/true_model_terms_params.p".format(os.getcwd())
     )
     parser.add_argument(
-        '-plot_probes', '--probes_plot_file',
+        '-plotprobes', '--probes_plot_file',
         help='Path where plot probe dict is pickled to.',
         type=str,
         default=None
@@ -354,89 +337,6 @@ def parse_cmd_line_args(args):
         help='Path to save list of terms latex/name maps to.',
         type=str,
         default=None
-    )
-
-    # Old inputs - TODO get from GR and remove from here
-    parser.add_argument(
-        '-pnoise', '--probe_noise_level',
-        help='Noise level to add to probe for learning',
-        type=float,
-        default=0.03
-    )
-    parser.add_argument(
-        '-rt', '--resample_threshold',
-        help='Resampling threshold for QInfer.',
-        type=float,
-        default=0.5
-    )
-    parser.add_argument(
-        '-ra', '--resample_a',
-        help='Resampling a for QInfer.',
-        type=float,
-        default=0.95
-    )
-    parser.add_argument(
-        '-pgh', '--pgh_factor',
-        help='Resampling threshold for QInfer.',
-        type=float,
-        default=1.0
-    )
-    parser.add_argument(
-        '-pgh_exp', '--pgh_exponent',
-        help='for use in time heuristic according to 1/sigma**exponent',
-        type=float,
-        default=1.0
-    )
-    parser.add_argument(
-        '-pgh_incr', '--increase_pgh_time',
-        help='Boost times found by PGH heursitic. Bool.',
-        type=int,
-        default=0
-    )
-    parser.add_argument(
-        '-bu', '--bayes_upper',
-        help='Higher Bayes threshold.',
-        type=int,
-        default=100
-    )
-    parser.add_argument(
-        '-bl', '--bayes_lower',
-        help='Lower Bayes threshold.',
-        type=int,
-        default=1
-    )
-
-    # Completely unused - TODO remove from passing to implement_qmla
-    parser.add_argument(
-        '-bt', '--num_experiments_for_bayes_updates',
-        help='Number of times to consider in Bayes function.',
-        type=int,
-        default=5
-    )
-    parser.add_argument(
-        '-resource', '--reallocate_resources',
-        help='Bool: whether to reallocate resources scaling  \
-        with num qubits/terms to be learned during QHL.',
-        type=int,
-        default=0
-    )
-    parser.add_argument(
-        '-exp', '--experimental_data',
-        help='Use experimental data if provided',
-        type=int,
-        default=False
-    )
-    parser.add_argument(
-        '-dst', '--data_max_time',
-        help='Maximum useful time in given data.',
-        type=int,
-        default=2000
-    )
-    parser.add_argument(
-        '-qhl_mods', '--models_for_qhl',
-        help='Models on which to run QHL.',
-        action='append',
-        default=[],
     )
 
     # Process arguments from command line

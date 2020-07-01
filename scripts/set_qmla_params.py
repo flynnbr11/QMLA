@@ -48,7 +48,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-sysinfo', '--system_info_file',
+    '-runinfo', '--run_info_file',
     help="File to pickle true params list to.",
     type=str,
     default=None
@@ -88,7 +88,7 @@ run_directory = arguments.run_directory
 
 # Generate GR instances
 growth_class_attributes = {
-    'true_params_path' : arguments.system_info_file,
+    'true_params_path' : arguments.run_info_file,
     'plot_probes_path' : probes_plot_file,
     'log_file': log_file
 }
@@ -115,7 +115,7 @@ true_model = growth_class.true_model
 
 qmla.set_shared_parameters(
     growth_class = growth_class,
-    system_info_file = arguments.system_info_file,
+    run_info_file = arguments.run_info_file,
     all_growth_rules = all_growth_rules,
     run_directory = run_directory,
     num_particles = num_particles,
@@ -164,23 +164,23 @@ growth_class.generate_probes(
     minimum_tolerable_noise=0.0,
 )
 
-probes_dir = str(
-    run_directory
-    + 'training_probes/'
+probes_dir = os.path.join(
+    run_directory,
+    "training_probes"
 )
 try:
     os.makedirs(probes_dir)
     system_probes_path = os.path.join(
-        probes_dir
-        + 'system_probes.p'
+        probes_dir,
+        "system_probes.p"
     )
     pickle.dump(
         growth_class.probes_system,
         open(system_probes_path, 'wb')
     )
     simulator_probes_path = os.path.join(
-        probes_dir
-        + 'simulator_probes.p'
+        probes_dir,
+        "simulator_probes.p"
     )
     pickle.dump(
         growth_class.probes_simulator,

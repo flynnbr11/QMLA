@@ -142,7 +142,7 @@ class ModelInstanceForLearning():
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.probe_number = qmla_core_info_dict['num_probes']
-        self.store_particle_locations_and_weights = qmla_core_info_dict['store_particles_weights']
+        # self.store_particle_locations_and_weights = qmla_core_info_dict['store_particles_weights']
         self.results_directory = qmla_core_info_dict['results_directory']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
@@ -156,7 +156,7 @@ class ModelInstanceForLearning():
         self.times_to_plot = qmla_core_info_dict['plot_times']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
-        self.true_params_path = qmla_core_info_dict['true_params_pickle_file']
+        self.true_params_path = qmla_core_info_dict['run_info_file']
         self.plots_directory = qmla_core_info_dict['plots_directory']
 
         # Instantiate growth rule
@@ -855,12 +855,12 @@ class ModelInstanceForLearning():
     def _plot_learning_summary(self):
         r"""
         Plot summary of this model's learning:
-        * parameter estimates and uncertainties
-        * volume of parameter distribution
-        * experimental times used
-        * (resample points superposed on the above)
-        * likelihoods of system/particles
-        * difference between system/particles' likelihoods
+            * parameter estimates and uncertainties
+            * volume of parameter distribution
+            * experimental times used
+            * (resample points superposed on the above)
+            * likelihoods of system/particles
+            * difference between system/particles' likelihoods
         """
 
         terms = self.track_param_estimate_v_epoch.keys()

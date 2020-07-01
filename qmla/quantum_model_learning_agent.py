@@ -257,8 +257,11 @@ class QuantumModelLearningAgent():
         if self.num_experiments_for_bayes_updates > self.num_experiments:
             self.num_experiments_for_bayes_updates = self.qmla_controls.num_experiments
 
-        self.bayes_threshold_lower = self.qmla_controls.bayes_lower
-        self.bayes_threshold_upper = self.qmla_controls.bayes_upper
+        # self.bayes_threshold_lower = self.qmla_controls.bayes_lower
+        # self.bayes_threshold_upper = self.qmla_controls.bayes_upper
+        self.bayes_threshold_lower = 1
+        self.bayes_threshold_upper = 100 # TODO get from GR
+
 
         # Analysis infrastructure
         self.model_f_scores = {}
@@ -417,7 +420,7 @@ class QuantumModelLearningAgent():
             '}B_{' + str(self.num_experiments_for_bayes_updates) +
             '}H_{' + str(number_hamiltonians_to_exponentiate) +
             r'}|\psi>_{' + str(self.probe_number) +
-            '}PN_{' + str(self.qmla_controls.probe_noise_level) +
+            '}PN_{' + str(self.growth_class.probe_noise_level) +
             '}$'
         )
 
@@ -440,7 +443,7 @@ class QuantumModelLearningAgent():
             'qhl_plots': False,  # TODO get from growth rule
             'experimental_measurement_times': self.experimental_measurement_times,
             'num_probes': self.probe_number,  # from growth rule or unneeded,
-            'true_params_pickle_file': self.qmla_controls.true_params_pickle_file,
+            'run_info_file': self.qmla_controls.run_info_file,
         }
 
         # Store qmla_settings and probe dictionaries on the redis database,

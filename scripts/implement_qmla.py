@@ -55,7 +55,7 @@ print("Implement QMLA script")
 start = time.time()
 
 experimental_measurements_dict = pickle.load(
-    open(qmla_controls.true_expec_path, 'rb')
+    open(qmla_controls.system_measurements_file, 'rb')
 )
 model_priors = None
 results_directory = qmla_controls.results_directory
@@ -89,8 +89,6 @@ if qmla_controls.further_qhl == True:
 #########################
 print("------ QMLA starting ------")
 
-# working on dev version
-# qmla_instance = qmla.DevQuantumModelLearningAgent(
 qmla_instance = QuantumModelLearningAgent(
     qmla_controls=qmla_controls,
     model_priors=model_priors,
@@ -102,22 +100,20 @@ if qmla_controls.qhl_mode:
     qmla_instance.run_quantum_hamiltonian_learning()
 
 elif (
-    qmla_controls.further_qhl == True
-    or qmla_controls.qhl_mode_multiple_models == True
+    qmla_controls.further_qhl
+    or qmla_controls.qhl_mode_multiple_models
 ):
 
-    if qmla_controls.qhl_mode_multiple_models == True:
+    if qmla_controls.qhl_mode_multiple_models:
         qhl_models = growth_class.qhl_models
         output_prefix = ''  # TODO make so that this can have an output prefix
     else:
         qhl_models = further_qhl_models
         output_prefix = 'further_qhl_'
 
-    log_print(
-        [
-            "Launching QHL with multiple models: {}".format(qhl_models)
-        ],
-    )
+    log_print([
+        "Launching QHL with multiple models: {}".format(qhl_models)
+    ])
     qmla_instance.run_quantum_hamiltonian_learning_multiple_models(
         model_names=qhl_models
     )
@@ -130,29 +126,23 @@ else:
 # TODO: wrap these functions into qmla_instance analysis method
 #########################
 if qmla_controls.qhl_mode:
-    log_print(
-        [
-            "QHL complete",
-        ],
-    )
+    log_print([
+        "QHL complete",
+    ])
     if qmla_controls.pickle_qmla_instance:
-        log_print(
-            [
-                "QMD complete. Pickling result to",
-                qmla_controls.class_pickle_file
-            ], 
-        )
+        log_print([
+            "QMD complete. Pickling result to",
+            qmla_controls.class_pickle_file
+        ])
         qmla_instance._delete_unpicklable_attributes() # TODO call from within QMLA
         with open(qmla_controls.class_pickle_file, "wb") as pkl_file:
             pickle.dump(qmla_instance, pkl_file, protocol=4)
 
     if qmla_controls.save_plots:
         try:
-            log_print(
-                [
-                    "Plotting parameter estimates",
-                ]
-            )
+            log_print([
+                "Plotting parameter estimates",
+            ])
             qmla_instance.plot_parameter_learning_single_model(
                 true_model=True,
                 save_to_file=str(
@@ -166,11 +156,9 @@ if qmla_controls.qhl_mode:
             pass
 
         try:
-            log_print(
-                [
-                    "Plotting volumes",
-                ],
-            )
+            log_print([
+                "Plotting volumes",
+            ])
             qmla_instance.plot_volume_after_qhl(
                 save_to_file=str(
                     qmla_controls.plots_directory +
@@ -181,11 +169,9 @@ if qmla_controls.qhl_mode:
             )
         except BaseException:
             pass
-        log_print(
-            [
-                "Plotting Quadratic Losses",
-            ],
-        )
+        log_print([
+            "Plotting Quadratic Losses",
+        ])
 
         qmla_instance.plot_branch_champs_quadratic_losses(
             save_to_file=str(
@@ -199,11 +185,6 @@ if qmla_controls.qhl_mode:
             qmla_instance.true_model_id
         )
 
-    # log_print(
-    #     [
-    #         "Plotting Dynamics",
-    #     ],
-    # )
     qmla_instance.plot_branch_champions_dynamics(
         save_to_file=str(
             qmla_controls.plots_directory +
@@ -212,19 +193,9 @@ if qmla_controls.qhl_mode:
             '.png'
         )
     )
-    # log_print(
-    #     [
-    #         "Finished plotting dynamics",
-    #     ],
-    # )
-
-    # true_mod = qmla_instance.get_model_storage_instance_by_id(
-    #     qmla_instance.true_model_id
-    # )
 
     results_file = qmla_controls.results_file
     pickle.dump(
-        # qmla_instance.champion_results,
         qmla_instance.get_results_dict(),
         open(results_file, "wb"),
         protocol=4
@@ -236,20 +207,9 @@ elif (
 ):
     model_ids = [
         qmla_instance._get_model_id_from_name(
-            # db=qmla_instance.model_database,
             model_name=mod
-            # ) for mod in further_qhl_models
         ) for mod in qhl_models
     ]
-
-    # qmla_instance.plot_branch_champions_dynamics(
-    #     save_to_file=str(
-    #         qmla_controls.plots_directory +
-    #         'dynamics_' +
-    #         str(qmla_controls.long_id) +
-    #         '.png'
-    #     )
-    # )
 
     if qmla_controls.pickle_qmla_instance:
         log_print(
@@ -281,7 +241,6 @@ elif (
         print("[Exp] results file:", results_file)
 
         pickle.dump(
-            # mod.results_dict,
             qmla_instance.get_results_dict(model_id = mid),
             open(results_file, "wb"),
             protocol=4

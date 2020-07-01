@@ -21,8 +21,8 @@ parser = argparse.ArgumentParser(
     description='Pass variables for QMLA.'
 )
 
-# Add parser arguments, ie command line arguments for QMD
-# QMLA parameters -- fundamentals such as number of particles etc
+# Add parser arguments, ie command line arguments
+
 parser.add_argument(
     '-dir', '--results_directory',
     help="Directory where results of multiple QMD are held.",
@@ -65,25 +65,17 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-params', '--true_model_terms_params',
+    '-runinfo', '--run_info_file',
     help="Path to pickled true params info.",
     type=str,
     default=None
 )
 
-
 parser.add_argument(
-    '-true_expec', '--true_expectation_value_path',
+    '-sysmeas', '--system_measurements_file',
     help="Path to pickled true expectation values.",
     type=str,
     default=None
-)
-
-parser.add_argument(
-    '-exp', '--use_experimental_data',
-    help="Bool: whether or not to use experimental data.",
-    type=int,
-    default=0
 )
 
 parser.add_argument(
@@ -110,38 +102,39 @@ parser.add_argument(
     default=None
 )
 parser.add_argument(
-    '-plot_probes', '--probes_plot_file',
+    '-plotprobes', '--probes_plot_file',
     help="File to pickle probes against which to plot expectation values.",
     type=str,
     default=None
 )
 
+# Parse command line arguments
 arguments = parser.parse_args()
 
+# Format inputs for use in this script
 directory_to_analyse = arguments.results_directory
 log_file = arguments.log_file
 all_bayes_csv = arguments.bayes_csv
 qhl_mode = bool(arguments.qhl_mode)
 further_qhl_mode = bool(arguments.further_qhl_mode)
-true_params_path = arguments.true_model_terms_params
-true_expec_path = arguments.true_expectation_value_path
+run_info_file = arguments.run_info_file
+system_measurements_file = arguments.system_measurements_file
 growth_generator = arguments.growth_generation_rule
 gather_summary_results = bool(arguments.gather_summary_results)
 true_growth_class = qmla.get_growth_generator_class(
     growth_generation_rule=growth_generator,
     log_file=log_file
 )
-# dataset = true_growth_class.experimental_dataset
 latex_mapping_file = arguments.latex_mapping_file
 probes_plot_file = arguments.probes_plot_file
 results_collection_file = "{}/collect_analyses.p".format(
     directory_to_analyse
 )
 
-if true_params_path is not None:
+if run_info_file is not None:
     true_params_info = pickle.load(
         open(
-            true_params_path,
+            run_info_file,
             'rb'
         )
     )
@@ -153,6 +146,8 @@ else:
 true_model_latex = true_growth_class.latex_name(
     true_model
 )
+if not directory_to_analyse.endswith('/'):
+    directory_to_analyse += '/'
 
 # Directories to store analyses in
 results_directories = {
@@ -162,7 +157,6 @@ results_directories = {
     'performance' : os.path.join(directory_to_analyse, 'performance'),
     'combined_datasets' : os.path.join(directory_to_analyse, 'combined_datasets')
 }
-
 for d in results_directories.values():
     if not os.path.exists(d):
         try:
@@ -170,8 +164,6 @@ for d in results_directories.values():
         except:
             pass
 
-if not directory_to_analyse.endswith('/'):
-    directory_to_analyse += '/'
 
 # Generate results' file names etc depending 
 # on what type of QMLA was run
@@ -186,14 +178,13 @@ else:
     results_file_name_start = 'results'
     plot_desc = ''
 
-# do preliminary analysis 
+# Preliminary analysis 
 os.chdir(directory_to_analyse)
 pickled_files = []
 for file in os.listdir(directory_to_analyse):
     if (
         file.endswith(".p")
-        and
-        file.startswith(results_file_name_start)
+        and file.startswith(results_file_name_start)
     ):
         pickled_files.append(file)
 
@@ -215,7 +206,7 @@ for g in unique_growth_rules:
     except BaseException:
         unique_growth_classes[g] = None
 
-# first get model scores
+# First get model scores (number of wins per model)
 model_score_results = qmla.analysis.get_model_scores(
     directory_name=directory_to_analyse,
     unique_growth_classes=unique_growth_classes,
@@ -234,11 +225,10 @@ pickle.dump(
         os.path.join(
             results_directories['champions'], 
             'champions_info.p'
-        ),
-        'wb'
+        ), 'wb'
     )
 )
-# rearrange some results... TODO this could be tidier/removed?
+# Rearrange some results... TODO this could be tidier/removed?
 models = sorted(model_score_results['wins'].keys())
 models.reverse()
 
@@ -271,7 +261,7 @@ wins = {
 
 
 #######################################
-# Now analyse the results.
+# Analyse the results according to various available analyses
 #######################################
 
 print("\nAnalysing and storing results in", directory_to_analyse)
@@ -316,8 +306,7 @@ if gather_summary_results:
         )
     except:
         print("ANALYSIS FAILURE: Correlation plot b/w fitness and F-score.")
-        pass
-        
+        pass        
         
     # Find number of occurences of each model
     # quite costly so it is optional
@@ -356,7 +345,7 @@ try:
         # dataset=dataset,
         results_path=results_csv,
         results_file_name_start=results_file_name_start,
-        true_expectation_value_path=true_expec_path,
+        true_expectation_value_path=system_measurements_file,
         growth_generator=growth_generator,
         unique_growth_classes=unique_growth_classes,
         top_number_models=arguments.top_number_models,
@@ -410,13 +399,13 @@ except:
     print("ANALYSIS FAILURE: average parameter plots.")
     raise
 
-# cluster champion learned parameters.
+# Cluster champion learned parameters.
 try:
     qmla.analysis.cluster_results_and_plot(
         path_to_results=results_csv,
-        true_expec_path=true_expec_path,
+        true_expec_path=system_measurements_file,
         plot_probe_path=probes_plot_file,
-        true_params_path=true_params_path,
+        true_params_path=run_info_file,
         growth_generator=growth_generator,
         save_param_values_to_file=str(
             plot_desc + 'clusters_by_param.png'),
@@ -436,7 +425,7 @@ except BaseException:
 # QMLA Performance
 ## model win rates and statistics
 #######################################
-# model win rates
+# Model number of wins
 try:
     qmla.analysis.plot_scores(
         scores=model_scores,
@@ -455,7 +444,7 @@ except:
     print("ANALYSIS FAILURE: plotting model win rates.")
     raise
 
-# model statistics (f-score, precision, sensitivty)
+# Model statistics (f-score, precision, sensitivty)
 try:
     qmla.analysis.plot_statistics(
         to_plot = [wins, f_score, precision, sensitivity],

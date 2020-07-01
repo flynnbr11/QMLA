@@ -342,7 +342,7 @@ def plot_learned_models_dynamics(
 
     model_ids = list(sorted(set(model_ids)))  # only uniques values
     true_expec_vals = pickle.load(
-        open(qmd.qmla_controls.true_expec_path, 'rb'))
+        open(qmd.qmla_controls.system_measurements_file, 'rb'))
     times_to_plot = list(sorted(true_expec_vals.keys()))
 
     # TODO this is overwritten within for loop below so that large
@@ -350,7 +350,7 @@ def plot_learned_models_dynamics(
     true_exp = [true_expec_vals[t] for t in times_to_plot]
     qmd.log_print([
         "[Dynamics plot] plot probe file:", qmd.qmla_controls.probes_plot_file,
-        "\n true expectation value path:", qmd.qmla_controls.true_expec_path 
+        "\n true expectation value path:", qmd.qmla_controls.system_measurements_file 
     ])
     plot_probes = pickle.load(
         open(qmd.qmla_controls.probes_plot_file, 'rb')
