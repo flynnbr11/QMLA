@@ -38,6 +38,7 @@ class NVCentreNQubitBath(
         self.simulator_probe_generation_function = self.probe_generation_function
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
 
         # True model configuration        
         self.true_model = 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2'
