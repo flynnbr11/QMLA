@@ -195,7 +195,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     ):
         r"""Writng to unique QMLA instance log."""
         if log_identifier is None: 
-            log_identifier = 'QInfer interface'
+            log_identifier = 'QInfer interface {}'.format(self.model_name)
 
         qmla.logging.print_to_log(
             to_print_list = to_print_list, 
@@ -719,13 +719,12 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
                 if output[evoId][tId] < 0:
                     print("NEGATIVE PROB")
-                    self.log_print(
-                        [
-                            "[QLE] Negative probability : \
-                            \t \t probability = ",
-                            output[evoId][tId]
-                        ],
-                    )
+                    self.log_print([
+                        "Negative probability : \
+                        \n probability = ",
+                        output[evoId][tId],
+                        "\nat t=", t_list
+                    ])
                 elif output[evoId][tId] > 1.001:
                     self.log_print(
                         [
