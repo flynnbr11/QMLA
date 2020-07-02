@@ -89,7 +89,7 @@ class NVCentreNQubitBath(
             'other': 6
         }
         self.num_processes_to_parallelise_over = 8
-        self.timing_insurance_factor = 0.2
+        self.timing_insurance_factor = 0.5
 
         # Test: a few hand picked models to see if true model wins
         self.test_preset_models = False
