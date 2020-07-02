@@ -397,6 +397,8 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
             np.sqrt(np.abs(np.diag(cov_mtx)))
         ) # of the uncertainty on the individual parameters
 
+        orders_of_magnitude[orders_of_magnitude < 1] = 1 # lower bound
+
         probs_of_orders = [
             i/sum(orders_of_magnitude) for i in orders_of_magnitude
         ] # weight of each order of magnitude
