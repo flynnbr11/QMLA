@@ -35,7 +35,7 @@ class NVCentreNQubitBath(
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
 
@@ -132,7 +132,7 @@ class NVCentreNQubitBath(
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        max_num_qubits = self.max_num_qubits
+        max_num_qubits = 3
         test_prior_info = {}      
         paulis_to_include = self.availalbe_pauli_terms
 
