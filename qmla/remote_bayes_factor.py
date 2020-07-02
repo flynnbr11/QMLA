@@ -222,6 +222,11 @@ def remote_bayes_factor_calculation(
         bayes_factors_winners_db.set(pair_id, 'b')
     else:
         log_print(["Neither model much better."])
+        log_print([
+            "Renorm record A: \n {}".format(model_a.qinfer_updater._normalization_record),
+            "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
+
+        ])
 
     # Record this result to the branch
     if branch_id is not None:

@@ -35,20 +35,9 @@ class NVCentreNQubitBath(
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.simulator_probe_generation_function = self.probe_generation_function
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-
-        # True model configuration        
-        self.true_model = 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2'
-        self.true_model_terms_params = {
-            'pauliSet_1_x_d2': 0.92450565,
-            'pauliSet_1_y_d2': 6.00664336,
-            'pauliSet_1_z_d2': 1.65998543,
-            'pauliSet_2_y_d2' : 2, 
-            'pauliSet_1J2_zJz_d2': 0.76546868,
-        }
 
 
         # QMLA and model learning configuration
@@ -62,7 +51,7 @@ class NVCentreNQubitBath(
 
         non_spin_qubit_contributions = [
             'rotation', 
-            'coupling',
+            # 'coupling',
             # 'transverserse'
         ]
         self.stages_by_num_qubits = {
@@ -91,6 +80,9 @@ class NVCentreNQubitBath(
         self.fraction_own_experiments_for_bf = 0.5
         self.fraction_particles_for_bf = 0.5
 
+        # True model configuration        
+        self._set_true_params()
+
         # Logistics
         self.max_num_models_by_shape = {
             1 : 3,
@@ -102,39 +94,110 @@ class NVCentreNQubitBath(
         # Test: a few hand picked models to see if true model wins
         self.test_preset_models = False
         if self.test_preset_models:
+            self._setup_preset_models_test()
 
-            self.initial_models = [
-                'pauliSet_1_x_d1', 
-                'pauliSet_1_y_d1', 
-                'pauliSet_1_z_d1', 
-                'pauliSet_1_x_d1+pauliSet_1_y_d1', 
-                'pauliSet_1_x_d1+pauliSet_1_z_d1', 
-                'pauliSet_1_y_d1+pauliSet_1_z_d1', 
-                'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1', 
 
-                # 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-                # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
-                # 'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-                # 'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
-                # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
-                # 3 qubits
-                # 'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
-                # 'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
+    def _set_true_params(self):
+        # self.true_model = 'pauliSet_1_x_d2+pauliSet_1_z_d2'
+        # self.true_model = 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2'
+        # self.true_model_terms_params = {
+        #     'pauliSet_1_x_d2': 0.92450565,
+        #     'pauliSet_1_y_d2': 6.00664336,
+        #     'pauliSet_1_z_d2': 1.65998543,
+        #     'pauliSet_2_y_d2' : 2, 
+        #     'pauliSet_1J2_zJz_d2': 0.76546868,
+        # }
 
-            ]
-            self.initial_models = [
-                qmla.construct_models.alph(m) for m in self.initial_models
-            ]
-            self.tree_completed_initially = True
-            if self.tree_completed_initially:
-                self.max_spawn_depth = 1
-            self.max_num_models_by_shape = {
-                2 : 6,
-                1 : 7,
-                'other': 0
-            }
-            self.num_processes_to_parallelise_over = len(self.initial_models)+1
-            self.timing_insurance_factor = 0.25
+        self.max_time_to_consider = 50e-6
+        self.plot_time_increment = 0.5e-6
+
+        n_qubits = 2
+        self.true_model_terms_params = {
+            # spin
+            'pauliSet_1_z_d{}'.format(n_qubits) : 2e9,
+            
+            # coupling with 2nd qubit
+            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 0.2e6, 
+            'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 0.4e6, 
+            'pauliSet_1J2_xJx_d{}'.format(n_qubits) : 0.2e6, 
+
+            # carbon nuclei - 2nd qubit
+            'pauliSet_2_x_d{}'.format(n_qubits) : 66e3,
+            'pauliSet_2_y_d{}'.format(n_qubits) : 66e3,
+            'pauliSet_2_z_d{}'.format(n_qubits) : 15e3,
+        }
+        self.true_model = '+'.join(
+            (self.true_model_terms_params.keys())
+        )
+        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.availalbe_pauli_terms  = ['x', 'y', 'z']
+
+        max_num_qubits = self.max_num_qubits
+        test_prior_info = {}      
+        paulis_to_include = self.availalbe_pauli_terms
+
+        for pauli in paulis_to_include:
+
+            for num_qubits in range(1, 1+max_num_qubits):
+        
+                spin_rotation_term = 'pauliSet_1_{p}_d{N}'.format(
+                    p=pauli, N=num_qubits)
+                test_prior_info[spin_rotation_term] = (5e9, 2e9)
+
+                for j in range(2, 1+num_qubits):
+
+                    nuclei_rotation = 'pauliSet_{j}_{p}_d{N}'.format(
+                        j = j, 
+                        p = pauli, 
+                        N = num_qubits
+                    )
+                    test_prior_info[nuclei_rotation] = (5e4, 2e4)
+
+                    coupling_w_spin = 'pauliSet_1J{j}_{p}J{p}_d{N}'.format(
+                        j = j, 
+                        p = pauli,
+                        N = num_qubits
+                    )
+                    test_prior_info[coupling_w_spin] = (5e5, 2e5)
+
+                    # TODO add transverse terms
+
+        self.gaussian_prior_means_and_widths = test_prior_info
+
+
+    def _setup_preset_models_test(self):
+        self.initial_models = [
+            'pauliSet_1_x_d1', 
+            'pauliSet_1_y_d1', 
+            'pauliSet_1_z_d1', 
+            'pauliSet_1_x_d1+pauliSet_1_y_d1', 
+            'pauliSet_1_x_d1+pauliSet_1_z_d1', 
+            'pauliSet_1_y_d1+pauliSet_1_z_d1', 
+            'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1', 
+
+            # 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+            # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
+            # 'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
+            # 'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
+            # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
+            # 3 qubits
+            # 'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
+            # 'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
+
+        ]
+        self.initial_models = [
+            qmla.construct_models.alph(m) for m in self.initial_models
+        ]
+        self.tree_completed_initially = True
+        if self.tree_completed_initially:
+            self.max_spawn_depth = 1
+        self.max_num_models_by_shape = {
+            2 : 6,
+            1 : 7,
+            'other': 0
+        }
+        self.num_processes_to_parallelise_over = len(self.initial_models)+1
+        self.timing_insurance_factor = 0.25
 
 
     # Model generation / QMLA progression
@@ -150,8 +213,8 @@ class NVCentreNQubitBath(
             self.log_print(["Available: rotation terms"])
             available_terms = [
                 'pauliSet_{N}_{p}_d{N}'.format(p=pauli_term, N=num_qubits)
-                for pauli_term in 
-                ['x', 'y']
+                for pauli_term in self.availalbe_pauli_terms
+                # ['x', 'y']
                 # ['x', 'y', 'z']
             ]
         elif substage == 'coupling':
@@ -162,7 +225,8 @@ class NVCentreNQubitBath(
                     p = pauli_term, 
                     N = num_qubits
                 )
-                for pauli_term in ['x', 'y', 'z']
+                for pauli_term in self.availalbe_pauli_terms
+                # ['x', 'y', 'z']
             ]
         elif 'transverse' in self.spawn_stage[-1]:
             self.log_print(["Available: transverse terms"])

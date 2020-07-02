@@ -471,8 +471,8 @@ class BranchQMLA():
                 # if multiple models have same number of wins,
                 # can't declare a branch champion yet
                 self.log_print([
-                    "Multiple models have same number of points within branch {}:\n{}".format(
-                        self.branch_id, models_with_max_points
+                    "Multiple models have same number of points within branch {}:\n{} \nPoints:\n{}".format(
+                        self.branch_id, models_with_max_points, models_points
                     )
                 ])
                 # Set joint champions so QMLA can re-compare the subset

@@ -257,8 +257,6 @@ class QuantumModelLearningAgent():
         if self.num_experiments_for_bayes_updates > self.num_experiments:
             self.num_experiments_for_bayes_updates = self.qmla_controls.num_experiments
 
-        # self.bayes_threshold_lower = self.qmla_controls.bayes_lower
-        # self.bayes_threshold_upper = self.qmla_controls.bayes_upper
         self.bayes_threshold_lower = 1
         self.bayes_threshold_upper = 100 # TODO get from GR
 
@@ -967,8 +965,8 @@ class QuantumModelLearningAgent():
         else:
             champ = None
             self.log_print([
-                "Neither model sufficiently better to earn point between {}/{}".format(
-                    mod_low.model_id, mod_high.model_id
+                "Neither model sufficiently better to earn point between {}/{}. BF={}".format(
+                    mod_low.model_id, mod_high.model_id, bayes_factor
                 )
             ])
 
@@ -1014,7 +1012,8 @@ class QuantumModelLearningAgent():
             mod1, mod2 = pair
             if mod1 != mod2:
                 res = self.process_model_pair_comparison(a=mod1, b=mod2)
-                models_points[res] += 1
+                if res is not None: 
+                    models_points[res] += 1
                 self.log_print([
                     "[process_model_set_comparisons]",
                     "Point to", res,
@@ -1022,6 +1021,9 @@ class QuantumModelLearningAgent():
                 ])
 
         # Analyse pairwise competition
+        self.log_print([
+            "Models points: \n{}".format(models_points)
+        ])
         max_points = max(models_points.values())
         models_with_max_points = [key for key, val in models_points.items()
                                   if val == max_points]
@@ -1029,7 +1031,8 @@ class QuantumModelLearningAgent():
             self.log_print([
                 "Multiple models \
                 have same number of points in process_model_set_comparisons:",
-                models_with_max_points
+                models_with_max_points,
+                "\n Model points:\n", models_points
             ])
             self.log_print(["After re-comparison, points:\n", models_points])
             self.compare_model_set(
@@ -1105,10 +1108,11 @@ class QuantumModelLearningAgent():
                 res = self.process_model_pair_comparison(
                     a=mod1, b=mod2
                 )
-                try:
-                    models_points[res] += 1
-                except BaseException:
-                    models_points[res] = 1
+                if res is not None: 
+                    try:
+                        models_points[res] += 1
+                    except BaseException:
+                        models_points[res] = 1
                 self.log_print([
                     "[branch {} comparison {}/{}] ".format(
                         branch_id, mod1, mod2
