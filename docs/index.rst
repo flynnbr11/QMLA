@@ -11,8 +11,8 @@ Quantum Model Learning Agent
 .. module:: qmla
 
 .. toctree::
-    intro
     glossary
+    intro
     guide/index
     apiref/index
     bib

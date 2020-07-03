@@ -20,4 +20,5 @@ User Guide
     growth_rule_tree
     modular_functions
     probes
+    experiment_design
     analysis

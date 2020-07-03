@@ -93,14 +93,20 @@ class BaseHeuristicQMLA(qi.Heuristic):
         self._volumes.append(current_volume)
 
         if self._updater.just_resampled:
-            self._resample_epochs.append(kwargs['epoch_id'] -1 )
+            self._resample_epochs.append( kwargs['epoch_id'] -1 )
         
         self.effective_sample_size.append(self._updater.n_ess)
 
         # Design a new experiment
         new_experiment =  self.design_experiment(**kwargs)
         new_time = new_experiment['t']
+        if new_time > 1e6: 
+            new_time = np.random.uniform(1e6, 1e7)
+            self.log_print([
+                "Time too high -> randomising to ", new_time
+            ])
         self._times_suggested.append(new_time)
+        new_experiment['t'] = new_time
         return new_experiment
 
     def design_experiment(self, **kwargs):

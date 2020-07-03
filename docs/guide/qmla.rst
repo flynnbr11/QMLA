@@ -30,15 +30,15 @@ similarly construct models
 based on the information available to the GR so far. 
 
 Each branch is resident on its associated GR tree, but also the branch is known
-to **QMLA**. Branches are assigned unique IDs by QMLA, such that QMLA has a 
+to QMLA. Branches are assigned unique IDs by QMLA, such that QMLA has a 
 birds-eye view of all of the mdoels on all branches on all GR trees. 
-**QMLA** calls on the GR (via the GR tree) for a set of models to place on
+QMLA calls on the GR (via the GR tree) for a set of models to place on
 its next branch, completely indifferent to how those models are generated, 
 or whether they have been learned already. 
 This allows for completely self-contained logic in the GR: 
-**QMLA** will simply learn and compare
+QMLA will simply learn and compare
 the models it is presented - it is up to the GR to decide how to interpret them. 
-As such the core **QMLA** class can be thought of as a simple loop: 
+As such the core QMLA algorithm can be thought of as a simple loop: 
 while the GR tree continues to return models, place those models on a branch, learn them 
 and compare them. 
 When all GR trees indicate they are finished, compare the champions of each tree against each other, 

@@ -6,7 +6,7 @@ Glossary
     :sorted:
 
     Instance 
-        A single implementation of **QMLA**. 
+        A single implementation of QMLA. 
     
     Run
         A collection of :term:`Instance`s. Note that for a run, 
@@ -31,7 +31,9 @@ Glossary
         The target system, i.e. underlying model. 
         In simulation, this is used to generate the expectation values
         against which likelihood estimation occurs. 
-        In experiments, this is unknown. 
+        In experiments, the form of the system is unknown, but 
+        data obtained from experiments are used in the likelihood 
+        estimation instead. 
 
     True Model
         .. seealso:: :term:`System`

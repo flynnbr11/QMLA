@@ -91,7 +91,7 @@ or a nearest-neighbour connected Ising chain :math:`\hat{H}_2`:
 Then, models exist in a `model space`, i.e. the space of all available terms.
 Any combination of terms is permissible in a given model. 
 QMLA can then be thought of as a search through the model space for 
-the set of terms which best match the system. 
+the set of terms which produce data that best matches that of the system. 
 
 
 
