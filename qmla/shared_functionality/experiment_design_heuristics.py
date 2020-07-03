@@ -101,7 +101,9 @@ class BaseHeuristicQMLA(qi.Heuristic):
         new_experiment =  self.design_experiment(**kwargs)
         new_time = new_experiment['t']
         if new_time > 1e6: 
-            new_time = np.random.uniform(1e6, 1e7)
+            # TODO understamd cutoff at which time 
+            # calculation becomes unstable
+            new_time = np.random.uniform(1e5, 1e6)
             self.log_print([
                 "Time too high -> randomising to ", new_time
             ])
