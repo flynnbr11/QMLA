@@ -207,7 +207,10 @@ def make_inversion_gate_rotate_y(num_qubits):
     :output : inversion gate
     """
     from scipy import linalg
-    sigma_y = np.array([[0 + 0.j, 0 - 1.j], [0 + 1.j, 0 + 0.j]])
+    sigma_y = np.array([
+        [0 + 0.j, 0 - 1.j], 
+        [0 + 1.j, 0 + 0.j]
+    ])
     hahn_angle = np.pi / 2
     hahn_gate = np.kron(
         hahn_angle * sigma_y,

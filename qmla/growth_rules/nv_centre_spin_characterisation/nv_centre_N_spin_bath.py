@@ -82,6 +82,10 @@ class NVCentreNQubitBath(
 
         # True model configuration        
         self._set_true_params()
+        # self.true_model = 'pauliSet_1_y_d2'
+        # self.num_probes = 1
+        # self.hard_fix_resample_effective_sample_size = 0
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedTimeTest
 
         # Logistics
         self.max_num_models_by_shape = {

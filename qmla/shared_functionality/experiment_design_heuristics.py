@@ -911,3 +911,35 @@ class RandomTimeUpperBounded(BaseHeuristicQMLA):
         return eps
 
 
+class FixedTimeTest(BaseHeuristicQMLA):
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+
+
+    def design_experiment(
+        self,
+        epoch_id=0,
+        **kwargs
+    ):
+        new_time = 3e10
+        # new_time  = self._max_time
+
+        eps = self._get_exp_params_array()
+        eps['t'] = new_time
+
+        # get sample from x
+        particle = self._updater.sample()
+        n_params = particle.shape[1]
+
+        for i in range(n_params):
+            p = particle[0][i]            
+            corresponding_expparam = self._model.modelparam_names[i]
+            eps[corresponding_expparam] = p
+
+        return eps
+
+
+

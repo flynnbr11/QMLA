@@ -67,7 +67,6 @@ class GrowthRule():
         else: 
             self.plot_probes_path = None
 
-        # self.assign_parameters()
         self._setup_modular_functions()
         self._setup_true_model()
         self._setup_model_learning()
@@ -395,7 +394,6 @@ class GrowthRule():
 
         # Infrastructure for tracking
         self.storage = qmla.utilities.StorageUnit()
-        # self.model_branches = {}
         self.spawn_stage = [None]
         self.spawn_step = 0
         self.prune_complete = False

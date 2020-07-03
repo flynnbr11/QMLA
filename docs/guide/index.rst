@@ -7,10 +7,17 @@
     
 .. _guide:
 
-User's Guide
+User Guide
 ============
 
 .. toctree::
     :maxdepth: 2
 
     qmla
+    growth_rule
+    quantum_hamiltonian_learning
+    bayes_factors
+    growth_rule_tree
+    modular_functions
+    probes
+    analysis

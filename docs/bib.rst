@@ -4,11 +4,11 @@
     license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/ or send a
     letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
     California, 94041, USA.
+
+.. _biblo:
     
-.. _intro:
+.. only:: not latex
 
-============
-Introduction
-============
+    Biblography
+    ===========
 
-**QMLA** is a library for learning the models of quantum systems through machine learning. 

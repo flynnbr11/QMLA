@@ -3,7 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to QuantumModelLearningAgent's documentation!
+=====================================================
+Quantum Model Learning Agent
 =====================================================
 
 
@@ -11,8 +12,10 @@ Welcome to QuantumModelLearningAgent's documentation!
 
 .. toctree::
     intro
+    glossary
     guide/index
     apiref/index
+    bib
     :maxdepth: 2
 
 

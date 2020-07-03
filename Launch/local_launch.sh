@@ -9,7 +9,7 @@ num_instances=1
 run_qhl=1 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
-q_id=0 # can start from other ID if desired
+q_id=0 # isntance ID can start from other ID if desired
 exp=20 # number of experiments
 prt=20 # number of particles
 

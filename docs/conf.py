@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'QuantumModelLearningAgent'
+project = 'Quantum Model Learning Agent'
 copyright = '2020, Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 author = 'Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 
@@ -27,6 +27,71 @@ author = 'Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 version = ''
 # The full version, including alpha/beta/rc tags
 release = '0'
+
+# -- Abstract ---------------------------------------------------
+
+# The LaTeX preamble is placed here so that it can be used both by pngmath
+# and by the LaTeX output plugin.
+with open('abstract.txt', 'r') as f:
+    abstract = f.read()
+
+preamble = r"""
+\usepackage{amsfonts}
+\usepackage{bbm}
+\usepackage[bold]{hhtensor}
+\newcommand{\T}{\mathrm{T}}
+\newcommand{\Tr}{\mathrm{Tr}}
+\newcommand{\ident}{\mathbbm{1}}
+\newcommand{\ave}{\mathrm{ave}}
+\newcommand{\ii}{\mathrm{i}}
+\newcommand{\expect}{\mathbb{E}}
+\usepackage{braket}
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{titlepage}%
+    \let\footnotesize\small
+    \let\footnoterule\relax
+    \rule{\textwidth}{1pt}%
+    \begingroup
+    % These \defs are required to deal with multi-line authors; it
+    % changes \\ to ', ' (comma-space), making it pass muster for
+    % generating document info in the PDF file.
+    \def\\{, }
+    \def\and{and }
+    \pdfinfo{
+    /Author (\@author)
+    /Title (\@title)
+    }
+    \endgroup
+    \begin{flushright}%
+      \sphinxlogo%
+      {\rm\Huge\py@HeaderFamily \@title \par}%
+      % {\em\LARGE\py@HeaderFamily \py@release\releaseinfo \par}
+      \vfill
+      {\LARGE\py@HeaderFamily
+        \begin{tabular}[t]{c}
+          \@author
+        \end{tabular}
+        \par}
+      \vfill
+      {\large
+       \@date \par
+       \vfill
+       \py@authoraddress \par
+      }%
+      {\bf\sffamily}
+      ABSTRACT_HERE%
+      \vfill
+    \end{flushright}%\par
+    \@thanks
+  \end{titlepage}%
+  %\cleardoublepage%
+  \setcounter{footnote}{0}%
+  \let\thanks\relax\let\maketitle\relax
+  %\gdef\@thanks{}\gdef\@author{}\gdef\@title{}
+}
+\makeatother
+""".replace("ABSTRACT_HERE", abstract)
 
 
 # -- General configuration ---------------------------------------------------
@@ -130,17 +195,24 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'QuantumModelLearningAgent.tex', 'QuantumModelLearningAgent Documentation',
+    (master_doc, 'QuantumModelLearningAgent.tex', 'Quantum Model Learning Agent Documentation',
      'Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati', 'manual'),
 ]
 
+# Additional stuff for the LaTeX preamble.
+latex_preamble = preamble
+# In Sphinx 1.5, this now appears as latex_elements, so we pack the
+# preamble that way, too.
+latex_elements = {
+    'preamble': preamble
+}
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'quantummodellearningagent', 'QuantumModelLearningAgent Documentation',
+    (master_doc, 'quantummodellearningagent', 'Quantum Model Learning Agent Documentation',
      [author], 1)
 ]
 
@@ -151,7 +223,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'QuantumModelLearningAgent', 'QuantumModelLearningAgent Documentation',
+    (master_doc, 'QuantumModelLearningAgent', 'Quantum Model Learning Agent Documentation',
      author, 'QuantumModelLearningAgent', 'One line description of project.',
      'Miscellaneous'),
 ]
