@@ -42,7 +42,6 @@ class NVCentreNQubitBath(
 
         # QMLA and model learning configuration
         self.initial_models = None
-        self.qhl_models =  ['pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1']
         self.prune_completed_initially = True # pruning is implicit in the spawn rule
 
         self.min_param = 0
@@ -82,6 +81,17 @@ class NVCentreNQubitBath(
 
         # True model configuration        
         self._set_true_params()
+        self.qhl_models =  [
+            'pauliSet_1_x_d1',
+            'pauliSet_1_y_d1',
+            'pauliSet_1_z_d1',
+
+            'pauliSet_1_x_d1+pauliSet_1_z_d1',
+            'pauliSet_1_x_d1+pauliSet_1_y_d1',
+            'pauliSet_1_y_d1+pauliSet_1_z_d1',
+
+            'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1',
+        ]
         # self.true_model = 'pauliSet_1_y_d2'
         # self.num_probes = 1
         # self.hard_fix_resample_effective_sample_size = 0
