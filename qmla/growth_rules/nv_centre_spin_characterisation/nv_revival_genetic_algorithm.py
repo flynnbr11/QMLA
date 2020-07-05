@@ -81,11 +81,6 @@ class NVCentreRevivalSimulation(
 
     def _set_true_params(self):
 
-        self.max_time_to_consider = 50e-6
-        self.plot_time_increment = 0.5e-6
-
-        self.min_param = 0
-        self.max_param = 1e6
 
         n_qubits = 2
         self.true_model_terms_params = {
@@ -109,6 +104,13 @@ class NVCentreRevivalSimulation(
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
     def _setup_prior(self):
+        self.max_time_to_consider = 50e-6
+        self.plot_time_increment = 0.5e-6
+
+        self.min_param = 0
+        self.max_param = 1e6
+
+
         max_num_qubits = 3
         test_prior_info = {}      
         paulis_to_include = self.availalbe_pauli_terms
