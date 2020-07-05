@@ -43,6 +43,8 @@ growth_classes = {
         GR.NVCentreRevivalsSimulated,
     'NVCentreNQubitBath' : 
         GR.NVCentreNQubitBath, 
+    'NVCentreRevivalSimulation' : 
+        GR.NVCentreRevivalSimulation,
 
     # Theoretical paper growth rules
     'IsingPredetermined':

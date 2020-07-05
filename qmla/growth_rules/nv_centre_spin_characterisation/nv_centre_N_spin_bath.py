@@ -82,15 +82,15 @@ class NVCentreNQubitBath(
         # True model configuration        
         self._set_true_params()
         self.qhl_models =  [
-            'pauliSet_1_x_d1',
+            # 'pauliSet_1_x_d1',
             'pauliSet_1_y_d1',
-            'pauliSet_1_z_d1',
+            # 'pauliSet_1_z_d1',
 
-            'pauliSet_1_x_d1+pauliSet_1_z_d1',
-            'pauliSet_1_x_d1+pauliSet_1_y_d1',
-            'pauliSet_1_y_d1+pauliSet_1_z_d1',
+            # 'pauliSet_1_x_d1+pauliSet_1_z_d1',
+            # 'pauliSet_1_x_d1+pauliSet_1_y_d1',
+            # 'pauliSet_1_y_d1+pauliSet_1_z_d1',
 
-            'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1',
+            # 'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1',
         ]
         # self.true_model = 'pauliSet_1_y_d2'
         # self.num_probes = 1

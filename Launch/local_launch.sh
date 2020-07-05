@@ -7,11 +7,11 @@
 ###############
 num_instances=1
 run_qhl=0 # perform QHL on known (true) model
-run_qhl_mulit_model=1 # perform QHL for defined list of models.
+run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=100 # number of experiments
-prt=100 # number of particles
+exp=3 # number of experiments
+prt=10 # number of particles
 
 ###############
 # QMLA settings
@@ -38,7 +38,8 @@ number_best_models_further_qhl=5
 # growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
-growth_rule='NVCentreNQubitBath'
+# growth_rule='NVCentreNQubitBath'
+growth_rule='NVCentreRevivalSimulation'
 
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'

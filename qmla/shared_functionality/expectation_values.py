@@ -387,8 +387,12 @@ def n_qubit_hahn_evolution(
     # expect_value is projection onto |+>
     # for this case Pr(0) refers to projection onto |->
     # so return 1 - expect_value
+    likelihood = 1 - expect_value
 
-    return 1 - expect_value
+    if likelihood > 1 or likelihood < 0:
+        print("Unphysical expectation value:", likelihood)
+
+    return likelihood
     # return expect_value
 
 
