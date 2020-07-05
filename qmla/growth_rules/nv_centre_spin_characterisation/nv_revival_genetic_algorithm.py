@@ -41,6 +41,7 @@ class NVCentreRevivalSimulation(
             genes = available_terms,
             **kwargs
         )
+        self._setup_prior()
 
         # Modular functions
         self.expectation_value_function = qmla.shared_functionality.n_qubit_hahn_evolution
@@ -53,7 +54,7 @@ class NVCentreRevivalSimulation(
         self.branch_comparison_strategy = 'optimal_graph'
         self.fitness_method =  'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 14
+        num_models_per_generation =  14
         self.max_spawn_depth =  12
 
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
@@ -107,6 +108,7 @@ class NVCentreRevivalSimulation(
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
+    def _setup_prior(self):
         max_num_qubits = 3
         test_prior_info = {}      
         paulis_to_include = self.availalbe_pauli_terms
