@@ -1222,14 +1222,6 @@ class ModelInstanceForLearning():
 
     def _plot_dynamics(self):
         
-        self.system_measurements = {
-            t : self.experimental_measurements[t] for t in times
-        }
-        self.log_print([
-            "Computing dynamics. \nTimes={} \n system={} \n model:{}".format(
-                times, self.system_measurements, self.expectation_values
-            )
-        ])
         # Plot dynamics of model vs system
         plt.clf()
         fig, ax = plt.subplots(
@@ -1237,13 +1229,16 @@ class ModelInstanceForLearning():
             constrained_layout=True
         )
 
+        # System
+        times = sorted(self.expectation_values.keys())
         ax.scatter(
             times, 
-            [self.system_measurements[t] for t in times], 
+            [self.experimental_measurements[t] for t in times], 
             color='red',
             label = 'System'
         )
 
+        # This model
         ax.plot(
             times, 
             [self.expectation_values[t] for t in times], 

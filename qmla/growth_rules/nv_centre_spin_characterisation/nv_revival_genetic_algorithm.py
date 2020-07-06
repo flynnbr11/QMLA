@@ -30,9 +30,20 @@ class NVCentreRevivalSimulation(
         # Fundamental set up
         self._set_true_params()
         available_terms = [
-            'pauliSet_1_x_d2', 'pauliSet_1_y_d2', 'pauliSet_1_z_d2', 
-            'pauliSet_1J2_xJx_d2', 'pauliSet_1J2_yJy_d2', 'pauliSet_1J2_zJz_d2', 
-            'pauliSet_2_x_d2', 'pauliSet_2_y_d2', 'pauliSet_2_z_d2', 
+            # electron spin rotation terms
+            'pauliSet_1_x_d2', 
+            'pauliSet_1_y_d2', 
+            'pauliSet_1_z_d2', 
+
+            # 2nd qubits
+            # coupling with spin
+            'pauliSet_1J2_xJx_d2', 
+            'pauliSet_1J2_yJy_d2', 
+            'pauliSet_1J2_zJz_d2', 
+            # rotation
+            'pauliSet_2_x_d2', 
+            'pauliSet_2_y_d2', 
+            'pauliSet_2_z_d2', 
         ]
 
         super().__init__(
@@ -43,6 +54,7 @@ class NVCentreRevivalSimulation(
         )
         self._set_true_params()
         self._setup_prior()
+        self._setup_test_learn_ghz_params()
 
         # Modular functions
         self.expectation_value_function = qmla.shared_functionality.n_qubit_hahn_evolution
@@ -143,3 +155,22 @@ class NVCentreRevivalSimulation(
                     # TODO add transverse terms
 
         self.gaussian_prior_means_and_widths = test_prior_info
+
+    def _setup_test_learn_ghz_params(self):
+        # make uncertainty on all other parmaters thin around true params 
+        # to force it to learn GHz param only. 
+        n_qubits = 2
+        self.gaussian_prior_means_and_widths = {
+            # spin
+            'pauliSet_1_z_d{}'.format(n_qubits) : (5e9, 2e9),
+            
+            # coupling with 2nd qubit
+            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : (0.2e6, 1e2), 
+            'pauliSet_1J2_yJy_d{}'.format(n_qubits) : (0.4e6, 1e2), 
+            'pauliSet_1J2_xJx_d{}'.format(n_qubits) : (0.2e6, 1e2),
+
+            # carbon nuclei - 2nd qubit
+            'pauliSet_2_x_d{}'.format(n_qubits) : (66e3, 1e1),
+            'pauliSet_2_y_d{}'.format(n_qubits) : (66e3, 1e1),
+            'pauliSet_2_z_d{}'.format(n_qubits) : (15e3, 1e1),
+        }
