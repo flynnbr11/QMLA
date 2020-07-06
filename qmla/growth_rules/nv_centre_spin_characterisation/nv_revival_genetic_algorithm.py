@@ -75,7 +75,7 @@ class NVCentreRevivalSimulation(
         }
         # self.num_processes_to_parallelise_over = 16
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 1
+        self.timing_insurance_factor = 0.35
 
 
     def _set_true_params(self):
