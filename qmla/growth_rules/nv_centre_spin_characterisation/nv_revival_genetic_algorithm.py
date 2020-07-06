@@ -40,7 +40,7 @@ class NVCentreRevivalSimulation(
         )
         self._set_true_params()
         self._setup_prior()
-        self._setup_test_learn_ghz_params()
+        # self._setup_test_learn_ghz_params()
 
         # Modular functions
         self.expectation_value_function = qmla.shared_functionality.n_qubit_hahn_evolution
