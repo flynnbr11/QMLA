@@ -418,7 +418,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         )
         if self.force_order is not None: 
             selected_order = self.force_order
-            
+
         try:
             self.count_order_of_magnitudes[ np.round(selected_order)] += 1
         except:
@@ -436,6 +436,9 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
 
         d = self._model.distance(x, xp)
         new_time = 1 / d
+
+        if self.force_order == 9:
+            new_time *= 100
         experiment[self._t] = new_time
 
         # print("Available orders of magnitude:", orders_of_magnitude)
