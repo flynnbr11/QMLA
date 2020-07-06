@@ -49,7 +49,7 @@ class NVCentreRevivalSimulation(
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
 
         # Genetic algorithm options
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
         self.branch_comparison_strategy = 'optimal_graph'
         self.fitness_method =  'elo_ratings'  # 'f_score'
 
