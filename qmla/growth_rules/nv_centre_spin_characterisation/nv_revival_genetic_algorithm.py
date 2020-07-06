@@ -62,8 +62,8 @@ class NVCentreRevivalSimulation(
         ]
 
         # Logistics
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_own_experiments_for_bf = 0.25
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_own_experiments_for_bf = 0.5
         self.fraction_opponents_experiments_for_bf = 0.5
 
         if self.tree_completed_initially:
