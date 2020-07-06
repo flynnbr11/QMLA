@@ -6,7 +6,7 @@
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=0 # perform QHL on known (true) model
+run_qhl=1 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
@@ -85,7 +85,7 @@ cp $(pwd)/local_launch.sh "$this_run_directory/launched_script.txt"
 git_commit=$(git rev-parse HEAD)
 
 ###############
-# First set up parameters/data to be used by all instances of QMD for this run. 
+# First set up parameters/data to be used by all instances of QMLA for this run. 
 ###############
 
 python3 ../scripts/set_qmla_params.py \

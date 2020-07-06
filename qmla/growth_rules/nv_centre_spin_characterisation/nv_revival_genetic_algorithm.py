@@ -41,6 +41,7 @@ class NVCentreRevivalSimulation(
             genes = available_terms,
             **kwargs
         )
+        self._set_true_params()
         self._setup_prior()
 
         # Modular functions
