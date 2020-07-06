@@ -21,6 +21,8 @@ further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
 number_best_models_further_qhl=5
+plot_level='model' #'instance'
+debug_mode=0
 
 ###############
 # Choose a growth rule This will determine how QMD proceeds. 
@@ -155,6 +157,8 @@ do
         -e=$exp \
         -rq=$use_rq \
         -pt=$plots \
+        -pl=$plot_level \
+        -debug=$debug_mode \
         -dir=$this_run_directory \
         -pkl=1 \
         -log=$log_for_entire_run \

@@ -161,6 +161,8 @@ class ModelInstanceForLearning():
             open(qmla_core_info_dict['probes_plot_file'], 'rb')
         )
         self.plots_directory = qmla_core_info_dict['plots_directory']
+        self.debug_mode = qmla_core_info_dict['debug_mode']
+        self.plot_level = qmla_core_info_dict['plot_level']
 
         # Instantiate growth rule
         self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
@@ -502,38 +504,40 @@ class ModelInstanceForLearning():
             * qmla.construct_models.compute(term)
             for term in self.qhl_final_param_estimates
         ])
+        self._compute_expectation_values()
 
-        # Plots for this model
-        # TODO replace excepts prints with warnings
-        self._plot_preliminary_preparation()
-        try:
-            self._plot_distributions()
-        except BaseException:
-            self.log_print(["Failed to plot posterior"])
-        try:
-            self._plot_learning_summary()
-        except BaseException:
-            self.log_print(["Failed to _plot_learning_summary"])
+        if self.plot_level >= 3:
+            # Plots for this model, if plot level wants to include them
+            # TODO replace excepts prints with warnings
+            self._plot_preliminary_preparation()
+            try:
+                self._plot_distributions()
+            except BaseException:
+                self.log_print(["Failed to plot posterior"])
+            try:
+                self._plot_learning_summary()
+            except BaseException:
+                self.log_print(["Failed to _plot_learning_summary"])
 
-        try:
-            self._plot_dynamics()
-        except:
-            self.log_print(["Failed to plot model dynamics."])
-            raise
-        try:
-            self.model_heuristic.plot_heuristic_attributes(
-                save_to_file=os.path.join(
-                    self.model_learning_plots_directory,
-                    '{}heuristic_attributes_{}.png'.format(
-                        self.plot_prefix, self.model_id)
+            try:
+                self._plot_dynamics()
+            except:
+                self.log_print(["Failed to plot model dynamics."])
+                raise
+            try:
+                self.model_heuristic.plot_heuristic_attributes(
+                    save_to_file=os.path.join(
+                        self.model_learning_plots_directory,
+                        '{}heuristic_attributes_{}.png'.format(
+                            self.plot_prefix, self.model_id)
+                    )
                 )
-            )
-        except BaseException:
-            self.log_print(["Failed to plot_heuristic_attributes"])
-        try:
-            self._plot_posterior_mesh_pairwise()
-        except BaseException:
-            self.log_print(["failed to _plot_poster_mesh_pairwise"])
+            except BaseException:
+                self.log_print(["Failed to plot_heuristic_attributes"])
+            try:
+                self._plot_posterior_mesh_pairwise()
+            except BaseException:
+                self.log_print(["failed to _plot_poster_mesh_pairwise"])
 
         
 
@@ -579,7 +583,6 @@ class ModelInstanceForLearning():
         learned_info['qinfer_pr0_diff_from_true'] = np.array(
             self.qinfer_model.store_p0_diffs)
         learned_info['expectation_values'] = self.expectation_values
-        learned_info['system_measurements'] = self.system_measurements
 
         # additionally wanted by comparison class
         learned_info['name'] = self.model_name
@@ -1201,17 +1204,11 @@ class ModelInstanceForLearning():
                          '{}posterior_mesh_pairwise_{}.png'.format(self.plot_prefix, self.model_id))
         )
 
-    def _plot_dynamics(self):
-        
+    def _compute_expectation_values(self):
         times = self.experimental_measurement_times
         model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
         if model_num_qubits > 4:
             times = times[::10] # reduce times to compute 
-        self.system_measurements = {
-            t : self.experimental_measurements[t] for t in times
-        }
-
-
         plot_probe = self.plot_probes[model_num_qubits]
 
         self.expectation_values = {
@@ -1222,8 +1219,12 @@ class ModelInstanceForLearning():
             )
             for t in times
         }
-        
 
+    def _plot_dynamics(self):
+        
+        self.system_measurements = {
+            t : self.experimental_measurements[t] for t in times
+        }
         self.log_print([
             "Computing dynamics. \nTimes={} \n system={} \n model:{}".format(
                 times, self.system_measurements, self.expectation_values

@@ -132,6 +132,8 @@ class QuantumModelLearningAgent():
         self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
         self.results_directory = self.qmla_controls.results_directory
+        self.debug_mode = self.qmla_controls.debug_mode
+        self.plot_level = self.qmla_controls.plot_level
 
         # Databases for storing learning/comparison data
         self.redis_databases = rds.get_redis_databases_by_qmla_id(
@@ -433,6 +435,8 @@ class QuantumModelLearningAgent():
             'num_experiments': self.num_experiments,
             'results_directory': self.results_directory,
             'plots_directory': self.qmla_controls.plots_directory,
+            'debug_mode' : self.debug_mode, 
+            'plot_level' : self.plot_level, 
             'long_id': self.qmla_controls.long_id,
             'model_priors': self.model_priors,  # could be path to unpickle within model?
             'experimental_measurements': self.experimental_measurements,
