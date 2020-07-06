@@ -157,6 +157,9 @@ class ModelInstanceForLearning():
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.true_params_path = qmla_core_info_dict['run_info_file']
+        self.plot_probes = pickle.load(
+            open(qmla_core_info_dict['probes_plot_file'], 'rb')
+        )
         self.plots_directory = qmla_core_info_dict['plots_directory']
 
         # Instantiate growth rule
@@ -511,6 +514,12 @@ class ModelInstanceForLearning():
             self._plot_learning_summary()
         except BaseException:
             self.log_print(["Failed to _plot_learning_summary"])
+
+        try:
+            self._plot_dynamics()
+        except:
+            self.log_print(["Failed to plot model dynamics."])
+            raise
         try:
             self.model_heuristic.plot_heuristic_attributes(
                 save_to_file=os.path.join(
@@ -525,6 +534,8 @@ class ModelInstanceForLearning():
             self._plot_posterior_mesh_pairwise()
         except BaseException:
             self.log_print(["failed to _plot_poster_mesh_pairwise"])
+
+        
 
     def learned_info_dict(self):
         """
@@ -567,6 +578,8 @@ class ModelInstanceForLearning():
         learned_info['qinfer_model_likelihoods'] = self.qinfer_model.store_likelihoods
         learned_info['qinfer_pr0_diff_from_true'] = np.array(
             self.qinfer_model.store_p0_diffs)
+        learned_info['expectation_values'] = self.expectation_values
+        learned_info['system_measurements'] = self.system_measurements
 
         # additionally wanted by comparison class
         learned_info['name'] = self.model_name
@@ -1187,6 +1200,68 @@ class ModelInstanceForLearning():
             os.path.join(self.model_learning_plots_directory,
                          '{}posterior_mesh_pairwise_{}.png'.format(self.plot_prefix, self.model_id))
         )
+
+    def _plot_dynamics(self):
+        
+        times = self.experimental_measurement_times
+        model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
+        if model_num_qubits > 4:
+            times = times[::10] # reduce times to compute 
+        self.system_measurements = {
+            t : self.experimental_measurements[t] for t in times
+        }
+
+
+        plot_probe = self.plot_probes[model_num_qubits]
+
+        self.expectation_values = {
+            t : self.growth_class.expectation_value(
+                ham = self.learned_hamiltonian, 
+                t = t, 
+                state = plot_probe
+            )
+            for t in times
+        }
+        
+
+        self.log_print([
+            "Computing dynamics. \nTimes={} \n system={} \n model:{}".format(
+                times, self.system_measurements, self.expectation_values
+            )
+        ])
+        # Plot dynamics of model vs system
+        plt.clf()
+        fig, ax = plt.subplots(
+            figsize=(18, 10),
+            constrained_layout=True
+        )
+
+        ax.scatter(
+            times, 
+            [self.system_measurements[t] for t in times], 
+            color='red',
+            label = 'System'
+        )
+
+        ax.plot(
+            times, 
+            [self.expectation_values[t] for t in times], 
+            color='blue', 
+            label='Model'
+        )
+        label_fontsize = 15
+        ax.set_xlim(0, max(times))
+        ax.set_ylabel('Expectation value', fontsize = label_fontsize)
+        ax.set_xlabel('Time', fontsize = label_fontsize)
+        ax.set_title('Dynamics for {}'.format(self.model_name_latex), fontsize = 1.5*label_fontsize)
+        ax.legend(prop={'size' : label_fontsize})
+        fig.savefig(
+            os.path.join(self.model_learning_plots_directory,
+                         '{}dynamics_{}.png'.format(self.plot_prefix, self.model_id))
+        )
+
+
+
 
     ##########
     # Section: Utilities
