@@ -134,7 +134,7 @@ class GeneticAlgorithmQMLA():
         terms = qmla.construct_models.get_constituent_names_from_name(model)
         assert \
             np.all([ t in self.chromosome_description for t in terms]), \
-            "Cannot map some term(s) to any available gene. Terms: {}".format(terms)
+            "Cannot map some term(s) to any available gene. Terms: {} \n Genes".format(terms, self.chromosome_description)
             
         locs = [ self.chromosome_description.index(t) for t in terms]
         new_chromosome = copy.copy(self.basic_chromosome)
