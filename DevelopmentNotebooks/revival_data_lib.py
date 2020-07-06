@@ -1,5 +1,6 @@
 """
-useful functions for the ipynb
+standard definitions and some useful functions for the 
+Revival Data.ipynb analysis
 """
 
 import numpy as np
@@ -11,7 +12,7 @@ def plus():
     return np.array([1, 1])/np.sqrt(2)
 
 def minus():
-    return np.array([1, -1])/np.sqrt(2)
+    return np.array([1, -1])/np.sqrt(2)s
     
 def zero():
     return np.array([1, 0])

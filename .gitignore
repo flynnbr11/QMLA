@@ -27,7 +27,7 @@ docs/_build
 
 ParallelDevelopment/*
 ExperimentalSimulations/*
-DevelopmentNotebooks/*
+# DevelopmentNotebooks/*
 Launch/*
 
 !Launch/Results/
