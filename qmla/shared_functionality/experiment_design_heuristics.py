@@ -382,6 +382,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
     ):
         super().__init__(updater, **kwargs)
         self.count_order_of_magnitudes =  {}
+        self.force_order = 9 # None
     
     def design_experiment(
         self,
@@ -415,6 +416,9 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
             a = orders_of_magnitude, 
             p = probs_of_orders
         )
+        if self.force_order is not None: 
+            selected_order = self.force_order
+            
         try:
             self.count_order_of_magnitudes[ np.round(selected_order)] += 1
         except:
