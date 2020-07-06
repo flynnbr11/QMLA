@@ -94,7 +94,6 @@ class NVCentreRevivalSimulation(
 
     def _set_true_params(self):
 
-
         n_qubits = 2
         self.true_model_terms_params = {
             # spin

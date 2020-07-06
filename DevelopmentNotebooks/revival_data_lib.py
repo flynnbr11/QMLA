@@ -12,7 +12,7 @@ def plus():
     return np.array([1, 1])/np.sqrt(2)
 
 def minus():
-    return np.array([1, -1])/np.sqrt(2)s
+    return np.array([1, -1])/np.sqrt(2)
     
 def zero():
     return np.array([1, 0])
