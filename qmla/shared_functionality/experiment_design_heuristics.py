@@ -71,6 +71,16 @@ class BaseHeuristicQMLA(qi.Heuristic):
             (1,),
             dtype=self._model.expparams_dtype
         )
+
+        # fill in particle in expparams
+        particle = self._updater.sample()
+        n_params = particle.shape[1]
+
+        for i in range(n_params):
+            p = particle[0][i]            
+            corresponding_expparam = self._model.modelparam_names[i]
+            experiment_params[corresponding_expparam] = p
+
         return experiment_params
 
     def log_print(
@@ -884,13 +894,13 @@ class FixedNineEighthsToPowerK(BaseHeuristicQMLA):
 
         # get sample from x
 
-        particle = self._updater.sample()
-        n_params = particle.shape[1]
+        # particle = self._updater.sample()
+        # n_params = particle.shape[1]
 
-        for i in range(n_params):
-            p = particle[0][i]            
-            corresponding_expparam = self._model.modelparam_names[i]
-            eps[corresponding_expparam] = p
+        # for i in range(n_params):
+        #     p = particle[0][i]            
+        #     corresponding_expparam = self._model.modelparam_names[i]
+        #     eps[corresponding_expparam] = p
 
         return eps
 
@@ -956,5 +966,41 @@ class FixedTimeTest(BaseHeuristicQMLA):
 
         return eps
 
+
+
+
+class TimeList(BaseHeuristicQMLA):
+    def __init__(
+        self,
+        **kwargs
+    ):
+        super().__init__(**kwargs)
+        
+        self.max_time_to_enforce = kwargs['max_time_to_enforce']
+        delta_t = self.max_time_to_enforce / self._num_experiments
+        time_list = np.arange(
+            delta_t, 
+            self.max_time_to_enforce, 
+            delta_t
+        )
+        self.log_print([
+            "delta t for heuristic:", delta_t
+        ])
+
+        self.time_list = itertools.cycle(time_list)        
+
+
+    def design_experiment(
+        self,
+        epoch_id=0,
+        **kwargs
+    ):
+
+        new_time = next(self.time_list)
+
+        eps = self._get_exp_params_array()
+        eps['t'] = new_time
+
+        return eps
 
 

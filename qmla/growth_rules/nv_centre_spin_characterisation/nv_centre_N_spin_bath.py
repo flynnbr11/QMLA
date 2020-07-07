@@ -37,7 +37,8 @@ class NVCentreNQubitBath(
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
 
 
         # QMLA and model learning configuration
