@@ -60,7 +60,8 @@ class NVCentreNQubitBath(
             # 4 : iter( non_spin_qubit_contributions )
         }
 
-        self.max_num_qubits = int(max( self.stages_by_num_qubits ))
+        # self.max_num_qubits = int(max( self.stages_by_num_qubits ))
+        self.max_num_qubits = 5
         self.log_print(["Max num qubits:", self.max_num_qubits])
         
         self.substage_layer_champions =  { i : {} for i in range(1, self.max_num_qubits+1) }
@@ -146,7 +147,7 @@ class NVCentreNQubitBath(
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        max_num_qubits = 3
+        max_num_qubits = 5
         test_prior_info = {}      
         paulis_to_include = self.availalbe_pauli_terms
 
