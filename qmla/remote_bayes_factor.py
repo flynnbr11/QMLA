@@ -109,7 +109,6 @@ def remote_bayes_factor_calculation(
 
     # Whether to build plots
     save_plots_of_posteriors = False
-    plot_true_mod_post_bayes_factor_dynamics = True
     plot_level = qmla_core_info_dict['plot_level']
 
     # Get model instances
@@ -176,6 +175,9 @@ def remote_bayes_factor_calculation(
 
     # Plot dynamics on which models were compared
     if plot_level >= 3:
+        log_print([
+            "Plotting dynamics of models involved."
+        ])
         plot_dynamics_from_models(
             models = [model_a, model_b], 
             exp_msmts = qmla_core_info_dict['experimental_measurements'],
@@ -183,6 +185,10 @@ def remote_bayes_factor_calculation(
             bf_times = bf_times, 
             save_directory=bf_data_folder
         )
+    else:
+        log_print([
+            "NOT Plotting dynamics of models involved."
+        ])
 
     # Present result
     log_print([
