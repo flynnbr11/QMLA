@@ -181,11 +181,9 @@ class NVCentreNQubitBath(
 
     def _setup_preset_models_test(self):
         self.initial_models = [
-            # 2 qubit secular approx
-            'pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2',
-
-            # 3 qubit secular approx
-            'pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_1J2_zJz_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3+pauliSet_1J3_zJz_d3',
+            secular_approximation(2),
+            secular_approximation(3), 
+            secular_approximation(4)
 
             # 'pauliSet_1_x_d1', 
             # 'pauliSet_1_y_d1', 
@@ -425,4 +423,38 @@ class NVCentreNQubitBath(
 
     def check_tree_pruned(self, prune_step, **kwargs):
         return True
+
+
+
+def secular_approximation(num_qubits):
+#     num_qubits = self.target_num_qubits
+
+    available_terms = [
+        # electron spin rotation terms
+        'pauliSet_1_z_d{}'.format(num_qubits), 
+    ]
+
+    for k in range(2, num_qubits+1):
+
+        coupling_terms = [
+            'pauliSet_1J{k}_zJz_d{n}'.format(
+                k = k,
+                n=num_qubits
+            )
+        ]
+        rotation_terms = [
+            'pauliSet_{k}_{p}_d{n}'.format(
+                k = k, 
+                p = pauli_term, 
+                n = num_qubits
+            )
+            for pauli_term in ['x', 'y', 'z']
+        ]
+
+        available_terms.extend(coupling_terms)
+        available_terms.extend(rotation_terms)
+
+    secular_approx = '+'.join(available_terms)
+    secular_approx = qmla.construct_models.alph(secular_approx)
+    return secular_approx
 
