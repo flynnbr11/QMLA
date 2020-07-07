@@ -106,12 +106,11 @@ def remote_bayes_factor_calculation(
     # Retrieve data from databases
     qmla_core_info_dict = pickle.loads(
         redis_databases['qmla_core_info_database']['qmla_settings'])
-    true_mod_name = qmla_core_info_dict['true_name']
-    log_print(["True name:", true_mod_name])
 
     # Whether to build plots
     save_plots_of_posteriors = False
-    plot_true_mod_post_bayes_factor_dynamics = False
+    plot_true_mod_post_bayes_factor_dynamics = True
+    plot_level = qmla_core_info_dict['plot_level']
 
     # Get model instances
     model_a = qmla.model_for_comparison.ModelInstanceForComparison(
@@ -147,6 +146,9 @@ def remote_bayes_factor_calculation(
         + list (set(model_b.bf_times) - set(model_a.bf_times) )
     ) # should be empty if same experiments were used for A and B
     log_print(["Difference in times:", diff_in_bf_times])
+    bf_times = list ( 
+        set(model_a.bf_times).union(set(model_b.bf_times))
+    ) 
 
     # Plot the posterior of the true model only
     if (
@@ -173,24 +175,14 @@ def remote_bayes_factor_calculation(
             pass
 
     # Plot dynamics on which models were compared
-    if plot_true_mod_post_bayes_factor_dynamics:
-        try:
-            times_used = model_a.bf_times + model_b.bf_times
-            plot_models_dynamics(
-                model_a,
-                model_b,
-                exp_msmts=qmla_core_info_dict['experimental_measurements'],
-                plot_probes_path=qmla_core_info_dict['probes_plot_file'],
-                bayes_factor=bayes_factor,
-                bf_times=times_used,
-                qmla_id=qid,
-                log_file=log_file,
-                save_directory=bf_data_folder,
-            )
-        except BaseException:
-            log_print(["Failed to plot dynamics after comparison."])
-            raise
-            # pass
+    if plot_level >= 3:
+        plot_dynamics_from_models(
+            models = [model_a, model_b], 
+            exp_msmts = qmla_core_info_dict['experimental_measurements'],
+            bayes_factor = bayes_factor,
+            bf_times = bf_times, 
+            save_directory=bf_data_folder
+        )
 
     # Present result
     log_print([
@@ -261,6 +253,75 @@ def log_print(
 #########
 # Plotting
 #########
+
+def plot_dynamics_from_models(
+    models, 
+    exp_msmts, 
+    bf_times, 
+    bayes_factor, 
+    save_directory
+):
+
+    times = list(sorted(exp_msmts.keys()))
+    fig, ax1 = plt.subplots(
+        figsize=(15, 10)
+    )
+
+    # Plot true measurements
+    ax1.scatter(
+        times,
+        [exp_msmts[t] for t in times],
+        label='System',
+        color='red',
+        alpha=0.6,
+        s=5
+    )
+    ax1.set_ylabel('Expectation Value')
+
+    for model in models:
+        model.plot_dynamics(
+            ax = ax1, 
+            times = times
+        )
+    ax1.set_xlim((min(times), max(times)))
+    
+    # Overlay times 
+    try:
+        # in background, show how often that time was considered
+        ax2 = ax1.twinx()
+        num_times = int(len(times)) - 1
+        ax2.hist(
+            bf_times,
+            bins=num_times,
+            # TODO put on separate plot to see when higher times compared on
+            range=(min(times), max(times)),
+            histtype='stepfilled',
+            fill=False,
+            label=str("{} times total".format(len(bf_times))),
+            alpha=0.1
+        )
+        ax2.set_ylabel('Frequency time was during comparison')
+    except BaseException:
+        raise
+        # pass
+
+    bf = np.log10(bayes_factor)
+    plt.title(
+        "[$log_{10}$ Bayes Factor]: " + str(np.round(bf, 2))
+    )
+    plt.figlegend()
+
+    plot_path = os.path.join(
+        save_directory,
+        'BF_{}_{}.png'.format(
+            str(models[0].model_id),
+            str(models[1].model_id)
+        )
+    )
+    plt.savefig(plot_path)
+
+
+
 
 def plot_models_dynamics(
     model_a,

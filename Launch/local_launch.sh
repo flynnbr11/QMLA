@@ -40,8 +40,8 @@ debug_mode=0
 # growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
-growth_rule='NVCentreNQubitBath'
 # growth_rule='NVCentreRevivalSimulation'
+growth_rule='NVCentreNQubitBath'
 
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'

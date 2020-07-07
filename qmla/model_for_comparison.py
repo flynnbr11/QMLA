@@ -82,6 +82,13 @@ class ModelInstanceForComparison():
             self.probes_system = qmla_core_info_database['probes_system']
             self.probes_simulator = qmla_core_info_database['probes_simulator']
 
+        self.plot_probes = pickle.load(
+            open(qmla_core_info_dict['probes_plot_file'], 'rb')
+        )
+        self.plots_directory = qmla_core_info_dict['plots_directory']
+        self.debug_mode = qmla_core_info_dict['debug_mode']
+        self.plot_level = qmla_core_info_dict['plot_level']
+
         # Assign attributes based on core data
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.num_particles = qmla_core_info_dict['num_particles']
@@ -131,6 +138,9 @@ class ModelInstanceForComparison():
         self.qhl_final_param_estimates = learned_model_info['qhl_final_param_estimates']
         self.qhl_final_param_uncertainties = learned_model_info['qhl_final_param_uncertainties']
         self.covariance_mtx_final = learned_model_info['covariance_mtx_final']
+        self.expectation_values = learned_model_info['expectation_values']
+        self.learned_hamiltonian = learned_model_info['learned_hamiltonian']
+
 
         # Process data from learned info
         if self.model_name == self.true_model_name:
@@ -262,6 +272,37 @@ class ModelInstanceForComparison():
             epoch_id += 1
 
         return self.qinfer_updater.log_total_likelihood
+
+    ##########
+    # Section: Plotting
+    ##########
+
+    def plot_dynamics(self, ax, times):
+        r"""
+        Plot dynamics of this model after its parameter learning stage. 
+
+        :param ax: matplotlib axis to plot on
+        :param list times: times against which to plot
+        """
+
+        times_not_yet_computed = list(
+            set(times) - set(self.expectation_values.keys())
+        )
+        n_qubits = qmla.construct_models.get_num_qubits(self.model_name)
+        plot_probe = self.plot_probes[n_qubits]
+
+        for t in times_not_yet_computed:
+            self.expectation_values[t] = self.growth_class.expectation_value(
+                ham = self.learned_hamiltonian, #TODO, 
+                t = t, 
+                state = plot_probe # TODO
+            )
+
+        ax.plot(
+            times, 
+            [self.expectation_values[t] for t in times],
+            label = "{}: {}".format(self.model_id, self.model_name_latex), 
+        )
 
     ##########
     # Section: Utilities
