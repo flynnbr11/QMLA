@@ -977,9 +977,10 @@ class TimeList(BaseHeuristicQMLA):
         super().__init__(**kwargs)
         
         self.max_time_to_enforce = kwargs['max_time_to_enforce']
-        delta_t = self.max_time_to_enforce / self._num_experiments
+        min_t = self.max_time_to_enforce / self._num_experiments
+        delta_t = 10*min_t # effectively how many iterations each time is eventually learned for
         time_list = np.arange(
-            delta_t, 
+            min_t, 
             self.max_time_to_enforce, 
             delta_t
         )
