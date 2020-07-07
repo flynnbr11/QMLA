@@ -146,7 +146,7 @@ def remote_bayes_factor_calculation(
     ) # should be empty if same experiments were used for A and B
     log_print(["Difference in times:", diff_in_bf_times])
     bf_times = list ( 
-        set(model_a.bf_times).union(set(model_b.bf_times))
+        model_a.bf_times + model_b.bf_times
     ) 
 
     # Plot the posterior of the true model only
@@ -304,7 +304,7 @@ def plot_dynamics_from_models(
             histtype='stepfilled',
             fill=False,
             label=str("{} times total".format(len(bf_times))),
-            alpha=0.1
+            alpha=0.25
         )
         ax2.set_ylabel('Frequency time was during comparison')
     except BaseException:
