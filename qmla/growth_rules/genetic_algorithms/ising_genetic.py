@@ -28,7 +28,7 @@ class IsingGenetic(
         self.base_terms = [
             'z',
         ]
-
+        true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             true_model = true_model,
@@ -110,14 +110,15 @@ class IsingGeneticTest(
         }
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(12)
+        self.initial_models = self.genetic_algorithm.random_initial_models(14)
+        self.max_spawn_depth = 16
 
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_experiments_for_bf = 0.5
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = 0.5
         self.fitness_method = 'elo_ratings' 
-        self.max_spawn_depth = 12
         self.iqle_mode = False
 
         if self.tree_completed_initially:
@@ -129,10 +130,10 @@ class IsingGeneticTest(
         }
 
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.3
+        self.timing_insurance_factor = 0.35
         self.max_time_to_consider = 20 
-        self.min_param = 0.35
-        self.max_param = 0.65
+        self.min_param = 0.25
+        self.max_param = 0.75
 
 class IsingGeneticSingleLayer(
     IsingGenetic

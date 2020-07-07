@@ -10,8 +10,8 @@ run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=50 # number of experiments
-prt=200 # number of particles
+exp=5 # number of experiments
+prt=20 # number of particles
 
 ###############
 # QMLA settings
@@ -30,7 +30,7 @@ debug_mode=0
 ###############
 
 # growth_rule='TestSimulatedNVCentre'
-# growth_rule='IsingGeneticTest'
+growth_rule='IsingGeneticTest'
 # growth_rule='IsingGeneticSingleLayer'
 # growth_rule='NVCentreRevivals'
 # growth_rule='NVCentreRevivalsSimulated'
@@ -41,7 +41,7 @@ debug_mode=0
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreRevivalSimulation'
-growth_rule='NVCentreNQubitBath'
+# growth_rule='NVCentreNQubitBath'
 
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
@@ -76,7 +76,6 @@ mkdir -p $this_run_directory
 
 bayes_csv="$this_run_directory/bayes_factors.csv"
 system_measurements_file="$this_run_directory/system_measurements.p"
-# prior_pickle_file="$this_run_directory/prior.p"
 run_info_file="$this_run_directory/run_info.p"
 plot_probe_file="$this_run_directory/plot_probes.p"
 latex_mapping_file="$this_run_directory/latex_mapping.txt"

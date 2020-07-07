@@ -78,7 +78,7 @@ class NVCentreNQubitBath(
         self.include_transverse_terms = True
 
         self.fraction_opponents_experiments_for_bf = 0.5
-        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_own_experiments_for_bf = self.fraction_opponents_experiments_for_bf
         self.fraction_particles_for_bf = 0.5
 
         # True model configuration        

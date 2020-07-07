@@ -47,8 +47,11 @@ class GrowthRule():
     def __init__(
         self,
         growth_generation_rule,
+        true_model=None,
         **kwargs
     ):
+        if true_model is not None: 
+            self.true_model = true_model
 
         self.growth_generation_rule = growth_generation_rule
 
