@@ -106,7 +106,7 @@ class NVCentreNQubitBath(
         self.timing_insurance_factor = 0.5
 
         # Test: a few hand picked models to see if true model wins
-        self.test_preset_models = False
+        self.test_preset_models = True
         if self.test_preset_models:
             self._setup_preset_models_test()
 
@@ -132,8 +132,8 @@ class NVCentreNQubitBath(
             
             # coupling with 2nd qubit
             'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 0.2e6, 
-            'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 0.4e6, 
-            'pauliSet_1J2_xJx_d{}'.format(n_qubits) : 0.2e6, 
+            # 'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 0.4e6, 
+            # 'pauliSet_1J2_xJx_d{}'.format(n_qubits) : 0.2e6, 
 
             # carbon nuclei - 2nd qubit
             'pauliSet_2_x_d{}'.format(n_qubits) : 66e3,
@@ -181,13 +181,19 @@ class NVCentreNQubitBath(
 
     def _setup_preset_models_test(self):
         self.initial_models = [
-            'pauliSet_1_x_d1', 
-            'pauliSet_1_y_d1', 
-            'pauliSet_1_z_d1', 
-            'pauliSet_1_x_d1+pauliSet_1_y_d1', 
-            'pauliSet_1_x_d1+pauliSet_1_z_d1', 
-            'pauliSet_1_y_d1+pauliSet_1_z_d1', 
-            'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1', 
+            # 2 qubit secular approx
+            'pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2',
+
+            # 3 qubit secular approx
+            'pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_1J2_zJz_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3+pauliSet_1J3_zJz_d3',
+
+            # 'pauliSet_1_x_d1', 
+            # 'pauliSet_1_y_d1', 
+            # 'pauliSet_1_z_d1', 
+            # 'pauliSet_1_x_d1+pauliSet_1_y_d1', 
+            # 'pauliSet_1_x_d1+pauliSet_1_z_d1', 
+            # 'pauliSet_1_y_d1+pauliSet_1_z_d1', 
+            # 'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1', 
 
             # 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
             # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
