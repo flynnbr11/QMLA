@@ -2,6 +2,7 @@ import numpy as np
 import scipy as sp
 import os
 import time
+import itertools
 import copy
 
 import qinfer as qi
@@ -140,6 +141,8 @@ class ModelInstanceForComparison():
         self.covariance_mtx_final = learned_model_info['covariance_mtx_final']
         self.expectation_values = learned_model_info['expectation_values']
         self.learned_hamiltonian = learned_model_info['learned_hamiltonian']
+        self.track_experiment_parameters = learned_model_info['track_experiment_parameters']
+        self.log_print(["Track exp params eg:", self.track_experiment_parameters[0]])
 
 
         # Process data from learned info
@@ -174,6 +177,7 @@ class ModelInstanceForComparison():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
+            debug_mode=self.debug_mode,
         )
 
         # Reconstruct the updater from results of learning
@@ -212,6 +216,7 @@ class ModelInstanceForComparison():
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
             num_experiments=self.num_experiments,
+            num_probes=self.probe_number,
             log_file=self.log_file,
             inv_field=[item[0]
                        for item in self.qinfer_model.expparams_dtype[1:]],
@@ -228,12 +233,13 @@ class ModelInstanceForComparison():
     def update_log_likelihood(
         self, 
         new_times, 
+        new_experimental_params, 
     ):
         r"""
 
         """
 
-        # Rewrite normalization record using only experiments to consider
+        # Reduced normalization record using only experiments to consider
         experiment_id_to_keep = int(
             len(self.qinfer_updater.normalization_record)
             - (self.growth_class.fraction_own_experiments_for_bf * len(self.qinfer_updater.normalization_record) ) 
@@ -246,31 +252,43 @@ class ModelInstanceForComparison():
             len(new_times)
             - (self.growth_class.fraction_opponents_experiments_for_bf * len(new_times) ) 
         )
-        self.times_to_update = new_times[experiment_id_to_keep:]
-        self.bf_times += self.times_to_update
-        self.bf_times = qmla.utilities.flatten(self.bf_times)
-        self.log_print(["Times to update length:", len(self.times_to_update)])
 
         epoch_id = len(self.times_learned_over)
+        experiments_to_update_with = new_experimental_params[experiment_id_to_keep:]
+        self.log_print(["Times to update length:", len(experiments_to_update_with)])
 
-        # Update with times of opponent
-        for t in self.times_to_update: 
-            experiment = self.experiment_design_heuristic(
+        for experiment in experiments_to_update_with:
+            # sample from own updater/heuristic so particle is correct shape
+            experiment_for_update = self.experiment_design_heuristic(
                 epoch_id = epoch_id
-            )
-            experiment['t'] = t
+            ) 
 
+            # retrieve probe and time used by opponent
+            experiment_for_update['probe_id'] = experiment['probe_id'][0]
+            exp_time = experiment['t'][0]
+            experiment_for_update['t'] = exp_time
+            self.bf_times.append(experiment['t'])
+
+            # run experiment
             params_array = np.array([[
                 self.true_model_params[:]
             ]])
+            self.log_print_debug([
+                "BF update epoch ", epoch_id
+            ])
             datum = self.qinfer_model.simulate_experiment(
                 params_array,
-                experiment,
+                experiment_for_update,
                 repeat=1
             )
-            self.qinfer_updater.update(datum, experiment)
-            epoch_id += 1
 
+            # update qinfer 
+            self.qinfer_updater.update(datum, experiment_for_update)
+
+            epoch_id += 1
+        
+        self.log_print_debug(["BF times:", self.bf_times])
+        self.bf_times = qmla.utilities.flatten(self.bf_times)
         return self.qinfer_updater.log_total_likelihood
 
     ##########
@@ -310,11 +328,27 @@ class ModelInstanceForComparison():
 
     def log_print(
         self,
-        to_print_list
+        to_print_list,
+        log_identifier=None,
     ):
         r"""Wrapper for :func:`~qmla.print_to_log`"""
+        if log_identifier is None: 
+            log_identifier="ModelForComparison {}".format(self.model_id)
+            
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=self.log_file,
-            log_identifier='ModelForComparison {}'.format(self.model_id)
+            log_identifier=log_identifier
         )
+        
+    def log_print_debug(
+        self, 
+        to_print_list
+    ):
+        r"""Log print if global debug_log_print set to True."""
+
+        if self.debug_mode:
+            self.log_print(
+                to_print_list = to_print_list,
+                log_identifier = 'Debug Comparison Model {}'.format(self.model_id)
+            )

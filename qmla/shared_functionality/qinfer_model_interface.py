@@ -19,8 +19,8 @@ import qmla.logging
 global_print_loc = False
 global debug_print
 debug_print = False
-global debug_log_print
-debug_log_print = True
+global debug_mode
+debug_mode = True
 global debug_print_file_line
 debug_print_file_line = False
 
@@ -88,7 +88,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         experimental_measurement_times,
         log_file,
         comparison_model = False, 
-        debug_log_print=False,
+        debug_mode=False,
         **kwargs
     ):
         self.model_name = model_name
@@ -98,7 +98,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._a = 0
         self._b = 0
         self.probe_counter = 0
-        self.probe_rotation_frequency = 25
+        self.probe_rotation_frequency = 10
         self._modelparams = modelparams
         self.signs_of_inital_params = np.sign(modelparams)
         self._true_oplist = true_oplist
@@ -112,7 +112,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             for x in ['system', 'particles_median', 'particles_std', 'particles_lower_quartile', 'particles_upper_quartile']
         }
         self.store_p0_diffs = []
-        self.debug_log_print = debug_log_print
+        self.debug_mode = debug_mode
         # get true_hamiltonian from true_param dict
         true_ham = None
         for k in list(self.true_param_dict.keys()):
@@ -170,10 +170,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 )
             )
         super(QInferModelQMLA, self).__init__(self._oplist)
-        self.log_print_debug([
-            "true ops:\n", self._true_oplist,
-            "\nsim ops:\n", self._oplist
-        ])
+        # self.log_print_debug([
+        #     "true ops:\n", self._true_oplist,
+        #     "\nsim ops:\n", self._oplist
+        # ])
 
         try:
             self.probe_dict = probe_dict
@@ -207,9 +207,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self, 
         to_print_list
     ):
-        r"""Log print if global debug_log_print set to True."""
+        r"""Log print if global debug_mode set to True."""
 
-        if self.debug_log_print:
+        if self.debug_mode:
             self.log_print(
                 to_print_list = to_print_list,
                 log_identifier = 'QInfer interface debug'
@@ -257,11 +257,14 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         (Modified from Qinfer).
         """
 
-        # expparams are the {t, w1, w2, ...} guessed parameters, i.e. each 
+        # expparams are the {t, probe_id, w1, w2, ...} guessed parameters, i.e. each 
         # particle has a specific sampled value of the corresponding
         # parameter
-        # 
-        expnames = [('t', 'float')]
+        
+        expnames = [
+            ('t', 'float'),
+            ('probe_id', 'int')
+        ]
         try:
             individual_model_terms = self.model_name.split('+')
         except:
@@ -272,9 +275,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         for term in individual_model_terms:
             expnames.append( (term, 'float') )
 
-        # for exppar in range(self.n_modelparams):
-        #     expnames.append(('w_' + str(exppar + 1), 'float'))
-        # self.log_print(["Expparams:", expnames])
         return expnames
 
     ################################################################################
@@ -394,8 +394,12 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
         # process expparams
         times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
+        probe_id = expparams['probe_id'][0]
         expparams_sampled_particle = np.array(
-            [expparams.item(0)[1:]]) # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS               
+            [expparams.item(0)[2:]]) # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS               
+        self.log_print_debug([
+            "expparams_sampled_particle:", expparams_sampled_particle
+        ])
         self.ham_from_expparams = np.tensordot(
             expparams_sampled_particle, 
             self._oplist, 
@@ -422,13 +426,19 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.true_evolution = False
             params = modelparams
 
-        if self.true_evolution:
-            # set probe counter at true evolution; keep for simulator
-            self._a += 1
-            if self._a % self.probe_rotation_frequency == 0:
-                self.probe_counter += 1
-                if self.probe_counter >= self.probe_number:
-                    self.probe_counter = 0
+        # if self.true_evolution:
+        #     # set probe counter at true evolution; keep for simulator
+        #     self._a += 1
+        #     if self._a % self.probe_rotation_frequency == 0:
+        #         self.probe_counter += 1
+        #         if self.probe_counter >= self.probe_number:
+        #             self.probe_counter = 0
+
+        self.probe_counter = probe_id
+        # self.log_print([
+        #     "Probe id from heuristic: {} \t probe counter: {}".format(probe_id, self.probe_counter)
+        # ])
+
         # self.log_print(["True evolution {} \t a = {} \t Probe counter {}".format(self.true_evolution, self._a,  self.probe_counter) ] )
 
         self.log_print_debug([

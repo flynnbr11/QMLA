@@ -37,8 +37,8 @@ class NVCentreNQubitBath(
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
 
 
         # QMLA and model learning configuration
@@ -47,7 +47,7 @@ class NVCentreNQubitBath(
 
         self.min_param = 0
         self.max_param = 10
-        self.num_probes = 25 # |++'>
+        self.num_probes = 25 # TODO restore 25 # |++'>
 
         non_spin_qubit_contributions = [
             'rotation', 
@@ -185,7 +185,7 @@ class NVCentreNQubitBath(
         self.initial_models = [
             secular_approximation(2),
             secular_approximation(3), 
-            secular_approximation(4)
+            # secular_approximation(4)
 
             # 'pauliSet_1_x_d1', 
             # 'pauliSet_1_y_d1', 

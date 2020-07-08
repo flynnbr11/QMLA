@@ -217,7 +217,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=False,
+            debug_mode=self.debug_mode,
         )
 
         # Updater to perform Bayesian inference with
@@ -247,6 +247,7 @@ class ModelInstanceForLearning():
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
             num_experiments=self.num_experiments,
+            num_probes=self.probe_number, 
             log_file=self.log_file,
             inv_field=[item[0]
                        for item in self.qinfer_model.expparams_dtype[1:]],
@@ -295,6 +296,7 @@ class ModelInstanceForLearning():
         self.epochs_after_resampling = []
         # To track at every epoch
         self.track_experimental_times = []
+        self.track_experiment_parameters = []
         self.volume_by_epoch = np.array([])
         self.track_param_means = []
         self.track_param_uncertainties = []
@@ -347,6 +349,11 @@ class ModelInstanceForLearning():
                 current_volume=self.volume_by_epoch[-1]
             )
             self.track_experimental_times.append(new_experiment['t'])
+            self.track_experiment_parameters.append(new_experiment)
+            self.log_print_debug([
+                "New experiment:", new_experiment
+            ])
+            
 
             # Run (or simulate) the experiment
             datum_from_experiment = self.qinfer_model.simulate_experiment(
@@ -557,6 +564,7 @@ class ModelInstanceForLearning():
         learned_info['num_particles'] = self.num_particles
         learned_info['num_experiments'] = self.num_experiments
         learned_info['times_learned_over'] = self.track_experimental_times
+        learned_info['track_experiment_parameters'] = self.track_experiment_parameters
         learned_info['final_learned_params'] = self.final_learned_params
         learned_info['model_normalization_record'] = self.qinfer_updater.normalization_record
         learned_info['log_total_likelihood'] = self.qinfer_updater.log_total_likelihood
@@ -672,15 +680,32 @@ class ModelInstanceForLearning():
                 a=self.growth_class.qinfer_resampler_a
             ),
         )
+        evaluation_heuristic = self.growth_class.heuristic(
+            model_id=self.model_id,
+            updater=evaluation_updater,
+            oplist=self.model_terms_matrices,
+            num_experiments=self.num_experiments,
+            num_probes=self.probe_number, 
+            log_file=self.log_file,
+            inv_field=[item[0]
+                       for item in self.qinfer_model.expparams_dtype[1:]],
+            max_time_to_enforce=self.growth_class.max_time_to_consider,
+        )
 
         evaluation_updater._log_total_likelihood = 0.0
         evaluation_updater._normalization_record = []
+        eval_epoch = 0
         for t in evaluation_times:
-            exp = qmla.utilities.format_experiment(
-                evaluation_qinfer_model,
-                final_learned_params=self.final_learned_params,
-                qhl_final_param_estimates=self.qhl_final_param_estimates,
-                time=[t],
+            # exp = qmla.utilities.format_experiment(
+            #     evaluation_qinfer_model,
+            #     final_learned_params=self.final_learned_params,
+            #     qhl_final_param_estimates=self.qhl_final_param_estimates,
+            #     time=[t],
+            # )
+            exp = evaluation_heuristic(
+                num_params = len(self.model_terms_matrices), 
+                epoch_id = eval_epoch, 
+                force_time_choice = t, 
             )
             params_array = np.array([[self.true_model_params[:]]])
             datum = evaluation_updater.model.simulate_experiment(
@@ -689,6 +714,7 @@ class ModelInstanceForLearning():
                 repeat=1
             )
             evaluation_updater.update(datum, exp)
+            eval_epoch += 1
 
         # Store evaluation
         self.evaluation_normalization_record = evaluation_updater.normalization_record
@@ -1265,14 +1291,30 @@ class ModelInstanceForLearning():
 
     def log_print(
         self,
-        to_print_list
+        to_print_list,
+        log_identifier=None
     ):
         r"""Wrapper for :func:`~qmla.print_to_log`"""
+
+        if log_identifier is None:
+            log_identifier = 'ModelForLearning {}'.format(self.model_id)
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=self.log_file,
-            log_identifier='ModelForLearning {}'.format(self.model_id)
+            log_identifier=log_identifier
         )
+
+    def log_print_debug(
+        self, 
+        to_print_list
+    ):
+        r"""Log print if global debug_log_print set to True."""
+
+        if self.debug_mode:
+            self.log_print(
+                to_print_list = to_print_list,
+                log_identifier = 'Debug Model {}'.format(self.model_id)
+            )
 
     def _consider_reallocate_resources(self):
         r"""Model might get less resources if it is deemed less complex than others"""

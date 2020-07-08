@@ -133,21 +133,21 @@ def remote_bayes_factor_calculation(
 
     # Update the models with the times trained by the other model.
     log_l_a = model_a.update_log_likelihood(
-        new_times = model_b.times_learned_over
+        new_times = model_b.times_learned_over,
+        new_experimental_params = model_b.track_experiment_parameters
     )
     log_l_b = model_b.update_log_likelihood(
-        new_times = model_a.times_learned_over
+        new_times = model_a.times_learned_over,
+        new_experimental_params = model_a.track_experiment_parameters
     )
     bayes_factor = np.exp( log_l_a - log_l_b )
 
+    # should be no difference in BF times
     diff_in_bf_times = (
         list ( set(model_a.bf_times) - set(model_b.bf_times) ) 
         + list (set(model_b.bf_times) - set(model_a.bf_times) )
-    ) # should be empty if same experiments were used for A and B
+    )
     log_print(["Difference in times:", diff_in_bf_times])
-    bf_times = list ( 
-        model_a.bf_times + model_b.bf_times
-    ) 
 
     # Plot the posterior of the true model only
     if (
@@ -182,7 +182,7 @@ def remote_bayes_factor_calculation(
             models = [model_a, model_b], 
             exp_msmts = qmla_core_info_dict['experimental_measurements'],
             bayes_factor = bayes_factor,
-            bf_times = bf_times, 
+            bf_times = model_a.bf_times, # same as model_b.bf_times
             save_directory=bf_data_folder
         )
     else:

@@ -57,6 +57,11 @@ class BaseHeuristicQMLA(qi.Heuristic):
         self._num_experiments = kwargs['num_experiments']
         self._log_file = log_file
 
+        # probe ID
+        self.probe_id = 0
+        self.probe_rotation_frequency = 1
+        self.num_probes = kwargs['num_probes']
+
         # storage infrastructure
         self.heuristic_data = {} # to be stored by model instance
         self._resample_epochs = []
@@ -65,7 +70,7 @@ class BaseHeuristicQMLA(qi.Heuristic):
         self._times_suggested = []
         self._label_fontsize = 10 # consistency when plotting
 
-    def _get_exp_params_array(self):
+    def _get_exp_params_array(self, epoch_id):
         r"""Return an empty array with a position for every experiment design parameter."""
         experiment_params = np.empty(
             (1,),
@@ -80,6 +85,21 @@ class BaseHeuristicQMLA(qi.Heuristic):
             p = particle[0][i]            
             corresponding_expparam = self._model.modelparam_names[i]
             experiment_params[corresponding_expparam] = p
+
+        # choose probe id
+        if epoch_id % self.probe_rotation_frequency == 0 :
+            self.probe_id += 1
+            if self.probe_id >= self.num_probes: 
+                self.probe_id = 0 
+        experiment_params['probe_id'] = self.probe_id
+        self.log_print([
+            "Choosing probe. Epoch {} rotation freq {} => ID {}".format(
+                epoch_id, self.probe_rotation_frequency, self.probe_id
+            ),
+            "\n Probe id -> ", experiment_params['probe_id'],
+            "\n expparams -> ", experiment_params,
+            "\n t ->", experiment_params['t']
+        ])
 
         return experiment_params
 
@@ -117,8 +137,17 @@ class BaseHeuristicQMLA(qi.Heuristic):
             self.log_print([
                 "Time too high -> randomising to ", new_time
             ])
+
+        if 'force_time_choice' in kwargs:
+            new_time = kwargs['force_time_choice']
+            self.log_print([
+                "Forcing time selection as ", new_time
+            ])
         self._times_suggested.append(new_time)
         new_experiment['t'] = new_time
+        self.log_print([
+            "Experiment -> ", new_experiment
+        ])
         return new_experiment
 
     def design_experiment(self, **kwargs):
@@ -291,7 +320,7 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
         d = self._model.distance(x, xp)
         new_time = 1 / d
 
-        eps = self._get_exp_params_array()
+        eps = self._get_exp_params_array(epoch_id = epoch_id)
         eps['t'] = new_time
 
         # get sample from x
@@ -362,7 +391,7 @@ class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
                 {} iterations.".format(self._maxiters)
             )
 
-        eps = self._get_exp_params_array()
+        eps = self._get_exp_params_array(epoch_id = epoch_id)
 
         if epoch_id < self.num_epochs_for_first_phase:
             d = self._model.distance(x, xp)
@@ -399,7 +428,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         epoch_id=0,
         **kwargs
     ):
-        experiment = self._get_exp_params_array() # empty experiment array
+        experiment = self._get_exp_params_array(epoch_id = epoch_id) # empty experiment array
         
         # sample from updater
         idx_iter = 0
@@ -498,7 +527,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         **kwargs
     ):
         self.call_counter += 1
-        experiment = self._get_exp_params_array() # empty experiment array
+        experiment = self._get_exp_params_array(epoch_id = epoch_id) # empty experiment array
         
         # sample from updater
         idx_iter = 0
@@ -707,7 +736,7 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
             )
             self.designed_times[method][epoch_id] = 1/d
 
-        eps = self._get_exp_params_array()
+        eps = self._get_exp_params_array(epoch_id = epoch_id)
         new_time = copy.copy(self.designed_times[self.distance_metric_to_use][epoch_id])
         new_time *= self.time_multiplicative_factor
         eps['t'] = new_time
@@ -889,7 +918,7 @@ class FixedNineEighthsToPowerK(BaseHeuristicQMLA):
             self._k += 1
         new_time = (9/8)**self._k
 
-        eps = self._get_exp_params_array()
+        eps = self._get_exp_params_array(epoch_id = epoch_id)
         eps['t'] = new_time
 
         # get sample from x
@@ -921,7 +950,7 @@ class RandomTimeUpperBounded(BaseHeuristicQMLA):
         new_time = random.uniform(0 , self._max_time)
         # new_time  = self._max_time
 
-        eps = self._get_exp_params_array()
+        eps = self._get_exp_params_array(epoch_id = epoch_id)
         eps['t'] = new_time
 
         # get sample from x
@@ -952,7 +981,7 @@ class FixedTimeTest(BaseHeuristicQMLA):
         new_time = 3e10
         # new_time  = self._max_time
 
-        eps = self._get_exp_params_array()
+        eps = self._get_exp_params_array(epoch_id = epoch_id)
         eps['t'] = new_time
 
         # get sample from x
@@ -999,7 +1028,7 @@ class TimeList(BaseHeuristicQMLA):
 
         new_time = next(self.time_list)
 
-        eps = self._get_exp_params_array()
+        eps = self._get_exp_params_array(epoch_id = epoch_id)
         eps['t'] = new_time
 
         return eps
