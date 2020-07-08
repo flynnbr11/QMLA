@@ -126,20 +126,14 @@ class BaseHeuristicQMLA(qi.Heuristic):
             # TODO understamd cutoff at which time 
             # calculation becomes unstable
             new_time = np.random.uniform(1e5, 1e6)
-            self.log_print([
-                "Time too high -> randomising to ", new_time
-            ])
+            # self.log_print([
+            #     "Time too high -> randomising to ", new_time
+            # ])
 
         if 'force_time_choice' in kwargs:
             new_time = kwargs['force_time_choice']
-            self.log_print([
-                "Forcing time selection as ", new_time
-            ])
         self._times_suggested.append(new_time)
         new_experiment['t'] = new_time
-        self.log_print([
-            "Experiment -> ", new_experiment
-        ])
         return new_experiment
 
     def design_experiment(self, **kwargs):
