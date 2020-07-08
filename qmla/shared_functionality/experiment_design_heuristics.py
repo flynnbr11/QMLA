@@ -92,14 +92,6 @@ class BaseHeuristicQMLA(qi.Heuristic):
             if self.probe_id >= self.num_probes: 
                 self.probe_id = 0 
         experiment_params['probe_id'] = self.probe_id
-        self.log_print([
-            "Choosing probe. Epoch {} rotation freq {} => ID {}".format(
-                epoch_id, self.probe_rotation_frequency, self.probe_id
-            ),
-            "\n Probe id -> ", experiment_params['probe_id'],
-            "\n expparams -> ", experiment_params,
-            "\n t ->", experiment_params['t']
-        ])
 
         return experiment_params
 

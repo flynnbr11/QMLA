@@ -2609,7 +2609,7 @@ class QuantumModelLearningAgent():
         s.get_figure().savefig(
             os.path.join(
                 self.qmla_controls.plots_directory,
-                'bayes_factors_{}.png'.format(self.qmla_controls.long_id)
+                'bayes_factors.png'.format(self.qmla_controls.long_id)
             )
         )
 

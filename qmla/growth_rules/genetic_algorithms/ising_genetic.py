@@ -70,7 +70,15 @@ class IsingGenetic(
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model
 
-        self.tree_completed_initially = True
+
+        self.branch_comparison_strategy = 'optimal_graph'
+        self.tree_completed_initially = False
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = 0.5
+        self.fitness_method = 'elo_ratings' 
+        self.iqle_mode = False
+
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth),
             'other': 0
@@ -80,9 +88,10 @@ class IsingGenetic(
             self.num_processes_to_parallelise_over = 16
         
         self.max_time_to_consider = 15
-        self.min_param = 0.45
-        self.max_param = 0.55
-        self.timing_insurance_factor = 1
+        self.num_processes_to_parallelise_over = 16
+        self.timing_insurance_factor = 0.5
+        self.min_param = 0.25
+        self.max_param = 0.75
 
 
 class IsingGeneticTest(
@@ -113,13 +122,6 @@ class IsingGeneticTest(
         self.initial_models = self.genetic_algorithm.random_initial_models(14)
         self.max_spawn_depth = 16
 
-        self.branch_comparison_strategy = 'optimal_graph'
-        self.tree_completed_initially = False
-        self.fraction_particles_for_bf = 0.25
-        self.fraction_own_experiments_for_bf = 0.5
-        self.fraction_opponents_experiments_for_bf = 0.5
-        self.fitness_method = 'elo_ratings' 
-        self.iqle_mode = False
 
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
@@ -129,11 +131,6 @@ class IsingGeneticTest(
             'other': 0
         }
 
-        self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.5
-        self.max_time_to_consider = 20 
-        self.min_param = 0.25
-        self.max_param = 0.75
 
 class IsingGeneticSingleLayer(
     IsingGenetic
