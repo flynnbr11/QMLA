@@ -31,7 +31,7 @@ debug_mode=0
 
 # growth_rule='TestSimulatedNVCentre'
 # growth_rule='IsingGeneticTest'
-# growth_rule='IsingGeneticSingleLayer'
+growth_rule='IsingGeneticSingleLayer'
 # growth_rule='NVCentreRevivals'
 # growth_rule='NVCentreRevivalsSimulated'
 
@@ -41,7 +41,7 @@ debug_mode=0
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreRevivalSimulation'
-growth_rule='NVCentreNQubitBath'
+# growth_rule='NVCentreNQubitBath'
 
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
