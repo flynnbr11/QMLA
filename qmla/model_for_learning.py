@@ -530,7 +530,7 @@ class ModelInstanceForLearning():
                 self._plot_dynamics()
             except:
                 self.log_print(["Failed to plot model dynamics."])
-                raise
+                # raise
             try:
                 self.model_heuristic.plot_heuristic_attributes(
                     save_to_file=os.path.join(

@@ -529,11 +529,9 @@ class QuantumModelLearningAgent():
                 branch_id=branch_id,
                 blocking=blocking
             )
-        self.log_print(
-            [
-                'Learning models from branch {} finished.'.format(branch_id)
-            ]
-        )
+        self.log_print([
+            'Learning models from branch {} finished.'.format(branch_id)
+        ])
 
     def learn_model(
         self,
