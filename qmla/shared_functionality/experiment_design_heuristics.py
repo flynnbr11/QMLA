@@ -59,7 +59,7 @@ class BaseHeuristicQMLA(qi.Heuristic):
 
         # probe ID
         self.probe_id = 0
-        self.probe_rotation_frequency = 1
+        self.probe_rotation_frequency = 25
         self.num_probes = kwargs['num_probes']
 
         # storage infrastructure
@@ -143,7 +143,10 @@ class BaseHeuristicQMLA(qi.Heuristic):
     
     def finalise_heuristic(self, **kwargs):
         self.log_print([
-            "Resample epochs: ", self._resample_epochs,
+            "{} Resample epochs: {}".format(
+                len(self._resample_epochs), 
+                self._resample_epochs,
+            )
             # "\nTimes suggested:", self._times_suggested
         ])
 

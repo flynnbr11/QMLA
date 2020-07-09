@@ -10,8 +10,8 @@ run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=10 # number of experiments
-prt=20 # number of particles
+exp=100 # number of experiments
+prt=200 # number of particles
 
 ###############
 # QMLA settings
@@ -31,10 +31,10 @@ debug_mode=0
 
 # growth_rule='TestSimulatedNVCentre'
 # growth_rule='IsingGeneticTest'
-growth_rule='IsingGeneticSingleLayer'
+# growth_rule='IsingGeneticSingleLayer'
 # growth_rule='NVCentreRevivals'
 # growth_rule='NVCentreRevivalsSimulated'
-# growth_rule='NVCentreNQubitBath'
+growth_rule='NVCentreNQubitBath'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'

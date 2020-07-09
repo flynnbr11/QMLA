@@ -124,7 +124,7 @@ class NVCentreNQubitBath(
         #     'pauliSet_1J2_zJz_d2': 0.76546868,
         # }
 
-        self.max_time_to_consider = 50e-6
+        self.max_time_to_consider = 200e-6
         self.plot_time_increment = 0.5e-6
 
         n_qubits = 2

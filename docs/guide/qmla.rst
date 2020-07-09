@@ -12,7 +12,7 @@ This is referred to as a :term:`Run`
 The QMLA class provides methods for each of the available algorithms, as well 
 as routines required therein, and methods for analysis and plotting. 
 
-Models are assigned a unique `model_ID` upon generation. 
+Models are assigned a unique ``model_ID`` upon generation. 
 QMLA considers a set of models as a `layer` or a `branch`. 
 Models can exist on multiple branches. 
 For each growth rule included in the instance, a growth rule tree is built. 
