@@ -13,14 +13,12 @@ sys.path.append(
 )
 import qmla
 
-# import DataBase
-# import GrowthRules
-
 parser = argparse.ArgumentParser(
     description='Pass variables for (I)QLE.'
 )
+
 # Add parser arguments, ie command line arguments for QMD
-# QMD parameters -- fundamentals such as number of particles etc
+# QMLA parameters -- fundamentals such as number of particles etc
 parser.add_argument(
     '-ggr', '--growth_generation_rule',
     help='Rule applied for generation of new models during QMD. \
@@ -156,18 +154,16 @@ def time_required(
     num_experiments,
     num_processes=1,
     resource_reallocation=False,
-    num_bayes_times=None,
+    # num_bayes_times=None,
     minimum_allowed_time=100,
     insurance_factor=2.5,
     **kwargs
 ):
     times_reqd = {}
-    if num_bayes_times is None:
-        num_bayes_times = num_experiments
 
     num_hamiltonians_per_model = (
         num_particles *
-        (num_experiments + num_bayes_times)
+        (2*num_experiments)
     )
 
     parallelisability = {}
@@ -200,7 +196,7 @@ def time_required(
                     q
                 ))
                 num_models_this_dimension = generator_max_num_models_by_shape['other']
-            print("Gen:", gen, "max num models for ", q, "qubits:",
+            print("GR:", gen, "max num models for ", q, "qubits:",
                   num_models_this_dimension
                   )
             time_this_dimension = (
@@ -228,10 +224,13 @@ def time_required(
     times_reqd['num_processes'] = highest_parallelisability
 
     true_dimension = qmla.get_num_qubits(true_model)
+    qhl_insurance_factor = 1.5 # buffer to ensure finished in time
     qhl_time = (
-        insurance_factor *
+        qhl_insurance_factor *
         hamiltonian_exponentiation_times[true_dimension]
-        * num_hamiltonians_per_model
+        * num_particles
+        * num_experiments
+        # * num_hamiltonians_per_model
     )
     times_reqd['qhl'] = max(
         minimum_allowed_time,
@@ -256,7 +255,7 @@ def time_required(
             int(times_reqd[k])
         )
         times_reqd[k] = int(times_reqd[k])
-
+    print("Time to request:\n", times_reqd)
     return times_reqd
 
 
@@ -292,7 +291,7 @@ time_reqd = time_required(
     num_experiments=num_experiments,
     num_processes=num_processes,
     resource_reallocation=resource_reallocation,
-    num_bayes_times=num_bayes_times,
+    # num_bayes_times=num_bayes_times,
     minimum_allowed_time=minimum_allowed_time,
 )
 

@@ -17,8 +17,8 @@ additional_growth=""
 # growth_rule='IsingLatticeSet'
 # growth_rule='TestSimulatedNVCentre'
 growth_rule='NVCentreNQubitBath'
-num_experiments=250
-num_particles=750
+num_experiments=1000
+num_particles=3000
 
 
 python3 time_required_calculation.py \

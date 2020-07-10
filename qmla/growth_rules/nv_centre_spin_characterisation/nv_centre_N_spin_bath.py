@@ -105,7 +105,7 @@ class NVCentreNQubitBath(
             'other': 6
         }
         self.num_processes_to_parallelise_over = 8
-        self.timing_insurance_factor = 0.5
+        self.timing_insurance_factor = 1
 
         # Test: a few hand picked models to see if true model wins
         self.test_preset_models = True
@@ -222,7 +222,6 @@ class NVCentreNQubitBath(
             'other': 4
         }
         self.num_processes_to_parallelise_over = len(self.initial_models)+1
-        self.timing_insurance_factor = 0.25
 
 
     # Model generation / QMLA progression
