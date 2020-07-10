@@ -217,9 +217,9 @@ class NVCentreNQubitBath(
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.max_num_models_by_shape = {
-            2 : 6,
-            1 : 7,
-            'other': 1
+            # 2 : 6,
+            # 1 : 7,
+            'other': 4
         }
         self.num_processes_to_parallelise_over = len(self.initial_models)+1
         self.timing_insurance_factor = 0.25
