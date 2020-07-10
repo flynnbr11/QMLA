@@ -15,7 +15,8 @@ additional_growth=""
 
 # growth_rule='two_qubit_ising_rotation_hyperfine_transverse'
 # growth_rule='IsingLatticeSet'
-growth_rule='TestSimulatedNVCentre'
+# growth_rule='TestSimulatedNVCentre'
+growth_rule='NVCentreNQubitBath'
 num_experiments=250
 num_particles=750
 
@@ -26,7 +27,6 @@ python3 time_required_calculation.py \
 	-use_agr=0 \
 	-e=$num_experiments \
 	-p=$num_particles \
-	-bt=$num_experiments \
 	-proc=1 \
 	-res=0 \
 	-time_insurance=1 \
