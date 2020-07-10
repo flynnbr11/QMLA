@@ -16,10 +16,15 @@ class LatticeSet(
     def __init__(
         self,
         growth_generation_rule,
+        true_model=None,
         **kwargs
     ):
+        if true_model is not None: 
+            self.true_model = true_model
+            print("[LatticeSet] got true model {}".format(self.true_model))
         super().__init__(
             growth_generation_rule=growth_generation_rule,
+            true_model=true_model,
             **kwargs
         )
         self.tree_completed_initially = True # fixed lattice set considered

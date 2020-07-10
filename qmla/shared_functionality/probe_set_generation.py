@@ -476,10 +476,10 @@ def separable_fermi_hubbard_half_filled(
     Probes for Fermi-Hubbard Hamiltonians. 
 
     Generates separable probes in N sites;
-        then projects so that for each dimension
-        the probe is projected onto the subspace of n
-        fermions on the n dimensional space, 
-        i.e. the half-filled basis. 
+    then projects so that for each dimension
+    the probe is projected onto the subspace of n
+    fermions on the n dimensional space, 
+    i.e. the half-filled basis. 
     
     :param int max_num_qubits: Largest number of qubits to generate probes up to.
     :param int  num_probes: How many probes to produce. 
@@ -545,6 +545,7 @@ def get_half_filled_basis_vectors(
 ):
     half_filled_list = [0, 1] * num_sites
 
+    # all the ways in which half filled can be spread across lattice
     perms = list(itertools.permutations(half_filled_list))
     perms = [
         ''.join([str(j) for j in this_el])
@@ -560,6 +561,7 @@ def random_superposition_occupation_basis():
     r"""
     Returns a random superposition over the occupation basis of a single site
         which can be singly or doubly occupied.
+    #TODO equivalent to 2 qubit Harr-random?
 
     vacant = np.array([1,0])
     occupied = np.array([0,1])
@@ -579,7 +581,7 @@ def random_superposition_occupation_basis():
 
     state = (alpha * down) + (beta * up) + \
         (gamma * unoccupied) + (delta * doubly_occupied)
-    state = state / np.linalg.norm(state)
+    state = state / np.linalg.norm(state) # normalise
     return state
 
 

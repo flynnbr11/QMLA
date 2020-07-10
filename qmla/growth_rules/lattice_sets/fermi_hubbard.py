@@ -18,14 +18,17 @@ class FermiHubbardLatticeSet(
         growth_generation_rule,
         **kwargs
     ):
-        super().__init__(
-            growth_generation_rule=growth_generation_rule,
-            **kwargs
-        )        
         self.true_lattice = topology_predefined._3_site_chain
         # self.true_lattice = topology_predefined._4_site_square
         self.onsite_terms_present = True
         self.true_model = self.model_from_lattice(self.true_lattice)
+        
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            true_model = self.true_model,
+            **kwargs
+        )        
+        self.log_print(["True model is:", self.true_model])
 
         self.available_lattices = [
             self.true_lattice, 
@@ -34,7 +37,7 @@ class FermiHubbardLatticeSet(
             topology_predefined._4_site_square,
         ]
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
-        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
 
         self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
@@ -66,12 +69,8 @@ class FermiHubbardLatticeSet(
                 connections = conn_string,
                 N = lattice_dimension
             )
-            for s in [
-                'up', 
-                'down'
-            ]
+            for s in ['up', 'down']
         ]
-
 
         if self.onsite_terms_present: 
             site_string = '_'.join(

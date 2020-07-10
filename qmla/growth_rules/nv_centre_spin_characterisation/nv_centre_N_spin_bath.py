@@ -113,19 +113,28 @@ class NVCentreNQubitBath(
             self._setup_preset_models_test()
 
 
-    def _set_true_params(self):
-        # self.true_model = 'pauliSet_1_x_d2+pauliSet_1_z_d2'
-        # self.true_model = 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2'
-        # self.true_model_terms_params = {
-        #     'pauliSet_1_x_d2': 0.92450565,
-        #     'pauliSet_1_y_d2': 6.00664336,
-        #     'pauliSet_1_z_d2': 1.65998543,
-        #     'pauliSet_2_y_d2' : 2, 
-        #     'pauliSet_1J2_zJz_d2': 0.76546868,
-        # }
+    def _setup_true_model_4_qubit_approx(self,):
+        self.true_model_terms_params =  {
+            # spin rotation
+            'pauliSet_1_z_d4' : 7255832515, 
+            # coupling
+            'pauliSet_1J2_zJz_d4' : 197814, 
+            'pauliSet_1J3_zJz_d4' : 577277, 
+            'pauliSet_1J4_zJz_d4' : 643980, 
+            # nuclear rotations
+            'pauliSet_2_x_d4' : 72321, 
+            'pauliSet_2_y_d4' : 67684, 
+            'pauliSet_2_z_d4' : 15466, 
+            'pauliSet_3_x_d4' : 27479, 
+            'pauliSet_3_y_d4' : 63002,
+            'pauliSet_3_z_d4' : 61635, 
+            'pauliSet_4_x_d4' : 47225, 
+            'pauliSet_4_y_d4' : 38920, 
+            'pauliSet_4_z_d4' : 50960
+        }
 
-        self.max_time_to_consider = 200e-6
-        self.plot_time_increment = 0.5e-6
+
+    def _setup_true_model_2_qubit_approx(self,):
 
         n_qubits = 2
         self.true_model_terms_params = {
@@ -142,19 +151,30 @@ class NVCentreNQubitBath(
             'pauliSet_2_y_d{}'.format(n_qubits) : 66e3,
             'pauliSet_2_z_d{}'.format(n_qubits) : 15e3,
         }
+
+
+    def _set_true_params(self):
+
+        # set target model
+        # self._setup_true_model_2_qubit_approx()
+        self._setup_true_model_4_qubit_approx()
+
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        max_num_qubits = 5
+        self.max_time_to_consider = 200e-6
+        self.plot_time_increment = 0.5e-6
+
+        # max_num_qubits = 5
         test_prior_info = {}      
         paulis_to_include = self.availalbe_pauli_terms
 
         for pauli in paulis_to_include:
 
-            for num_qubits in range(1, 1+max_num_qubits):
+            for num_qubits in range(1, 1+self.max_num_qubits):
         
                 spin_rotation_term = 'pauliSet_1_{p}_d{N}'.format(
                     p=pauli, N=num_qubits)
@@ -183,26 +203,11 @@ class NVCentreNQubitBath(
 
     def _setup_preset_models_test(self):
         self.initial_models = [
-            secular_approximation(2),
+            # secular_approximation(2),
             secular_approximation(3), 
-            secular_approximation(4)
-
-            # 'pauliSet_1_x_d1', 
-            # 'pauliSet_1_y_d1', 
-            # 'pauliSet_1_z_d1', 
-            # 'pauliSet_1_x_d1+pauliSet_1_y_d1', 
-            # 'pauliSet_1_x_d1+pauliSet_1_z_d1', 
-            # 'pauliSet_1_y_d1+pauliSet_1_z_d1', 
-            # 'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1', 
-
-            # 'pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-            # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2', 
-            # 'pauliSet_1_x_d2+pauliSet_2_y_d2+pauliSet_1J2_zJz_d2', 
-            # 'pauliSet_1_z_d2+pauliSet_2_z_d2+pauliSet_1J2_zJz_d2', 
-            # 'pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2',
-            # 3 qubits
-            # 'pauliSet_1_z_d3+pauliSet_2_z_d3+pauliSet_3_z_d3+pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3', 
-            # 'pauliSet_1_x_d3+pauliSet_1_y_d3+pauliSet_1_z_d3+pauliSet_2_x_d3+pauliSet_2_y_d3+pauliSet_2_z_d3+pauliSet_3_x_d3+pauliSet_3_y_d3+pauliSet_3_z_d3', 
+            secular_approximation(4),
+            secular_approximation(5),
+            # secular_approximation(6),
 
         ]
         self.initial_models = [

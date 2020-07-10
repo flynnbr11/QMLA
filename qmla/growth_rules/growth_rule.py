@@ -50,10 +50,11 @@ class GrowthRule():
         true_model=None,
         **kwargs
     ):
+        self.growth_generation_rule = growth_generation_rule
         if true_model is not None: 
             self.true_model = true_model
-
-        self.growth_generation_rule = growth_generation_rule
+        else:
+            self.true_model = None
 
         if 'log_file' in kwargs:
             self.log_file = kwargs['log_file']
@@ -144,7 +145,8 @@ class GrowthRule():
             }``
 
         """
-        self.true_model = 'pauliSet_1_x_d1'
+        if self.true_model is None: 
+            self.true_model = 'pauliSet_1_x_d1'
         self.qhl_models = ['pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1']
         self.true_model_terms_params = {}
 
