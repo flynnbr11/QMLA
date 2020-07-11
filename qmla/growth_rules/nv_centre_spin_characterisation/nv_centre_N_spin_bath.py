@@ -101,8 +101,8 @@ class NVCentreNQubitBath(
 
         # Logistics
         self.max_num_models_by_shape = {
-            1 : 3,
-            'other': 6
+            # 1 : 3,
+            'other': 1
         }
         self.num_processes_to_parallelise_over = 8
         self.timing_insurance_factor = 1
