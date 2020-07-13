@@ -147,3 +147,5 @@ class NVCentreExperimentalShortDynamicsGenticAlgorithm(
             )
         )
         return self.measurements
+
+

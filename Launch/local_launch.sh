@@ -6,12 +6,12 @@
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=1 # perform QHL on known (true) model
+run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=200 # number of experiments
-prt=1000 # number of particles
+exp=20 # number of experiments
+prt=100 # number of particles
 
 ###############
 # QMLA settings
@@ -42,10 +42,12 @@ debug_mode=0
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreRevivalSimulation'
+# growth_rule='FermiHubbardLatticeSet'
+growth_rule='NVCentreSimulatedLongDynamicsGenticAlgorithm'
+
 
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
-growth_rule='FermiHubbardLatticeSet'
 # growth_rule='NVLargeSpinBath'
 # growth_rule='GeneticTest'
 # growth_rule='Genetic'

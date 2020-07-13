@@ -35,6 +35,8 @@ growth_classes = {
         GR.NVCentreSimulatedShortDynamicsGenticAlgorithm, 
     'NVCentreExperimentalShortDynamicsGenticAlgorithm':
         GR.NVCentreExperimentalShortDynamicsGenticAlgorithm,
+    'NVCentreSimulatedLongDynamicsGenticAlgorithm' :
+        GR.NVCentreSimulatedLongDynamicsGenticAlgorithm,
     'ExperimentNVCentreNQubits':
         GR.ExperimentNVCentreNQubits,
     'NVCentreRevivals' : 
