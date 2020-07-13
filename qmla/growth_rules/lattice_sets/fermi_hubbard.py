@@ -22,7 +22,9 @@ class FermiHubbardLatticeSet(
         # self.true_lattice = topology_predefined._3_site_chain
         # self.true_lattice = topology_predefined._4_site_square
         self.onsite_terms_present = True
-        self.true_model = self.model_from_lattice(self.true_lattice)
+        # self.true_model = self.model_from_lattice(self.true_lattice)
+        # TEST:
+        self.true_model = 'FH-hopping-sum_down_1h2_d2+FH-onsite-sum_1_2_d2'
         
         super().__init__(
             growth_generation_rule=growth_generation_rule,
@@ -38,11 +40,11 @@ class FermiHubbardLatticeSet(
             topology_predefined._4_site_square,
         ]
 
-        self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        # self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         # self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
 
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
 
@@ -59,10 +61,15 @@ class FermiHubbardLatticeSet(
         self.min_param = 0.25
         self.max_param = 0.75
         self.true_model_terms_params = {
+            # 3 sites
             'FH-hopping-sum_down_1h2_2h3_d3' : 0.25,
             'FH-hopping-sum_up_1h2_2h3_d3' : 0.75,
+            'FH-onsite-sum_1_2_3_d3': 0.55,
+            
+            # 2 sites
             'FH-hopping-sum_down_1h2_d2' : 0.25,
-            'FH-hopping-sum_up_1h2_d2' : 0.75
+            'FH-hopping-sum_up_1h2_d2' : 0.75,
+            'FH-onsite-sum_1_2_d2': 0.55,
         }
 
     def model_from_lattice(self, lattice):

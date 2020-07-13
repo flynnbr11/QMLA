@@ -1231,6 +1231,11 @@ class ModelInstanceForLearning():
         )
 
     def _compute_expectation_values(self):
+        # TODO replace with call to method which precomputes
+        # U = e^{-iH} and takes 
+        # scipy.linalg.fractional_matrix_power(U, t), 
+        # instead of computing e^{-iHt} for all values of t
+
         times = self.experimental_measurement_times
         model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
         if model_num_qubits > 4:

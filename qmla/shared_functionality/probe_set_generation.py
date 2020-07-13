@@ -475,7 +475,9 @@ def separable_fermi_hubbard_half_filled(
     r"""
     Probes for Fermi-Hubbard Hamiltonians. 
 
-    Generates separable probes in N sites;
+    Generates separable probes using a half filled system,
+    i.e. N spins in N sites.
+    First generates completely random probes,
     then projects so that for each dimension
     the probe is projected onto the subspace of n
     fermions on the n dimensional space, 
@@ -680,10 +682,10 @@ def fermi_hubbard_occupation_basis_down_in_first_site(
     probe_dict = {}    
     for j in range(num_probes):
         for n in range(1, max_num_qubits+1):
-            num_occupation_locations =2*n
+            num_occupation_locations = 2*n
             down_in_first_site = ['0']*num_occupation_locations
             down_in_first_site[0] = '1'
-            down_in_first_site = ''.join(  down_in_first_site )
+            down_in_first_site = ''.join( down_in_first_site )
             probe_dict[(j, n)] = state_from_string(down_in_first_site)
     
     return probe_dict
