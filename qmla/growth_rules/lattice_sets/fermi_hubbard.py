@@ -18,7 +18,8 @@ class FermiHubbardLatticeSet(
         growth_generation_rule,
         **kwargs
     ):
-        self.true_lattice = topology_predefined._3_site_chain
+        self.true_lattice = topology_predefined._2_site_chain
+        # self.true_lattice = topology_predefined._3_site_chain
         # self.true_lattice = topology_predefined._4_site_square
         self.onsite_terms_present = True
         self.true_model = self.model_from_lattice(self.true_lattice)
@@ -36,14 +37,20 @@ class FermiHubbardLatticeSet(
             topology_predefined._4_site_chain,
             topology_predefined._4_site_square,
         ]
+
+        # self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+
+        # self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
+
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
 
         self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.max_num_qubits = 5
         self.max_num_probe_qubits = self.max_num_qubits
-        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_all_sites
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.lattice_set_fermi_hubbard
@@ -86,6 +93,28 @@ class FermiHubbardLatticeSet(
         # complete_model = qmla.construct_models.alph(complete_model)
         return complete_model
 
+    def expectation_value(self, **kwargs):
+        r"""
+        Transform probe to the Jordan Wigner basis before computing expectation value. 
+        """
+
+        try:
+            ex_val = self.expectation_value_function(**kwargs)
+            method = 'default'
+        except:
+            # transform - e.g. probe was from a different starting basis
+            probe = kwargs['state']
+            transformed_probe = self.probe_transformer.transform(probe = probe)
+            kwargs['state'] = transformed_probe
+            
+            method = 'transform'
+
+            ex_val = self.expectation_value_function(**kwargs)
+
+        # self.log_print([
+        #     "Expectation value method: {}".format(method)
+        # ])
+        return ex_val
 
 
 
