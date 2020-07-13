@@ -22,9 +22,9 @@ class FermiHubbardLatticeSet(
         # self.true_lattice = topology_predefined._3_site_chain
         # self.true_lattice = topology_predefined._4_site_square
         self.onsite_terms_present = True
-        # self.true_model = self.model_from_lattice(self.true_lattice)
+        self.true_model = self.model_from_lattice(self.true_lattice)
         # TEST:
-        self.true_model = 'FH-hopping-sum_down_1h2_d2+FH-onsite-sum_1_2_d2'
+        # self.true_model = 'FH-hopping-sum_down_1h2_d2+FH-onsite-sum_1_2_d2'
         
         super().__init__(
             growth_generation_rule=growth_generation_rule,
