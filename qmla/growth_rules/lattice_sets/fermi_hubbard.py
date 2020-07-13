@@ -38,11 +38,12 @@ class FermiHubbardLatticeSet(
             topology_predefined._4_site_square,
         ]
 
-        # self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         # self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
 
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
