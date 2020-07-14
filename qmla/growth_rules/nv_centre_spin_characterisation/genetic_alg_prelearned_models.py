@@ -73,7 +73,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
         # Genetic algorithm options
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
         self.branch_comparison_strategy = 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
@@ -85,8 +85,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # TEST: force inclusion of true model
         if self.true_model not in self.initial_models:
             self.initial_models[-1] = self.true_model
-        self.max_spawn_depth = 12
-        
+        self.max_spawn_depth = 16
 
         # Logistics
         self.force_evaluation = True
@@ -103,7 +102,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         }
         # self.num_processes_to_parallelise_over = 16
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.35
+        self.timing_insurance_factor = 0.1
 
     def _set_true_params(self):
 
