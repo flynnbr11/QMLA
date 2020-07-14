@@ -61,7 +61,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
         # Modular functions
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
         self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         self.simulator_probe_generation_function = self.probe_generation_function
@@ -82,6 +83,10 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
+        ]
+        self.qhl_models = [
+            self.true_model, 
+            'pauliSet_2_x_d2'
         ]
         # TEST: force inclusion of true model
         # if self.true_model not in self.initial_models:
