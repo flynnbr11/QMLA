@@ -83,8 +83,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
         # TEST: force inclusion of true model
-        if self.true_model not in self.initial_models:
-            self.initial_models[-1] = self.true_model
+        # if self.true_model not in self.initial_models:
+        #     self.initial_models[-1] = self.true_model
         self.max_spawn_depth = 16
 
         # Logistics
