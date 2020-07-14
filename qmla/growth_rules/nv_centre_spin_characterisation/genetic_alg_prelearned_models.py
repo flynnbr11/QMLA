@@ -78,7 +78,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.branch_comparison_strategy = 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 4
+        num_models_per_generation = 14
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
