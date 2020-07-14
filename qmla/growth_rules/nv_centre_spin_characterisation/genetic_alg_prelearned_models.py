@@ -102,7 +102,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'other': 0
         }
         # self.num_processes_to_parallelise_over = 16
-        self.num_processes_to_parallelise_over = 16
+        self.num_processes_to_parallelise_over = 8
         self.timing_insurance_factor = 1
 
     def _set_true_params(self):
@@ -199,7 +199,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             self.plot_time_increment
         )
         eval_data = super().generate_evaluation_data(
-            num_probes = 10, 
+            num_probes = 1, 
             evaluation_times = times, 
             **kwargs
         )
