@@ -738,7 +738,7 @@ class ModelInstanceForLearning():
             self.log_print(["Evaluation ll is nan"])
         else:
             self.evaluation_log_likelihood = evaluation_updater.log_total_likelihood
-            self.evaluation_log_likelihood /= len(evaluation_experiments) # normalise
+            # self.evaluation_log_likelihood /= len(evaluation_experiments) # normalise
             self.evaluation_log_likelihood = qmla.utilities.round_nearest(
                 self.evaluation_log_likelihood, 0.05
             )
