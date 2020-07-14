@@ -104,6 +104,10 @@ class GrowthRuleTree():
                     "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
                         len(pairs_to_compare))])
             self.graphs[self.spawn_step] = graph
+        elif self.growth_class.branch_comparison_strategy == 'disconnected':
+            pairs_to_compare = []
+        elif self.growth_class.branch_comparison_strategy == 'sparse_connection':
+            pairs_to_compare = []
         else:
             pairs_to_compare = 'all'
 

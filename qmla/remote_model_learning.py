@@ -124,7 +124,7 @@ def remote_learn_model_parameters(
         ])
 
         # Evaluate learned parameterisation
-        qml_instance.compute_likelihood_after_parameter_learning()
+        # qml_instance.compute_likelihood_after_parameter_learning()
 
     except NameError:
         log_print([

@@ -13,3 +13,4 @@ from qmla.growth_rules.nv_centre_spin_characterisation.experiment_vary_num_qubit
 from qmla.growth_rules.nv_centre_spin_characterisation.nv_centre_N_spin_bath import *
 from qmla.growth_rules.nv_centre_spin_characterisation.nv_revival_genetic_algorithm import *
 from qmla.growth_rules.nv_centre_spin_characterisation.genetic_algorithm_long_dynamics import *
+from qmla.growth_rules.nv_centre_spin_characterisation.genetic_alg_prelearned_models import *

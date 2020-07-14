@@ -59,6 +59,10 @@ class RatingSystem():
         self,
         model_list=None
     ):
+        for m in model_list: 
+            if m not in self.models:
+                self.add_ranking_model(model_id = m)
+
         self.ratings = {
             m : self.models[m].rating
             for m in self.models

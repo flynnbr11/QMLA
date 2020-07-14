@@ -406,6 +406,8 @@ class ModelInstanceForLearning():
                 break
 
         self._finalise_learning()
+        self.compute_likelihood_after_parameter_learning()
+        self._model_plots()
         self.model_heuristic.finalise_heuristic()
 
     def _record_experiment_updates(self, update_step):
@@ -512,6 +514,9 @@ class ModelInstanceForLearning():
             for term in self.qhl_final_param_estimates
         ])
         self._compute_expectation_values()
+
+
+    def _model_plots(self):
 
         if self.plot_level >= 3:
             # Plots for this model, if plot level wants to include them
@@ -628,20 +633,22 @@ class ModelInstanceForLearning():
         """
         self.log_print(["Evaluating learned model."])
 
-        # Retrieve times and probe states used for evaluation.
-        true_params_dict = pickle.load(open(
-            self.true_params_path,
-            'rb'
-        ))
-        evaluation_times = true_params_dict['evaluation_times']
-        evaluation_probe_dict = true_params_dict['evaluation_probes']
+        # Retrieve probes and experiment list used as evaluation data.
 
-        if self.num_experiments < 20:
+        evaluation_data = pickle.load(open(
+            os.path.join(self.results_directory, 'evaluation_data.p'), 'rb'
+        )) # TODO get from command line argument instead of reconstructing path here
+
+        # evaluation_times = evaluation_data['times']
+        evaluation_probe_dict = evaluation_data['probes']
+        evaluation_experiments = evaluation_data['experiments']
+
+        if not self.growth_class.force_evaluation and self.num_experiments < 20:
             # TODO make optional robustly in GR or pass dev arg to QMLA
             # instance.
             self.log_print(
                 ["<20 experiments; presumed dev mode. Not evaluating all models"])
-            evaluation_times = evaluation_times[::10]
+            evaluation_experiments = evaluation_experiments[::10]
 
         # Construct a fresh updater and model to evaluate on.
         estimated_params = self.qinfer_updater.est_mean()
@@ -695,18 +702,18 @@ class ModelInstanceForLearning():
         evaluation_updater._log_total_likelihood = 0.0
         evaluation_updater._normalization_record = []
         eval_epoch = 0
-        for t in evaluation_times:
-            # exp = qmla.utilities.format_experiment(
-            #     evaluation_qinfer_model,
-            #     final_learned_params=self.final_learned_params,
-            #     qhl_final_param_estimates=self.qhl_final_param_estimates,
-            #     time=[t],
-            # )
+
+        for experiment in evaluation_experiments:
+            t = experiment['t'].item()
+            probe_id = experiment['probe_id'].item()
+
             exp = evaluation_heuristic(
                 num_params = len(self.model_terms_matrices), 
                 epoch_id = eval_epoch, 
                 force_time_choice = t, 
             )
+            exp['probe_id'] = probe_id
+            
             params_array = np.array([[self.true_model_params[:]]])
             datum = evaluation_updater.model.simulate_experiment(
                 params_array,
@@ -1238,7 +1245,8 @@ class ModelInstanceForLearning():
 
         times = self.experimental_measurement_times
         model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
-        if model_num_qubits > 4:
+        if model_num_qubits > 5:
+            # TODO compute U=e^{-iH} once then it doesn't really matter how many times computed here
             times = times[::10] # reduce times to compute 
         plot_probe = self.plot_probes[model_num_qubits]
 
@@ -1274,7 +1282,7 @@ class ModelInstanceForLearning():
             times, 
             [self.expectation_values[t] for t in times], 
             color='blue', 
-            label='Model'
+            label='Model. $LL$={}'.format(self.evaluation_log_likelihood)
         )
         label_fontsize = 15
         ax.set_xlim(0, max(times))

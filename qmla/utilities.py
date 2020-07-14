@@ -186,3 +186,24 @@ def ensure_consisten_num_qubits_pauli_set(initial_model, new_dimension=None):
 
     full_model = '+'.join(separate_terms)
     return full_model
+
+
+def plot_probes_on_bloch_sphere(
+    probe_dict, num_probes, save_to_file=None
+):
+    import qutip as qt
+    bloch = qt.Bloch()
+
+    for i in range(num_probes):
+        state = probe_dict[i, 1]
+        a = state[0]
+        b = state[1]
+        A = a * qt.basis(2, 0)
+        B = b * qt.basis(2, 1)
+        vec = (A + B)
+        bloch.add_states(vec)
+
+    if save_to_file is not None:
+        bloch.save(save_to_file)
+    else:
+        bloch.show()

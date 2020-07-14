@@ -158,51 +158,52 @@ def set_shared_parameters(
     # Generate dataset for evaluation: times and probes
     # these must not be the same as those trained upon, so that
     # all models are evaluated with no advantages.
-    evaluation_probes = None
-    if generate_evaluation_experiments:
-        # Generate test data to evaluate independent of training data.
-        evaluation_probes = growth_class.generate_probes(
-            store_probes=False,
-            probe_maximum_number_qubits=probe_max_num_qubits_all_growth_rules,
-            noise_level=growth_class.probe_noise_level,
-            minimum_tolerable_noise=0.0,
-        )
+    # evaluation_probes = None
+    # if generate_evaluation_experiments:
+    #     # Generate test data to evaluate independent of training data.
+    #     evaluation_probes = growth_class.generate_probes(
+    #         store_probes=False,
+    #         probe_maximum_number_qubits=probe_max_num_qubits_all_growth_rules,
+    #         noise_level=growth_class.probe_noise_level,
+    #         minimum_tolerable_noise=0.0,
+    #     )
 
-        # use at least 50 times to evaluate
-        num_evaluation_times = int(max(num_particles, 50))
-        evaluation_times = scipy.stats.reciprocal.rvs(
-            growth_class.max_time_to_consider / 100,
-            growth_class.max_time_to_consider,
-            size=num_evaluation_times
-        )  # evaluation times generated log-uniformly
-        available_probe_ids = list(range(growth_class.num_probes))
-        list_len_fator = math.ceil(
-            len(evaluation_times) /
-            len(available_probe_ids))
-        iterable_probe_ids = iter(available_probe_ids * list_len_fator)
+    #     # use at least 50 times to evaluate
+    #     num_evaluation_times = int(max(num_particles, 50))
+    #     evaluation_times = scipy.stats.reciprocal.rvs(
+    #         growth_class.max_time_to_consider / 100,
+    #         growth_class.max_time_to_consider,
+    #         size=num_evaluation_times
+    #     )  # evaluation times generated log-uniformly
+    #     available_probe_ids = list(range(growth_class.num_probes))
+    #     list_len_fator = math.ceil(
+    #         len(evaluation_times) /
+    #         len(available_probe_ids))
+    #     iterable_probe_ids = iter(available_probe_ids * list_len_fator)
 
-        # Plot the times used for evaluation.
-        plt.clf()
-        plt.hist(
-            evaluation_times,
-            bins=list(np.linspace(0, growth_class.max_time_to_consider, 10))
-        )
-        plt.title('Times used for evaluation')
-        plt.ylabel('Frequency')
-        plt.xlabel('Time')
-        fig_path = os.path.join(
-            run_directory,
-            'times_for_evaluation.png'
-        )
-        plt.savefig(fig_path)
+    #     # Plot the times used for evaluation.
+    #     plt.clf()
+    #     plt.hist(
+    #         evaluation_times,
+    #         bins=list(np.linspace(0, growth_class.max_time_to_consider, 10))
+    #     )
+    #     plt.title('Times used for evaluation')
+    #     plt.ylabel('Frequency')
+    #     plt.xlabel('Time')
+    #     fig_path = os.path.join(
+    #         run_directory,
+    #         'times_for_evaluation.png'
+    #     )
+    #     plt.savefig(fig_path)
+
 
     # Gather and store/return the true parameters.
     true_params_info = {
         'params_list': true_model_terms_params,
         'params_dict': true_params_dict,
         'all_growth_rules': all_growth_rules,
-        'evaluation_probes': evaluation_probes,
-        'evaluation_times': evaluation_times,
+        # 'evaluation_probes': evaluation_probes,
+        # 'evaluation_times': evaluation_times,
         'true_model': true_model,
         'growth_generator': growth_class.growth_generation_rule
     }
@@ -214,3 +215,20 @@ def set_shared_parameters(
         )
     else:
         return true_params_info
+
+    # Generate evaluation data set
+    evalution_data = growth_class.generate_evaluation_data(
+        probe_maximum_number_qubits=probe_max_num_qubits_all_growth_rules,
+        num_times = 1e4, 
+        run_directory = run_directory,
+    )
+    evaluation_data_path = os.path.join(
+        run_directory, 
+        'evaluation_data.p'
+    )
+    pickle.dump(
+        evalution_data, 
+        open(evaluation_data_path, 'wb')
+    )
+
+    

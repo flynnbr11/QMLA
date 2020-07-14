@@ -2860,27 +2860,36 @@ class QuantumModelLearningAgent():
 
     def plot_one_qubit_probes_bloch_sphere(self, save=False):
         r"""Show all one qubit probes on Bloch sphere."""
-        import qutip as qt
-        bloch = qt.Bloch()
-        for i in range(self.probe_number):
-            state = self.probes_system[i, 1]
-            a = state[0]
-            b = state[1]
-            A = a * qt.basis(2, 0)
-            B = b * qt.basis(2, 1)
-            vec = (A + B)
-            print(vec)
-            bloch.add_states(vec)
 
-        if save:
-            bloch.save(
-                os.path.join(
-                    self.qmla_controls.plots_directory,
-                    'probes_bloch_sphere.png'
-                )
+        qmla.utilities.plot_probes_on_bloch_sphere(
+            probe_dict = self.probes_system, 
+            num_probes = self.probe_number, 
+            save_to_file=os.path.join(
+                self.qmla_controls.plots_directory,
+                'probes_bloch_sphere.png'
             )
-        else:
-            bloch.show()
+        )
+        # import qutip as qt
+        # bloch = qt.Bloch()
+        # for i in range(self.probe_number):
+        #     state = self.probes_system[i, 1]
+        #     a = state[0]
+        #     b = state[1]
+        #     A = a * qt.basis(2, 0)
+        #     B = b * qt.basis(2, 1)
+        #     vec = (A + B)
+        #     print(vec)
+        #     bloch.add_states(vec)
+
+        # if save:
+        #     bloch.save(
+        #         os.path.join(
+        #             self.qmla_controls.plots_directory,
+        #             'probes_bloch_sphere.png'
+        #         )
+        #     )
+        # else:
+        #     bloch.show()
 
 
     def _plot_model_terms(self, colour_by = 'binary'):

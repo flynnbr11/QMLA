@@ -6,6 +6,8 @@ import numpy as np
 import itertools
 
 import matplotlib
+import matplotlib.pyplot as plt
+import scipy 
 
 import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
@@ -111,6 +113,7 @@ class GrowthRule():
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
+        self.evaluation_probe_generation_function = None
         self.probe_noise_level = 0 # 1e-5
 
         # Experiment design
@@ -272,6 +275,7 @@ class GrowthRule():
         self.fraction_own_experiments_for_bf = 1.0
         self.fraction_opponents_experiments_for_bf = 1.0
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
+        self.force_evaluation = False
 
         # Plotting
         self.plot_time_increment = None
@@ -692,10 +696,12 @@ class GrowthRule():
             "probe max num qubits:", probe_maximum_number_qubits
         ])
 
+        if 'new_probes' not in kwargs:
+            kwargs['num_probes'] = self.num_probes
         # Generate a set of probes
         new_probes = self.probe_generation_function(
             max_num_qubits=probe_maximum_number_qubits,
-            num_probes=self.num_probes,
+            # num_probes=self.num_probes,
             **kwargs
         )
 
@@ -708,7 +714,7 @@ class GrowthRule():
             else:
                 self.probes_simulator = self.simulator_probe_generation_function(
                     max_num_qubits=probe_maximum_number_qubits,
-                    num_probes=self.num_probes,
+                    # num_probes=self.num_probes,
                     **kwargs
                 )
         else:
@@ -821,6 +827,90 @@ class GrowthRule():
             **kwargs
         )
         return self.prior
+
+    # Generate evaluation data
+    def generate_evaluation_data(
+        self, 
+        num_probes = None, 
+        num_times = 100, 
+        probe_maximum_number_qubits = 10,
+        evaluation_times = None, 
+        run_directory = '', 
+    ):
+        if num_probes is None: 
+            num_probes = self.num_probes
+        
+        if self.evaluation_probe_generation_function is not None: 
+            probes = self.evaluation_probe_generation_function(
+                num_probes = num_probes,
+                max_num_qubits=probe_maximum_number_qubits,
+            )
+        else:
+            probes = self.probe_generation_function(
+                num_probes = num_probes,
+                max_num_qubits=probe_maximum_number_qubits,
+            )
+
+        # probes = self.generate_probes(
+        #     num_probes = num_probes, 
+        #     store_probes=False, 
+        #     probe_maximum_number_qubits = probe_maximum_number_qubits,
+        # )
+
+        if evaluation_times is None: 
+            # num_evaluation_times = int(max(num_particles, 50))
+            evaluation_times = scipy.stats.reciprocal.rvs(
+                self.max_time_to_consider / 100,
+                self.max_time_to_consider,
+                size = num_times
+            )  # evaluation times generated log-uniformly
+
+        # Format pairs of experimental times and probes
+        iter_probe_id = itertools.cycle(range(num_probes))
+        experiments = [
+            np.array(
+                ( t, next(iter_probe_id) ),
+                dtype = [('t', 'float'), ('probe_id', 'int')]
+            )
+            for t in evaluation_times
+        ]        
+
+        eval_data = {
+            'probes' : probes, 
+            'experiments' : experiments
+        }
+
+        # Plot the times/probes used for evaluation.
+        
+        # first make directory to plot to:
+        eval_directory = os.path.join(run_directory, 'evaluation')
+        try:
+            os.makedirs(eval_directory)
+        except:
+            pass
+
+        plt.clf()
+        plt.hist(
+            evaluation_times,
+            bins=list(np.linspace(0, max(evaluation_times), int(1e3)))
+        )
+        plt.title('Times used for evaluation')
+        plt.ylabel('Frequency')
+        plt.xlabel('Time')
+        fig_path = os.path.join(
+            eval_directory,
+            'times.png'
+        )
+        plt.savefig(fig_path)
+
+        qmla.utilities.plot_probes_on_bloch_sphere(
+            probe_dict = probes, 
+            num_probes = num_probes, 
+            save_to_file=os.path.join(eval_directory, 'probes.png')
+        )
+
+        return eval_data
+
 
     # Map model name strings to latex representation
     def latex_name(

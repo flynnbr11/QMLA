@@ -8,7 +8,8 @@ import qmla.construct_models as construct_models
 import qmla.logging
 
 __all__ = [
-    'gaussian_prior'
+    'gaussian_prior',
+    'prelearned_true_parameters_prior'
 ]
 
 def log_print(
@@ -103,6 +104,54 @@ def gaussian_prior(
     )
 
     return dist
+
+def prelearned_true_parameters_prior(
+    model_name, 
+    true_parameters, 
+    prior_specific_terms,
+    default_parameter=0, 
+    default_width = 0.05, 
+    fraction_true_parameter_width=0.01,
+    log_file = 'qmla.log', 
+    log_identifier= 'PrelearnedPrior'
+    ,**kwargs
+):
+
+    individual_terms = qmla.construct_models.get_constituent_names_from_name(
+        model_name
+    )
+    num_terms = len(individual_terms)
+
+    means = []
+    sigmas = []
+
+    for term in individual_terms:
+        if term in true_parameters:
+            param = true_parameters[term]
+            width = fraction_true_parameter_width * param
+        else:
+            try:
+                param = prior_specific_terms[term][0]
+                width = prior_specific_terms[term][1]
+            except:
+                param = default_parameter
+                width = default_width
+            
+        means.append(param)
+        sigmas.append(width)
+    
+    means = np.array(means)
+    sigmas = np.array(sigmas)
+    cov_mtx = np.diag(sigmas**2)
+    dist = qinfer.MultivariateNormalDistribution(
+        means,
+        cov_mtx
+    )
+
+    return dist
+    
+    
+    
 
 
 def plot_prior(
