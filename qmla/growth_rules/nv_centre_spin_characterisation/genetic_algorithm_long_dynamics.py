@@ -66,7 +66,8 @@ class NVCentreSimulatedLongDynamicsGenticAlgorithm(
         self.shared_probes = True
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
         # Genetic algorithm options
@@ -114,7 +115,7 @@ class NVCentreSimulatedLongDynamicsGenticAlgorithm(
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        self.max_time_to_consider = 50e-6
+        self.max_time_to_consider = 100e-6
         self.plot_time_increment = 0.5e-6
 
         self.max_num_qubits = 5
