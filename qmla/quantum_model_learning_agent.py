@@ -1665,7 +1665,7 @@ class QuantumModelLearningAgent():
         # Store model IDs and names
         model_data = self.model_database[
             # subset of columns to store
-            ['model_id', 'model_name', 'latex_name', 'branch_id', 'f_score']
+            ['model_id', 'model_name', 'latex_name', 'branch_id', 'f_score',] # TODO add log_likelihood here
         ]
         model_data.to_csv(
             os.path.join(
@@ -2295,8 +2295,11 @@ class QuantumModelLearningAgent():
 
         self.log_print([
             "\nFinal winner:", self.global_champion_name,
-            "has F-score ", np.round(
-                self.model_f_scores[self.champion_model_id], 2)
+            "(ID {}) has F-score {}".format(
+                self.champion_model_id, 
+                np.round(
+                    self.model_f_scores[self.champion_model_id], 2)
+                )
         ])
 
     ##########

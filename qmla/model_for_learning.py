@@ -650,6 +650,13 @@ class ModelInstanceForLearning():
                 ["<20 experiments; presumed dev mode. Not evaluating all models"])
             evaluation_experiments = evaluation_experiments[::10]
 
+        self.log_print([
+            "Evaluation experiments len {}. First 5 elements:\n{}".format(
+                len(evaluation_experiments),
+                evaluation_experiments[:5]
+            )
+        ])
+
         # Construct a fresh updater and model to evaluate on.
         estimated_params = self.qinfer_updater.est_mean()
         cov_mt_uncertainty = [1e-10] * np.shape(estimated_params)[0]
@@ -713,7 +720,7 @@ class ModelInstanceForLearning():
                 force_time_choice = t, 
             )
             exp['probe_id'] = probe_id
-            
+
             params_array = np.array([[self.true_model_params[:]]])
             datum = evaluation_updater.model.simulate_experiment(
                 params_array,
@@ -730,16 +737,21 @@ class ModelInstanceForLearning():
             self.evaluation_median_likelihood = None
             self.log_print(["Evaluation ll is nan"])
         else:
+            self.evaluation_log_likelihood = evaluation_updater.log_total_likelihood
+            self.evaluation_log_likelihood /= len(evaluation_experiments) # normalise
             self.evaluation_log_likelihood = qmla.utilities.round_nearest(
-                evaluation_updater.log_total_likelihood,
-                0.05
+                self.evaluation_log_likelihood, 0.05
             )
+
             self.evaluation_median_likelihood = np.round(
                 np.median(evaluation_updater.normalization_record),
                 2
             )
         self.log_print([
-            "Model evaluation ll:", self.evaluation_log_likelihood
+            "Model {} evaluation ll:{}".format(   
+                self.model_id,    
+                self.evaluation_log_likelihood
+            )
         ])
 
     ##########

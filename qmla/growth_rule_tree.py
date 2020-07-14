@@ -105,6 +105,7 @@ class GrowthRuleTree():
                         len(pairs_to_compare))])
             self.graphs[self.spawn_step] = graph
         elif self.growth_class.branch_comparison_strategy == 'disconnected':
+            # TODO very few connections, only used to avoid crash
             pairs_to_compare = []
         elif self.growth_class.branch_comparison_strategy == 'sparse_connection':
             pairs_to_compare = []

@@ -315,7 +315,7 @@ def NV_centre_ising_probes_plus(
 def plus_plus_with_phase_difference(
     max_num_qubits=2,
     num_probes=40,
-    noise_level=0.,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
     # noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
     # *args,
     **kwargs
@@ -346,7 +346,7 @@ def plus_plus_with_phase_difference(
 
     # if minimum_tolerable_noise > noise_level:
     #     noise_level = minimum_tolerable_noise
-    noise_level = 0.01
+    # noise_level = 0.01
     plus_state = np.array([1 + 0j, 1]) / np.sqrt(2)
     random_noise = noise_level * random_probe(1)
     noisy_plus = plus_state + random_noise

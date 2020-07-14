@@ -62,7 +62,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Modular functions
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_probes = 5
@@ -77,7 +78,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.branch_comparison_strategy = 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 14
+        num_models_per_generation = 4
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
@@ -116,7 +117,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
         self.max_time_to_consider = 50e-6
-        self.plot_time_increment = 0.5e-6
+        self.plot_time_increment = self.max_time_to_consider / 100
         self.max_num_qubits = 5
         test_prior_info = {}      
         paulis_to_include = self.availalbe_pauli_terms
@@ -195,10 +196,10 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         times = np.arange(
             self.plot_time_increment, 
             self.max_time_to_consider, 
-            self.plot_time_increment
+            self.plot_time_increment/10
         )
         eval_data = super().generate_evaluation_data(
-            num_probes=1, 
+            num_probes = 10, 
             evaluation_times = times, 
             **kwargs
         )
