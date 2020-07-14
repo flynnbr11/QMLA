@@ -196,7 +196,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         times = np.arange(
             self.plot_time_increment, 
             self.max_time_to_consider, 
-            self.plot_time_increment/10
+            self.plot_time_increment
         )
         eval_data = super().generate_evaluation_data(
             num_probes = 10, 
