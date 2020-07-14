@@ -91,7 +91,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # TEST: force inclusion of true model
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model
-        self.max_spawn_depth = 16
+        self.max_spawn_depth = 24
 
         # Logistics
         self.force_evaluation = True
