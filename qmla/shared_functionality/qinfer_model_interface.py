@@ -87,7 +87,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         experimental_measurements,
         experimental_measurement_times,
         log_file,
-        evaluation_model= False,
+        evaluation_model=False,
+        estimated_params=None,
         comparison_model=False, 
         debug_mode=False,
         **kwargs
@@ -157,6 +158,29 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.iqle_mode = self.growth_class.iqle_mode 
         self.comparison_model = comparison_model
         self.evaluation_model = evaluation_model
+        if self.evaluation_model:
+            self.estimated_params = estimated_params
+            self.log_print([
+                "Evaluation qinfer model. Estimated parameters: {}".format(
+                    self.estimated_params
+                )
+            ])
+            estimated_model=None
+            for i in range(len(self.estimated_params)):
+                p = self.estimated_params[i]
+                m = self._oplist[i]
+                if estimated_model is None:
+                    estimated_model = p*m
+                else:
+                    estimated_model += p*m
+            self.estimated_model = estimated_model
+            self.log_print([
+                "Estimated model:\n", self.estimated_model,
+                "\nDifference from true model", 
+                np.max(np.abs(self.estimated_model - self.true_hamiltonian))
+            ])
+
+
         # Required by QInfer: 
         self._min_freq = 0 # what does this do?
         self._solver = 'scipy'
@@ -574,12 +598,21 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         ]
         self.timings[timing_marker]['get_probe'] += time.time() - t_init
         operator_list = self._oplist
+        if self.evaluation_model:
+            self.log_print([
+                "Using precomputed Hamiltonian"
+            ])
+            hamiltonian = self.estimated_model
+        else:
+            hamiltonian = None
+        
         t_init = time.time()
         pr0 = self.default_pr0_from_modelparams_times(
             t_list = times, 
             particles = particles, 
             oplist = operator_list, 
             probe = probe, 
+            hamiltonian=hamiltonian,
             timing_marker=timing_marker
             # **kwargs
         )
@@ -631,6 +664,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             ),
             "\nTimes: ", t_list
         ])
+
+        # if hamiltonian is not None: 
+        #     self.log_print([
+        #         "Hamiltonian passed:\n", hamiltonian
+        #     ])
 
         num_particles = len(particles)
         num_times = len(t_list)
