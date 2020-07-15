@@ -681,12 +681,13 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_mode=True,
+            debug_mode=False,
         )
 
         evaluation_updater = qi.SMCUpdater(
             model=evaluation_qinfer_model,
-            n_particles=min(5, self.num_particles),
+            # n_particles=min(5, self.num_particles),
+            n_particles = 50, 
             prior=posterior_distribution,
             # turn off resampling - want to evaluate the learned model, not
             # improved version
@@ -899,8 +900,7 @@ class ModelInstanceForLearning():
             os.path.join(self.model_learning_plots_directory, "{}distributions_{}.png".format(
                 self.plot_prefix,
                 self.model_id
-            )
-            ))
+        )))
 
         # Plot covariance matrix heatmap
         plt.clf()

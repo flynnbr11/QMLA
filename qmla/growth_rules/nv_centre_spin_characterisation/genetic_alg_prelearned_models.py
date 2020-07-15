@@ -48,6 +48,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'pauliSet_1J2_xJx_d2',
             'pauliSet_1J2_yJy_d2',
             'pauliSet_1J2_zJz_d2',
+            # 'pauliSet_1J2_xJz_d2' # test
         ]
 
         super().__init__(
@@ -74,6 +75,9 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
+        self.qinfer_resampler_a = 1
+        self.qinfer_resampler_threshold = 0.0
+
         # Genetic algorithm options
         self.tree_completed_initially = False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
@@ -87,7 +91,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         ]
         self.qhl_models = [
             self.true_model, 
-            'pauliSet_2_x_d2'
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            # 'pauliSet_1J2_xJz_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra, visible to |+>
         ]
         # TEST: force inclusion of true model
         # if self.true_model not in self.initial_models:

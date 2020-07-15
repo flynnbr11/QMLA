@@ -6,12 +6,12 @@
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=1 # perform QHL on known (true) model
-run_qhl_mulit_model=0 # perform QHL for defined list of models.
+run_qhl=0 # perform QHL on known (true) model
+run_qhl_mulit_model=1 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
 exp=2 # number of experiments
-prt=10 # number of particles
+prt=250 # number of particles
 
 ###############
 # QMLA settings
@@ -21,7 +21,7 @@ further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
 number_best_models_further_qhl=5
-plot_level=3
+plot_level=4
 debug_mode=0
 
 ###############

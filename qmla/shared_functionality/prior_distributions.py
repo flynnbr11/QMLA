@@ -111,7 +111,7 @@ def prelearned_true_parameters_prior(
     prior_specific_terms,
     default_parameter=0, 
     default_width = 0.05, 
-    fraction_true_parameter_width=0.01,
+    fraction_true_parameter_width=1e-7,
     log_file = 'qmla.log', 
     log_identifier= 'PrelearnedPrior'
     ,**kwargs
