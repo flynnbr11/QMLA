@@ -672,6 +672,8 @@ class ModelInstanceForLearning():
             cov_mt = cov_mt, 
         )
 
+        # TODO using precise mean of posterior to evaluate model
+        # want to sample from it -- add flag to qinfer model 
         evaluation_qinfer_model = self.growth_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
@@ -695,7 +697,7 @@ class ModelInstanceForLearning():
         evaluation_updater = qi.SMCUpdater(
             model=evaluation_qinfer_model,
             # n_particles=min(5, self.num_particles),
-            n_particles = 10, 
+            n_particles = 50, 
             prior=posterior_distribution,
             # turn off resampling - want to evaluate the learned model, not
             # improved version

@@ -599,7 +599,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.timings[timing_marker]['get_probe'] += time.time() - t_init
         operator_list = self._oplist
         if self.evaluation_model:
-            self.log_print([
+            self.log_print_debug([
                 "Using precomputed Hamiltonian"
             ])
             hamiltonian = self.estimated_model
