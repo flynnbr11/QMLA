@@ -64,8 +64,9 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
-        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_probes = 5
@@ -90,9 +91,11 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
         self.qhl_models = [
-            self.true_model, 
+            'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # True
             'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            # 'pauliSet_1J2_xJz_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra, visible to |+>
+            # 'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2', # no rotation on 2nd qubit
+            # 'pauliSet_1J2_yJy_d2+pauliSet_1_x_d2+pauliSet_1_y_d2+pauliSet_2_z_d2', # no true terms
+
         ]
         # TEST: force inclusion of true model
         # if self.true_model not in self.initial_models:
@@ -209,7 +212,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             self.plot_time_increment
         )
         eval_data = super().generate_evaluation_data(
-            num_probes = 1, 
+            num_probes = 5, 
             evaluation_times = times, 
             **kwargs
         )
