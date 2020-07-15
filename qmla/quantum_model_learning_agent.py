@@ -3028,12 +3028,17 @@ class QuantumModelLearningAgent():
             models = self.branches[branch_id].resident_model_ids
             times = sorted(self.experimental_measurements.keys())
 
-
+            plt.clf()
             fig = plt.figure(
                 figsize=(15, 10),
                 tight_layout=True
             )
             num_rows = math.ceil( len(models) / max_models_per_subplot )
+            self.log_print([
+                "plotting branch dynamics. On branch {} there are {} rows".format(
+                    branch_id, num_rows
+                )
+            ])
             gs = GridSpec(
                 nrows=num_rows,
                 ncols=1,
@@ -3043,16 +3048,6 @@ class QuantumModelLearningAgent():
             row = 0
             n_models_this_row = 0
             ax = fig.add_subplot(gs[row, col])
-            ax.scatter(
-                times, 
-                [
-                    self.experimental_measurements[t]
-                    for t in times
-                ], 
-                c = 'red',
-                label = 'System'
-            )
-
 
             for m in models:
                 
@@ -3071,32 +3066,38 @@ class QuantumModelLearningAgent():
                 )
 
                 n_models_this_row += 1
-                if n_models_this_row == max_models_per_subplot:
-                    
-                    ax.scatter(
-                        times, 
-                        [
-                            self.experimental_measurements[t]
-                            for t in times
-                        ], 
-                        c = 'red',
-                        label = 'System'
-                    )
-
-                    ax.set_xlim(0, max(times))
-                    ax.set_ylabel('Expectation Value')
-                    ax.set_xlabel('Time ($s$)')
-                    ax.legend()
-
-                    path = os.path.join(
-                        self.branch_results_dir, 
-                        'dynamics_branch_{}.png'.format(branch_id)
-                    )
-
-                    # New subplot
-                    n_models_this_row = 0
+                if (
+                    n_models_this_row == max_models_per_subplot
+                ):
                     row += 1
+                    n_models_this_row = 0 
                     ax = fig.add_subplot(gs[row, col])
+                    
+            for row in range(num_rows):
+                # Finish each subplot
+                ax = fig.add_subplot(gs[row, col])
+
+                ax.scatter(
+                    times, 
+                    [
+                        self.experimental_measurements[t]
+                        for t in times
+                    ], 
+                    c = 'red',
+                    label = 'System',
+                    s = 5, 
+                )
+
+                ax.set_xlim(0, max(times))
+                ax.set_ylabel('Expectation Value')
+                ax.set_xlabel('Time ($s$)')
+                ax.legend()
+
+            path = os.path.join(
+                self.branch_results_dir, 
+                'dynamics_branch_{}.png'.format(branch_id)
+            )
+
             fig.savefig(
                 path
             )
