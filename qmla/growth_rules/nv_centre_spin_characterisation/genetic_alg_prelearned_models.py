@@ -212,7 +212,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             self.plot_time_increment
         )
         eval_data = super().generate_evaluation_data(
-            num_probes = 5, 
+            num_probes = 6, 
             evaluation_times = times, 
             **kwargs
         )
