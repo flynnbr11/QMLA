@@ -174,7 +174,7 @@ def remote_bayes_factor_calculation(
             pass
 
     # Plot dynamics on which models were compared
-    if plot_level >= 3:
+    if plot_level >= 4:
         log_print([
             "Plotting dynamics of models involved."
         ])

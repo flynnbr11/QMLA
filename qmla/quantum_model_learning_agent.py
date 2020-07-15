@@ -2896,6 +2896,8 @@ class QuantumModelLearningAgent():
 
 
     def _plot_model_terms(self, colour_by = 'binary'):
+        if not self.plot_level >= 1:
+            return
         
         # Prepare dataframes
         unique_terms = list(set(qmla.utilities.flatten(list(self.model_database.latex_terms))))
@@ -3001,7 +3003,7 @@ class QuantumModelLearningAgent():
 
     def _plot_dynamics_all_models_on_branches(self, branches=None):
         # TODO if > 5 models on branch, split into multiple axes for readibility
-        if self.plot_level < 3:
+        if not self.plot_level >= 3:
             return
 
         self.branch_results_dir = os.path.join(

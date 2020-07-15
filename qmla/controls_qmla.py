@@ -115,13 +115,13 @@ class ControlsQMLA():
         self.debug_mode = bool(arguments.debug_mode)
         self.pickle_qmla_instance = bool(arguments.pickle_qmla_instance)
         self.rq_timeout = arguments.rq_timeout
-        plot_level = arguments.plot_level
-        if plot_level == 'run':
-            self.plot_level = 1
-        elif plot_level == 'instance':
-            self.plot_level = 2
-        elif plot_level == 'model' : 
-            self.plot_level = 3
+        self.plot_level = arguments.plot_level
+        # if plot_level == 'run':
+        #     self.plot_level = 1
+        # elif plot_level == 'instance':
+        #     self.plot_level = 2
+        # elif plot_level == 'model' : 
+        #     self.plot_level = 3
 
 
         # Redis
@@ -279,9 +279,9 @@ def parse_cmd_line_args(args):
     )
     parser.add_argument(
         '-pl', '--plot_level',
-        help='Level to plot at. Options are run, instance and model',
-        type=str,
-        default='model'
+        help='Level to plot at. Between 1-5 depending on how much info desired for plots.',
+        type=int,
+        default=2
     )
     parser.add_argument(
         '-debug', '--debug_mode',

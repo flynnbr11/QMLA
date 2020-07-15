@@ -21,7 +21,7 @@ further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
 number_best_models_further_qhl=5
-plot_level='model' #'instance'
+plot_level=3
 debug_mode=0
 
 ###############

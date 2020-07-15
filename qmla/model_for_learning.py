@@ -521,15 +521,17 @@ class ModelInstanceForLearning():
             # Plots for this model, if plot level wants to include them
             # TODO replace excepts prints with warnings
             self._plot_preliminary_preparation()
-            try:
-                self._plot_distributions()
-            except BaseException:
-                self.log_print(["Failed to plot posterior"])
+
             try:
                 self._plot_learning_summary()
             except BaseException:
                 self.log_print(["Failed to _plot_learning_summary"])
 
+        if self.plot_level >= 4:
+            try:
+                self._plot_distributions()
+            except BaseException:
+                self.log_print(["Failed to plot posterior"])
             try:
                 self._plot_dynamics()
             except:
