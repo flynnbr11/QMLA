@@ -147,7 +147,12 @@ def separable_probe_dict(
 
     return separable_probes
 
-def tomographic_basis(max_num_qubits = 2, num_probes = 10, **kwargs):
+def tomographic_basis(
+    max_num_qubits = 2, 
+    num_probes = 10, 
+    noise_level = 0.01, 
+    **kwargs
+):
     r"""
     To manually check something. Currently should be ideal for learning Y. 
     """
@@ -155,26 +160,36 @@ def tomographic_basis(max_num_qubits = 2, num_probes = 10, **kwargs):
     probe_list = [
 
         np.array([1, 0j]),
-        np.array([0, 1]),
+        np.array([0j, 1]),
         
-        1/np.sqrt(2)*np.array([1,1]),
-        1/np.sqrt(2)*np.array([1,-1]),
+        1/np.sqrt(2)*np.array([ 1+0j,  1+0j ]),
+        1/np.sqrt(2)*np.array([ 1+0j, -1+0j ]),
 
-        1/np.sqrt(2)*np.array([1,1j]),
-        1/np.sqrt(2)*np.array([1,-1j]),
+        1/np.sqrt(2)*np.array([ 1, 1j ]),
+        1/np.sqrt(2)*np.array([ 1,-1j ]),
 
     ]
+
     available_probes = itertools.cycle(probe_list)
     for j in range(num_probes):
-        probes[(j, 1)] = next(available_probes)
+        probe = next(available_probes)
+        # add noise and normalise
+        probe += noise_level * random_probe(1)
+        probe /= np.linalg.norm(probe)
+        
+        probes[(j, 1)] = probe
     
     for N in range(2, max_num_qubits+1):
-        new = next(available_probes)
 
         for j in range(num_probes):
+            # add noise and normalise
+            new = next(available_probes)
+            new += noise_level * random_probe(1)
+            new /= np.linalg.norm(new)
+
             probes[(j, N)] = np.kron(
                 probes[(j, N-1)], 
-                next(available_probes)
+                new
             )
     return probes
     
@@ -184,7 +199,12 @@ def tomographic_basis(max_num_qubits = 2, num_probes = 10, **kwargs):
 ## e.g. matching experiment.
 ###################################
 
-def manual_set_probes(max_num_qubits = 2, num_probes = 10, **kwargs):
+def manual_set_probes(
+    max_num_qubits = 2, 
+    num_probes = 10, 
+    noise_level = 0, 
+    **kwargs
+):
     r"""
     To manually check something. Currently should be ideal for learning Y. 
     """
@@ -209,12 +229,14 @@ def manual_set_probes(max_num_qubits = 2, num_probes = 10, **kwargs):
         probes[(j, 1)] = next(available_probes)
     
     for N in range(2, max_num_qubits+1):
-        new = next(available_probes)
-
         for j in range(num_probes):
+            new = next(available_probes)
+            new += noise_level * random_probe(1)
+            new /= np.linalg.norm(new)
+
             probes[(j, N)] = np.kron(
                 probes[(j, N-1)], 
-                next(available_probes)
+                new
             )
     return probes
     
