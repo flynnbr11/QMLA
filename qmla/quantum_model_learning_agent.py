@@ -3043,6 +3043,17 @@ class QuantumModelLearningAgent():
             row = 0
             n_models_this_row = 0
             ax = fig.add_subplot(gs[row, col])
+            ax.scatter(
+                times, 
+                [
+                    self.experimental_measurements[t]
+                    for t in times
+                ], 
+                c = 'red',
+                label = 'System'
+            )
+
+
             for m in models:
                 
                 mod = self.get_model_storage_instance_by_id(m)
