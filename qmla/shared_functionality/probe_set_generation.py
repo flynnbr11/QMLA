@@ -315,7 +315,7 @@ def NV_centre_ising_probes_plus(
 def plus_plus_with_phase_difference(
     max_num_qubits=2,
     num_probes=40,
-    noise_level=0.0,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
+    noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
     # noise_level=0.03,  # from 1000 counts - Poissonian noise = 1/sqrt(1000)
     # *args,
     **kwargs
