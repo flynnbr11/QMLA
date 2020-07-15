@@ -835,6 +835,7 @@ class GrowthRule():
         num_times = 100, 
         probe_maximum_number_qubits = 10,
         evaluation_times = None, 
+        num_eval_points=None, 
         run_directory = '', 
     ):
         if num_probes is None: 
@@ -860,12 +861,17 @@ class GrowthRule():
 
         # Format pairs of experimental times and probes
         iter_probe_id = itertools.cycle(range(num_probes))
+        iter_times = itertools.cycle(evaluation_times)
+        if num_eval_points is None: 
+            num_eval_points = len(evaluation_times)
+        
+
         experiments = [
             np.array(
-                ( t, next(iter_probe_id) ),
+                ( next(iter_times), next(iter_probe_id) ),
                 dtype = [('t', 'float'), ('probe_id', 'int')]
             )
-            for t in evaluation_times
+            for _ in range(num_eval_points)
         ]        
 
         eval_data = {
