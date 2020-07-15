@@ -11,7 +11,7 @@ run_qhl_mulit_model=1 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
 exp=2 # number of experiments
-prt=250 # number of particles
+prt=2 # number of particles
 
 ###############
 # QMLA settings

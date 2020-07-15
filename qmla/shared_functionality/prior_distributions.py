@@ -113,8 +113,8 @@ def prelearned_true_parameters_prior(
     default_width = 0.05, 
     fraction_true_parameter_width=1e-7,
     log_file = 'qmla.log', 
-    log_identifier= 'PrelearnedPrior'
-    ,**kwargs
+    log_identifier= 'PrelearnedPrior',
+    **kwargs
 ):
 
     individual_terms = qmla.construct_models.get_constituent_names_from_name(

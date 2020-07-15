@@ -220,5 +220,12 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
         return eval_data
 
-
-
+    def get_evaluation_prior(
+        self, 
+        model_name, 
+        estimated_params, 
+        cov_mt, 
+        **kwargs
+    ):
+        posterior_distribution = self.get_prior(model_name = model_name)
+        return posterior_distribution

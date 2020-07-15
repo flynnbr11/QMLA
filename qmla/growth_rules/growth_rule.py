@@ -906,6 +906,18 @@ class GrowthRule():
 
         return eval_data
 
+    def get_evaluation_prior(
+        self, 
+        model_name, 
+        estimated_params, 
+        cov_mt, 
+        **kwargs
+    ):
+        posterior_distribution = qi.MultivariateNormalDistribution(
+            estimated_params,
+            cov_mt
+        )
+        return posterior_distribution
 
     # Map model name strings to latex representation
     def latex_name(
