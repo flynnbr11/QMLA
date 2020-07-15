@@ -68,7 +68,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 25
-        self.num_eval_times = 250
+        # self.num_eval_times = 250 # not currently used
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_probes = 5
@@ -131,8 +131,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        self.max_time_to_consider = 150e-6
-        self.plot_time_increment = self.max_time_to_consider / self.num_eval_times
+        self.max_time_to_consider = 50e-6
+        self.plot_time_increment = self.max_time_to_consider / 250
         self.max_num_qubits = 5
         test_prior_info = {}      
         paulis_to_include = self.availalbe_pauli_terms
