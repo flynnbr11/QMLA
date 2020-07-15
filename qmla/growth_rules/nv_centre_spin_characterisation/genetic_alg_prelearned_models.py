@@ -67,7 +67,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
-        self.num_eval_probes = 25
+        self.num_eval_probes = 36
         self.num_eval_points = 500 # not currently used
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
