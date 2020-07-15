@@ -693,7 +693,7 @@ class ModelInstanceForLearning():
         evaluation_updater = qi.SMCUpdater(
             model=evaluation_qinfer_model,
             # n_particles=min(5, self.num_particles),
-            n_particles = 250, 
+            n_particles = 500, 
             prior=posterior_distribution,
             # turn off resampling - want to evaluate the learned model, not
             # improved version
