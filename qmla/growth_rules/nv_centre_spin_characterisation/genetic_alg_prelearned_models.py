@@ -99,7 +99,6 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.fraction_particles_for_bf = 0.1 # BF not meaningful here so minimising cost
         self.fraction_own_experiments_for_bf = 0.1
         self.fraction_opponents_experiments_for_bf = 0
-        # self.max_time_to_consider = 10
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -122,7 +121,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        self.max_time_to_consider = 50e-6
+        self.max_time_to_consider = 150e-6
         self.plot_time_increment = self.max_time_to_consider / 100
         self.max_num_qubits = 5
         test_prior_info = {}      

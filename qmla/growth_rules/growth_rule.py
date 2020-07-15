@@ -851,14 +851,7 @@ class GrowthRule():
                 max_num_qubits=probe_maximum_number_qubits,
             )
 
-        # probes = self.generate_probes(
-        #     num_probes = num_probes, 
-        #     store_probes=False, 
-        #     probe_maximum_number_qubits = probe_maximum_number_qubits,
-        # )
-
         if evaluation_times is None: 
-            # num_evaluation_times = int(max(num_particles, 50))
             evaluation_times = scipy.stats.reciprocal.rvs(
                 self.max_time_to_consider / 100,
                 self.max_time_to_consider,
@@ -892,7 +885,9 @@ class GrowthRule():
         plt.clf()
         plt.hist(
             evaluation_times,
-            bins=list(np.linspace(0, max(evaluation_times), int(1e3)))
+            bins = 2*len(evaluation_times) - 1
+            # bins=list(np.linspace(0, max(evaluation_times), 3*len(evaluation_times))),
+            # align='left'
         )
         plt.title('Times used for evaluation')
         plt.ylabel('Frequency')
