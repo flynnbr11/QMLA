@@ -142,7 +142,6 @@ class ModelInstanceForLearning():
         self.num_particles = qmla_core_info_dict['num_particles']
         self.num_experiments = qmla_core_info_dict['num_experiments']
         self.probe_number = qmla_core_info_dict['num_probes']
-        # self.store_particle_locations_and_weights = qmla_core_info_dict['store_particles_weights']
         self.results_directory = qmla_core_info_dict['results_directory']
         self.true_model_constituent_operators = qmla_core_info_dict['true_oplist']
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
@@ -680,7 +679,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_log_print=False,
+            debug_mode=True,
         )
 
         evaluation_updater = qi.SMCUpdater(

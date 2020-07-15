@@ -87,7 +87,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         experimental_measurements,
         experimental_measurement_times,
         log_file,
-        comparison_model = False, 
+        evaluation_model= False,
+        comparison_model=False, 
         debug_mode=False,
         **kwargs
     ):
@@ -155,6 +156,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.experimental_measurement_times = experimental_measurement_times
         self.iqle_mode = self.growth_class.iqle_mode 
         self.comparison_model = comparison_model
+        self.evaluation_model = evaluation_model
         # Required by QInfer: 
         self._min_freq = 0 # what does this do?
         self._solver = 'scipy'
@@ -426,20 +428,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.true_evolution = False
             params = modelparams
 
-        # if self.true_evolution:
-        #     # set probe counter at true evolution; keep for simulator
-        #     self._a += 1
-        #     if self._a % self.probe_rotation_frequency == 0:
-        #         self.probe_counter += 1
-        #         if self.probe_counter >= self.probe_number:
-        #             self.probe_counter = 0
-
         self.probe_counter = probe_id
-        # self.log_print([
-        #     "Probe id from heuristic: {} \t probe counter: {}".format(probe_id, self.probe_counter)
-        # ])
-
-        # self.log_print(["True evolution {} \t a = {} \t Probe counter {}".format(self.true_evolution, self._a,  self.probe_counter) ] )
 
         self.log_print_debug([
             "\n\nLikelihood fnc called. Probe counter={}. True system -> {}.".format(self.probe_counter, self.true_evolution)
@@ -476,21 +465,19 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             )
         )
         self.timings[timing_marker]['likelihood_array'] += time.time() - t_init
-        self.log_print_debug(
-            [
-                '\ntrue_evo:', self.true_evolution,
-                '\ntimes:', times,
-                '\nlen(outcomes):', len(outcomes),
-                '\n_a = {}, _b={}'.format(self._a, self._b),
-                '\nprobe counter:', self.probe_counter,
-                '\nexp:', expparams,
-                '\nOutcomes:', outcomes[:3],
-                '\nparticles:', params[:3],
-                "\nPr0: ", pr0[:3], 
-                "\nLikelihood: ", likelihood_array[0][:3],
-                "\nexpparams_sampled_particle:", expparams_sampled_particle
-            ]
-        )
+        self.log_print_debug([
+            '\ntrue_evo:', self.true_evolution,
+            '\nevolution times:', times,
+            '\nlen(outcomes):', len(outcomes),
+            '\n_a = {}, _b={}'.format(self._a, self._b),
+            '\nprobe counter:', self.probe_counter,
+            '\nexp:', expparams,
+            '\nOutcomes:', outcomes[:3],
+            '\nparticles:', params[:3],
+            "\nPr0: ", pr0[:3], 
+            "\nLikelihood: ", likelihood_array[0][:3],
+            "\nexpparams_sampled_particle:", expparams_sampled_particle
+        ])
         
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
 

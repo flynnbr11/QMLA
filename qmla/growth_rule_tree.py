@@ -104,9 +104,13 @@ class GrowthRuleTree():
                     "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
                         len(pairs_to_compare))])
             self.graphs[self.spawn_step] = graph
-        elif self.growth_class.branch_comparison_strategy == 'disconnected':
+        elif self.growth_class.branch_comparison_strategy == 'minimal':
             # TODO very few connections, only used to avoid crash
-            pairs_to_compare = []
+            model_list = self.initial_models
+            first_half = model_list[  : int(len(model_list)/2) ]
+            second_half = model_list[  int(len(model_list)/2) : ]
+            pairs_to_compare = list(zip(first_half, second_half))
+
         elif self.growth_class.branch_comparison_strategy == 'sparse_connection':
             pairs_to_compare = []
         else:
@@ -169,6 +173,11 @@ class GrowthRuleTree():
                     "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
                         len(pairs_to_compare))])
                 self.graphs[self.spawn_step] = graph
+            elif self.growth_class.branch_comparison_strategy == 'minimal':
+                # TODO very few connections, only used to avoid crash
+                first_half = model_list[  : int(len(model_list)/2) ]
+                second_half = model_list[  int(len(model_list)/2) : ]
+                pairs_to_compare = list(zip(first_half, second_half))
             else:
                 pairs_to_compare = 'all'
 

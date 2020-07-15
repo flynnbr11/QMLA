@@ -152,11 +152,15 @@ def plot_qmla_branches(q, return_graphs=False):
         for n in graph:
             for target in graph:
                 if n != target:
-                    shortest_path = nx.shortest_path_length(
-                        graph, 
-                        source = n, 
-                        target = target
-                    )
+                    try:
+                        shortest_path = nx.shortest_path_length(
+                            graph, 
+                            source = n, 
+                            target = target
+                        )
+                    except:
+                        # can't connect to some other node
+                        shortest_path = -1
 
                     this_node_current_longest_path = graph.nodes[n]['longest_path_to_any_target']
                     if shortest_path  > this_node_current_longest_path:

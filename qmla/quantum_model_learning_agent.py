@@ -2997,3 +2997,96 @@ class QuantumModelLearningAgent():
             )
 
         )
+
+
+    def _plot_dynamics_all_models_on_branches(self, branches=None):
+        # TODO if > 5 models on branch, split into multiple axes for readibility
+        if self.plot_level < 3:
+            return
+
+        self.branch_results_dir = os.path.join(
+            self.qmla_controls.plots_directory, 
+            'branches'
+        )
+        try:
+            os.makedirs(self.branch_results_dir)
+        except:
+            pass
+
+        if branches is None:
+            branches = sorted(list(self.branches.keys()))
+
+        colours = itertools.cycle(
+            ['blue', 'orange', 'green', 'cyan', 'purple', 'olive', 'grey']
+        )
+        linestyles = itertools.cycle(
+            ['solid','dashed', 'dotted', 'dashdot']
+        )
+        max_models_per_subplot = 5
+
+        for branch_id in branches:
+            models = self.branches[branch_id].resident_model_ids
+            times = sorted(self.experimental_measurements.keys())
+
+
+            fig = plt.figure(
+                figsize=(15, 10),
+                tight_layout=True
+            )
+            num_rows = math.ceil( len(models) / max_models_per_subplot )
+            gs = GridSpec(
+                nrows=num_rows,
+                ncols=1,
+            )
+
+            col = 0
+            row = 0
+            n_models_this_row = 0
+            ax = fig.add_subplot(gs[row, col])
+            for m in models:
+                
+                mod = self.get_model_storage_instance_by_id(m)
+                exp_vals = [
+                    mod.expectation_values[t] 
+                    for t in times
+                ]
+                
+                ax.plot(
+                    times, 
+                    exp_vals, 
+                    label="{} ($LL$={})".format(m, mod.evaluation_log_likelihood),
+                    color=next(colours), 
+                    ls=next(linestyles)
+                )
+
+                n_models_this_row += 1
+                if n_models_this_row == max_models_per_subplot:
+                    
+                    ax.scatter(
+                        times, 
+                        [
+                            self.experimental_measurements[t]
+                            for t in times
+                        ], 
+                        c = 'red',
+                        label = 'System'
+                    )
+
+                    ax.set_xlim(0, max(times))
+                    ax.set_ylabel('Expectation Value')
+                    ax.set_xlabel('Time ($s$)')
+                    ax.legend()
+
+                    path = os.path.join(
+                        self.branch_results_dir, 
+                        'dynamics_branch_{}.png'.format(branch_id)
+                    )
+
+                    # New subplot
+                    n_models_this_row = 0
+                    row += 1
+                    ax = fig.add_subplot(gs[row, col])
+            fig.savefig(
+                path
+            )
+
