@@ -912,6 +912,22 @@ class GrowthRule():
 
         return eval_data
 
+    def plot_dynamics_of_true_model(self, probe_dict, times):
+        r"""
+        Given a set of probes and times, plot their dynamics.
+        """
+
+        keys = list(probe_dict.keys())
+        true_model_num_qubits = qmla.construct_models.get_num_qubits(self.true_model)
+        probe_ids = [t for t in list(eval_probes.keys()) if t[1] == true_model_num_qubits]
+
+        for pid in probe_ids:
+            probe = probe_dict[pid]
+
+            
+
+
+
     def get_evaluation_prior(
         self, 
         model_name, 

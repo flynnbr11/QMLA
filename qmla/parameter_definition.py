@@ -217,7 +217,7 @@ def set_shared_parameters(
         return true_params_info
 
     # Generate evaluation data set
-    evalution_data = growth_class.generate_evaluation_data(
+    evaluation_data = growth_class.generate_evaluation_data(
         probe_maximum_number_qubits=probe_max_num_qubits_all_growth_rules,
         num_times = 1e4, 
         run_directory = run_directory,
@@ -227,8 +227,29 @@ def set_shared_parameters(
         'evaluation_data.p'
     )
     pickle.dump(
-        evalution_data, 
+        evaluation_data, 
         open(evaluation_data_path, 'wb')
     )
+
+    true_ham = None
+    for k in list(true_params_dict.keys()):
+        param = true_params_dict[k]
+        mtx = qmla.construct_models.compute(k)
+        if true_ham is not None:
+            true_ham += param * mtx
+        else:
+            true_ham = param * mtx
+
+    qmla.utilities.plot_evaluation_dataset(
+        evaluation_data = evaluation_data, 
+        true_hamiltonian = true_ham,
+        expectation_value_function = growth_class.expectation_value,
+        save_to_file=os.path.join(
+            run_directory, 
+            'evaluation', 
+            'dynamics.png'
+        )
+    )
+
 
     

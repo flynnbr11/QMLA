@@ -3,12 +3,16 @@ import scipy as sp
 import os
 import time
 import copy
-import qinfer as qi
 import random
+import itertools
 
+import qutip as qt
+import qinfer as qi
 import redis
 import pickle
 import matplotlib.colors
+import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 
 import qmla.construct_models
 
@@ -189,13 +193,21 @@ def ensure_consisten_num_qubits_pauli_set(initial_model, new_dimension=None):
 
 
 def plot_probes_on_bloch_sphere(
-    probe_dict, num_probes, save_to_file=None
+    probe_dict, 
+    # num_probes, 
+    save_to_file=None,
+    **kwargs
 ):
     import qutip as qt
     bloch = qt.Bloch()
 
-    for i in range(num_probes):
-        state = probe_dict[i, 1]
+    # isolate 1 qubit probes
+    probe_ids = [t for t in list(probe_dict.keys()) if t[1] == 1]
+
+    # for i in range(num_probes):
+    #     state = probe_dict[i, 1]
+    for pid in probe_ids:
+        state = probe_dict[pid]
         a = state[0]
         b = state[1]
         A = a * qt.basis(2, 0)
@@ -207,3 +219,120 @@ def plot_probes_on_bloch_sphere(
         bloch.save(save_to_file)
     else:
         bloch.show()
+
+
+
+import qutip as qt
+
+
+def plot_subset_eval_probes(
+    true_hamiltonian,
+    probe_dict, 
+    subset_probes, 
+    expectation_value_function, 
+    times, 
+    fig, 
+    dynamics_ax, 
+    bloch_ax, 
+):
+    r"""
+    Retained separately in case we later want to plot all eval probes instead of just a sample
+    """ 
+
+    colours = ['red', 'green', 'cyan', 'orange', 'brown', 'blue', 'pink']
+    linestyles=['dashed', 'dotted', 'dashdot']
+    linestyles = itertools.cycle(linestyles)
+    iter_colours = itertools.cycle(colours)
+    num_probes_per_subplot = len(colours)
+
+    bloch = qt.Bloch(fig=fig, axes = bloch_ax)
+    bloch_ax.axis('square') # to get a nice circular plot
+
+    for pid in subset_probes:
+        probe = probe_dict[pid]
+
+        ev = [
+            expectation_value_function(
+                ham = true_hamiltonian, 
+                t = t, 
+                state = probe
+            )
+            for t in times
+        ]
+
+        dynamics_ax.plot(
+            times, 
+            ev, 
+            c=next(iter_colours),
+            ls=next(linestyles),
+            lw = 3,
+        )
+
+        corresponding_single_qubit_probe = probe_dict[(pid[0], 1)]   
+
+        a = corresponding_single_qubit_probe[0]
+        b = corresponding_single_qubit_probe[1]
+        A = probe[0] * qt.basis(2, 0)
+        B = b * qt.basis(2, 1)
+        vec = (A + B)
+        bloch.add_states(vec)
+
+    bloch.vector_color = colours
+    bloch.render(fig=fig, axes=bloch_ax) # render to the correct subplot 
+    dynamics_ax.set_ylabel('Expectation Value')
+    dynamics_ax.set_xlabel('Time')
+
+
+
+
+def plot_evaluation_dataset(
+    evaluation_data, 
+    true_hamiltonian,
+    expectation_value_function,
+    num_probes_to_plot=5, 
+    save_to_file=None
+):
+    print("plotting eval dataset. true hamm:", true_hamiltonian)
+    times = sorted(np.array(evaluation_data['experiments'])['t'])
+    probe_dict = evaluation_data['probes']
+    keys = list(probe_dict.keys())
+    true_model_num_qubits = np.log2( np.shape(true_hamiltonian)[0] )
+    probe_ids = [t for t in list(probe_dict.keys()) if t[1] == true_model_num_qubits]
+
+    # Plot
+    fig, axes = plt.subplots(
+        figsize=(18, 10),
+        constrained_layout=True,
+    )
+
+    nrows = 1 # TODO plot more than just a sample
+    ncols = 2
+    gs = GridSpec(
+        nrows=nrows,
+        ncols=ncols,
+        width_ratios=[3, 1]
+    )
+
+    row = 0
+    dynamics_ax = fig.add_subplot(gs[row, 0])
+    bloch_ax = fig.add_subplot(gs[row, 1], projection='3d')
+
+
+    subset_probes = probe_ids[:num_probes_to_plot]
+
+    plot_subset_eval_probes(
+        true_hamiltonian = true_hamiltonian, 
+        expectation_value_function = expectation_value_function,
+        subset_probes = subset_probes,
+        probe_dict = probe_dict, 
+        times = times, 
+        fig = fig,  
+        dynamics_ax = dynamics_ax, 
+        bloch_ax = bloch_ax, 
+    )
+
+    if save_to_file is not None:
+        fig.savefig(save_to_file)
+    else:
+        plt.show()
+    

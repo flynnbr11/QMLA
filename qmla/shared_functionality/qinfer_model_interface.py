@@ -175,8 +175,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     estimated_model += p*m
             self.estimated_model = estimated_model
             self.log_print([
-                "Estimated model:\n", self.estimated_model,
-                "\nDifference from true model", 
+                "Estimated model's difference from true model", 
                 np.max(np.abs(self.estimated_model - self.true_hamiltonian))
             ])
 
@@ -519,7 +518,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.summarise_likelihoods['particles_lower_quartile'].append( np.percentile(pr0, 25) )
             self.summarise_likelihoods['particles_upper_quartile'].append( np.percentile(pr0, 75) )
         self.log_print_debug(["Stored likelihoods"])
-
+        self.log_print([
+            "True {}. t={} Likelihood={}".format(
+            self.true_evolution, times[0], likelihood_array
+        )])
+        
         return likelihood_array
 
     def get_system_pr0_array(
@@ -732,24 +735,20 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     self.timings[timing_marker]['storing_output'] += time.time() - t_init
 
                 except NameError:
-                    self.log_print(
-                        [
-                            "Error raised; unphysical expecation value.",
-                            "\nHam:\n", ham,
-                            "\nt=", t,
-                            "\nState=", probe,
-                        ],
-                    )
+                    self.log_print([
+                        "Error raised; unphysical expecation value.",
+                        "\nHam:\n", ham,
+                        "\nt=", t,
+                        "\nState=", probe,
+                    ])
                     sys.exit()
                 except timeouts.JobTimeoutException:
-                    self.log_print(
-                        [
-                            "RQ Time exception. \nprobe=",
-                            probe,
-                            "\nt=", t, "\nHam=",
-                            ham
-                        ],
-                    )
+                    self.log_print([
+                        "RQ Time exception. \nprobe=",
+                        probe,
+                        "\nt=", t, "\nHam=",
+                        ham
+                    ])
                     sys.exit()
 
                 if output[evoId][tId] < 0:
@@ -769,8 +768,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                         ]
                     )
         return output
-
-
 
 
 class QInferNVCentreExperiment(QInferModelQMLA):

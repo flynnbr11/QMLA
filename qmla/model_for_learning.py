@@ -697,7 +697,7 @@ class ModelInstanceForLearning():
         evaluation_updater = qi.SMCUpdater(
             model=evaluation_qinfer_model,
             # n_particles=min(5, self.num_particles),
-            n_particles = 250, 
+            n_particles = 25, 
             prior=posterior_distribution,
             # turn off resampling - want to evaluate the learned model, not
             # improved version
@@ -737,7 +737,7 @@ class ModelInstanceForLearning():
             datum = evaluation_updater.model.simulate_experiment(
                 params_array,
                 exp,
-                repeat=1
+                repeat=1000
             )
             evaluation_updater.update(datum, exp)
             eval_epoch += 1
@@ -750,10 +750,10 @@ class ModelInstanceForLearning():
             self.log_print(["Evaluation ll is nan"])
         else:
             self.evaluation_log_likelihood = evaluation_updater.log_total_likelihood
-            self.evaluation_log_likelihood /= len(evaluation_experiments) # normalise
-            self.evaluation_log_likelihood = qmla.utilities.round_nearest(
-                self.evaluation_log_likelihood, 0.05
-            )
+            # self.evaluation_log_likelihood /= len(self.evaluation_normalization_record) # normalise
+            # self.evaluation_log_likelihood = qmla.utilities.round_nearest(
+            #     self.evaluation_log_likelihood, 0.05
+            # )
 
             self.evaluation_median_likelihood = np.round(
                 np.median(evaluation_updater.normalization_record),
