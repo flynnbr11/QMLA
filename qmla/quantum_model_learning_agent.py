@@ -3002,9 +3002,6 @@ class QuantumModelLearningAgent():
 
 
     def _plot_dynamics_all_models_on_branches(self, branches=None):
-        # TODO if > 5 models on branch, split into multiple axes for readibility
-        if not self.plot_level >= 3:
-            return
 
         self.branch_results_dir = os.path.join(
             self.qmla_controls.plots_directory, 
@@ -3014,6 +3011,10 @@ class QuantumModelLearningAgent():
             os.makedirs(self.branch_results_dir)
         except:
             pass
+
+        if not self.plot_level >= 3:
+            return
+
 
         if branches is None:
             branches = sorted(list(self.branches.keys()))
@@ -3104,3 +3105,42 @@ class QuantumModelLearningAgent():
                 path
             )
 
+
+    def _plot_evaluation_normalisation_records(self):
+        if self.plot_level < 3 : 
+            return
+
+        for branch_id in list(self.branches.keys()):
+
+            fig, ax = plt.subplots(
+                figsize=(15, 10),
+                tight_layout=True
+            )
+            for m in self.branches[branch_id].resident_model_ids:
+                mod = self.get_model_storage_instance_by_id(m)
+                
+                ax.hist(
+                    qmla.utilities.flatten(mod.evaluation_normalization_record),
+                    bins = np.arange(0, 1, 0.05), 
+                    label = "{} ($LL={}$)".format(
+                        self.growth_class.latex_name(mod.name),
+                        # TODO use GR of branch to get latex name
+                        mod.evaluation_log_likelihood
+                    ),
+                    histtype='step'
+                )
+            ax.legend(
+                bbox_to_anchor=(1.1, 1.05),
+                fontsize=12, 
+            )
+
+            ax.set_ylabel('Frequency')
+            ax.set_xlabel('Likelihood')
+            ax.set_title('Normalisation record for evaluating models on branch {}'.format(branch_id))
+
+            fig.savefig(
+                os.path.join(
+                    self.branch_results_dir, 
+                    'normalisation_record_branch_{}.png'.format(branch_id)
+                )
+            )

@@ -64,10 +64,10 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
-        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
-        self.num_eval_probes = 3
+        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
+        self.num_eval_probes = 36
         self.num_eval_points = 500 # not currently used
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
@@ -97,14 +97,21 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
             # extra coupling in X,Y
             'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            # 'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            # 'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
 
             # extra rotation on spin qubit
-            # 'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
-            # 'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
 
+            # incorrect model
+            # 'pauliSet_1_x_d2+pauliSet_1J2_yJy_d2'
         ]
+
+        self.qhl_models = [
+            qmla.construct_models.alph(m) for m in self.qhl_models
+        ]
+
         # TEST: force inclusion of true model
         # if self.true_model not in self.initial_models:
         #     self.initial_models[-1] = self.true_model

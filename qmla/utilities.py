@@ -204,11 +204,8 @@ def plot_probes_on_bloch_sphere(
     # isolate 1 qubit probes
     probe_ids = [t for t in list(probe_dict.keys()) if t[1] == 1]
 
-    # for i in range(num_probes):
-    #     state = probe_dict[i, 1]
     for pid in probe_ids:
         state = probe_dict[pid]
-        print("[All probes] 1 qubit state:", state)
         a = state[0]
         b = state[1]
         A = a * qt.basis(2, 0)
@@ -220,10 +217,6 @@ def plot_probes_on_bloch_sphere(
         bloch.save(save_to_file)
     else:
         bloch.show()
-
-
-
-import qutip as qt
 
 
 def plot_subset_eval_probes(
@@ -267,10 +260,10 @@ def plot_subset_eval_probes(
             c=next(iter_colours),
             ls=next(linestyles),
             lw = 3,
+            label="{}".format(pid[0])
         )
 
         corresponding_single_qubit_probe = probe_dict[(pid[0], 1)]   
-        print("[probes + dynamics] 1 qubit probe:", corresponding_single_qubit_probe)
         A = corresponding_single_qubit_probe[0] * qt.basis(2, 0)
         B = corresponding_single_qubit_probe[1] * qt.basis(2, 1)
         vec = (A + B)
@@ -280,6 +273,7 @@ def plot_subset_eval_probes(
     bloch.render(fig=fig, axes=bloch_ax) # render to the correct subplot 
     dynamics_ax.set_ylabel('Expectation Value')
     dynamics_ax.set_xlabel('Time')
+    dynamics_ax.legend()
 
 
 
@@ -288,15 +282,14 @@ def plot_evaluation_dataset(
     evaluation_data, 
     true_hamiltonian,
     expectation_value_function,
-    num_probes_to_plot=5, 
+    num_probes_to_plot=6, 
     save_to_file=None
 ):
-    print("plotting eval dataset. true hamm:", true_hamiltonian)
     times = sorted(np.array(evaluation_data['experiments'])['t'])
     probe_dict = evaluation_data['probes']
     keys = list(probe_dict.keys())
     true_model_num_qubits = np.log2( np.shape(true_hamiltonian)[0] )
-    probe_ids = [t for t in list(probe_dict.keys()) if t[1] == true_model_num_qubits]
+    probe_ids = sorted([t for t in list(probe_dict.keys()) if t[1] == true_model_num_qubits])
 
     # Plot
     fig, axes = plt.subplots(
@@ -317,7 +310,7 @@ def plot_evaluation_dataset(
     bloch_ax = fig.add_subplot(gs[row, 1], projection='3d')
 
 
-    subset_probes = probe_ids[:num_probes_to_plot]
+    subset_probes = sorted(probe_ids[:num_probes_to_plot])
 
     plot_subset_eval_probes(
         true_hamiltonian = true_hamiltonian, 
