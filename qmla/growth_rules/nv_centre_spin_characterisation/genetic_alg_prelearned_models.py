@@ -114,7 +114,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
         if self.tree_completed_initially:
-            self.initial_models = self.qhl_models        
+            self.initial_models = self.qhl_models
 
         # Logistics
         self.force_evaluation = True
@@ -129,7 +129,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'other': 0
         }
         # self.num_processes_to_parallelise_over = 16
-        self.num_processes_to_parallelise_over = 16
+        self.num_processes_to_parallelise_over = len(self.initial_models)
         self.timing_insurance_factor = 1
 
     def _set_true_params(self):
