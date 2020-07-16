@@ -240,7 +240,10 @@ def plot_subset_eval_probes(
     num_probes_per_subplot = len(colours)
 
     bloch = qt.Bloch(fig=fig, axes = bloch_ax)
-    bloch_ax.axis('square') # to get a nice circular plot
+    try:
+        bloch_ax.axis('square') # to get a nice circular plot
+    except:
+        pass
 
     for pid in subset_probes:
         probe = probe_dict[pid]
