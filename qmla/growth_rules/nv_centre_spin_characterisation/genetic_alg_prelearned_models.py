@@ -90,8 +90,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
 
             # extra rotation on spin qubit
-            'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
-            'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            # 'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            # 'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
 
             # incorrect model
             # 'pauliSet_1_x_d2+pauliSet_1J2_yJy_d2'
