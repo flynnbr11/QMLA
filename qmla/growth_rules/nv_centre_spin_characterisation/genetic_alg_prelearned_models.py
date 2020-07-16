@@ -65,7 +65,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 36
         self.num_eval_points = 500
@@ -74,7 +74,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.num_probes = 5
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
