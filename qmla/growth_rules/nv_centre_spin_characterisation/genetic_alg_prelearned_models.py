@@ -81,6 +81,27 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.qinfer_resampler_a = 1
         self.qinfer_resampler_threshold = 0.0
 
+        self.qhl_models = [
+            'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # True
+
+            # extra coupling in X,Y
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+
+            # extra rotation on spin qubit
+            'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+
+            # incorrect model
+            # 'pauliSet_1_x_d2+pauliSet_1J2_yJy_d2'
+        ]
+
+        self.qhl_models = [
+            qmla.construct_models.alph(m) for m in self.qhl_models
+        ]
+
+
         # Genetic algorithm options
         self.tree_completed_initially = False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
@@ -92,30 +113,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
-        self.qhl_models = [
-            'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # True
-
-            # extra coupling in X,Y
-            'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            # 'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-
-            # extra rotation on spin qubit
-            # 'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
-            'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
-
-            # incorrect model
-            # 'pauliSet_1_x_d2+pauliSet_1J2_yJy_d2'
-        ]
-
-        self.qhl_models = [
-            qmla.construct_models.alph(m) for m in self.qhl_models
-        ]
-
-        # TEST: force inclusion of true model
-        # if self.true_model not in self.initial_models:
-        #     self.initial_models[-1] = self.true_model
-        
+        if self.tree_completed_initially:
+            self.initial_models = self.qhl_models        
 
         # Logistics
         self.force_evaluation = True
