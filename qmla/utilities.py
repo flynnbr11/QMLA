@@ -208,6 +208,7 @@ def plot_probes_on_bloch_sphere(
     #     state = probe_dict[i, 1]
     for pid in probe_ids:
         state = probe_dict[pid]
+        print("[All probes] 1 qubit state:", state)
         a = state[0]
         b = state[1]
         A = a * qt.basis(2, 0)
@@ -269,11 +270,9 @@ def plot_subset_eval_probes(
         )
 
         corresponding_single_qubit_probe = probe_dict[(pid[0], 1)]   
-
-        a = corresponding_single_qubit_probe[0]
-        b = corresponding_single_qubit_probe[1]
-        A = probe[0] * qt.basis(2, 0)
-        B = b * qt.basis(2, 1)
+        print("[probes + dynamics] 1 qubit probe:", corresponding_single_qubit_probe)
+        A = corresponding_single_qubit_probe[0] * qt.basis(2, 0)
+        B = corresponding_single_qubit_probe[1] * qt.basis(2, 1)
         vec = (A + B)
         bloch.add_states(vec)
 
