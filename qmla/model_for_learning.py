@@ -526,17 +526,18 @@ class ModelInstanceForLearning():
                 self._plot_learning_summary()
             except BaseException:
                 self.log_print(["Failed to _plot_learning_summary"])
+                
+            try:
+                self._plot_dynamics()
+            except:
+                self.log_print(["Failed to plot model dynamics."])
+                # raise
 
         if self.plot_level >= 4:
             try:
                 self._plot_distributions()
             except BaseException:
                 self.log_print(["Failed to plot posterior"])
-            try:
-                self._plot_dynamics()
-            except:
-                self.log_print(["Failed to plot model dynamics."])
-                # raise
             try:
                 self.model_heuristic.plot_heuristic_attributes(
                     save_to_file=os.path.join(
