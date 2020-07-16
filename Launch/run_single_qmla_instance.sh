@@ -79,6 +79,8 @@ mpirun --display-map --tag-output \
 	-sysmeas=$SYS_MEAS_FILE \
 	-plotprobes=$PLOT_PROBES_FILE \
 	-latex=$LATEX_MAP_FILE \
+	-pl=$PLOT_LEVEL \
+	-debug=$DEBUG \
 	-ggr=$GROWTH_RULE \
 	$ALT_GROWTH \
 	> $RESULTS_DIR/output_and_error_logs/profile_$QMLA_ID.txt \
