@@ -296,7 +296,7 @@ def plot_evaluation_dataset(
 
     # Plot
     fig, axes = plt.subplots(
-        figsize=(18, 10),
+        figsize=(14, 7),
         constrained_layout=True,
     )
 
