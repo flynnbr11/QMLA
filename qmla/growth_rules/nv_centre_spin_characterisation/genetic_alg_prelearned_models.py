@@ -80,6 +80,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
+        self.iqle_mode = True
         self.qinfer_resampler_a = 1
         self.qinfer_resampler_threshold = 0.0
 
