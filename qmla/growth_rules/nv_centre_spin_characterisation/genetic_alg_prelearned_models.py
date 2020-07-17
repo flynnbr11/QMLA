@@ -68,7 +68,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 36
-        self.num_eval_points = 1000
+        self.num_eval_points = 100
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_probes = 5
@@ -106,7 +106,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
 
         # Genetic algorithm options
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
