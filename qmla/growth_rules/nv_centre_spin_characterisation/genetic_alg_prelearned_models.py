@@ -50,6 +50,19 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'pauliSet_1J2_zJz_d2',
             # 'pauliSet_1J2_xJz_d2' # test
         ]
+        # TODO reproduce for Ising / Heisenberg model
+        heis_avail_terms = [
+            'pauliSet_1J2_xJx_d3',
+            'pauliSet_1J2_yJy_d3',
+            'pauliSet_1J2_zJz_d3',
+            'pauliSet_1J3_xJx_d3',
+            'pauliSet_1J3_yJy_d3',
+            'pauliSet_1J3_zJz_d3',
+            'pauliSet_2J3_xJx_d3',
+            'pauliSet_2J3_yJy_d3',
+            'pauliSet_2J3_zJz_d3',
+        ]
+        
 
         super().__init__(
             growth_generation_rule=growth_generation_rule,
@@ -68,7 +81,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 36
-        self.num_eval_points = 1000
+        self.num_eval_points = 500
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_probes = 5
@@ -80,7 +93,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
-        self.iqle_mode = True
+        self.iqle_mode = False
         self.qinfer_resampler_a = 1
         self.qinfer_resampler_threshold = 0.0
 
@@ -88,8 +101,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # True
 
             # extra coupling in X,Y
-            # 'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            # 'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
             'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
 
             # extra rotation on spin qubit
@@ -106,7 +119,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
 
         # Genetic algorithm options
-        self.tree_completed_initially = False
+        self.tree_completed_initially = True
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'log_likelihoods' # 'elo_ratings'  # 'f_score'
 

@@ -511,8 +511,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.summarise_likelihoods['system'].append(np.median(pr0))
         else:
             self.store_likelihoods['simulator'][self._a] = pr0
-            diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self._a])
-            self.store_p0_diffs.append( [np.median(diff_p0), np.std(diff_p0)])
+            diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self._a] )
+            self.store_p0_diffs.append( [np.median(diff_p0), np.std(diff_p0)] )
             self.summarise_likelihoods['particles_median'].append( np.median(pr0) )
             self.summarise_likelihoods['particles_std'].append( np.std(pr0) )
             self.summarise_likelihoods['particles_lower_quartile'].append( np.percentile(pr0, 25) )

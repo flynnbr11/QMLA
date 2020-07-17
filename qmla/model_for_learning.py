@@ -362,7 +362,7 @@ class ModelInstanceForLearning():
                 new_experiment,
                 repeat=1
             )
-            # self.log_print(["Datum:", datum_from_experiment])
+            self.log_print_debug(["Datum:", datum_from_experiment])
 
             # Call updater to update distribution based on datum
             try:
@@ -594,6 +594,7 @@ class ModelInstanceForLearning():
         learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
         learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
+        learned_info['evaluation_pr0_diffs'] = self.evaluation_pr0_diffs
         learned_info['qinfer_model_likelihoods'] = self.qinfer_model.store_likelihoods
         learned_info['qinfer_pr0_diff_from_true'] = np.array(
             self.qinfer_model.store_p0_diffs)
@@ -690,7 +691,7 @@ class ModelInstanceForLearning():
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
-            debug_mode=False,
+            debug_mode=self.debug_mode,
             evaluation_model=True,
             estimated_params=posterior_distribution.mean
         )
@@ -739,7 +740,9 @@ class ModelInstanceForLearning():
                 params_array,
                 exp,
                 repeat=1000
+                # repeat=1
             )
+            self.log_print_debug(["Datum:", datum])
             evaluation_updater.update(datum, exp)
             eval_epoch += 1
 
@@ -760,6 +763,8 @@ class ModelInstanceForLearning():
                 np.median(evaluation_updater.normalization_record),
                 2
             )
+            self.evaluation_pr0_diffs = np.array(evaluation_qinfer_model.store_p0_diffs)
+
         self.log_print([
             "Model {} evaluation ll:{}".format(   
                 self.model_id,    
