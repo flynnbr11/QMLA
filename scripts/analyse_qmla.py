@@ -462,10 +462,11 @@ except:
 try:
     qmla.analysis.count_term_occurences(
         combined_results = combined_results, 
-        save_directory = results_directores['performance']
+        save_directory = results_directories['performance']
     )
 except:
     print("ANALYSIS FAILURE: Counting term occurences.")
+    raise
 
 
 # Evaluation: log likelihoods of considered models, compared with champion/true
