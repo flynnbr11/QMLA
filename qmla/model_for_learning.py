@@ -740,9 +740,9 @@ class ModelInstanceForLearning():
                 params_array,
                 exp,
                 repeat=1000
-                # repeat=1
+                # repeat=5
             )
-            self.log_print_debug(["Datum:", datum])
+            self.log_print_debug(["Datum:", datum,])
             evaluation_updater.update(datum, exp)
             eval_epoch += 1
 
