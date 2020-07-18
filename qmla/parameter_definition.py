@@ -219,7 +219,7 @@ def set_shared_parameters(
     # Generate evaluation data set
     evaluation_data = growth_class.generate_evaluation_data(
         probe_maximum_number_qubits=probe_max_num_qubits_all_growth_rules,
-        num_times = 1e4, 
+        num_times = int(1e2), 
         run_directory = run_directory,
     )
     evaluation_data_path = os.path.join(
