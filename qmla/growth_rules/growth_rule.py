@@ -8,6 +8,7 @@ import itertools
 import matplotlib
 import matplotlib.pyplot as plt
 import scipy 
+import qinfer as qi
 
 import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
@@ -923,9 +924,6 @@ class GrowthRule():
 
         for pid in probe_ids:
             probe = probe_dict[pid]
-
-            
-
 
 
     def get_evaluation_prior(
