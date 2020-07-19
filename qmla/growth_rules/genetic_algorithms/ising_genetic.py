@@ -131,7 +131,7 @@ class IsingGeneticTest(
             'other': 0
 
         }
-        self.timing_insurance_factor = 0.75
+        # self.timing_insurance_factor = 0.75
 
 class IsingGeneticSingleLayer(
     IsingGenetic
