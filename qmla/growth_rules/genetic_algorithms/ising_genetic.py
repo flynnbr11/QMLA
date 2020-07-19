@@ -58,7 +58,7 @@ class IsingGenetic(
 
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.fitness_method =  'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' # 'elo_ratings' 
+        self.fitness_method = 'elo_ratings' # 'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' #  
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.max_spawn_depth = 2
         self.initial_num_models = 10
@@ -129,8 +129,9 @@ class IsingGeneticTest(
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
-        }
 
+        }
+        self.timing_insurance_factor = 0.75
 
 class IsingGeneticSingleLayer(
     IsingGenetic
