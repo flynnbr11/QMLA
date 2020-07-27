@@ -77,8 +77,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
-        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 36
         self.num_eval_points = 500
@@ -86,9 +86,9 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.shared_probes = True
         self.num_probes = 5
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-        # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
+        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
         # self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
+        # self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
@@ -101,12 +101,12 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # True
 
             # extra coupling in X,Y
-            # 'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            # 'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
             'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
 
             # extra rotation on spin qubit
-            'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            # 'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
             # 'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
 
             # incorrect model
@@ -159,7 +159,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.true_model = qmla.construct_models.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        self.max_time_to_consider = 100e-6
+        self.max_time_to_consider = 1e-1 # 100e-6
         self.plot_time_increment = self.max_time_to_consider / 100
         self.max_num_qubits = 5
         test_prior_info = {}      
@@ -238,10 +238,14 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # delta_t = 10*min_t # effectively how many iterations each time is eventually learned for
         times = np.arange(
             self.plot_time_increment, 
+            # 10*self.max_time_to_consider, 
             self.max_time_to_consider, 
             # 10*self.plot_time_increment # to speedup test
             self.plot_time_increment
         )
+        self.log_print([
+            "Generating evaluation data. Max time={}".format(max(times))
+        ])
         eval_data = super().generate_evaluation_data(
             num_probes = self.num_eval_probes, 
             evaluation_times = times, 
