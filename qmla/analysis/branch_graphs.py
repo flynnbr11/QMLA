@@ -218,7 +218,7 @@ def plot_qmla_branches(q, return_graphs=False):
     # Save figure
     fig.savefig(
         os.path.join(q.qmla_controls.plots_directory, 
-        'branch_graphs.png')
+        'graphs_of_branches.png')
     )
     if return_graphs:
         return graphs
