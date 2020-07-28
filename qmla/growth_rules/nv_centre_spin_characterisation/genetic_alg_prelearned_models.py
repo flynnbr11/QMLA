@@ -75,19 +75,16 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.qinfer_resampler_threshold = 0.0
 
         self.qhl_models = [
-            'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # True
+            'pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # True
 
             # extra coupling in X,Y
-            'pauliSet_1J2_xJx_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            'pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
-            'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
+            'pauliSet_1J2_xJx_d{N}+pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # 1 extra invisible to |+>
+            'pauliSet_1J2_yJy_d{N}+pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # 1 extra invisible to |+>
+            'pauliSet_1J2_xJx_d{N}+pauliSet_1J2_yJy_d{N}+pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # 1 extra invisible to |+>
 
             # extra rotation on spin qubit
-            'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
-            'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
-
-            # incorrect model
-            # 'pauliSet_1_x_d2+pauliSet_1J2_zJz_d2+pauliSet_2_y_d2'
+            'pauliSet_1J2_zJz_d{N}+pauliSet_1_x_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), 
+            'pauliSet_1J2_zJz_d{N}+pauliSet_1_y_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), 
         ]
 
         self.qhl_models = [
@@ -98,7 +95,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Genetic algorithm options
         self.tree_completed_initially = False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
-        self.fitness_method =  'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
+        self.fitness_method =   'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
         num_models_per_generation = 24
         self.max_spawn_depth = 48
@@ -147,7 +144,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         )
         self.true_model = qmla.construct_models.alph(self.true_model)
         
-        self.max_time_to_consider = 10 # 100e-6
+        self.max_time_to_consider = 100e-6
         self.plot_time_increment = self.max_time_to_consider / 100
 
     def _setup_prior_by_parameters(self):

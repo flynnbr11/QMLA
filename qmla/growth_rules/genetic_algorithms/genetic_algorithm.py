@@ -466,6 +466,7 @@ class GeneticAlgorithmQMLA():
     def truncate_to_top_half(
         self, 
         model_fitnesses, 
+        truncation_rate = 0.5,
         **kwargs
     ):
         ranked_models = sorted(
@@ -478,7 +479,7 @@ class GeneticAlgorithmQMLA():
             "Considering truncation for {} models".format(num_models),
             "ranked models:", ranked_models
         ])
-        truncation_rate = 0.5
+        
         truncation_cutoff = max( int(num_models*truncation_rate), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
         truncated_model_list = ranked_models[:truncation_cutoff]
@@ -600,7 +601,8 @@ class GeneticAlgorithmQMLA():
         ] # list of chromosome strings to return
 
         chromosome_selection_probabilities = self.get_selection_probabilities(
-            model_fitnesses = model_fitnesses
+            model_fitnesses = model_fitnesses,
+            truncation_rate = 0.25 # TODO restore as 0.5
         )
 
         self.prepare_chromosome_pair_dataframe(

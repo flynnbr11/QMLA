@@ -243,7 +243,9 @@ class Genetic(
             model_f_scores[mod] = np.round(self.f_score_model_comparison(test_model = mod), 2)
             self.model_f_scores[m] = model_f_scores[mod]
             model_win_ratio[mod] = model_number_wins[mod]/sum_wins
-            one_minus_pr0_diff[mod] = 1 - model_storage_instnace.evaluation_mean_pr0_diff
+            # one_minus_pr0_diff[mod] = 1 - model_storage_instnace.evaluation_median_pr0_diff
+            one_minus_pr0_diff[mod] = (1 - model_storage_instnace.evaluation_mean_pr0_diff)**2
+
             
 
             # store scores for offline analysis
