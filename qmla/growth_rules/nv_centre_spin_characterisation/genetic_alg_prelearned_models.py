@@ -119,12 +119,12 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
 
         # Genetic algorithm options
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
         num_models_per_generation = 14
-        self.max_spawn_depth = 16
+        self.max_spawn_depth = 6
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
