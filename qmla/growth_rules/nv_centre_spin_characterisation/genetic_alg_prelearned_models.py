@@ -100,8 +100,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 14
-        self.max_spawn_depth = 32
+        num_models_per_generation = 24
+        self.max_spawn_depth = 48
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
@@ -122,7 +122,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'other': 0
         }
         # self.num_processes_to_parallelise_over = 16
-        self.num_processes_to_parallelise_over = len(self.initial_models)
+        self.num_processes_to_parallelise_over = min(16, len(self.initial_models))
         self.timing_insurance_factor = 1
 
     def _set_true_params(self):

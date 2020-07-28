@@ -70,10 +70,10 @@ def get_all_configurations(
     test_setup = True
     if test_setup: 
         print("Getting reduced set of configurations to test.")
-        number_of_iterations = 2
-        numbers_of_sites = [5]
-        numbers_of_generations = [16, ]
-        starting_populations = [8, ]
+        number_of_iterations = 10
+        numbers_of_sites = [6]
+        numbers_of_generations = [16, 32, 64 ]
+        starting_populations = [16, 32]
         elite_models_protected = [1, ]
         mutation_probabilities = [0.1, ]
         unchanged_gen_count_for_termination = [3]        
