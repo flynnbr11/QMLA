@@ -119,7 +119,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
 
         # Genetic algorithm options
-        self.tree_completed_initially = False
+        self.tree_completed_initially = True
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method =  'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 

@@ -519,7 +519,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.summarise_likelihoods['particles_upper_quartile'].append( np.percentile(pr0, 75) )
         self.log_print_debug(["Stored likelihoods"])
         if self.evaluation_model:
-            self.log_print([
+            self.log_print_debug([
                 "\nSystem evolution {}. t={} Likelihood={}".format(
                 self.true_evolution, times[0], likelihood_array[:3]
             )])
@@ -604,7 +604,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         operator_list = self._oplist
         if self.evaluation_model:
             # self.log_print_debug([
-            self.log_print([
+            self.log_print_debug([
                 "\nUsing precomputed Hamiltonian. probe[0] (ID {}):\n{}".format(
                     self.probe_counter, 
                     probe[0]
