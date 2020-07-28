@@ -75,11 +75,11 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
         # Modular functions
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
-        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
+        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
+        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 36
         self.num_eval_points = 1
         self.simulator_probe_generation_function = self.probe_generation_function
