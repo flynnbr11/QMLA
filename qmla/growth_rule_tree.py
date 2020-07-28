@@ -56,7 +56,7 @@ class GrowthRuleTree():
         self.log_print(["Tree started for {}".format(self.growth_rule)])
         self.branches = {}
         self.models = {}
-        self.model_for_learning = {}
+        self.model_storage_instances = {}
         self.parent_children = {}
         self.child_parents = {}
         self.spawn_step = 0
@@ -229,7 +229,7 @@ class GrowthRuleTree():
         branch_id,
         models,
         pairs_to_compare,
-        model_for_learning,
+        model_storage_instances,
         precomputed_models,
         spawning_branch,
         **kwargs
@@ -245,7 +245,7 @@ class GrowthRuleTree():
         :param int branch_id: branch ID unique to this branch and new in the QMLA environment.
         :param list models: model names to place on this branch.
         :param list pairs_to_compare: list of pairs of models to compare on this branch.
-        :param dict model_for_learning: :class:`~qmla.ModelInstanceForStorage` instances of
+        :param dict model_storage_instances: :class:`~qmla.ModelInstanceForStorage` instances of
             each model id to be placed on this branch.
         :param list precomputed_models: models to place on branch
             which have already been learned on a previous branch.
@@ -258,7 +258,7 @@ class GrowthRuleTree():
         branch = BranchQMLA(
             branch_id=branch_id,
             models=models,
-            model_for_learning=model_for_learning,
+            model_storage_instances=model_storage_instances,
             precomputed_models=precomputed_models,
             tree=self,
             spawning_branch=spawning_branch,
@@ -268,8 +268,8 @@ class GrowthRuleTree():
 
         # Update trees records
         self.branches[branch_id] = branch
-        for m in model_for_learning:
-            self.model_for_learning[m] = model_for_learning[m]
+        for m in model_storage_instances:
+            self.model_storage_instances[m] = model_storage_instances[m]
 
         return branch
 
@@ -318,7 +318,7 @@ class BranchQMLA():
         self,
         branch_id,
         models,
-        model_for_learning,
+        model_storage_instances,
         pairs_to_compare,
         tree,
         precomputed_models,
@@ -342,7 +342,7 @@ class BranchQMLA():
 
         :param int branch_id: branch ID unique to this branch and new in the QMLA environment.
         :param list models: model names to place on this branch.
-        :param dict model_for_learning: :class:`~qmla.ModelInstanceForStorage` instances of
+        :param dict model_storage_instances: :class:`~qmla.ModelInstanceForStorage` instances of
             each model id to be placed on this branch.
         :param list pairs_to_compare: list of pairs of models to compare on this branch.
         :param GrowthRuleTree tree: tree to which this branch is associated.
@@ -379,7 +379,7 @@ class BranchQMLA():
 
         # Models to place on the branch
         # TODO tidy up how models passed etc. (currently a bit redundant)
-        self.model_for_learning = model_for_learning
+        self.model_storage_instances = model_storage_instances
         self.models = models
         self.models_by_id = models
         self.resident_model_ids = sorted(self.models_by_id.keys())
@@ -447,7 +447,7 @@ class BranchQMLA():
             # TODO should not be using bayes_points anywhere
             self.bayes_points = models_points
             self.evaluation_log_likelihoods = {
-                k: self.model_for_learning[k].evaluation_log_likelihood
+                k: self.model_storage_instances[k].evaluation_log_likelihood
                 for k in self.resident_model_ids
             }
         else:
@@ -460,7 +460,7 @@ class BranchQMLA():
         pair_list = [(min(pair), max(pair)) for pair in pair_list]
         bayes_factors = {
             pair:
-            self.model_for_learning[min(pair)].model_bayes_factors[max(pair)][-1]
+            self.model_storage_instances[min(pair)].model_bayes_factors[max(pair)][-1]
             for pair in pair_list
         }
 

@@ -214,6 +214,7 @@ class Genetic(
         model_hamming_distances = {'fitness_type' : 'hamming_distance'}
         model_number_wins = {'fitness_type' : 'number_wins'}
         model_win_ratio = {'fitness_type' : 'win_ratio'}
+        one_minus_pr0_diff = {'fitness_type' : 'one_minus_pr0_diff'}
 
         # Alter finished dicts also useable as fitness
         log_likelihoods['fitness_type'] = 'log_likelihoods'
@@ -224,11 +225,15 @@ class Genetic(
             model_f_scores, model_hamming_distances, 
             model_number_wins, model_win_ratio, 
             model_elo_ratings, model_points_distributed_by_ranking, 
-            log_likelihoods
+            log_likelihoods, one_minus_pr0_diff
         ] 
 
         # store info on each model for analysis
         for m in model_ids:
+            model_storage_instnace = self.tree.model_storage_instances[m]
+            self.log_print([
+                "Model storage instance:", model_storage_instnace
+            ])
             mod = kwargs['model_names_ids'][m]
             model_number_wins[mod] = model_points[m]
             hamming_dist = self.hamming_distance_model_comparison(
@@ -238,6 +243,8 @@ class Genetic(
             model_f_scores[mod] = np.round(self.f_score_model_comparison(test_model = mod), 2)
             self.model_f_scores[m] = model_f_scores[mod]
             model_win_ratio[mod] = model_number_wins[mod]/sum_wins
+            one_minus_pr0_diff[mod] = 1 - model_storage_instnace.evaluation_mean_pr0_diff
+            
 
             # store scores for offline analysis
             self.fitness_by_f_score = (
@@ -253,6 +260,7 @@ class Genetic(
                         'model_points_distributed_by_ranking' : model_points_distributed_by_ranking[mod], 
                         'model_hamming_distances' : model_hamming_distances[mod], 
                         'log_likelihood' : evaluation_log_likelihoods[m],
+                        'one_minus_pr0_diff' : one_minus_pr0_diff[mod]
                     }), 
                     ignore_index=True
                 )
@@ -271,19 +279,16 @@ class Genetic(
                 self.fitness_df = self.fitness_df.append(
                     new_entry, ignore_index=True)
 
-        self.log_print(
-            [
-                'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{} \nlog_likelihoods: \n{}'.format(
-                    self.spawn_step,
-                    model_number_wins,
-                    model_f_scores,
-                    model_win_ratio,
-                    ratings_by_name, 
-                    model_points_distributed_by_ranking,
-                    log_likelihoods
-                )                
-            ]
-        )
+        self.log_print([
+            'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{} \nlog_likelihoods: \n{}'.format(
+                self.spawn_step,
+                model_number_wins,
+                model_f_scores,
+                model_win_ratio,
+                ratings_by_name, 
+                model_points_distributed_by_ranking,
+                log_likelihoods
+        )])
 
         # choose the fitness method to use for the genetic algorithm
         if self.fitness_method == 'f_score':
@@ -300,6 +305,8 @@ class Genetic(
             genetic_algorithm_fitnesses = log_likelihoods
         elif self.fitness_method == 'win_ratio':
             genetic_algorithm_fitnesses = model_win_ratio
+        elif self.fitness_method == 'one_minus_pr0_diff':
+            genetic_algorithm_fitnesses = one_minus_pr0_diff
         else:
             self.log_print(["No fitness method selected for genetic algorithm"])
 

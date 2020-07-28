@@ -1464,7 +1464,7 @@ class QuantumModelLearningAgent():
                 ),
             ])
 
-        model_for_learning = {
+        model_storage_instances = {
             m: self.get_model_storage_instance_by_id(m)
             for m in list(this_branch_models.keys())
         }
@@ -1492,7 +1492,7 @@ class QuantumModelLearningAgent():
             branch_id=branch_id,
             models=this_branch_models,
             pairs_to_compare=pairs_to_compare,
-            model_for_learning=model_for_learning,
+            model_storage_instances=model_storage_instances,
             precomputed_models=pre_computed_models,
             spawning_branch=spawning_branch,
         )
@@ -3063,7 +3063,7 @@ class QuantumModelLearningAgent():
                 ax.plot(
                     times, 
                     exp_vals, 
-                    label="{} ($LL$={})".format(m, mod.evaluation_log_likelihood),
+                    label="{} (ID={}, $LL$={})".format(mod.model_name_latex, m, mod.evaluation_log_likelihood),
                     color=next(colours), 
                     ls=next(linestyles)
                 )
@@ -3082,10 +3082,7 @@ class QuantumModelLearningAgent():
 
                 ax.scatter(
                     times, 
-                    [
-                        self.experimental_measurements[t]
-                        for t in times
-                    ], 
+                    [self.experimental_measurements[t] for t in times],
                     c = 'red',
                     label = 'System',
                     s = 5, 
@@ -3094,7 +3091,10 @@ class QuantumModelLearningAgent():
                 ax.set_xlim(0, max(times))
                 ax.set_ylabel('Expectation Value')
                 ax.set_xlabel('Time ($s$)')
-                ax.legend()
+                ax.legend(
+                    bbox_to_anchor=(1.2, 1.05),
+                    fontsize=12, 
+                )
 
             path = os.path.join(
                 self.branch_results_dir, 

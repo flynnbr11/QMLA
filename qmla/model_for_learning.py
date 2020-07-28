@@ -595,6 +595,7 @@ class ModelInstanceForLearning():
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
         learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
         learned_info['evaluation_pr0_diffs'] = self.evaluation_pr0_diffs
+        learned_info['evaluation_mean_pr0_diff'] = np.mean(self.evaluation_pr0_diffs)
         learned_info['qinfer_model_likelihoods'] = self.qinfer_model.store_likelihoods
         learned_info['qinfer_pr0_diff_from_true'] = np.array(
             self.qinfer_model.store_p0_diffs)
@@ -739,10 +740,10 @@ class ModelInstanceForLearning():
             datum = evaluation_updater.model.simulate_experiment(
                 params_array,
                 exp,
-                repeat=1000
-                # repeat=5
+                # repeat=1000
+                repeat=5
             )
-            self.log_print_debug(["Datum:", datum,])
+            self.log_print_debug(["(eval) Datum:", datum,])
             evaluation_updater.update(datum, exp)
             eval_epoch += 1
 

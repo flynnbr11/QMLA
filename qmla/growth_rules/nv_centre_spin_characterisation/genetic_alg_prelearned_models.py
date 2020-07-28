@@ -75,13 +75,13 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
         # Modular functions
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
-        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
+        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
+        # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 36
-        self.num_eval_points = 500
+        self.num_eval_points = 1
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_probes = 5
@@ -106,8 +106,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', # 1 extra invisible to |+>
 
             # extra rotation on spin qubit
-            # 'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
-            # 'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            'pauliSet_1J2_zJz_d2+pauliSet_1_x_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
+            'pauliSet_1J2_zJz_d2+pauliSet_1_y_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2', 
 
             # incorrect model
             # 'pauliSet_1_x_d2+pauliSet_1J2_zJz_d2+pauliSet_2_y_d2'
@@ -119,9 +119,9 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
 
         # Genetic algorithm options
-        self.tree_completed_initially = True
+        self.tree_completed_initially = False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
-        self.fitness_method =  'log_likelihoods' # 'elo_ratings'  # 'f_score'
+        self.fitness_method =  'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
         num_models_per_generation = 14
         self.max_spawn_depth = 16
@@ -217,8 +217,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             true_parameters = self.true_model_terms_params, 
             prior_specific_terms=self.gaussian_prior_means_and_widths,
             default_parameter = 0, 
-            default_width = 0.05, 
-            fraction_true_parameter_width = 0.01,
+            default_width = 1e-1, #0.05, 
+            fraction_true_parameter_width = 1e-6, #0.01,
             log_file = self.log_file, 
             log_identifier= 'PrelearnedPrior'
         )
