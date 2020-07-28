@@ -136,7 +136,7 @@ pickle.dump(
 # Store growth rule config to share with all instances in this run
 path_to_store_configs = os.path.join(
     run_directory, 
-    'growth_rule_configs.p'
+    'configs_growth_rules.p'
 )
 growth_rule_configurations = {
     gr : unique_growth_classes[gr].store_growth_rule_configuration()

@@ -33,41 +33,18 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # if true_model is None:
         #     true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2'
         # true_model = qmla.construct_models.alph(true_model)
+        self.true_n_qubits = 3
+        self.available_axes = ['x', 'y', 'z']
         self._set_true_params()
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
         self.true_model = qmla.construct_models.alph(self.true_model)
-        available_terms = [
-            'pauliSet_1_x_d2',
-            'pauliSet_1_y_d2',
-            'pauliSet_1_z_d2',
-            'pauliSet_2_x_d2',
-            'pauliSet_2_y_d2',
-            'pauliSet_2_z_d2',
-            'pauliSet_1J2_xJx_d2',
-            'pauliSet_1J2_yJy_d2',
-            'pauliSet_1J2_zJz_d2',
-            # 'pauliSet_1J2_xJz_d2' # test
-        ]
-        # TODO reproduce for Ising / Heisenberg model
-        heis_avail_terms = [
-            'pauliSet_1J2_xJx_d3',
-            'pauliSet_1J2_yJy_d3',
-            'pauliSet_1J2_zJz_d3',
-            'pauliSet_1J3_xJx_d3',
-            'pauliSet_1J3_yJy_d3',
-            'pauliSet_1J3_zJz_d3',
-            'pauliSet_2J3_xJx_d3',
-            'pauliSet_2J3_yJy_d3',
-            'pauliSet_2J3_zJz_d3',
-        ]
-        
 
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             true_model = self.true_model,
-            genes = available_terms,
+            genes = self.available_terms,
             **kwargs
         )
 
@@ -151,23 +128,33 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
     def _set_true_params(self):
 
         # set target model
-        self._setup_true_model_2_qubit_approx()
+        # self._setup_true_model_2_qubit_approx()
+        n_qubits = self.true_n_qubits
+        available_axes = self.available_axes
+        # self.availalbe_pauli_terms  = ['x', 'y', 'z']
+
+        self._setup_true_model_secular_approx(
+            n_qubits=n_qubits
+        ) 
+        self._setup_available_terms_gali_model(
+            n_qubits=n_qubits, 
+            available_axes = available_axes
+        )
+        self._setup_prior_by_parameters()
 
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
         self.true_model = qmla.construct_models.alph(self.true_model)
-        self.availalbe_pauli_terms  = ['x', 'y', 'z']
-
+        
         self.max_time_to_consider = 10 # 100e-6
         self.plot_time_increment = self.max_time_to_consider / 100
-        self.max_num_qubits = 5
+
+    def _setup_prior_by_parameters(self):
         test_prior_info = {}      
-        paulis_to_include = self.availalbe_pauli_terms
 
-        for pauli in paulis_to_include:
-
-            for num_qubits in range(1, 1+self.max_num_qubits):
+        for pauli in self.available_axes:
+            for num_qubits in range(1, 1+self.true_n_qubits):
         
                 spin_rotation_term = 'pauliSet_1_{p}_d{N}'.format(
                     p=pauli, N=num_qubits)
@@ -193,9 +180,11 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
 
         self.gaussian_prior_means_and_widths = test_prior_info
 
-    def _setup_true_model_2_qubit_approx(self,):
-
-        n_qubits = 2
+    def _setup_true_model_secular_approx(
+        self, 
+        n_qubits=2,
+        available_axes = ['x']
+    ):
         self.true_model_terms_params = {
             # spin
             'pauliSet_1_z_d{}'.format(n_qubits) : 2e9,
@@ -210,6 +199,23 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             'pauliSet_2_y_d{}'.format(n_qubits) : 66e3,
             'pauliSet_2_z_d{}'.format(n_qubits) : 15e3,
         }
+
+    def _setup_available_terms_gali_model(self, n_qubits=2, available_axes=['z']):
+        available_terms = []
+        
+        # spin_terms
+        for i in range(1, 1+n_qubits):
+            for p in available_axes:
+                t = 'pauliSet_{i}_{p}_d{N}'.format(i=i, p=p, N=n_qubits)
+                available_terms.append(t)
+        
+        # axial coupling terms between electron and nuclei
+        for i in range(2, 1+n_qubits):
+            for p in available_axes:
+                t = 'pauliSet_1J{i}_{p}J{p}_d{N}'.format(i=i, p=p, N=n_qubits)
+                available_terms.append(t)
+        
+        self.available_terms = available_terms
 
     def get_prior(self, model_name, **kwargs):
         prior = qmla.shared_functionality.prior_distributions.prelearned_true_parameters_prior(
