@@ -240,16 +240,19 @@ def set_shared_parameters(
         else:
             true_ham = param * mtx
 
-    qmla.utilities.plot_evaluation_dataset(
-        evaluation_data = evaluation_data, 
-        true_hamiltonian = true_ham,
-        expectation_value_function = growth_class.expectation_value,
-        save_to_file=os.path.join(
-            run_directory, 
-            'evaluation', 
-            'dynamics.png'
+    try:
+        qmla.utilities.plot_evaluation_dataset(
+            evaluation_data = evaluation_data, 
+            true_hamiltonian = true_ham,
+            expectation_value_function = growth_class.expectation_value,
+            save_to_file=os.path.join(
+                run_directory, 
+                'evaluation', 
+                'dynamics.png'
+            )
         )
-    )
+    except:
+        print("Failed to plot evaluation dataset.")
 
 
     

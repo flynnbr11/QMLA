@@ -640,15 +640,19 @@ except:
 ## genetic algorithm ananlytics
 #######################################
 
+# if model space is too big this takes too long, so optional
+include_model_generation_plots = False 
+
 try: 
-    unique_chromosomes = pandas.read_csv(
-        os.path.join(results_directories['combined_datasets'], 'unique_chromosomes.csv')
-    )
-    qmla.analysis.model_generation_probability(
-        combined_results = combined_results,
-        unique_chromosomes = unique_chromosomes, 
-        save_directory = results_directories['performance'], 
-    )
+    if include_model_generation_plots:
+        unique_chromosomes = pandas.read_csv(
+            os.path.join(results_directories['combined_datasets'], 'unique_chromosomes.csv')
+        )
+        qmla.analysis.model_generation_probability(
+            combined_results = combined_results,
+            unique_chromosomes = unique_chromosomes, 
+            save_directory = results_directories['performance'], 
+        )
 except:
     print("ANALYSIS FAILURE: [gentic algorithm] Model generation rate.")
     pass

@@ -95,7 +95,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Genetic algorithm options
         self.tree_completed_initially = False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
-        self.fitness_method =   'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
+        self.fitness_method = 'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
         num_models_per_generation = 8*self.true_n_qubits
         self.max_spawn_depth = 12*self.true_n_qubits

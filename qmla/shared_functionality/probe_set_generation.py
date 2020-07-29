@@ -239,7 +239,47 @@ def manual_set_probes(
                 new
             )
     return probes
+
+
+def fixed_amplitude_test_probes(
+    num_probes = 10, 
+    max_num_qubits = 4, 
+    **kwargs
+):
     
+    amplitudes = [
+        ( np.sqrt(1/2), np.sqrt(1/2) ) ,
+        ( np.sqrt(1/3), np.sqrt(2/3) ) ,
+        ( np.sqrt(1/4), np.sqrt(3/4) ) ,
+        ( np.sqrt(1/5), np.sqrt(4/5) ) ,
+        ( np.sqrt(1/6), np.sqrt(5/6) ) ,
+    ]
+    
+    designed_probes = [np.array(a) for a in amplitudes]
+    designed_probes = itertools.cycle(designed_probes)
+    
+    probes = {}
+    
+    for p in range(num_probes):
+        probes[(p, 0)] = next(designed_probes)
+        probes[(p, 1)] = next(designed_probes)
+        
+        for nq in range(2, max_num_qubits+1):
+        
+            pid = (p, nq)
+            new_probe = np.tensordot(
+                probes[(p, nq-1)], 
+                probes[(p, 1)], 
+                axes = 0
+            ).flatten('c')
+            probes[pid] = new_probe
+            
+            norm = np.linalg.norm(new_probe)
+            if not np.isclose(norm, 1, atol=1e-6):
+                print("norm=", norm)
+            
+
+    return probes
     
 
 def eigenbasis_of_first_qubit(
