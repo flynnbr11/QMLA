@@ -40,8 +40,8 @@ class FermiHubbardLatticeSet(
             topology_predefined._4_site_square,
         ]
 
-        # self.quantisation = 'first'
-        self.quantisation = 'second'  
+        self.quantisation = 'first'
+        # self.quantisation = 'second'  
         if self.quantisation == 'first':
             # need a probe transformer
             self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
