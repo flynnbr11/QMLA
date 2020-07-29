@@ -40,19 +40,28 @@ class FermiHubbardLatticeSet(
             topology_predefined._4_site_square,
         ]
 
-        self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.fixed_amplitude_test_probes
+        # self.quantisation = 'first'
+        self.quantisation = 'second'  
+        if self.quantisation == 'first':
+            # need a probe transformer
+            self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
+            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_first_quantisation
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
-
-        # self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+        elif self.quantisation == 'second':
+            # Default for FH
+            
+            self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()        
+            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_second_quantisation
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
 
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
 
         self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
+        self.num_probes = 50
+
         self.max_num_qubits = 5
         self.max_num_probe_qubits = self.max_num_qubits
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site

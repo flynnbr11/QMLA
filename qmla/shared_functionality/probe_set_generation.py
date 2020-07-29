@@ -241,27 +241,110 @@ def manual_set_probes(
     return probes
 
 
-def fixed_amplitude_test_probes(
+# test the probe transformer - 
+# probes should match in first quantisation and second quantisation, 
+# when generated consistently from these methods
+
+
+def get_fh_amplitudes():
+    r"""For consistency, use this both for first and second quantisation test probes."""
+    amplitudes = [
+        ( 1, 0 ) ,
+        ( np.sqrt(1/2), np.sqrt(1/2) ) ,
+        ( np.sqrt(1/3), np.sqrt(2/3) ) ,
+        ( np.sqrt(1/4), np.sqrt(3/4) ) ,
+        ( np.sqrt(1/5), np.sqrt(4/5) ) ,
+        ( np.sqrt(1/6), np.sqrt(5/6) ) ,        
+    ]
+    return amplitudes
+   
+
+def one_site_probes_first_quantisation():
+    amplitudes = get_fh_amplitudes()
+    
+    one_site_probes = []
+    for a in amplitudes:
+        phases = [
+            np.array([a[0], a[1]]),
+            np.array([a[0], -a[1]]),
+
+            np.array([a[0], 1j*a[1]]),
+            np.array([1j*a[0], a[1]]),
+
+        ]
+        one_site_probes.extend(phases)
+        
+        
+    one_site_probes = [ np.array(a) for a in one_site_probes ]
+    one_site_probes = itertools.cycle(one_site_probes)
+    return one_site_probes
+
+def one_site_probes_second_quantisation():
+    r"""
+    This picture uses the occupation basis:
+    |down> = |10>  = (0,0,1,0);
+    |up> = |10>  = (0,1,0,0);
+    
+    """
+    
+    amplitudes = get_fh_amplitudes()
+    
+    one_site_probes = []
+    for a in amplitudes:
+        phases = [
+            np.array([ 0, a[1], a[0], 0 ]),
+            np.array([ 0, -a[1], a[0], 0 ]),
+
+            np.array([ 0, 1j*a[1], a[0], 0 ]),
+            np.array([ 0 , a[1], 1j*a[0], 0 ]),
+
+        ]
+        one_site_probes.extend(phases)
+        
+        
+    one_site_probes = [ np.array(a) for a in one_site_probes ]
+    one_site_probes = itertools.cycle(one_site_probes)
+    return one_site_probes
+
+def test_probes_first_quantisation(
     num_probes = 10, 
     max_num_qubits = 4, 
     **kwargs
 ):
     
-    amplitudes = [
-        ( np.sqrt(1/2), np.sqrt(1/2) ) ,
-        ( np.sqrt(1/3), np.sqrt(2/3) ) ,
-        ( np.sqrt(1/4), np.sqrt(3/4) ) ,
-        ( np.sqrt(1/5), np.sqrt(4/5) ) ,
-        ( np.sqrt(1/6), np.sqrt(5/6) ) ,
-    ]
-    
-    designed_probes = [np.array(a) for a in amplitudes]
-    designed_probes = itertools.cycle(designed_probes)
+    designed_probes = one_site_probes_first_quantisation()
     
     probes = {}
     
     for p in range(num_probes):
-        probes[(p, 0)] = next(designed_probes)
+        probes[(p, 1)] = next(designed_probes)
+        
+        for nq in range(2, max_num_qubits+1):
+        
+            pid = (p, nq)
+            new_probe = np.tensordot(
+                probes[(p, nq-1)], 
+                probes[(p, 1)], 
+                axes = 0
+            ).flatten('c')
+            probes[pid] = new_probe
+            
+            norm = np.linalg.norm(new_probe)
+            if not np.isclose(norm, 1, atol=1e-6):
+                print("norm=", norm)
+    return probes
+
+def test_probes_second_quantisation(
+    num_probes = 10, 
+    max_num_qubits = 4, 
+    **kwargs
+):
+    
+    designed_probes = one_site_probes_second_quantisation()
+    
+    probes = {}
+    
+    for p in range(num_probes):
         probes[(p, 1)] = next(designed_probes)
         
         for nq in range(2, max_num_qubits+1):
@@ -280,7 +363,8 @@ def fixed_amplitude_test_probes(
             
 
     return probes
-    
+
+
 
 def eigenbasis_of_first_qubit(
     max_num_qubits=2,
