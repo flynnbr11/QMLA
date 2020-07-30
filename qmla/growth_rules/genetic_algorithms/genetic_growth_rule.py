@@ -89,7 +89,7 @@ class Genetic(
             true_model = self.true_model,
             # base_terms=self.base_terms,
             mutation_probability=self.mutation_probability,
-            log_file=self.log_file
+            **kwargs, 
         )
 
 

@@ -21,13 +21,15 @@ class GeneticAlgorithmQMLA():
         num_sites,
         true_model=None,
         base_terms=['x', 'y', 'z'],
-        mutation_probability=0.1,
         selection_method = 'roulette', 
         mutation_method = 'element_wise', 
         crossover_method = 'one_point',
+        mutation_probability=0.1,
+        selection_truncation_rate = 0.5, 
         num_protected_elite_models = 2, 
         unchanged_elite_num_generations_cutoff = 4,
         log_file=None, 
+        **kwargs
     ):
         self.num_sites = num_sites
         self.base_terms = base_terms
@@ -68,6 +70,7 @@ class GeneticAlgorithmQMLA():
         self.terminate_early_if_top_model_unchanged = True
         self.best_model_unchanged = False
         self.unchanged_elite_num_generations_cutoff = unchanged_elite_num_generations_cutoff
+        self.selection_truncation_rate = selection_truncation_rate
         self.birth_register = pd.DataFrame(
             columns=[
                 'child', 'chromosome_child', 
@@ -466,7 +469,6 @@ class GeneticAlgorithmQMLA():
     def truncate_to_top_half(
         self, 
         model_fitnesses, 
-        truncation_rate = 0.5,
         **kwargs
     ):
         ranked_models = sorted(
@@ -480,7 +482,8 @@ class GeneticAlgorithmQMLA():
             "ranked models:", ranked_models
         ])
         
-        truncation_cutoff = max( int(num_models*truncation_rate), 4) # either consider top half, or top 4 if too small
+        # truncation_cutoff = max( int(num_models*truncation_rate), 4) # either consider top half, or top 4 if too small
+        truncation_cutoff = max( int(num_models*self.selection_truncation_rate), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
         truncated_model_list = ranked_models[:truncation_cutoff]
 
@@ -602,7 +605,6 @@ class GeneticAlgorithmQMLA():
 
         chromosome_selection_probabilities = self.get_selection_probabilities(
             model_fitnesses = model_fitnesses,
-            truncation_rate = 0.25 # TODO restore as 0.5
         )
 
         self.prepare_chromosome_pair_dataframe(

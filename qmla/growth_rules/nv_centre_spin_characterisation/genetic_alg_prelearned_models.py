@@ -41,6 +41,12 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         )
         self.true_model = qmla.construct_models.alph(self.true_model)
 
+        # Add genetic algorithm parameters to kwargs, which the Genetic GR passes to GA class
+        kwargs['selection_truncation_rate'] = 0.25
+        kwargs['unchanged_elite_num_generations_cutoff'] = 10
+        kwargs['num_protected_elite_models'] = 1
+
+
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             true_model = self.true_model,
@@ -97,8 +103,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method = 'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = min(8*self.true_n_qubits, 24)
-        self.max_spawn_depth = 20*self.true_n_qubits
+        num_models_per_generation = 10*self.true_n_qubits
+        self.max_spawn_depth = 10*self.true_n_qubits
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
