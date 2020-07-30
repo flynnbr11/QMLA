@@ -25,7 +25,8 @@ plot_level=4
 debug_mode=0
 
 ###############
-# Choose a growth rule This will determine how QMD proceeds. 
+# Choose a growth rule 
+# This will determine how QMLA proceeds. 
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 ###############
 
