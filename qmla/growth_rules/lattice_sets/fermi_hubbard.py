@@ -60,7 +60,7 @@ class FermiHubbardLatticeSet(
 
         self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
-        self.num_probes = 50
+        self.num_probes = 10
 
         self.max_num_qubits = 5
         self.max_num_probe_qubits = self.max_num_qubits
