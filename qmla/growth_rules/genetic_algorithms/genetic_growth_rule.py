@@ -83,6 +83,8 @@ class Genetic(
 
         self.mutation_probability = 0.1
 
+        if 'log_file' not in kwargs:
+            kwargs['log_file'] = self.log_file
         self.genetic_algorithm = qmla.growth_rules.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
             genes = genes, 
             num_sites=self.num_sites,
