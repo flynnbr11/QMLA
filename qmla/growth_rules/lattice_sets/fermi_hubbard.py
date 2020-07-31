@@ -45,8 +45,8 @@ class FermiHubbardLatticeSet(
         if self.quantisation == 'first':
             # need a probe transformer
             self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
-            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_first_quantisation
-            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_first_quantisation
+            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         elif self.quantisation == 'second':
             # Default for FH
