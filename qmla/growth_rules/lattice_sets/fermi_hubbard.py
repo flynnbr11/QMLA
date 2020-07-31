@@ -40,13 +40,13 @@ class FermiHubbardLatticeSet(
             topology_predefined._4_site_square,
         ]
 
-        # self.quantisation = 'first'
-        self.quantisation = 'second'  
+        self.quantisation = 'first'
+        # self.quantisation = 'second'  
         if self.quantisation == 'first':
             # need a probe transformer
             self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
-            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_first_quantisation
-            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_first_quantisation
+            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         elif self.quantisation == 'second':
             # Default for FH
@@ -60,7 +60,7 @@ class FermiHubbardLatticeSet(
 
         self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
-        self.num_probes = 10
+        self.num_probes = 25
 
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
         self.max_time_to_consider = 25
