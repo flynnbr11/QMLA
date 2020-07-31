@@ -62,6 +62,8 @@ class FermiHubbardLatticeSet(
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.num_probes = 10
 
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
+        self.max_time_to_consider = 25
         self.max_num_qubits = 5
         self.max_num_probe_qubits = self.max_num_qubits
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
