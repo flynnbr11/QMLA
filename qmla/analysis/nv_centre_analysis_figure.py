@@ -204,7 +204,7 @@ def branch_champion_dynamics(
     ax.legend(
         title='Generation champions',
         fontsize=legend_fontsize,
-        ncols = 5, 
+        ncol = 5, 
         loc='bottom center'
     )
 #     ax.set_xlim(0, max(times))
