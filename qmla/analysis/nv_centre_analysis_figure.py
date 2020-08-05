@@ -179,11 +179,11 @@ def branch_champion_dynamics(
 #         times, 
         [true_measurements[t] for t in times],
         color='red', 
-        lw = linewidth, 
+        lw = linewidth*0.2, 
     )
 
     # Plot branch champions' dynamics
-    colours = itertools.cycle(['blue', 'green', 'orange', 'indigo'])
+    colours = itertools.cycle(['blue', 'orange', 'indigo', 'green'])
     linestyles = itertools.cycle(['--', '-.'])
     
     storage_instance.expectation_values['microseconds'] = 1e6 * storage_instance.expectation_values.time
