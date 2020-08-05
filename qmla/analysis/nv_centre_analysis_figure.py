@@ -198,7 +198,8 @@ def branch_champion_dynamics(
         sns.lineplot(
 #             x = 'time', 
             x = 'microseconds', 
-            y = 'exp_val', 
+            y = 'exp_val',
+            c = next(colours), 
             data = df, 
             label = "{}".format(b), 
             ax = ax, 
