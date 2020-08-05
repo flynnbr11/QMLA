@@ -346,12 +346,12 @@ def model_wins_and_occurences_by_f_score(
     ax.set_ylim(0,1)
     ax.set_ylabel('F-score', **axis_font)
     ax.set_xlabel('# occurences', **axis_font)
-    ax.set_xticks([
-        range(
-            0, ax.get_xlim()[1], 
-            0.5*(10**math.floor(np.log10(a)))
-        )
-    ])
+    # ax.set_xticks([
+    #     range(
+    #         0, ax.get_xlim()[1], 
+    #         int(0.5*(10**math.floor(np.log10(ax.get_xlim()[1]))))
+    #     )
+    # ])
     champ_ax.set_xlabel('# champions', **axis_font)
     ax.legend(fontsize=legend_fontsize)
     # TODO legend with champion and occurences together

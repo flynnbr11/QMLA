@@ -17,12 +17,15 @@ sys.path.append(
 import qmla
 import qmla.analysis
 
-run_path = '/panfs/panasas01/phys/bf16951/QMD/Launch/Results/Aug_05/15_59/'
-focus_on_instance = '011'
-branches_to_draw = [1, 10, 20, 30, 40]
-# run_path = '/home/bf16951/QMD/Launch/Results/Aug_05/15_23'
-# focus_on_instance = '001'
-# branches_to_draw = [1]
+test = True
+if test:
+    run_path = '/home/bf16951/QMD/Launch/Results/Aug_05/15_23'
+    focus_on_instance = '001'
+    branches_to_draw = [1]
+else:
+    run_path = '/panfs/panasas01/phys/bf16951/QMD/Launch/Results/Aug_05/15_59/'
+    focus_on_instance = '011'
+    branches_to_draw = [1, 10, 20, 30, 40]
 
 save_to_file = os.path.join(run_path, 'analysis_figure_3.pdf')
 
