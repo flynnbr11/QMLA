@@ -204,6 +204,8 @@ def branch_champion_dynamics(
     ax.legend(
         title='Generation champions',
         fontsize=legend_fontsize,
+        ncols = 5, 
+        loc='bottom center'
     )
 #     ax.set_xlim(0, max(times))
     ax.set_ylim(0,1)
@@ -301,7 +303,7 @@ def term_occurences(
     ax.set_ylabel("Term", **axis_font,)
     max_x = max([term_counter[t]['occurences'] for t in term_counter])
     ax.set_xlim(0, max_x+1)
-    ax.set_xticks(range(0, max_x+1))
+    ax.set_xticks(range(0, max_x+1, 5))
 
     ax.tick_params(
         axis='both', 
@@ -329,7 +331,8 @@ def model_wins_and_occurences_by_f_score(
         label='Occurrences'
     )
     
-    ax.hist(
+    champ_ax = ax.twiny()
+    champ_ax.hist(
         champions.f_score, 
         bins = bins, 
         histtype='stepfilled', 
@@ -341,8 +344,16 @@ def model_wins_and_occurences_by_f_score(
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_ylim(0,1)
     ax.set_ylabel('F-score', **axis_font)
-    ax.set_xlabel('Number models', **axis_font)
+    ax.set_xlabel('# occurences', **axis_font)
+    ax.set_xticks([
+        np.range(
+            0, ax.get_xlim()[1], 
+            0.5*(10**math.floor(np.log10(a)))
+        )
+    ])
+    champ_ax.set_xlabel('# champions', **axis_font)
     ax.legend(fontsize=legend_fontsize)
+    # TODO legend with champion and occurences together
     ax.tick_params(
         axis='both', 
         labelsize=legend_fontsize,
