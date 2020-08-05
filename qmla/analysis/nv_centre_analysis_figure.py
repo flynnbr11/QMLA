@@ -352,6 +352,7 @@ def model_wins_and_occurences_by_f_score(
 def nv_centre_experimental_paper_fig_3(
     run_path,
     focus_on_instance='001',
+    branches_to_draw = [1], 
     storage_instance=None, 
     all_models_generated=None, 
     save_to_file=None, 
@@ -407,7 +408,7 @@ def nv_centre_experimental_paper_fig_3(
         run_path = run_path, 
         instance_id = focus_on_instance,
         ax = ax,
-        branches = [1, 10, 20, 30, 40]
+        branches = branches_to_draw, 
     )
     ax.set_title(
         'd', 
@@ -434,6 +435,9 @@ def nv_centre_experimental_paper_fig_3(
     # Term occurences
     ax = fig.add_subplot(
         gs[1:3, 0],
+    )
+    combined_results = pd.read_csv(
+        os.path.join(run_path, 'combined_results.csv')
     )
     term_occurences(
         combined_results = combined_results, 
