@@ -346,7 +346,7 @@ def model_wins_and_occurences_by_f_score(
     ax.set_ylabel('F-score', **axis_font)
     ax.set_xlabel('# occurences', **axis_font)
     ax.set_xticks([
-        np.range(
+        range(
             0, ax.get_xlim()[1], 
             0.5*(10**math.floor(np.log10(a)))
         )
