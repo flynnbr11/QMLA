@@ -14,6 +14,7 @@ from scipy import linalg
 from matplotlib.gridspec import GridSpec
 from matplotlib import rc
 from matplotlib import rcParams
+import math
 
 ##############
 # Configure
