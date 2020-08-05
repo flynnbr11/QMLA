@@ -127,6 +127,9 @@ def model_pool_f_scores(
     ]
 
     ax.set_xlabel('Generation', **axis_font)
+    ax.set_xticks(
+        range(0, max(generations), 5)
+    )
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_ylabel('F-score', **axis_font)
     ax.set_ylim(0, 1)
@@ -300,7 +303,7 @@ def term_occurences(
         title='Identified:',
         fontsize=legend_fontsize
     )
-    ax.set_xlabel("# winning occurences", **axis_font)
+    ax.set_xlabel("# identifications", **axis_font)
     ax.set_ylabel("Term", **axis_font,)
     max_x = max([term_counter[t]['occurences'] for t in term_counter])
     ax.set_xlim(0, max_x+1)
