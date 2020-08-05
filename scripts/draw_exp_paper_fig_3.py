@@ -17,7 +17,7 @@ sys.path.append(
 import qmla
 import qmla.analysis
 
-test = True
+test = False
 if test:
     run_path = '/home/bf16951/QMD/Launch/Results/Aug_05/15_23'
     focus_on_instance = '001'
