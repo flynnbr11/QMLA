@@ -128,7 +128,7 @@ def model_pool_f_scores(
 
     ax.set_xlabel('Generation', **axis_font)
     ax.set_xticks(
-        range(0, max(generations), 5)
+        range(0, int(max(generations)), 5)
     )
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_ylabel('F-score', **axis_font)
