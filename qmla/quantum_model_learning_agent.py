@@ -1832,7 +1832,48 @@ class QuantumModelLearningAgent():
         self.storage = qmla.utilities.StorageUnit()
         self.storage.qmla_id = self.qmla_id
         self.storage.bayes_factors_df = self.bayes_factors_df
+        self.storage.model_f_scores = self.model_f_scores
         self.storage.growth_rule_storage = self.growth_class.storage
+
+        # store expectation values of all models
+
+        df_cols = ['time', 'exp_val', 'model_id', 'qmla_id']
+        expectation_values_df = pd.DataFrame(columns=df_cols)
+
+        for m in self.models_learned:
+            mod = self.get_model_storage_instance_by_id(m)
+            times = list(sorted(mod.expectation_values.keys()))
+            ev = [mod.expectation_values[t] for t in times]    
+            d = pd.DataFrame(
+                columns = df_cols,
+            )
+            d['time'] = times
+            d['exp_val'] = ev
+            d['model_id'] = m
+            d['qmla_id'] = self.qmla_id
+            
+            expectation_values_df = expectation_values_df.append(d)
+        
+        self.storage.expectation_values = expectation_values_df            
+        self.storage.branch_champions = {
+            b : self.branches[b].champion_id
+            for b in self.branches
+        }
+
+        models_generated = self.model_database[
+            ['model_name', 'model_id', 'latex_name', 'f_score', 'terms']
+        ]
+
+        models_generated['champion'] = False
+        models_generated.loc[
+            (models_generated.model_id == self.champion_model_id), 
+            'champion'
+        ] = True
+        self.storage.models_generated = models_generated
+
+        for r in results_dict:
+            # TODO: get rid of results_dict; use storage class instead to achieve the same things
+            self.storage.__setattr__(r, results_dict[r])
 
         return results_dict
 

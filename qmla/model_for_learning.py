@@ -517,7 +517,7 @@ class ModelInstanceForLearning():
 
     def _model_plots(self):
 
-        if self.plot_level >= 3:
+        if self.plot_level >= 4:
             # Plots for this model, if plot level wants to include them
             # TODO replace excepts prints with warnings
             self._plot_preliminary_preparation()
@@ -533,7 +533,7 @@ class ModelInstanceForLearning():
                 self.log_print(["Failed to plot model dynamics."])
                 # raise
 
-        if self.plot_level >= 4:
+        if self.plot_level >= 5:
             try:
                 self._plot_distributions()
             except BaseException:

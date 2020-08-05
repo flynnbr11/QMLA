@@ -82,6 +82,7 @@ def _generate_combined_datasets(
     results_file_name_start="results",
     results_csv_name="results.csv", 
 ):
+    r""" DEPRECATED"""
 
     pickled_files = []
     for file in os.listdir(directory_name):
@@ -166,6 +167,7 @@ def generate_combined_datasets(
     fitness_correlations = pd.DataFrame()
     fitness_by_f_score = pd.DataFrame()
     fitness_df = pd.DataFrame()
+    all_models_generated = pd.DataFrame()
     misc_gr_data = pd.DataFrame()
     unique_chromosomes = pd.DataFrame()
 
@@ -190,6 +192,16 @@ def generate_combined_datasets(
             fitness_by_f_score = fitness_by_f_score.append(fit_f, ignore_index=True)
         except:
             pass
+
+        try:
+            models_generated = storage.models_generated
+            models_generated['qmla_id'] = storage.qmla_id
+            all_models_generated = all_models_generated.append(models_generated, ignore_index=True)
+        except:
+            print("Failed to add generated models.")
+            raise
+            # pass
+
 
         try:
             fit_f = storage.growth_rule_storage.fitness_df
@@ -240,6 +252,14 @@ def generate_combined_datasets(
             os.path.join( combined_datasets_directory, 'fitness_df.csv')
         )
         datasets_generated.append('fitness_df')
+    except:
+        pass
+
+    try:
+        all_models_generated.to_csv(
+            os.path.join( combined_datasets_directory, 'models_generated.csv')
+        )
+        datasets_generated.append('all_models_generated')
     except:
         pass
 

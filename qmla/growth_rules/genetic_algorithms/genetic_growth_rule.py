@@ -257,6 +257,7 @@ class Genetic(
                     {
                         'generation' : self.spawn_step,
                         'model' : mod, 
+                        'model_id' : m, 
                         'model_win_ratio' : model_win_ratio[mod], 
                         'model_elo_ratings' : model_elo_ratings[mod], 
                         'original_elo_rating' : original_ratings_by_name[mod],
