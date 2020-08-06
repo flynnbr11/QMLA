@@ -127,8 +127,10 @@ def model_pool_f_scores(
     ]
 
     ax.set_xlabel('Generation', **axis_font)
+    xt = range(0, int(max(generations)), 5)
+    print("xt = ", xt)
     ax.set_xticks(
-        range(0, int(max(generations)), 5)
+        xt
     )
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_ylabel('F-score', **axis_font)
@@ -357,7 +359,7 @@ def model_wins_and_occurences_by_f_score(
     #     )
     # ])
     champ_ax.set_xlabel('# champions', **axis_font)
-    ax.legend(fontsize=legend_fontsize)
+    ax.legend(fontsize=legend_fontsize, loc='lower right')
     # TODO legend with champion and occurences together
     ax.tick_params(
         axis='both', 
