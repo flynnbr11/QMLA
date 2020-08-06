@@ -1125,7 +1125,9 @@ class QuantumModelLearningAgent():
 
         # Update branch with these results to determine branch champion
         branch.update_branch(
-            pair_list=pair_list, models_points=models_points)
+            pair_list=pair_list, 
+            models_points=models_points
+        )
 
         # If the given results are not sufficient for the GR to determine a branch champion,
         # reconsider a subset of models

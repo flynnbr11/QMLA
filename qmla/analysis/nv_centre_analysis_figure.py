@@ -362,7 +362,25 @@ def model_wins_and_occurences_by_f_score(
     # ])
     champ_ax.set_xlabel('# champions', **axis_font)
     champ_ax.legend(fontsize=legend_fontsize, loc='upper right')
-    ax.legend(fontsize=legend_fontsize, loc='lower right')
+
+    legend_elements = [
+        Line2D([0], [0], 
+            # marker='X', 
+            color='champ_colour', 
+            linestyle='None', 
+            # markersize=marker_size, 
+            label='Champion'
+        ),
+        Line2D([0], [0], 
+            # marker='*', 
+            color=candidate_colour, 
+            label='Occurences',
+            linestyle='None', 
+            # markersize=2*marker_size,
+        ),
+    ]
+    ax.legend(handles=legend_elements,  loc='lower right')
+    # ax.legend(fontsize=legend_fontsize, loc='lower right')
     # TODO legend with champion and occurences together
     ax.tick_params(
         axis='both', 

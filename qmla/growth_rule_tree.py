@@ -382,6 +382,10 @@ class BranchQMLA():
         self.model_storage_instances = model_storage_instances
         self.models = models
         self.models_by_id = models
+        self.model_id_by_name = {
+            self.models_by_id[m] : m
+            for m in self.models_by_id
+        }
         self.resident_model_ids = sorted(self.models_by_id.keys())
         self.resident_models = list(self.models_by_id.values())
         self.num_models = len(self.resident_models)
@@ -513,6 +517,21 @@ class BranchQMLA():
             )
             self.log_print(["Champion set by ratings"])
             self.is_branch_champion_set = True
+
+        elif self.growth_class.branch_champion_selection_stratgey == 'fitness':
+            # using a genetic algorithm - so we can now analyse the generation because it has finished
+            ranked_models_by_name = self.growth_class.analyse_generation(
+                model_points = models_points,
+                model_names_ids=self.models_by_id,
+            )
+            self.ranked_models = [ 
+                self.model_id_by_name[m]
+                for m in ranked_models_by_name
+            ] # get id from name
+            self.log_print(["Champion set by fitness:", self.ranked_models])
+            self.is_branch_champion_set = True
+
+
 
         if self.result_counter > 1 and not self.is_branch_champion_set:
             self.log_print([

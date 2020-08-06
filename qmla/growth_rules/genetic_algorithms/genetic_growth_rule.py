@@ -64,7 +64,7 @@ class Genetic(
             k_const=30
         ) # for use when ranking/rating models
 
-        self.branch_champion_selection_stratgey = 'ratings'
+        self.branch_champion_selection_stratgey = 'fitness' # 'ratings'
         self.fitness_method = 'f_scores' # 'elo_ratings'
         self.prune_completed_initially = True
         self.prune_complete = True
@@ -141,15 +141,21 @@ class Genetic(
 
     def analyse_generation(
         self, 
+        model_points,
+        model_names_ids, 
         **kwargs        
     ):
         self.log_print(["Analysing generation at spawn step ", self.spawn_step])
-        model_points = kwargs['branch_model_points']
+        self.log_print(["model names ids:", model_names_ids])
+        # if model_points is None:
+        #     model_points = kwargs['branch_model_points']
         self.model_points_at_step[self.spawn_step] = model_points
-        evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
+        # evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
         
-        model_names_ids = kwargs['model_names_ids']
+        # model_names_ids = model_names_ids
         sum_wins = sum(list(model_points.values()))
+        if sum_wins == 0:
+            sum_wins = 1 # TODO hack to get over some times passing empty dict from update_branch -- find a better way
         model_ids = list(model_points.keys())
 
 
@@ -159,7 +165,7 @@ class Genetic(
             key=model_points.get,
             reverse=True
         )
-        ranked_models_by_name = [kwargs['model_names_ids'][m] for m in ranked_model_list]
+        ranked_models_by_name = [model_names_ids[m] for m in ranked_model_list]
         self.log_print(["Ranked models:", ranked_model_list, "\n Names:", ranked_models_by_name, "\n with fitnesses:", ])
 
         self.generation_model_rankings[self.spawn_step] = ranked_models_by_name
@@ -175,7 +181,7 @@ class Genetic(
         # Model ratings  (Elo ratings)        
         precomputed_ratings = self.ratings_class.get_ratings(list(model_points.keys()))
         original_ratings_by_name = {
-            kwargs['model_names_ids'][m] : precomputed_ratings[m]
+            model_names_ids[m] : precomputed_ratings[m]
             for m in model_ids
         }
         min_rating = min(original_ratings_by_name.values())
@@ -183,10 +189,6 @@ class Genetic(
             m : original_ratings_by_name[m] - min_rating
             for m in original_ratings_by_name
         }
-        # ratings_by_name = {
-        #     m : original_ratings_by_name[m] / self.ratings_class.initial_rating
-        #     for m in original_ratings_by_name
-        # }
         self.log_print(["Rating (as fraction of starting rating):\n", ratings_by_name])
         sum_ratings = np.sum(list(ratings_by_name.values()))
         model_elo_ratings = {
@@ -195,21 +197,21 @@ class Genetic(
         }
 
         # log likelihoods evaluated against test data
-        self.log_print(["Eval log likels:", evaluation_log_likelihoods])
-        ll_to_score = {
-            a : -1/evaluation_log_likelihoods[a]
-            for a in evaluation_log_likelihoods
-        }
-        s = sum(ll_to_score.values())
-        for a in ll_to_score:
-            ll_to_score[a] /= s
+        # self.log_print(["Eval log likels:", evaluation_log_likelihoods])
+        # ll_to_score = {
+        #     a : -1/evaluation_log_likelihoods[a]
+        #     for a in evaluation_log_likelihoods
+        # }
+        # s = sum(ll_to_score.values())
+        # for a in ll_to_score:
+        #     ll_to_score[a] /= s
 
         # sum_log_likelihoods = sum(evaluation_log_likelihoods.values())
-        log_likelihoods = {
-            model_names_ids[mod] : ll_to_score[mod]
-            for mod in evaluation_log_likelihoods
-        }
-        self.log_print(["Eval log likels:", log_likelihoods])
+        # log_likelihoods = {
+        #     model_names_ids[mod] : ll_to_score[mod]
+        #     for mod in evaluation_log_likelihoods
+        # }
+        # self.log_print(["Eval log likels:", log_likelihoods])
 
         # New dictionaries which can be used as fitnesses:
         model_f_scores = {'fitness_type' : 'f_score'}
@@ -217,9 +219,10 @@ class Genetic(
         model_number_wins = {'fitness_type' : 'number_wins'}
         model_win_ratio = {'fitness_type' : 'win_ratio'}
         one_minus_pr0_diff = {'fitness_type' : 'one_minus_pr0_diff'}
+        log_likelihoods = {'fitness_type' : 'log_likelihoods'}
 
         # Alter finished dicts also useable as fitness
-        log_likelihoods['fitness_type'] = 'log_likelihoods'
+        # log_likelihoods['fitness_type'] = 'log_likelihoods'
         model_elo_ratings['fitness_type'] = 'elo_ratings'
         model_points_distributed_by_ranking['fitness_type'] = 'ranking'
 
@@ -236,19 +239,20 @@ class Genetic(
             self.log_print([
                 "Model storage instance:", model_storage_instnace
             ])
-            mod = kwargs['model_names_ids'][m]
+            mod = model_names_ids[m]
             model_number_wins[mod] = model_points[m]
             hamming_dist = self.hamming_distance_model_comparison(
                 test_model = mod
             ) # for fitness use 1/H
+            log_likelihoods[mod] = -1 / model_storage_instnace.evaluation_log_likelihood
             model_hamming_distances[mod] = (self.genetic_algorithm.num_terms - hamming_dist)/self.genetic_algorithm.num_terms
-            model_f_scores[mod] = np.round(self.f_score_model_comparison(test_model = mod), 2)
+            model_f_scores[mod] = np.round(self.f_score_model_comparison(
+                test_model = mod), 2
+            ) # TODO get from model instance
             self.model_f_scores[m] = model_f_scores[mod]
             model_win_ratio[mod] = model_number_wins[mod]/sum_wins
             # one_minus_pr0_diff[mod] = 1 - model_storage_instnace.evaluation_median_pr0_diff
             one_minus_pr0_diff[mod] = (1 - model_storage_instnace.evaluation_mean_pr0_diff)**2
-
-            
 
             # store scores for offline analysis
             self.fitness_by_f_score = (
@@ -264,7 +268,7 @@ class Genetic(
                         'f_score' : model_f_scores[mod],
                         'model_points_distributed_by_ranking' : model_points_distributed_by_ranking[mod], 
                         'model_hamming_distances' : model_hamming_distances[mod], 
-                        'log_likelihood' : evaluation_log_likelihoods[m],
+                        'log_likelihood' : log_likelihoods[mod],
                         'one_minus_pr0_diff' : one_minus_pr0_diff[mod]
                     }), 
                     ignore_index=True
@@ -329,7 +333,8 @@ class Genetic(
         )
         self.model_fitness_by_generation[self.spawn_step] = genetic_algorithm_fitnesses
 
-        return genetic_algorithm_fitnesses
+        # return genetic_algorithm_fitnesses
+        return self.models_ranked_by_fitness[self.spawn_step]
 
     def generate_models(
         self,
@@ -337,7 +342,8 @@ class Genetic(
         **kwargs
     ):       
         # Analyse the previous generation using results passed from QMLA
-        genetic_algorithm_fitnesses = self.analyse_generation(**kwargs)
+        # genetic_algorithm_fitnesses = self.analyse_generation(**kwargs)
+        genetic_algorithm_fitnesses = self.model_fitness_by_generation[self.spawn_step]
       
         self.spawn_step += 1
         self.log_print([
@@ -353,7 +359,8 @@ class Genetic(
         return new_models
 
     def finalise_model_learning(self, **kwargs):
-        self.analyse_generation(**kwargs)
+        return
+        # self.analyse_generation(**kwargs)
 
     def hamming_distance_model_comparison(
         self, 
