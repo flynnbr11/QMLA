@@ -308,7 +308,7 @@ def term_occurences(
     )
     ax.set_xlabel("# identifications", **axis_font)
     ax.set_ylabel("Term", **axis_font,)
-    max_x = max([term_counter[t]['occurences'] for t in term_counter])
+    max_x = max([ (term_counter[t]['occurences']+5) for t in term_counter])
     ax.set_xlim(0, max_x+1)
     ax.set_xticks(range(0, max_x+1, 5))
 
@@ -339,7 +339,7 @@ def model_wins_and_occurences_by_f_score(
     )
     
     champ_ax = ax.twiny()
-    champ_ax.hist(
+    champ_scores, champ_locs, d = champ_ax.hist(
         champions.f_score, 
         bins = bins, 
         histtype='stepfilled', 
@@ -347,6 +347,8 @@ def model_wins_and_occurences_by_f_score(
         color = champ_colour,
         label='Instance champions'
     )
+
+    print("Champ \nlocs={} \nscores={} ".format(champ_locs, champ_scores))
 
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_ylim(0,1)
@@ -359,6 +361,7 @@ def model_wins_and_occurences_by_f_score(
     #     )
     # ])
     champ_ax.set_xlabel('# champions', **axis_font)
+    champ_ax.legend(fontsize=legend_fontsize, loc='upper right')
     ax.legend(fontsize=legend_fontsize, loc='lower right')
     # TODO legend with champion and occurences together
     ax.tick_params(
