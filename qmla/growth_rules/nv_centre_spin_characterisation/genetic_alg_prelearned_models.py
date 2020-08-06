@@ -64,7 +64,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         self.evaluation_probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.num_eval_probes = 36
-        self.num_eval_points = 10
+        self.num_eval_points = 100
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_probes = 5
@@ -103,8 +103,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method = 'one_minus_pr0_diff' # 'log_likelihoods' # 'elo_ratings'  # 'f_score'
 
-        num_models_per_generation = 4 # 12*self.true_n_qubits # TODO INCREASE NUM EVAL POINTS
-        self.max_spawn_depth = 3 # 10*self.true_n_qubits
+        num_models_per_generation = 12*self.true_n_qubits # TODO INCREASE NUM EVAL POINTS
+        self.max_spawn_depth = 10*self.true_n_qubits
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models

@@ -528,7 +528,7 @@ class BranchQMLA():
                 self.model_id_by_name[m]
                 for m in ranked_models_by_name
             ] # get id from name
-            self.log_print(["Champion set by fitness:", self.ranked_models])
+            self.log_print(["Champion set by fitness. Ranked models:", self.ranked_models])
             self.is_branch_champion_set = True
 
 
