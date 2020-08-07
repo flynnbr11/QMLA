@@ -145,6 +145,8 @@ class Genetic(
         model_names_ids, 
         **kwargs        
     ):
+        self.spawn_step += 1
+
         self.log_print(["Analysing generation at spawn step ", self.spawn_step])
         self.log_print(["model names ids:", model_names_ids])
         # if model_points is None:
@@ -239,7 +241,7 @@ class Genetic(
             self.log_print([
                 "Model storage instance:", model_storage_instnace
             ])
-            mod = model_names_ids[m]
+            mod = model_storage_instnace.model_name
             model_number_wins[mod] = model_points[m]
             hamming_dist = self.hamming_distance_model_comparison(
                 test_model = mod
@@ -269,7 +271,8 @@ class Genetic(
                         'model_points_distributed_by_ranking' : model_points_distributed_by_ranking[mod], 
                         'model_hamming_distances' : model_hamming_distances[mod], 
                         'log_likelihood' : log_likelihoods[mod],
-                        'one_minus_pr0_diff' : one_minus_pr0_diff[mod]
+                        'one_minus_pr0_diff' : one_minus_pr0_diff[mod],
+                        'akaike_info_criterion' : 1 / model_storage_instnace.akaike_info_criterion
                     }), 
                     ignore_index=True
                 )
@@ -299,6 +302,7 @@ class Genetic(
                 log_likelihoods
         )])
 
+        # TODO succinctly get fitnesses from DF , like done for akaike generically using self.fitness_method
         # choose the fitness method to use for the genetic algorithm
         if self.fitness_method == 'f_score':
             genetic_algorithm_fitnesses = model_f_scores
@@ -316,6 +320,14 @@ class Genetic(
             genetic_algorithm_fitnesses = model_win_ratio
         elif self.fitness_method == 'one_minus_pr0_diff':
             genetic_algorithm_fitnesses = one_minus_pr0_diff
+        elif self.fitness_method == 'akaike':
+            self.log_print(["Akaike fitness evaluation. spawn step=", self.spawn_step])
+            fitnesses = self.fitness_by_f_score[
+                self.fitness_by_f_score.generation == self.spawn_step
+            ][ ['model', 'akaike_info_criterion'] ]
+
+            genetic_algorithm_fitnesses = dict(zip(fitnesses.model, fitnesses.akaike_info_criterion))  
+            genetic_algorithm_fitnesses['fitness_type'] = 'akaike' # TODO this is dumb, clean up this section     
         else:
             self.log_print(["No fitness method selected for genetic algorithm"])
 
@@ -345,7 +357,7 @@ class Genetic(
         # genetic_algorithm_fitnesses = self.analyse_generation(**kwargs)
         genetic_algorithm_fitnesses = self.model_fitness_by_generation[self.spawn_step]
       
-        self.spawn_step += 1
+        # self.spawn_step += 1
         self.log_print([
             "Spawn step:", self.spawn_step,
         ])
@@ -565,12 +577,15 @@ class Genetic(
                 'fitness_v_fscore.png'.format(qmla_id)
             )
         )
-        self.plot_fitness_v_generation(
-            save_to_file = os.path.join(
-                save_directory, 
-                'fitness_v_generation.png'.format(qmla_id)
+        try:
+            self.plot_fitness_v_generation(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'fitness_v_generation.png'.format(qmla_id)
+                )
             )
-        )
+        except:
+            pass
         self.plot_model_ratings(
             save_to_file = os.path.join(
                 save_directory, 

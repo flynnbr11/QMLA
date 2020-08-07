@@ -524,6 +524,7 @@ class BranchQMLA():
                 model_points = models_points,
                 model_names_ids=self.models_by_id,
             )
+            self.log_print(["ranked_models_by_name:", ranked_models_by_name, "\n model IDs:\n", self.model_id_by_name])
             self.ranked_models = [ 
                 self.model_id_by_name[m]
                 for m in ranked_models_by_name

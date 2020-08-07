@@ -593,6 +593,7 @@ class ModelInstanceForLearning():
         learned_info['model_heuristic_class'] = self.model_heuristic_class
         learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
+        learned_info['akaike_info_criterion'] = self.akaike_info_criterion
         learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
         learned_info['evaluation_pr0_diffs'] = self.evaluation_pr0_diffs
         learned_info['evaluation_mean_pr0_diff'] = np.mean(self.evaluation_pr0_diffs)
@@ -766,11 +767,13 @@ class ModelInstanceForLearning():
                 2
             )
             self.evaluation_pr0_diffs = np.array(evaluation_qinfer_model.store_p0_diffs)
+        self.akaike_info_criterion = 2*len(self.model_terms_names) - 2*self.evaluation_log_likelihood
 
         self.log_print([
-            "Model {} evaluation ll:{}".format(   
+            "Model {} evaluation ll:{} AIC:{}".format(   
                 self.model_id,    
-                self.evaluation_log_likelihood
+                self.evaluation_log_likelihood,
+                self.akaike_info_criterion
             )
         ])
 

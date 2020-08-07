@@ -1647,10 +1647,14 @@ class QuantumModelLearningAgent():
             )
 
         self.bayes_factors_data()
-        self.growth_class.growth_rule_specific_plots(
-            save_directory=self.qmla_controls.plots_directory,
-            qmla_id=self.qmla_controls.long_id
-        )
+        try:
+            self.growth_class.growth_rule_specific_plots(
+                save_directory=self.qmla_controls.plots_directory,
+                qmla_id=self.qmla_controls.long_id
+            )
+        except:
+            # TODO log print the reason for failure
+            pass
         self.growth_class.growth_rule_finalise()
         self.get_statistical_metrics()
 
@@ -1857,10 +1861,14 @@ class QuantumModelLearningAgent():
             expectation_values_df = expectation_values_df.append(d)
         
         self.storage.expectation_values = expectation_values_df            
-        self.storage.branch_champions = {
-            b : self.branches[b].champion_id
-            for b in self.branches
-        }
+        try:
+            # TODO this fails for QHL mode since champion not assigned -- fix
+            self.storage.branch_champions = {
+                b : self.branches[b].champion_id
+                for b in self.branches
+            }
+        except:
+            pass
 
         models_generated = self.model_database[
             ['model_name', 'model_id', 'latex_name', 'f_score', 'terms']
