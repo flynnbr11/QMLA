@@ -30,9 +30,17 @@ class IsingLatticeSet(
         self.available_lattices = [
             # topology_predefined._2_site_chain,
             self.true_lattice, 
+
+            # Ising chains
             topology_predefined._3_site_chain,
             topology_predefined._5_site_chain,
             topology_predefined._6_site_chain,
+
+            # other lattices
+            topology_predefined._4_site_square_fully_connected, 
+            topology_predefined._5_site_lattice_fully_connected, 
+            topology_predefined._6_site_grid
+
         ]
 
         self.fraction_own_experiments_for_bf = 0.5
@@ -57,5 +65,5 @@ class IsingLatticeSet(
             6 : 2, 
             'other' : 0
         }
-        
+        self.timing_insurance_factor = 0.2
         

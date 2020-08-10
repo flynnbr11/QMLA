@@ -236,11 +236,11 @@ class GrowthRule():
             the Bayes factor from 1 000 particles is expected to be in favour of the same 
             model as the Bayes factor using 10 000 particles, using far less time, but with weaker evidence. 
         fraction_experiments_for_bf
+            # TODO out of date
             fraction of experiments to use during pairwise comparison between models. 
             In particular, the latter portion of experiments are used. 
             This is equivalent to allowing a number of `burn-in` experiments, which are not counted 
             towards the Bayes factor. 
-            # TODO BF(A,B) uses full renormalisation_record of A, and only updates the portion of B's expeiriments; 
             it should base comparison on latter fraction only. 
 
         *Plotting*

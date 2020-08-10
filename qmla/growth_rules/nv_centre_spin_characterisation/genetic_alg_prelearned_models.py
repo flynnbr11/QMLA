@@ -100,8 +100,8 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Genetic algorithm options
         self.tree_completed_initially =  False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
-        # self.fitness_method = 'log_likelihood' # 'one_minus_pr0_diff' # 'elo_rating'  # 'f_score'
-        self.fitness_method = 'bayesian_info_criterion' # 'akaike_info_criterion'
+        self.fitness_method = 'one_minus_pr0_diff' # 'elo_rating'  # 'f_score'
+        # self.fitness_method = 'bayesian_info_criterion' # 'akaike_info_criterion'
 
         test = False
         if test:
