@@ -65,5 +65,5 @@ class IsingLatticeSet(
             6 : 2, 
             'other' : 0
         }
-        self.timing_insurance_factor = 0.2
+        self.timing_insurance_factor = 0.4
         
