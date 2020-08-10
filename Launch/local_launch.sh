@@ -36,8 +36,9 @@ debug_mode=0
 # growth_rule='NVCentreRevivals'
 # growth_rule='NVCentreRevivalsSimulated'
 # growth_rule='NVCentreNQubitBath'
-growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
+# growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
 # growth_rule='FermiHubbardLatticeSet'
+growth_rule='IsingLatticeSet'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'

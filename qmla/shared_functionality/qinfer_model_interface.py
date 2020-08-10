@@ -174,10 +174,14 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 else:
                     estimated_model += p*m
             self.estimated_model = estimated_model
-            self.log_print([
-                "Estimated model's difference from true model", 
-                np.max(np.abs(self.estimated_model - self.true_hamiltonian))
-            ])
+            try:
+                self.log_print([
+                    "Estimated model's difference from true model", 
+                    np.max(np.abs(self.estimated_model - self.true_hamiltonian))
+                ])
+            except:
+                # different dimension candidate from true model; doesn't really matter
+                pass
 
 
         # Required by QInfer: 
