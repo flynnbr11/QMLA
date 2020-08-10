@@ -103,7 +103,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self.fitness_method = 'log_likelihood' # 'one_minus_pr0_diff' # 'elo_rating'  # 'f_score'
         self.fitness_method = 'bayesian_info_criterion' # 'akaike_info_criterion'
 
-        test = True
+        test = False
         if test:
             num_models_per_generation = 4
             self.max_spawn_depth = 3
