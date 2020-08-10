@@ -79,7 +79,7 @@ class Genetic(
             'pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
             'pauliSet_1J2_zJz_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
         ]
-        self.spawn_step = 1 # 1st generation's ID
+        self.spawn_step = 0 # 1st generation's ID
 
         self.mutation_probability = 0.1
 
@@ -149,10 +149,7 @@ class Genetic(
 
         self.log_print(["Analysing generation at spawn step ", self.spawn_step])
         self.log_print(["model names ids:", model_names_ids])
-        # if model_points is None:
-        #     model_points = kwargs['branch_model_points']
         self.model_points_at_step[self.spawn_step] = model_points
-        # evaluation_log_likelihoods = kwargs['evaluation_log_likelihoods']
         
         # model_names_ids = model_names_ids
         sum_wins = sum(list(model_points.values()))
@@ -232,53 +229,59 @@ class Genetic(
             model_f_scores, model_hamming_distances, 
             model_number_wins, model_win_ratio, 
             model_elo_ratings, model_points_distributed_by_ranking, 
-            log_likelihoods, one_minus_pr0_diff
+            log_likelihoods, 
+            # one_minus_pr0_diff
         ] 
 
         # store info on each model for analysis
         for m in model_ids:
-            model_storage_instnace = self.tree.model_storage_instances[m]
+            # Access the model storage instance and retrieve some attributes from there
+            model_storage_instance = self.tree.model_storage_instances[m]
             self.log_print([
-                "Model storage instance:", model_storage_instnace
+                "Model storage instance:", model_storage_instance
             ])
-            mod = model_storage_instnace.model_name
+            mod = model_storage_instance.model_name
             model_number_wins[mod] = model_points[m]
             hamming_dist = self.hamming_distance_model_comparison(
                 test_model = mod
             ) # for fitness use 1/H
-            log_likelihoods[mod] = -1 / model_storage_instnace.evaluation_log_likelihood
+            log_likelihoods[mod] = -1 / model_storage_instance.evaluation_log_likelihood
             model_hamming_distances[mod] = (self.genetic_algorithm.num_terms - hamming_dist)/self.genetic_algorithm.num_terms
             model_f_scores[mod] = np.round(self.f_score_model_comparison(
                 test_model = mod), 2
             ) # TODO get from model instance
             self.model_f_scores[m] = model_f_scores[mod]
             model_win_ratio[mod] = model_number_wins[mod]/sum_wins
-            # one_minus_pr0_diff[mod] = 1 - model_storage_instnace.evaluation_median_pr0_diff
-            one_minus_pr0_diff[mod] = (1 - model_storage_instnace.evaluation_mean_pr0_diff)**2
 
             # store scores for offline analysis
             self.fitness_by_f_score = (
                 self.fitness_by_f_score.append(
                     pd.Series(
                     {
-                        'generation' : self.spawn_step,
                         'model' : mod, 
                         'model_id' : m, 
-                        'model_win_ratio' : model_win_ratio[mod], 
-                        'model_elo_ratings' : model_elo_ratings[mod], 
-                        'original_elo_rating' : original_ratings_by_name[mod],
+                        'generation' : self.spawn_step,
+                        # absolute metrics (not available in real experiments)
                         'f_score' : model_f_scores[mod],
-                        'model_points_distributed_by_ranking' : model_points_distributed_by_ranking[mod], 
-                        'model_hamming_distances' : model_hamming_distances[mod], 
+                        'hamming_distance' : model_hamming_distances[mod], 
+                        # from storagen instance
+                        'akaike_info_criterion' : 1 / model_storage_instance.akaike_info_criterion, 
                         'log_likelihood' : log_likelihoods[mod],
-                        'one_minus_pr0_diff' : one_minus_pr0_diff[mod],
-                        'akaike_info_criterion' : 1 / model_storage_instnace.akaike_info_criterion
+                        'one_minus_pr0_diff' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
+                        'eval_log_likelihood' : model_storage_instance.evaluation_log_likelihood, 
+                        # relative to other models in this branch
+                        'win_ratio' : model_win_ratio[mod], 
+                        'elo_rating' : model_elo_ratings[mod], 
+                        'original_elo_rating' : original_ratings_by_name[mod],
+                        'model_points_distributed_by_ranking' : model_points_distributed_by_ranking[mod], 
                     }), 
                     ignore_index=True
                 )
             )
 
             for data in available_fitness_data:
+                # TODO everything in fitness_df should be accessible through fitness_by_f_score
+                # TODO remove fitness_df and tidy up (it is currently used for analysis in several places)
                 new_entry = pd.Series(
                     {
                         'generation' : self.spawn_step,
@@ -291,47 +294,13 @@ class Genetic(
                 self.fitness_df = self.fitness_df.append(
                     new_entry, ignore_index=True)
 
-        self.log_print([
-            'Generation {} \nModel Win numbers: \n{} \nF-scores: \n{} \nWin ratio:\n{} \nModel Ratings:\n{} \nRanking: \n{} \nlog_likelihoods: \n{}'.format(
-                self.spawn_step,
-                model_number_wins,
-                model_f_scores,
-                model_win_ratio,
-                ratings_by_name, 
-                model_points_distributed_by_ranking,
-                log_likelihoods
-        )])
+        # Extract fitness specified by user (growth rule's fitness_method attribute) 
+        # to use for generating models within genetic algorithm
+        fitnesses = self.fitness_by_f_score[
+            self.fitness_by_f_score.generation == self.spawn_step
+        ][ ['model', self.fitness_method] ]
 
-        # TODO succinctly get fitnesses from DF , like done for akaike generically using self.fitness_method
-        # choose the fitness method to use for the genetic algorithm
-        if self.fitness_method == 'f_score':
-            genetic_algorithm_fitnesses = model_f_scores
-        elif self.fitness_method == 'hamming_distance': 
-            genetic_algorithm_fitnesses = model_hamming_distances
-        elif self.fitness_method == 'elo_ratings':
-            genetic_algorithm_fitnesses = model_elo_ratings
-        # elif self.fitness_method == 'model_number_wins':
-        #     genetic_algorithm_fitnesses = model_number_wins
-        elif self.fitness_method == 'ranking':
-            genetic_algorithm_fitnesses = model_points_distributed_by_ranking
-        elif self.fitness_method == 'log_likelihoods':
-            genetic_algorithm_fitnesses = log_likelihoods
-        elif self.fitness_method == 'win_ratio':
-            genetic_algorithm_fitnesses = model_win_ratio
-        elif self.fitness_method == 'one_minus_pr0_diff':
-            genetic_algorithm_fitnesses = one_minus_pr0_diff
-        elif self.fitness_method == 'akaike':
-            self.log_print(["Akaike fitness evaluation. spawn step=", self.spawn_step])
-            fitnesses = self.fitness_by_f_score[
-                self.fitness_by_f_score.generation == self.spawn_step
-            ][ ['model', 'akaike_info_criterion'] ]
-
-            genetic_algorithm_fitnesses = dict(zip(fitnesses.model, fitnesses.akaike_info_criterion))  
-            genetic_algorithm_fitnesses['fitness_type'] = 'akaike' # TODO this is dumb, clean up this section     
-        else:
-            self.log_print(["No fitness method selected for genetic algorithm"])
-
-        genetic_algorithm_fitnesses.pop('fitness_type', None)
+        genetic_algorithm_fitnesses = dict(zip(fitnesses['model'], fitnesses[self.fitness_method]))  
 
         self.log_print([
             "fitness method:{} => Fitnesses={}".format(
@@ -558,25 +527,41 @@ class Genetic(
         save_directory,
         qmla_id=0, 
     ):
-        self.plot_correlation_fitness_with_f_score(
-            save_to_file = os.path.join(
-                save_directory, 
-                'correlations_bw_fitness_and_f_score.png'.format(qmla_id)
+        try:
+            self.plot_correlation_fitness_with_f_score(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'correlations_bw_fitness_and_f_score.png'.format(qmla_id)
+                )
             )
-        )
+        except: 
+            self.log_print([
+                "Failed to plot_correlation_fitness_with_f_score"
+            ])
 
-        self.plot_fitness_v_fscore_by_generation(
-            save_to_file = os.path.join(
-                save_directory, 
-                'fitness_types.png'.format(qmla_id)
+        try:
+            self.plot_fitness_v_fscore_by_generation(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'fitness_types.png'.format(qmla_id)
+                )
             )
-        )
-        self.plot_fitness_v_fscore(
-            save_to_file = os.path.join(
-                save_directory, 
-                'fitness_v_fscore.png'.format(qmla_id)
+        except:
+            self.log_print([
+                "failed to plot_fitness_v_fscore_by_generation"
+            ])
+
+        try:
+            self.plot_fitness_v_fscore(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'fitness_v_fscore.png'.format(qmla_id)
+                )
             )
-        )
+        except:
+            self.log_print([
+                "failed to plot_fitness_v_fscore"
+            ])
         try:
             self.plot_fitness_v_generation(
                 save_to_file = os.path.join(
@@ -586,31 +571,52 @@ class Genetic(
             )
         except:
             pass
-        self.plot_model_ratings(
-            save_to_file = os.path.join(
-                save_directory, 
-                'ratings.png'.format(qmla_id)
-            )
-        )
-        self.plot_gene_pool(
-            save_to_file = os.path.join(
-                save_directory, 
-                'gene_pool.png'
-            )
-        )
 
-        self.plot_generational_metrics(
-            save_to_file = os.path.join(
-                save_directory, 
-                'generation_progress.png'
+        try:
+            self.plot_model_ratings(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'ratings.png'.format(qmla_id)
+                )
             )
-        )
+        except:
+            self.log_print([
+                "failed to plot_model_ratings"
+            ])
 
+        try:
+            self.plot_gene_pool(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'gene_pool.png'
+                )
+            )
+        except:
+            self.log_print([
+                "failed to plot_gene_pool"
+            ])
 
-        self.ratings_class.plot_models_ratings_against_generation(
-            f_scores = self.model_f_scores, 
-            save_directory = save_directory
-        )
+        try:          
+            self.plot_generational_metrics(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'generation_progress.png'
+                )
+            )
+        except:
+            self.log_print([
+                "failed to plot_generational_metrics"
+            ])
+
+        try:
+            self.ratings_class.plot_models_ratings_against_generation(
+                f_scores = self.model_f_scores, 
+                save_directory = save_directory
+            )
+        except:
+            self.log_print([
+                "failed to plot_models_ratings_against_generation"
+            ])
 
     def plot_correlation_fitness_with_f_score(
         self,
@@ -782,7 +788,7 @@ class Genetic(
         cmap = sns.cubehelix_palette(dark=.3, light=.8, as_cmap=True)
         sns.scatterplot(
             x='f_score', 
-            y='model_elo_ratings', 
+            y='elo_rating', 
             # hue='generation',
             # palette = cmap,
             label='Rating',
@@ -792,7 +798,7 @@ class Genetic(
 
         sns.scatterplot(
             x='f_score', 
-            y='model_win_ratio', 
+            y='win_ratio', 
             # hue='generation',
             # palette = cmap,
             label='Win ratio',
