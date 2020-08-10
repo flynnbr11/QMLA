@@ -266,6 +266,7 @@ class Genetic(
                         'hamming_distance' : model_hamming_distances[mod], 
                         # from storagen instance
                         'akaike_info_criterion' : 1 / model_storage_instance.akaike_info_criterion, 
+                        'bayesian_info_criterion' : (1 / model_storage_instance.bayesian_info_criterion)**2,
                         'log_likelihood' : log_likelihoods[mod],
                         'one_minus_pr0_diff' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
                         'eval_log_likelihood' : model_storage_instance.evaluation_log_likelihood, 

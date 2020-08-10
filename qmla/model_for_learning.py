@@ -176,6 +176,7 @@ class ModelInstanceForLearning():
             name=self.model_name
         )
         self.model_terms_matrices = np.asarray(op.constituents_operators)
+        self.num_parameters = len(self.model_terms_matrices)
         self.model_dimension = qmla.construct_models.get_num_qubits(
             self.model_name)
 
@@ -594,10 +595,12 @@ class ModelInstanceForLearning():
         learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
         learned_info['akaike_info_criterion'] = self.akaike_info_criterion
+        learned_info['bayesian_info_criterion'] = self.bayesian_info_criterion
         learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
         learned_info['evaluation_pr0_diffs'] = self.evaluation_pr0_diffs
         learned_info['evaluation_mean_pr0_diff'] = np.mean(self.evaluation_pr0_diffs)
         learned_info['evaluation_median_pr0_diff'] = np.median(self.evaluation_pr0_diffs)
+        learned_info['num_evaluation_points'] = self.num_evaluation_points
         learned_info['qinfer_model_likelihoods'] = self.qinfer_model.store_likelihoods
         learned_info['qinfer_pr0_diff_from_true'] = np.array(
             self.qinfer_model.store_p0_diffs)
@@ -648,6 +651,7 @@ class ModelInstanceForLearning():
         # evaluation_times = evaluation_data['times']
         evaluation_probe_dict = evaluation_data['probes']
         evaluation_experiments = evaluation_data['experiments']
+        self.num_evaluation_points = len(evaluation_experiments)
 
         if not self.growth_class.force_evaluation and self.num_experiments < 20:
             # TODO make optional robustly in GR or pass dev arg to QMLA
@@ -767,7 +771,14 @@ class ModelInstanceForLearning():
                 2
             )
             self.evaluation_pr0_diffs = np.array(evaluation_qinfer_model.store_p0_diffs)
+        
+        
         self.akaike_info_criterion = 2*len(self.model_terms_names) - 2*self.evaluation_log_likelihood
+        self.bayesian_info_criterion = (
+            self.num_parameters * np.log(self.num_evaluation_points)
+            - 2*self.evaluation_log_likelihood
+        )
+
 
         self.log_print([
             "Model {} evaluation ll:{} AIC:{}".format(   

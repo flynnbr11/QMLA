@@ -62,6 +62,7 @@ class ModelInstanceForStorage():
         self.model_name = qmla.construct_models.alph(model_name)
         self.model_id = model_id
         self.model_terms_matrices = model_terms_matrices
+        self.num_terms = len(self.model_terms_matrices)
         self.log_file = log_file
 
         # Redis database settings
