@@ -251,13 +251,9 @@ class QuantumModelLearningAgent():
         # Learning parameters, used by QInfer updates
         self.num_particles = self.qmla_controls.num_particles
         self.num_experiments = self.qmla_controls.num_experiments
-        self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
-        self.num_experiments_for_bayes_updates = int(max(
-            self.num_experiments * self.fraction_experiments_for_bf,
-            5
-        ))
-        if self.num_experiments_for_bayes_updates > self.num_experiments:
-            self.num_experiments_for_bayes_updates = self.qmla_controls.num_experiments
+        # self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
+        self.num_experiments_for_bayes_updates = self.num_experiments # TODO remove
+
 
         self.bayes_threshold_lower = 1
         self.bayes_threshold_upper = 100 # TODO get from GR
@@ -412,12 +408,12 @@ class QuantumModelLearningAgent():
 
         number_hamiltonians_to_exponentiate = (
             self.num_particles *
-            (self.num_experiments + self.num_experiments_for_bayes_updates)
+            (2*self.num_experiments)
         )
         self.latex_config = str(
             '$P_{' + str(self.num_particles) +
             '}E_{' + str(self.num_experiments) +
-            '}B_{' + str(self.num_experiments_for_bayes_updates) +
+            # '}B_{' + str(self.num_experiments_for_bayes_updates) +
             '}H_{' + str(number_hamiltonians_to_exponentiate) +
             r'}|\psi>_{' + str(self.probe_number) +
             '}PN_{' + str(self.growth_class.probe_noise_level) +
@@ -710,7 +706,7 @@ class QuantumModelLearningAgent():
                 branch_id=branch_id,
                 times_record=self.bayes_factors_store_times_file,
                 bf_data_folder=self.instance_learning_and_comparisons_path,
-                num_times_to_use=self.num_experiments_for_bayes_updates,
+                # num_times_to_use=self.num_experiments_for_bayes_updates,
                 bayes_threshold=self.bayes_threshold_lower,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number,
@@ -738,7 +734,7 @@ class QuantumModelLearningAgent():
                 model_b_id=model_b_id,
                 bf_data_folder=self.instance_learning_and_comparisons_path,
                 times_record=self.bayes_factors_store_times_file,
-                num_times_to_use=self.num_experiments_for_bayes_updates,
+                # num_times_to_use=self.num_experiments_for_bayes_updates,
                 branch_id=branch_id,
                 bayes_threshold=self.bayes_threshold_lower,
                 host_name=self.redis_host_name,
@@ -1783,7 +1779,7 @@ class QuantumModelLearningAgent():
             'QID': self.qmla_id,
             'NumParticles': self.num_particles,
             'NumExperiments': mod.num_experiments,
-            'NumBayesTimes': self.num_experiments_for_bayes_updates,
+            # 'NumBayesTimes': self.num_experiments_for_bayes_updates,
             'ConfigLatex': self.latex_config,
             'Heuristic': mod.model_heuristic_class,
             'Time': time_taken,

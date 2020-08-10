@@ -28,7 +28,7 @@ def remote_bayes_factor_calculation(
     model_a_id,
     model_b_id,
     branch_id=None,
-    num_times_to_use='all',
+    # num_times_to_use='all', # TODO remove
     bf_data_folder=None,
     times_record='BayesFactorsTimes.txt',
     check_db=False,
@@ -88,7 +88,6 @@ def remote_bayes_factor_calculation(
             log_identifier='BF ({}/{})'.format(model_a_id, model_b_id)
         )
     log_print(["BF Start on branch", branch_id])
-    log_print(["num experiments to use for BF=", num_times_to_use])
     time_start = time.time()
 
     # Access databases

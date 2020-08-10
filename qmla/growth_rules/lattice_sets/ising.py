@@ -34,6 +34,10 @@ class IsingLatticeSet(
             topology_predefined._5_site_chain,
             topology_predefined._6_site_chain,
         ]
+
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = self.fraction_own_experiments_for_bf
+
         self.timing_insurance_factor = 4
         self.true_model_terms_params = {
             'pauliLikewise_lz_1J2_2J3_3J4_d4' : 0.78,
