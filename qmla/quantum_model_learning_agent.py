@@ -2761,7 +2761,7 @@ class QuantumModelLearningAgent():
         r"""
         Store the pairwise comparisons computed during this instance in a CSV shared by all concurrent instances.
         """
-        qmla.analysis.update_shared_bayes_factor_csv(self, bayes_csv)
+        qmla.analysis.update_shared_bayes_factor_csv(self, self.qmla_controls.cumulative_csv)
 
     def plot_parameter_learning_single_model(
         self,
