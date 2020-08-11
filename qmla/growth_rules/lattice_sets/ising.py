@@ -28,8 +28,7 @@ class IsingLatticeSet(
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         self.available_lattices = [
-            # topology_predefined._2_site_chain,
-            self.true_lattice, 
+            self.true_lattice, # 4 site chain
 
             # Ising chains
             topology_predefined._3_site_chain,
