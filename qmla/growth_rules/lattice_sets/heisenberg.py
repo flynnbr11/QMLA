@@ -48,4 +48,4 @@ class HeisenbergLatticeSet(
         }
         self.base_terms = ['x', 'z']
         self.num_processes_to_parallelise_over = len(self.available_lattices)
-        self.timing_insurance_factor = 1
+        self.timing_insurance_factor = 0.5
