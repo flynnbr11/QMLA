@@ -79,7 +79,7 @@ day_time=$(date +%b_%d/%H_%M)
 this_run_directory="$running_dir/Results/$day_time/"
 mkdir -p $this_run_directory
 
-bayes_csv="$this_run_directory/bayes_factors.csv"
+bayes_csv="$this_run_directory/all_models_bayes_factors.csv"
 system_measurements_file="$this_run_directory/system_measurements.p"
 run_info_file="$this_run_directory/run_info.p"
 plot_probe_file="$this_run_directory/plot_probes.p"

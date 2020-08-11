@@ -2761,6 +2761,7 @@ class QuantumModelLearningAgent():
         r"""
         Store the pairwise comparisons computed during this instance in a CSV shared by all concurrent instances.
         """
+        # TODO this doesn't get used anywhere useful any more; remove
         qmla.analysis.update_shared_bayes_factor_csv(self, self.qmla_controls.cumulative_csv)
 
     def plot_parameter_learning_single_model(
@@ -3102,13 +3103,19 @@ class QuantumModelLearningAgent():
             for m in models:
                 
                 mod = self.get_model_storage_instance_by_id(m)
-                exp_vals = [
-                    mod.expectation_values[t] 
-                    for t in times
-                ]
-                
+                computed_expec_val_times = sorted(mod.expectation_values.keys())
+                try:
+                    exp_vals = [
+                        mod.expectation_values[t] 
+                        for t in computed_expec_val_times
+                    ]
+                except:
+                    self.log_print([
+                        "Failed to get expectation values for model id {}".format(m)
+                    ])
+                    raise
                 ax.plot(
-                    times, 
+                    computed_expec_val_times, 
                     exp_vals, 
                     label="{} (ID={}, $LL$={})".format(mod.model_name_latex, m, mod.evaluation_log_likelihood),
                     color=next(colours), 

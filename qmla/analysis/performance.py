@@ -139,7 +139,7 @@ def update_shared_bayes_factor_csv(qmd, all_bayes_csv):
         )
 
         if len(new_models) > 0:
-
+            
             import pandas
             csv_input = pandas.read_csv(
                 all_bayes_csv,

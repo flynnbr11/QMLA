@@ -1289,6 +1289,7 @@ class ModelInstanceForLearning():
         # instead of computing e^{-iHt} for all values of t
 
         times = self.experimental_measurement_times
+        self.log_print(["Getting expectation values for times:", times])
         model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
         if model_num_qubits > 5:
             # TODO compute U=e^{-iH} once then it doesn't really matter how many times computed here
