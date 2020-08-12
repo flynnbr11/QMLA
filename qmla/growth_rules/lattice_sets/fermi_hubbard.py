@@ -18,7 +18,7 @@ class FermiHubbardLatticeSet(
         growth_generation_rule,
         **kwargs
     ):
-        self.true_lattice = topology_predefined._2_site_chain
+        self.true_lattice = topology_predefined._3_site_chain_fully_connected
         # self.true_lattice = topology_predefined._3_site_chain
         # self.true_lattice = topology_predefined._4_site_square
         self.onsite_terms_present = True
@@ -35,13 +35,13 @@ class FermiHubbardLatticeSet(
 
         self.available_lattices = [
             self.true_lattice, 
-            topology_predefined._3_site_chain_fully_connected, 
+            topology_predefined._2_site_chain, 
             topology_predefined._4_site_chain,
-            topology_predefined._4_site_square,
+            topology_predefined._4_site_square_fully_connected
         ]
 
-        self.quantisation = 'first'
-        # self.quantisation = 'second'  
+        # self.quantisation = 'first'
+        self.quantisation = 'second'  
         if self.quantisation == 'first':
             # need a probe transformer
             self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
@@ -110,7 +110,7 @@ class FermiHubbardLatticeSet(
             individual_operators.append(onsite_sum)
 
         complete_model = '+'.join(individual_operators)
-        # complete_model = qmla.construct_models.alph(complete_model)
+        complete_model = qmla.construct_models.alph(complete_model)
         return complete_model
 
     def expectation_value(self, **kwargs):
