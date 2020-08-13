@@ -166,7 +166,8 @@ class ModelInstanceForLearning():
         # Instantiate growth rule
         self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
-            log_file=self.log_file
+            log_file=self.log_file,
+            qmla_id = self.qmla_id, 
         )
 
         # Get initial configuration for this model

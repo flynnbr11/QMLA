@@ -62,7 +62,8 @@ class ControlsQMLA():
                 growth_generation_rule=self.growth_generation_rule,
                 true_params_path=arguments.run_info_file,
                 plot_probes_path=arguments.probes_plot_file,
-                log_file=self.log_file
+                log_file=self.log_file,
+                qmla_id = arguments.qmla_id, 
             )
         except BaseException:
             raise

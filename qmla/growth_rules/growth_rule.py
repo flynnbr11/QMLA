@@ -64,6 +64,11 @@ class GrowthRule():
         else:
             self.log_file = '.default_qmla_log.log'
         
+        if 'qmla_id' in kwargs:
+            self.qmla_id = kwargs['qmla_id']
+        else:
+            self.qmla_id = -1
+        
         if 'true_params_path' in kwargs: 
             self.true_params_path = kwargs['true_params_path']
         else: 

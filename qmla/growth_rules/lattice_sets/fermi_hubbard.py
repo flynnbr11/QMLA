@@ -18,11 +18,7 @@ class FermiHubbardLatticeSet(
         growth_generation_rule,
         **kwargs
     ):
-        self.true_lattice = topology_predefined._3_site_chain_fully_connected
-        # self.true_lattice = topology_predefined._3_site_chain
-        # self.true_lattice = topology_predefined._4_site_square
         self.onsite_terms_present = True
-        self.true_model = self.model_from_lattice(self.true_lattice)
         # TEST:
         # self.true_model = 'FH-hopping-sum_down_1h2_d2+FH-onsite-sum_1_2_d2'
         
@@ -33,12 +29,23 @@ class FermiHubbardLatticeSet(
         )        
         self.log_print(["True model is:", self.true_model])
 
-        self.available_lattices = [
-            self.true_lattice, 
-            topology_predefined._2_site_chain, 
-            topology_predefined._4_site_chain,
-            topology_predefined._4_site_square_fully_connected
-        ]
+        self.available_lattices = {
+            # Ising chains
+            'chain_2' : topology_predefined._2_site_chain,
+            'chain_3' : topology_predefined._3_site_chain,
+
+            # fully connected
+            'fully_connected_3' : topology_predefined._3_site_lattice_fully_connected, 
+            'fully_connected_4' : topology_predefined._4_site_lattice_fully_connected, 
+
+            # other lattices
+            'grid_4' : topology_predefined._4_site_square,
+        }
+
+        # randomly select a true model from the available lattices
+        self.true_lattice_name = np.random.choice(self.available_lattices)
+        self.true_latttice = self.available_lattices[self.true_lattice_name]
+        self.true_model = self.model_from_lattice(self.true_lattice)
 
         # self.quantisation = 'first'
         self.quantisation = 'second'  

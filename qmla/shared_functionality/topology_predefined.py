@@ -23,23 +23,25 @@ _5_site_chain = GridTopology(
     dimension=1, num_sites = 5
 )
 _6_site_chain = GridTopology(
-    dimension=1, num_sites = 5
+    dimension=1, num_sites = 6
 )
 
 
 # 2D 
-# Squares
-_4_site_square = GridTopology(dimension=2, num_sites=4)
-_4_site_square_fully_connected = GridTopology(
+
+# Fully connected
+_3_site_lattice_fully_connected = GridTopology(
+    dimension=2, num_sites=3, all_sites_connected=True
+) 
+_4_site_lattice_fully_connected = GridTopology(
     dimension=2, num_sites=4, all_sites_connected=True
 ) 
-
-# Grids
-_6_site_grid = GridTopology(
-    dimension=2, num_sites = 6
-)
-
-# Other lattices
 _5_site_lattice_fully_connected = GridTopology(
     dimension=2, num_sites=5, all_sites_connected=True
+)
+
+# Squares and Grids
+_4_site_square = GridTopology(dimension=2, num_sites=4)
+_6_site_grid = GridTopology(
+    dimension=2, num_sites = 6
 )

@@ -170,6 +170,7 @@ def generate_combined_datasets(
     all_models_generated = pd.DataFrame()
     misc_gr_data = pd.DataFrame()
     unique_chromosomes = pd.DataFrame()
+    lattice_record = pd.DataFrame()
 
     # cycle through files
     for f in filenames:
@@ -225,6 +226,18 @@ def generate_combined_datasets(
             )
         except:
             pass
+
+        try:
+            instance_lattice = storage.growth_rule_storage.lattice_record
+            instance_lattice['qmla_id'] = storage.qmla_id
+            instance_lattice['true_model_found'] = storage.TrueModelFound
+            lattice_record = lattice_record.append(instance_lattice, ignore_index=True)
+        except:
+            pass                   
+
+        
+
+
     # Store datasets and add their name to the list
     datasets_generated = []
 
@@ -280,6 +293,14 @@ def generate_combined_datasets(
         raise
         # pass
     
+    try:
+        lattice_record.to_csv(
+            os.path.join( combined_datasets_directory, 'lattice_record.csv'),
+        )
+        datasets_generated.append('lattice_record')
+    except:
+        raise
+
     # Gather together and return
     # combined_data = {
     #     'results_directory' : combined_datasets_directory,  

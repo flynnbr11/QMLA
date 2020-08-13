@@ -353,7 +353,7 @@ class GridTopology():
             added_sites.append(new_site_idx)
         self.new_site_indices.append(added_sites)
 
-    def draw_topology(self):
+    def draw_topology(self, save_to_file=None):
         r"""Plot the current topology. For use in interactive sessions."""
         import networkx as nx
         plt.clf()
@@ -399,7 +399,8 @@ class GridTopology():
         # which nodes to connect (nearest neighbours)
         edges = []
         for c in self.site_indices:
-            neighbours = self.nearest_neighbours[c]
+            # neighbours = self.nearest_neighbours[c]
+            neighbours = self.site_connections[c]
             for n in neighbours:
                 edge = tuple(sorted([c, n]))
                 if edge not in edges:
@@ -434,3 +435,7 @@ class GridTopology():
         )
 
         self.Graph = Graph
+        
+        if save_to_file is not None:
+            plt.savefig(save_to_file)
+
