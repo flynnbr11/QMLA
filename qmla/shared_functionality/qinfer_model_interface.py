@@ -87,6 +87,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         experimental_measurements,
         experimental_measurement_times,
         log_file,
+        qmla_id=-1, 
         evaluation_model=False,
         estimated_params=None,
         comparison_model=False, 
@@ -95,6 +96,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     ):
         self.model_name = model_name
         self.log_file = log_file
+        self.qmla_id = qmla_id
         self.growth_generation_rule = growth_generation_rule
         self._oplist = oplist
         self._a = 0
@@ -144,7 +146,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
-                log_file=self.log_file
+                log_file=self.log_file,
+                qmla_id=self.qmla_id, 
             )
         except BaseException:
             self.log_print([

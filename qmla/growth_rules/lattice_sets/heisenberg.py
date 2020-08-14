@@ -15,10 +15,10 @@ class HeisenbergLatticeSet(
         growth_generation_rule,
         **kwargs
     ):
+        self.transverse_field = None # 'x'
+        self.base_terms = ['x', 'y', 'z']
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.transverse_field = None # 'x'
-        self.base_terms = ['x', 'y', 'z']
         self.timing_insurance_factor = 0.5

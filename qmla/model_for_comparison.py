@@ -156,7 +156,8 @@ class ModelInstanceForComparison():
         self.model_terms_parameters_final = np.array(self.final_learned_params)
         self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
             growth_generation_rule=self.growth_rule_of_this_model,
-            log_file=self.log_file
+            log_file=self.log_file,
+            qmla_id = self.qmla_id,
         )
         self.model_name_latex = self.growth_class.latex_name(self.model_name)
 
@@ -176,6 +177,7 @@ class ModelInstanceForComparison():
             growth_generation_rule=self.growth_rule_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
+            qmla_id=self.qmla_id, 
             log_file=self.log_file,
             debug_mode=self.debug_mode,
         )

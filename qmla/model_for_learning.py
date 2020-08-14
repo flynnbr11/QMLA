@@ -217,6 +217,7 @@ class ModelInstanceForLearning():
             growth_generation_rule=self.growth_rule_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
+            qmla_id=self.qmla_id, 
             log_file=self.log_file,
             debug_mode=self.debug_mode,
         )
@@ -700,6 +701,7 @@ class ModelInstanceForLearning():
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
             debug_mode=self.debug_mode,
+            qmla_id=self.qmla_id, 
             evaluation_model=True,
             estimated_params=posterior_distribution.mean
         )

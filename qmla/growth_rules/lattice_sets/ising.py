@@ -17,12 +17,14 @@ class IsingLatticeSet(
         growth_generation_rule,
         **kwargs
     ):
+
+        self.base_terms = ['z']
+        self.transverse_field = 'x'
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.base_terms = ['z']
-        self.transverse_field = 'x'
+
 
         self.timing_insurance_factor = 4
         self.true_model_terms_params = {

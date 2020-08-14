@@ -72,7 +72,8 @@ class ControlsQMLA():
         self.unique_growth_rule_instances = {
             gen: qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=gen,
-                log_file=self.log_file
+                log_file=self.log_file,
+                qmla_id = arguments.qmla_id,
             )
             for gen in self.alternative_growth_rules
         }
