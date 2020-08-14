@@ -43,18 +43,18 @@ class LatticeSet(
             # Ising chains
             '_2_site_chain' : topology_predefined._2_site_chain,
             '_3_site_chain' : topology_predefined._3_site_chain,
-            # '_4_site_chain' : topology_predefined._4_site_chain,
-            # '_5_site_chain' : topology_predefined._5_site_chain,
-            # '_6_site_chain' : topology_predefined._6_site_chain,
+            '_4_site_chain' : topology_predefined._4_site_chain,
+            '_5_site_chain' : topology_predefined._5_site_chain,
+            '_6_site_chain' : topology_predefined._6_site_chain,
 
-            # # fully connected
-            # '_3_site_lattice_fully_connected' : topology_predefined._3_site_lattice_fully_connected, 
-            # '_4_site_lattice_fully_connected' : topology_predefined._4_site_lattice_fully_connected, 
-            # '_5_site_lattice_fully_connected' : topology_predefined._5_site_lattice_fully_connected, 
+            # fully connected
+            '_3_site_lattice_fully_connected' : topology_predefined._3_site_lattice_fully_connected, 
+            '_4_site_lattice_fully_connected' : topology_predefined._4_site_lattice_fully_connected, 
+            '_5_site_lattice_fully_connected' : topology_predefined._5_site_lattice_fully_connected, 
 
-            # # other lattices
-            # '_4_site_square' : topology_predefined._4_site_square,
-            # '_6_site_grid' : topology_predefined._6_site_grid
+            # other lattices
+            '_4_site_square' : topology_predefined._4_site_square,
+            '_6_site_grid' : topology_predefined._6_site_grid
         }
         self.available_lattices = list(self.available_lattices_by_name.values())
         self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
