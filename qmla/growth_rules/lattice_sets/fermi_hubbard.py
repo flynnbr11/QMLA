@@ -24,27 +24,28 @@ class FermiHubbardLatticeSet(
         
         super().__init__(
             growth_generation_rule=growth_generation_rule,
-            true_model = self.true_model,
+            # true_model = self.true_model,
             **kwargs
         )        
         self.log_print(["True model is:", self.true_model])
 
-        self.available_lattices = {
+        self.available_lattices_by_name = {
             # Ising chains
-            'chain_2' : topology_predefined._2_site_chain,
-            'chain_3' : topology_predefined._3_site_chain,
-
+            '_2_site_chain' : topology_predefined._2_site_chain,
+            '_3_site_chain' : topology_predefined._3_site_chain,
             # fully connected
-            'fully_connected_3' : topology_predefined._3_site_lattice_fully_connected, 
-            'fully_connected_4' : topology_predefined._4_site_lattice_fully_connected, 
-
+            '_3_site_lattice_fully_connected' : topology_predefined._3_site_lattice_fully_connected, 
+            '_4_site_lattice_fully_connected' : topology_predefined._4_site_lattice_fully_connected, 
             # other lattices
-            'grid_4' : topology_predefined._4_site_square,
+            '_4_site_square' : topology_predefined._4_site_square,
         }
-
+        self.available_lattices = list(self.available_lattices_by_name.values())
+        self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
         # randomly select a true model from the available lattices
-        self.true_lattice_name = np.random.choice(self.available_lattices)
-        self.true_latttice = self.available_lattices[self.true_lattice_name]
+        lattice_idx = self.qmla_id % len(self.available_lattices)
+        self.true_lattice_name = self.lattice_names[ lattice_idx ]
+        self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
+        self.log_print(["QMLA {} using lattice {}: {}".format(self.qmla_id, self.true_lattice_name, self.true_lattice)])
         self.true_model = self.model_from_lattice(self.true_lattice)
 
         # self.quantisation = 'first'

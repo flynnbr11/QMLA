@@ -353,7 +353,7 @@ class GridTopology():
             added_sites.append(new_site_idx)
         self.new_site_indices.append(added_sites)
 
-    def draw_topology(self, save_to_file=None):
+    def draw_topology(self, include_labels=True, save_to_file=None):
         r"""Plot the current topology. For use in interactive sessions."""
         import networkx as nx
         plt.clf()
@@ -416,13 +416,14 @@ class GridTopology():
             node_color='blue',
             alpha=0.2
         )
-        nx.draw_networkx_labels(
-            Graph,
-            label_positions,
-            labels,
-            font_color='black',
-            font_weight='bold'
-        )
+        if include_labels:
+            nx.draw_networkx_labels(
+                Graph,
+                label_positions,
+                labels,
+                font_color='black',
+                font_weight='bold'
+            )
 
         nx.draw_networkx_edges(
             Graph,
@@ -435,7 +436,7 @@ class GridTopology():
         )
 
         self.Graph = Graph
-        
+
         if save_to_file is not None:
             plt.savefig(save_to_file)
 
