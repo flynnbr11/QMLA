@@ -98,7 +98,8 @@ class ControlsQMLA():
             )
 
         # Attributes about true model
-        self.true_model = true_params_info['true_model']
+        # self.true_model = true_params_info['true_model']
+        self.true_model = self.growth_class.true_model
         self.true_model_name = construct_models.alph(self.true_model)
         self.true_model_class = construct_models.Operator(
             self.true_model_name

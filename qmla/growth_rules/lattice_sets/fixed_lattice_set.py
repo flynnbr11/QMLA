@@ -39,25 +39,44 @@ class LatticeSet(
         self.fraction_own_experiments_for_bf = 0.5
         self.fraction_opponents_experiments_for_bf = self.fraction_own_experiments_for_bf
 
+        # self.available_lattices_by_name = {
+        #     # Ising chains
+        #     '_2_site_chain' : topology_predefined._2_site_chain,
+        #     '_3_site_chain' : topology_predefined._3_site_chain,
+        #     '_4_site_chain' : topology_predefined._4_site_chain,
+        #     '_5_site_chain' : topology_predefined._5_site_chain,
+        #     '_6_site_chain' : topology_predefined._6_site_chain,
+
+        #     # fully connected
+        #     '_3_site_lattice_fully_connected' : topology_predefined._3_site_lattice_fully_connected, 
+        #     '_4_site_lattice_fully_connected' : topology_predefined._4_site_lattice_fully_connected, 
+        #     '_5_site_lattice_fully_connected' : topology_predefined._5_site_lattice_fully_connected, 
+
+        #     # other lattices
+        #     '_4_site_square' : topology_predefined._4_site_square,
+        #     '_6_site_grid' : topology_predefined._6_site_grid
+        # }
+        self.lattice_names = [
+            '_2_site_chain', 
+            '_3_site_chain', 
+            '_4_site_chain', 
+            '_5_site_chain', 
+            '_6_site_chain', 
+            '_3_site_lattice_fully_connected', 
+            '_4_site_lattice_fully_connected',
+            '_5_site_lattice_fully_connected',
+            '_4_site_square',
+            '_6_site_grid'
+        ]
+        # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
         self.available_lattices_by_name = {
-            # Ising chains
-            '_2_site_chain' : topology_predefined._2_site_chain,
-            '_3_site_chain' : topology_predefined._3_site_chain,
-            '_4_site_chain' : topology_predefined._4_site_chain,
-            '_5_site_chain' : topology_predefined._5_site_chain,
-            '_6_site_chain' : topology_predefined._6_site_chain,
-
-            # fully connected
-            '_3_site_lattice_fully_connected' : topology_predefined._3_site_lattice_fully_connected, 
-            '_4_site_lattice_fully_connected' : topology_predefined._4_site_lattice_fully_connected, 
-            '_5_site_lattice_fully_connected' : topology_predefined._5_site_lattice_fully_connected, 
-
-            # other lattices
-            '_4_site_square' : topology_predefined._4_site_square,
-            '_6_site_grid' : topology_predefined._6_site_grid
+            k : topology_predefined.__getattribute__(k)
+            for k in self.lattice_names
         }
-        self.available_lattices = list(self.available_lattices_by_name.values())
-        self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
+        self.available_lattices = [
+            topology_predefined.__getattribute__(k)
+            for k in self.lattice_names
+        ]
         # self.true_lattice = topology_predefined._4_site_square
         # randomly select a true model from the available lattices
         lattice_idx = self.qmla_id % len(self.available_lattices)
