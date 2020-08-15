@@ -38,8 +38,8 @@ debug_mode=0
 # growth_rule='NVCentreNQubitBath'
 # growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
 # growth_rule='FermiHubbardLatticeSet'
-growth_rule='IsingLatticeSet'
-# growth_rule='HeisenbergLatticeSet'
+# growth_rule='IsingLatticeSet'
+growth_rule='HeisenbergLatticeSet'
 
 # growth_rule='IsingGenetic'
 # growth_rule='SimulatedNVCentre'

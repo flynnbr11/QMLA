@@ -21,4 +21,4 @@ class HeisenbergLatticeSet(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
-        self.timing_insurance_factor = 0.5
+        self.timing_insurance_factor = 0.4
