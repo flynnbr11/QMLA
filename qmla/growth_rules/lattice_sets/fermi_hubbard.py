@@ -27,27 +27,36 @@ class FermiHubbardLatticeSet(
             # true_model = self.true_model,
             **kwargs
         )        
-        self.log_print(["True model is:", self.true_model])
 
+        self.lattice_names = [
+            '_2_site_chain', 
+            '_3_site_chain', 
+            '_3_site_lattice_fully_connected', 
+            '_4_site_lattice_fully_connected',
+            '_4_site_square',
+        ]
+        # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
         self.available_lattices_by_name = {
-            # Ising chains
-            '_2_site_chain' : topology_predefined._2_site_chain,
-            '_3_site_chain' : topology_predefined._3_site_chain,
-            # fully connected
-            '_3_site_lattice_fully_connected' : topology_predefined._3_site_lattice_fully_connected, 
-            '_4_site_lattice_fully_connected' : topology_predefined._4_site_lattice_fully_connected, 
-            # other lattices
-            '_4_site_square' : topology_predefined._4_site_square,
+            k : topology_predefined.__getattribute__(k)
+            for k in self.lattice_names
         }
-        self.available_lattices = list(self.available_lattices_by_name.values())
-        self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
+        self.available_lattices = [
+            topology_predefined.__getattribute__(k)
+            for k in self.lattice_names
+        ]
+        # self.true_lattice = topology_predefined._4_site_square
         # randomly select a true model from the available lattices
         lattice_idx = self.qmla_id % len(self.available_lattices)
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
-        self.log_print(["QMLA {} using lattice {}: {}".format(self.qmla_id, self.true_lattice_name, self.true_lattice)])
         self.true_model = self.model_from_lattice(self.true_lattice)
+        self.log_print(["QMLA {} using lattice {} has model {}".format(self.qmla_id, self.true_lattice_name, self.true_model)])
 
+
+        self.qhl_models = [
+            self.model_from_lattice(l)
+            for l in self.available_lattices
+        ]
         # self.quantisation = 'first'
         self.quantisation = 'second'  
         if self.quantisation == 'first':
