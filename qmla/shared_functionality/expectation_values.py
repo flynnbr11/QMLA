@@ -46,20 +46,24 @@ def probability_from_default_expectation_value(
     if n_q >= 4: 
         # use sparse 
         sparse_ham = sparse.csc_matrix(-1j*ham*t)
-        u_psi = sparse.linalg.expm_multiply( 
-            sparse_ham, 
-            state
-        )
+        try:
+            u_psi = sparse.linalg.expm_multiply( 
+                sparse_ham, 
+                state
+            )
+        except:
+            print("Failed: n_q={} state={}".format(n_q, repr(state)))
+            raise
     else:
         try:
             unitary = linalg.expm(-1j * ham * t)
+            u_psi = np.dot(unitary, state)
         except:
             log_print(
                 [ "Failed to build unitary for ham:\n {}".format(ham) ],
                 log_file=log_file, log_identifier=log_identifier
             )
             raise
-        u_psi = np.dot(unitary, state)
 
 
 

@@ -452,7 +452,11 @@ else:
 # TODO put in qmla wrap up method
 
 qmla_instance._plot_model_terms()
-qmla_instance._plot_dynamics_all_models_on_branches()
+try:
+    qmla_instance._plot_dynamics_all_models_on_branches()
+except:
+    # TODO at least register failure; figure out why it fails in some cases
+    pass
 qmla_instance.plot_one_qubit_probes_bloch_sphere(save=True)
 qmla_instance._plot_evaluation_normalisation_records()
 
