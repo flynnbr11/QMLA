@@ -29,6 +29,8 @@ class IsingGenetic(
             'z',
         ]
         true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
+        true_model = qmla.construct_models.alph(true_model)
+        
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             true_model = true_model,

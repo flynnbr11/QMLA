@@ -38,7 +38,7 @@ class HeisenbergGenetic(
             'pauliSet_3J4_xJx_d4', 'pauliSet_3J4_yJy_d4', 'pauliSet_3J4_zJz_d4', # 3,4
         ]
         true_model = 'pauliSet_1J2_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4'
-
+        true_model = qmla.construct_models.alph(true_model)
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             true_model = true_model,

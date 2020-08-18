@@ -1,6 +1,6 @@
 import numpy as np
 
-from scipy import linalg
+from scipy import linalg, sparse
 import qmla.logging
 
 
@@ -41,16 +41,29 @@ def probability_from_default_expectation_value(
 
     :return: probability of measuring the input state after Hamiltonian evolution
     """
-    try:
-        unitary = linalg.expm(-1j * ham * t)
-    except:
-        log_print(
-            [ "Failed to build unitary for ham:\n {}".format(ham) ],
-            log_file=log_file, log_identifier=log_identifier
+
+    n_q = np.log2(np.shape(ham)[0])
+    if n_q > 4: 
+        # use sparse 
+        sparse_ham = sparse.csc_matrix(-1j*ham*t)
+        u_psi = sparse.linalg.expm_multiply( 
+            sparse_ham, 
+            state
         )
-        raise
+    else:
+        try:
+            unitary = linalg.expm(-1j * ham * t)
+        except:
+            log_print(
+                [ "Failed to build unitary for ham:\n {}".format(ham) ],
+                log_file=log_file, log_identifier=log_identifier
+            )
+            raise
+        u_psi = np.dot(unitary, state)
+
+
+
     probe_bra = state.conj().T
-    u_psi = np.dot(unitary, state)
     expectation_value = np.dot(probe_bra, u_psi) # in general a complex number
     prob_of_measuring_input_state = np.abs(expectation_value)
 
