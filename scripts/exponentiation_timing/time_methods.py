@@ -4,7 +4,7 @@ from scipy import linalg
 import numpy as np
 import time
 import random
-import tensorflow as tf
+# import tensorflow as tf
 import pandas as pd
 from scipy import sparse
 
@@ -53,19 +53,19 @@ def linalg_expm(
     Up = np.dot(U, probe)
     return np.abs(np.dot(probe.conj().T, Up))**2    
         
-def tensorflow_expm(
-    ham, 
-    t, 
-    probe
-):
-    for t in time_list:
-        with tf.Session() as sess: 
-            tf_ex = tf.linalg.expm(
-                tf.convert_to_tensor(-1j*ham*t, dtype='complex128')
-            ).eval()
+# def tensorflow_expm(
+#     ham, 
+#     t, 
+#     probe
+# ):
+#     for t in time_list:
+#         with tf.Session() as sess: 
+#             tf_ex = tf.linalg.expm(
+#                 tf.convert_to_tensor(-1j*ham*t, dtype='complex128')
+#             ).eval()
             
-    Up = np.dot(tf_ex, probe)
-    return np.abs(np.dot(probe.conj().T, Up))**2    
+#     Up = np.dot(tf_ex, probe)
+#     return np.abs(np.dot(probe.conj().T, Up))**2    
 
 def sparse_expm_csc(
     ham, 
