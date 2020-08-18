@@ -42,9 +42,8 @@ def probability_from_default_expectation_value(
     :return: probability of measuring the input state after Hamiltonian evolution
     """
 
-    n_q = np.log2(np.shape(ham)[0])
-    if n_q >= 4: 
-        # use sparse 
+    if np.shape(ham)[0] >= 128: 
+        # use sparse for >=5 qubits
         sparse_ham = sparse.csc_matrix(-1j*ham*t)
         try:
             u_psi = sparse.linalg.expm_multiply( 
@@ -52,6 +51,7 @@ def probability_from_default_expectation_value(
                 state
             )
         except:
+            n_q = np.log2(np.shape(ham)[0])
             print("Failed: n_q={} state={}".format(n_q, repr(state)))
             raise
     else:
