@@ -18,6 +18,8 @@ qmla_root = os.path.abspath('/'.join(elements))
 sys.path.append(qmla_root)
 import qmla
 
+import py_hexp
+
 def random_hamiltonian(number_qubits):
     """
     Generate a random Hamiltonian - will be square with length/width= 2**number_qubits.
@@ -70,6 +72,17 @@ def linalg_expm(
 #     Up = np.dot(tf_ex, probe)
 #     return np.abs(np.dot(probe.conj().T, Up))**2    
 
+def custom_exphm(
+    ham, 
+    t, 
+    probe
+):
+    U = py_hexp.exphm(
+        ham*t
+    )
+    Up = np.dot(U, probe)
+    return np.abs(np.dot(probe.conj().T, Up))**2
+
 def sparse_expm_csc(
     ham, 
     t,
@@ -120,11 +133,12 @@ methods = {
     'csc_multiply' : sparse_expm_multiply_csc,
     'csr' : sparse_expm_csr, 
     'csr_multiply' : sparse_expm_multiply_csr,
+    'custom' : custom_exphm, 
 }
 
 
 timings = pd.DataFrame()
-num_samples = 100
+num_samples = 50
 max_num_qubits = 8
 probes = qmla.shared_functionality.probe_set_generation.separable_probe_dict(
     num_probes=1, 

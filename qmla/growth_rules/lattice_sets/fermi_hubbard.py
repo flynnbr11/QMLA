@@ -48,8 +48,8 @@ class FermiHubbardLatticeSet(
         # randomly select a true model from the available lattices
         lattice_idx = self.qmla_id % len(self.available_lattices)
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
-        # self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
-        self.true_lattice = self.available_lattices_by_name['_3_site_chain'] # test
+        self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
+        # self.true_lattice = self.available_lattices_by_name['_3_site_chain'] # test
         self.true_model = self.model_from_lattice(self.true_lattice)
         self.log_print(["QMLA {} using lattice {} has model {}".format(self.qmla_id, self.true_lattice_name, self.true_model)])
 
@@ -93,7 +93,7 @@ class FermiHubbardLatticeSet(
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_all_sites
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.lattice_set_fermi_hubbard
-        self.timing_insurance_factor = 2
+        self.timing_insurance_factor = 1
         self.min_param = 0.25
         self.max_param = 0.75
         self.true_model_terms_params = {
