@@ -12,7 +12,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import itertools
 
-sys.path.append("/home/bf16951/QMD")
+p = os.path.abspath(os.path.realpath(__file__))
+elements = p.split('/')[:-3]
+qmla_root = os.path.abspath('/'.join(elements))
+sys.path.append(qmla_root)
 import qmla
 
 def random_hamiltonian(number_qubits):
@@ -121,7 +124,7 @@ methods = {
 
 
 timings = pd.DataFrame()
-num_samples = 50
+num_samples = 100
 max_num_qubits = 8
 probes = qmla.shared_functionality.probe_set_generation.separable_probe_dict(
     num_probes=1, 
@@ -195,3 +198,8 @@ for m1, m2 in method_pairs:
 close_checks.to_csv(
     "results_similarity_{}.csv".format(test_description)
 )
+timings.to_csv(
+    "store_timings_{}.csv".format(test_description)
+)
+
+
