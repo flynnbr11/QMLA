@@ -48,7 +48,8 @@ class FermiHubbardLatticeSet(
         # randomly select a true model from the available lattices
         lattice_idx = self.qmla_id % len(self.available_lattices)
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
-        self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
+        # self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
+        self.true_lattice = self.available_lattices_by_name['_3_site_chain'] # test
         self.true_model = self.model_from_lattice(self.true_lattice)
         self.log_print(["QMLA {} using lattice {} has model {}".format(self.qmla_id, self.true_lattice_name, self.true_model)])
 
@@ -57,12 +58,15 @@ class FermiHubbardLatticeSet(
             self.model_from_lattice(l)
             for l in self.available_lattices
         ]
-        # self.quantisation = 'first'
-        self.quantisation = 'second'  
+
+        self.quantisation = 'first'
+        # self.quantisation = 'second'  
         if self.quantisation == 'first':
             # need a probe transformer
-            self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
+            # self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
             # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_first_quantisation
+            # self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferInterfaceJordanWigner
+            self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()        
             self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         elif self.quantisation == 'second':
@@ -84,7 +88,7 @@ class FermiHubbardLatticeSet(
 
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
         self.max_time_to_consider = 25
-        self.max_num_qubits = 5
+        self.max_num_qubits = 8
         self.max_num_probe_qubits = self.max_num_qubits
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_all_sites
@@ -133,6 +137,8 @@ class FermiHubbardLatticeSet(
         complete_model = qmla.construct_models.alph(complete_model)
         return complete_model
 
+
+
     def expectation_value(self, **kwargs):
         r"""
         Transform probe to the Jordan Wigner basis before computing expectation value. 
@@ -151,9 +157,6 @@ class FermiHubbardLatticeSet(
 
             ex_val = self.expectation_value_function(**kwargs)
 
-        # self.log_print([
-        #     "Expectation value method: {}".format(method)
-        # ])
         return ex_val
 
 
