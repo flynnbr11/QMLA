@@ -38,6 +38,7 @@ class LatticeSet(
         self.max_time_to_consider = 45
         self.fraction_own_experiments_for_bf = 0.5
         self.fraction_opponents_experiments_for_bf = self.fraction_own_experiments_for_bf
+        self.fraction_particles_for_bf = 0.5
 
         self.lattice_names = [
             '_2_site_chain', 
