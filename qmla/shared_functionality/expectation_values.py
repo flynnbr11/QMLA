@@ -43,7 +43,7 @@ def probability_from_default_expectation_value(
     """
 
     n_q = np.log2(np.shape(ham)[0])
-    if n_q > 4: 
+    if n_q >= 4: 
         # use sparse 
         sparse_ham = sparse.csc_matrix(-1j*ham*t)
         u_psi = sparse.linalg.expm_multiply( 
