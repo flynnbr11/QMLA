@@ -70,7 +70,10 @@ class FermiHubbardLatticeSet(
             
             self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()        
             # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.test_probes_second_quantisation
-            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+            # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+            
+            # TEST whether normal probes can be learned upon
+            self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition

@@ -87,6 +87,8 @@ growth_classes = {
         GR.Genetic,
     'GeneticTest':
         GR.GeneticTest,
+    'HeisenbergGenetic':
+        GR.HeisenbergGenetic,
     'IsingGenetic':
         GR.IsingGenetic,
     'IsingGeneticTest':
