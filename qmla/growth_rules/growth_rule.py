@@ -564,7 +564,6 @@ class GrowthRule():
         self.true_hamiltonian = true_ham
 
     def generate_true_parameters(self):
-        # self.unique_true_model_per_instance = False
 
         # Dissect true model into separate terms.
         true_model = self.true_model
@@ -583,7 +582,7 @@ class GrowthRule():
         true_params_dict = {}
         true_params_dict_latex_names = {}
 
-        # Generate and store true parameters.
+        # Generate true parameters.
         true_prior = self.get_prior(
             model_name = self.true_model,
             log_file = self.log_file, 
@@ -595,7 +594,7 @@ class GrowthRule():
         true_prior.__setattr__('cov', new_cov_mtx)
         sampled_list = true_prior.sample()
 
-        # Either use randomly sampled parameter or that set in growth rule
+        # Either use randomly sampled parameter, or parameter set in true_model_terms_params
         for i in range(num_terms):
             term = terms[i]
             try:
@@ -616,7 +615,6 @@ class GrowthRule():
             'params_dict' : true_params_dict
         }
 
-        # TODO  if told not to inherit true params, use these
         self.log_print([
             "Generating true params; true_param_info:", true_param_info
         ])

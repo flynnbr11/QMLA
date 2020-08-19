@@ -45,11 +45,11 @@ class LatticeSet(
         self.lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
-            '_4_site_chain', 
+            # '_4_site_chain', 
             # '_5_site_chain', 
             # '_6_site_chain', 
             '_3_site_lattice_fully_connected', 
-            '_4_site_lattice_fully_connected',
+            # '_4_site_lattice_fully_connected',
             # '_5_site_lattice_fully_connected',
             # '_4_site_square',
             # '_6_site_grid'

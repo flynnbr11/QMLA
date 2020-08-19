@@ -5,8 +5,8 @@
 ###############
 # QMLA run configuration
 ###############
-num_instances=5
-run_qhl=1 # perform QHL on known (true) model
+num_instances=1
+run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
@@ -59,6 +59,9 @@ growth_rule='IsingLatticeSet'
 # growth_rule='NVExperimentalData'
 
 alt_growth_rules=(
+    # 'IsingLatticeSet'
+    'HeisenbergLatticeSet'
+    # 'FermiHubbardLatticeSet'
     # 'GeneticTest'
 )
 
