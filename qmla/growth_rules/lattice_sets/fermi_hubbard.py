@@ -19,14 +19,14 @@ class FermiHubbardLatticeSet(
         **kwargs
     ):
         self.onsite_terms_present = True
-        # TEST:
-        # self.true_model = 'FH-hopping-sum_down_1h2_d2+FH-onsite-sum_1_2_d2'
-        
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             # true_model = self.true_model,
             **kwargs
         )        
+
+        # TEST:
+        # self.true_model = 'FH-hopping-sum_down_1h2_d2+FH-onsite-sum_1_2_d2'
 
         self.lattice_names = [
             '_2_site_chain', 
@@ -52,7 +52,6 @@ class FermiHubbardLatticeSet(
         # self.true_lattice = self.available_lattices_by_name['_3_site_chain'] # test
         self.true_model = self.model_from_lattice(self.true_lattice)
         self.log_print(["QMLA {} using lattice {} has model {}".format(self.qmla_id, self.true_lattice_name, self.true_model)])
-
 
         self.qhl_models = [
             self.model_from_lattice(l)
@@ -98,9 +97,9 @@ class FermiHubbardLatticeSet(
         self.max_param = 0.75
         self.true_model_terms_params = {
             # 3 sites
-            'FH-hopping-sum_down_1h2_2h3_d3' : 0.25,
-            'FH-hopping-sum_up_1h2_2h3_d3' : 0.75,
-            'FH-onsite-sum_1_2_3_d3': 0.55,
+            # 'FH-hopping-sum_down_1h2_2h3_d3' : 0.25,
+            # 'FH-hopping-sum_up_1h2_2h3_d3' : 0.75,
+            # 'FH-onsite-sum_1_2_3_d3': 0.55,
             
             # 2 sites
             'FH-hopping-sum_down_1h2_d2' : 0.25,
@@ -137,27 +136,29 @@ class FermiHubbardLatticeSet(
         complete_model = qmla.construct_models.alph(complete_model)
         return complete_model
 
+    # @property
+    # def shared_true_parameters(self):
+    #     return False
 
+    # def expectation_value(self, **kwargs):
+    #     r"""
+    #     Transform probe to the Jordan Wigner basis before computing expectation value. 
+    #     """
 
-    def expectation_value(self, **kwargs):
-        r"""
-        Transform probe to the Jordan Wigner basis before computing expectation value. 
-        """
-
-        try:
-            ex_val = self.expectation_value_function(**kwargs)
-            method = 'default'
-        except:
-            # transform - e.g. probe was from a different starting basis
-            probe = kwargs['state']
-            transformed_probe = self.probe_transformer.transform(probe = probe)
-            kwargs['state'] = transformed_probe
+    #     try:
+    #         ex_val = self.expectation_value_function(**kwargs)
+    #         method = 'default'
+    #     except:
+    #         # transform - e.g. probe was from a different starting basis
+    #         probe = kwargs['state']
+    #         transformed_probe = self.probe_transformer.transform(probe = probe)
+    #         kwargs['state'] = transformed_probe
             
-            method = 'transform'
+    #         method = 'transform'
 
-            ex_val = self.expectation_value_function(**kwargs)
+    #         ex_val = self.expectation_value_function(**kwargs)
 
-        return ex_val
+    #     return ex_val
 
 
 

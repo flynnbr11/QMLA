@@ -79,15 +79,24 @@ class GrowthRule():
         else: 
             self.plot_probes_path = None
 
+        # Set up default parameters (don't call any functions here)
         self._setup_modular_functions()
         self._setup_true_model()
         self._setup_model_learning()
         self._setup_tree_infrastructure()
         self._setup_logistics()
 
+        # Allow user GR parameters to take over before any functionality is called
+        self.overwrite_default_parameters()
+
+        # Set or retrieve system data shared over instances
+        # self.get_true_parameters()
+
     ##########
     # Section: Set up, assign parameters etc
     ##########
+    def overwrite_default_parameters(self):
+        pass
 
     def _setup_modular_functions(self):
         r"""
@@ -158,9 +167,8 @@ class GrowthRule():
             self.true_model = 'pauliSet_1_x_d1'
         self.qhl_models = ['pauliSet_1_x_d1', 'pauliSet_1_y_d1', 'pauliSet_1_z_d1']
         self.true_model_terms_params = {}
+        self._shared_true_parameters = True
 
-        # Set or retrieve system data shared over instances
-        self.get_true_parameters()
 
     def _setup_model_learning(self):
         r"""
@@ -459,8 +467,6 @@ class GrowthRule():
         self.timing_insurance_factor = 1
         self.f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"])
 
-
-
     ##########
     # Section: System (true model) infomation
     ##########
@@ -483,6 +489,10 @@ class GrowthRule():
         self.true_op_terms = set(sorted(latex_true_terms))
 
         return self.true_op_terms
+    
+    @property
+    def shared_true_parameters(self):
+        return self._shared_true_parameters
 
     def get_true_parameters(
         self,
@@ -502,7 +512,23 @@ class GrowthRule():
         """      
 
         # get true data from pickled file
-        try:
+        # try:
+        #     true_config = pickle.load(
+        #         open(
+        #             self.true_params_path, 
+        #             'rb'
+        #         )
+        #     )
+        #     self.true_params_list = true_config['params_list']
+        #     self.true_params_dict = true_config['params_dict']
+        # except:
+        #     self.true_params_list = []
+        #     self.true_params_dict = {}
+        # try:
+        self.log_print(["Getting true parameters. QMLA {} with true_model {}".format(self.qmla_id, self.true_model)])
+        if self.shared_true_parameters:
+            # i.e. load the true parameters from run_info file in run directory
+            self.log_print(["Parameters set from shared run file"])
             true_config = pickle.load(
                 open(
                     self.true_params_path, 
@@ -511,9 +537,21 @@ class GrowthRule():
             )
             self.true_params_list = true_config['params_list']
             self.true_params_dict = true_config['params_dict']
-        except:
-            self.true_params_list = []
-            self.true_params_dict = {}
+        else:
+            self.log_print(["Parameters set uniquely for this instance"])
+            try:
+                true_params_info = self.generate_true_parameters()
+                self.true_params_dict = true_params_info['params_dict']
+                self.true_params_list = true_params_info['params_list']
+                self.log_print(["true_params_info:", true_params_info])
+            except:
+                self.log_print(["failed to generate params for unique instance"])
+        # except:
+        #     self.true_params_list = []
+        #     self.true_params_dict = {}
+        self.log_print([
+            "True params dict:", self.true_params_dict
+        ])
 
         true_ham = None
         for k in list(self.true_params_dict.keys()):
@@ -524,6 +562,66 @@ class GrowthRule():
             else:
                 true_ham = param * mtx
         self.true_hamiltonian = true_ham
+
+    def generate_true_parameters(self):
+        # self.unique_true_model_per_instance = False
+
+        # Dissect true model into separate terms.
+        true_model = self.true_model
+        terms = qmla.construct_models.get_constituent_names_from_name(
+            true_model
+        )
+        latex_terms = [
+            self.latex_name(name=term) for term in terms
+        ]
+        true_model_latex = self.latex_name(
+            name=true_model,
+        )
+        num_terms = len(terms)
+
+        true_model_terms_params = []
+        true_params_dict = {}
+        true_params_dict_latex_names = {}
+
+        # Generate and store true parameters.
+        true_prior = self.get_prior(
+            model_name = self.true_model,
+            log_file = self.log_file, 
+            log_identifier = "[GR true param setup]"
+        )
+        widen_prior_factor = self.true_param_cov_mtx_widen_factor
+        old_cov_mtx = true_prior.cov
+        new_cov_mtx = old_cov_mtx**(1 / widen_prior_factor)
+        true_prior.__setattr__('cov', new_cov_mtx)
+        sampled_list = true_prior.sample()
+
+        # Either use randomly sampled parameter or that set in growth rule
+        for i in range(num_terms):
+            term = terms[i]
+            try:
+                # if this term is set in growth rule true_model_terms_params,
+                # use that value
+                true_param = self.true_model_terms_params[term]
+            except BaseException:
+                # otherwise, use value sampled from true prior
+                true_param = sampled_list[0][i]
+
+            true_model_terms_params.append(true_param)
+            true_params_dict[terms[i]] = true_param
+            true_params_dict_latex_names[latex_terms[i]] = true_param
+        
+        true_param_info = {
+            'true_model' : true_model,
+            'params_list' : true_model_terms_params, 
+            'params_dict' : true_params_dict
+        }
+
+        # TODO  if told not to inherit true params, use these
+        self.log_print([
+            "Generating true params; true_param_info:", true_param_info
+        ])
+        return true_param_info
+
 
     def get_measurements_by_time(
         self
@@ -958,7 +1056,6 @@ class GrowthRule():
         :param str name: name of model to map.
         :return str latex_name: representation of input model as LaTeX string. 
         """
-
         latex_name = self.latex_model_naming_function(name, **kwargs)
         return latex_name
 

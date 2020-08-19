@@ -88,6 +88,7 @@ class QuantumModelLearningAgent():
         else:
             self.qmla_controls = qmla_controls
         self.growth_class = self.qmla_controls.growth_class
+        
 
         # Basic settings, path definitions etc
         self._fundamental_settings()
@@ -128,6 +129,7 @@ class QuantumModelLearningAgent():
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
+        self.log_print(["\nwithin QMLA, GR's qmla id is {}. True model={}".format(self.growth_class.qmla_id, self.growth_class.true_model)])
         self.qhl_mode = self.qmla_controls.qhl_mode
         self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file

@@ -29,6 +29,8 @@ class LatticeSet(
             true_model=true_model,
             **kwargs
         )
+
+        self._shared_true_parameters = False
         self.tree_completed_initially = True # fixed lattice set considered
         # self.base_terms = ['x', 'z']
         # self.transverse_field = None
@@ -44,13 +46,13 @@ class LatticeSet(
             '_2_site_chain', 
             '_3_site_chain', 
             '_4_site_chain', 
-            '_5_site_chain', 
-            '_6_site_chain', 
+            # '_5_site_chain', 
+            # '_6_site_chain', 
             '_3_site_lattice_fully_connected', 
             '_4_site_lattice_fully_connected',
-            '_5_site_lattice_fully_connected',
-            '_4_site_square',
-            '_6_site_grid'
+            # '_5_site_lattice_fully_connected',
+            # '_4_site_square',
+            # '_6_site_grid'
         ]
         # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
         self.available_lattices_by_name = {
@@ -85,7 +87,6 @@ class LatticeSet(
         self, 
         lattice
     ):
-        self.log_print("Model from lattice via fixed lattice parent GR")
         connected_sites = lattice.get_connected_site_list()
         conn_list = [list(str(c) for c in conn) for conn in connected_sites]
         conn_string = '_'.join(['J'.join(c) for c in conn_list])

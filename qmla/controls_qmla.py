@@ -67,6 +67,10 @@ class ControlsQMLA():
             )
         except BaseException:
             raise
+        self.growth_class.get_true_parameters() # either retrieve or assign true parameters
+        self.log_print([
+            "GR set by controls has ID {} has true model {}".format(arguments.qmla_id, self.growth_class.true_model)
+        ])
 
         self.alternative_growth_rules = arguments.alternative_growth_rules
         self.unique_growth_rule_instances = {
@@ -99,13 +103,13 @@ class ControlsQMLA():
 
         # Attributes about true model
         # self.true_model = true_params_info['true_model']
-        self.true_model = self.growth_class.true_model
-        self.true_model_name = construct_models.alph(self.true_model)
+        self.true_model = construct_models.alph(self.growth_class.true_model)
+        self.true_model_name = self.true_model # TODO remove redundancy
         self.true_model_class = construct_models.Operator(
             self.true_model_name
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
-        self.true_model_terms_params = true_params_info['params_list']
+        # self.true_model_terms_params = true_params_info['params_list']
         self.run_info_file = arguments.run_info_file
         self.log_print(["Shared true params set for this instance."])
 
@@ -349,7 +353,7 @@ def parse_cmd_line_args(args):
         '-sysmeas', '--system_measurements_file',
         help='Path to save true params to.',
         type=str,
-        default="{}/true_model_terms_params.p".format(os.getcwd())
+        default="{}/system_measurements.p".format(os.getcwd())
     )
     parser.add_argument(
         '-plotprobes', '--probes_plot_file',

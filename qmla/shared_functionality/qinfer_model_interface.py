@@ -118,6 +118,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.store_p0_diffs = []
         self.debug_mode = debug_mode
         # get true_hamiltonian from true_param dict
+        self.log_print(["True params dict:", self.true_param_dict])
         true_ham = None
         for k in list(self.true_param_dict.keys()):
             param = self.true_param_dict[k]
@@ -572,6 +573,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.probe_counter,
             self._true_dim 
         ]
+        self.log_print([
+            "\nModel {} using system probe dimension {}: {}".format(self.model_name, self._true_dim, probe.shape),
+            "\nTrue Model  {} has shape {} with dimension {}".format(self._truename, np.shape(operator_list[0]), self._true_dim)
+        ])
 
         # TODO: could just work with true_hamiltonian, worked out on __init__
         return self.default_pr0_from_modelparams_times(

@@ -5,7 +5,7 @@
 ###############
 # QMLA run configuration
 ###############
-num_instances=1
+num_instances=5
 run_qhl=1 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -37,9 +37,9 @@ debug_mode=0
 # growth_rule='NVCentreRevivalsSimulated'
 # growth_rule='NVCentreNQubitBath'
 # growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
-# growth_rule='IsingLatticeSet'
+growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
-growth_rule='FermiHubbardLatticeSet'
+# growth_rule='FermiHubbardLatticeSet'
 
 # growth_rule='HeisenbergGenetic'
 # growth_rule='IsingGenetic'
