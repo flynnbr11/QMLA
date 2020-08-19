@@ -30,7 +30,7 @@ class LatticeSet(
             **kwargs
         )
 
-        self._shared_true_parameters = True
+        self._shared_true_parameters = False
         self.tree_completed_initially = True # fixed lattice set considered
         # self.base_terms = ['x', 'z']
         # self.transverse_field = None
@@ -74,7 +74,6 @@ class LatticeSet(
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)
-        self.log_print(["QMLA {} using lattice {} has model {}".format(self.qmla_id, self.true_lattice_name, self.true_model)])
 
         self.max_num_models_by_shape = {
             1 : 2, 

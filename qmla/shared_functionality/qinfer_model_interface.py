@@ -620,23 +620,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # format of probe dict keys: (probe_id, qubit_number)
         # probe_counter controlled in likelihood method
         t_init = time.time()
-        # check_probe_present = (self.probe_couter, self.model_dimension) in self.sim_probe_dict.keys()
-        self.log_print([
-            "\nGoing to get sim probe; (probe_id, model_dimension)=", self.probe_counter,  self.model_dimension, 
-            # "\n(probe_id, dim) in simulator_probes:", check_probe_present
-        ])
-        self.log_print(["sim probe dict has keys", self.sim_probe_dict.keys()])
-        # self.log_print(["Simulator probes:", self.sim_probe_dict])
 
         probe = self.sim_probe_dict[
             self.probe_counter,
             self.model_dimension
         ]
-        self.log_print([
-            "Model {} with {} qubits gets probe of shape {}".format(
-                self.model_name, self.model_dimension, np.shape(probe)
-            )
-        ])
 
         self.timings[timing_marker]['get_probe'] += time.time() - t_init
         operator_list = self._oplist

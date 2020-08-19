@@ -54,7 +54,7 @@ class FermiHubbardLatticeSet(
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)
-        self.log_print(["QMLA {} using lattice {} has model {}".format(self.qmla_id, self.true_lattice_name, self.true_model)])
+        # self.log_print(["QMLA {} using lattice {} (lattice idx {}) has model {}".format(self.qmla_id, self.true_lattice_name, lattice_idx, self.true_model)])
         self.max_num_qubits = 8
         self.max_num_probe_qubits = 8
 
