@@ -197,7 +197,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # self.model_dimension = qmla.construct_models.get_num_qubits(self.model_name)
         self.model_dimension = int(np.log2(self._oplist[0].shape[0]))
         self._true_dim = int(np.log2(self.true_hamiltonian.shape[0]))
-        self.log_print(["Model {} dimension: {}. true dim={}".format(self.model_name,  self.model_dimension, self._true_dim)])
+        self.log_print(["\nModel {} dimension: {}. \nTrue model {}, has dimension: {}".format(
+            self.model_name,  self.model_dimension, 
+            self._truename, self._true_dim)
+        ])
         if true_oplist is not None and trueparams is None:
             raise(
                 ValueError(
@@ -471,6 +474,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         try:
             if self.true_evolution:
                 t_init = time.time()
+                # self.log_print(["Getting system pr0"])
                 pr0 = self.get_system_pr0_array(
                     times=times,
                     particles=params,
@@ -479,6 +483,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 self.timings[timing_marker]['get_pr0'] += time.time() - t_init
             else:
                 t_init = time.time()
+                # self.log_print(["Getting simulator pr0"])
                 pr0 = self.get_simulator_pr0_array(
                     times=times,
                     particles=params,
@@ -489,7 +494,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.log_print([
                 "Failed to compute pr0. Params:\n", params[:5]
             ])
-            self.log_print(["H_ for IQLE:", self.ham_from_expparams[0]])
+            # self.log_print(["H_ for IQLE:", self.ham_from_expparams[0]])
             raise # TODO raise specific error
             sys.exit()
         t_init = time.time()
@@ -573,10 +578,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.probe_counter,
             self._true_dim 
         ]
-        self.log_print([
-            "\nModel {} using system probe dimension {}: {}".format(self.model_name, self._true_dim, probe.shape),
-            "\nTrue Model  {} has shape {} with dimension {}".format(self._truename, np.shape(operator_list[0]), self._true_dim)
-        ])
+        # self.log_print([
+        #     "\nTrue Model {} has dim {} (operator shape {}) using system probe dimension: {}".format(
+        #         self._truename, self._true_dim, np.shape(operator_list[0]), probe.shape),
+        #     # "\nTrue Model  {} has shape {} with dimension {}".format(self._truename, np.shape(operator_list[0]), self._true_dim)
+        # ])
 
         # TODO: could just work with true_hamiltonian, worked out on __init__
         return self.default_pr0_from_modelparams_times(
@@ -614,11 +620,23 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # format of probe dict keys: (probe_id, qubit_number)
         # probe_counter controlled in likelihood method
         t_init = time.time()
-        
+        # check_probe_present = (self.probe_couter, self.model_dimension) in self.sim_probe_dict.keys()
+        self.log_print([
+            "\nGoing to get sim probe; (probe_id, model_dimension)=", self.probe_counter,  self.model_dimension, 
+            # "\n(probe_id, dim) in simulator_probes:", check_probe_present
+        ])
+        self.log_print(["sim probe dict has keys", self.sim_probe_dict.keys()])
+        # self.log_print(["Simulator probes:", self.sim_probe_dict])
+
         probe = self.sim_probe_dict[
             self.probe_counter,
-            self.model_dimension 
+            self.model_dimension
         ]
+        self.log_print([
+            "Model {} with {} qubits gets probe of shape {}".format(
+                self.model_name, self.model_dimension, np.shape(probe)
+            )
+        ])
 
         self.timings[timing_marker]['get_probe'] += time.time() - t_init
         operator_list = self._oplist

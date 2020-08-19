@@ -418,7 +418,6 @@ try:
     )
 except BaseException:
     print("ANALYSIS FAILURE: clustering plots.")
-    raise
 
 
 #######################################

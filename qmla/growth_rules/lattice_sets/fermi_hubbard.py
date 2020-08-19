@@ -46,12 +46,17 @@ class FermiHubbardLatticeSet(
         ]
         # self.true_lattice = topology_predefined._4_site_square
         # randomly select a true model from the available lattices
-        lattice_idx = self.qmla_id % len(self.available_lattices)
+        if self._shared_true_parameters:
+            lattice_idx = -1
+        else:
+            lattice_idx = self.qmla_id % len(self.available_lattices)  
+
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
-        # self.true_lattice = self.available_lattices_by_name['_3_site_chain'] # test
         self.true_model = self.model_from_lattice(self.true_lattice)
         self.log_print(["QMLA {} using lattice {} has model {}".format(self.qmla_id, self.true_lattice_name, self.true_model)])
+        self.max_num_qubits = 8
+        self.max_num_probe_qubits = 8
 
         self.qhl_models = [
             self.model_from_lattice(l)
@@ -78,8 +83,10 @@ class FermiHubbardLatticeSet(
             # TEST whether normal probes can be learned upon
             # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
-        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
+        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
         # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
+        # TODO plot probe dict with meaningful probes wrt FH model 
+        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
 
         self.num_sites_true = construct_models.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 

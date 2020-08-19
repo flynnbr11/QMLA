@@ -30,7 +30,7 @@ class LatticeSet(
             **kwargs
         )
 
-        self._shared_true_parameters = False
+        self._shared_true_parameters = True
         self.tree_completed_initially = True # fixed lattice set considered
         # self.base_terms = ['x', 'z']
         # self.transverse_field = None
@@ -45,14 +45,14 @@ class LatticeSet(
         self.lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
-            # '_4_site_chain', 
-            # '_5_site_chain', 
-            # '_6_site_chain', 
+            '_4_site_chain', 
+            '_5_site_chain', 
+            '_6_site_chain', 
             '_3_site_lattice_fully_connected', 
-            # '_4_site_lattice_fully_connected',
-            # '_5_site_lattice_fully_connected',
-            # '_4_site_square',
-            # '_6_site_grid'
+            '_4_site_lattice_fully_connected',
+            '_5_site_lattice_fully_connected',
+            '_4_site_square',
+            '_6_site_grid'
         ]
         # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
         self.available_lattices_by_name = {
@@ -65,7 +65,12 @@ class LatticeSet(
         ]
         # self.true_lattice = topology_predefined._4_site_square
         # randomly select a true model from the available lattices
-        lattice_idx = self.qmla_id % len(self.available_lattices)
+        if self._shared_true_parameters:
+            lattice_idx = -1
+        else:
+            lattice_idx = self.qmla_id % len(self.available_lattices)  
+
+
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)

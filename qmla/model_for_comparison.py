@@ -308,7 +308,8 @@ class ModelInstanceForComparison():
         times_not_yet_computed = list(
             set(times) - set(self.expectation_values.keys())
         )
-        n_qubits = qmla.construct_models.get_num_qubits(self.model_name)
+        # n_qubits = qmla.construct_models.get_num_qubits(self.model_name)
+        n_qubits = np.log2( np.shape(self.learned_hamiltonian)[0]) # TODO get model num qubits from learned_info
         plot_probe = self.plot_probes[n_qubits]
 
         for t in times_not_yet_computed:

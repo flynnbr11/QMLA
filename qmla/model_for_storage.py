@@ -116,8 +116,10 @@ class ModelInstanceForStorage():
 
         # Parameters used by QMLA manager class
         self.model_bayes_factors = {}
-        self.model_num_qubits = qmla.construct_models.get_num_qubits(
-            self.model_name)
+        # self.model_num_qubits = qmla.construct_models.get_num_qubits(
+        #     self.model_name)
+        # self.probe_num_qubits = self.model_num_qubits
+        self.model_num_qubits = np.log2( np.shape(self.model_terms_matrices[0])[0] )
         self.probe_num_qubits = self.model_num_qubits
         self.expectation_values = {}
         self.values_updated = False

@@ -271,10 +271,16 @@ class QuantumModelLearningAgent():
         self.growth_class.generate_probes(
             noise_level=self.growth_class.probe_noise_level,
             minimum_tolerable_noise=0.0,
+            # tell it the max number of qubits required by any GR under consideration
+            probe_maximum_number_qubits = max(
+                [gr.max_num_probe_qubits for gr in self.qmla_controls.unique_growth_rule_instances.values()]
+            )
         )
         self.probes_system = self.growth_class.probes_system
         self.probes_simulator = self.growth_class.probes_simulator
         self.probe_number = self.growth_class.num_probes
+        sim_probe_keys = list(self.probes_simulator.keys())
+        self.log_print(["Simulator probe keys (len {}):{}".format(len(sim_probe_keys), sim_probe_keys) ])
 
         # Measurements of true model
         self.experimental_measurements = experimental_measurements
@@ -1578,7 +1584,7 @@ class QuantumModelLearningAgent():
                 'model_storage_instance': model_storage_instance,
                 'branches_present_on' : [int(branch_id)], 
                 'terms' : terms,
-                'latex_terms' : [self.growth_class.latex_name(t) for t in terms]
+                'latex_terms' : [growth_tree.growth_class.latex_name(t) for t in terms] # need to get latex name by the GR which spawned this model
             })
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
@@ -3183,7 +3189,7 @@ class QuantumModelLearningAgent():
                     qmla.utilities.flatten(mod.evaluation_normalization_record),
                     bins = np.arange(0, 1, 0.05), 
                     label = "{} ($LL={}$)".format(
-                        self.growth_class.latex_name(mod.name),
+                        mod.model_name_latex,
                         # TODO use GR of branch to get latex name
                         mod.evaluation_log_likelihood
                     ),

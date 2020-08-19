@@ -37,9 +37,9 @@ debug_mode=0
 # growth_rule='NVCentreRevivalsSimulated'
 # growth_rule='NVCentreNQubitBath'
 # growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
-growth_rule='IsingLatticeSet'
+# growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
-# growth_rule='FermiHubbardLatticeSet'
+growth_rule='FermiHubbardLatticeSet'
 
 # growth_rule='HeisenbergGenetic'
 # growth_rule='IsingGenetic'
@@ -59,7 +59,7 @@ growth_rule='IsingLatticeSet'
 # growth_rule='NVExperimentalData'
 
 alt_growth_rules=(
-    # 'IsingLatticeSet'
+    'IsingLatticeSet'
     'HeisenbergLatticeSet'
     # 'FermiHubbardLatticeSet'
     # 'GeneticTest'

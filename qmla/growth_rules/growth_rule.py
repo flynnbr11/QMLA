@@ -396,7 +396,7 @@ class GrowthRule():
         self.tree_completed_initially = False
         self.prune_completed_initially = False
         self.max_spawn_depth = 10
-        self.max_num_qubits = 5
+        self.max_num_qubits = 8
         self.max_num_probe_qubits = 6
         self.num_top_models_to_build_on = 1
 
@@ -658,7 +658,8 @@ class GrowthRule():
                 true_ham = param * mtx
         self.true_hamiltonian = true_ham
 
-        true_ham_dim = construct_models.get_num_qubits(self.true_model)
+        # true_ham_dim = construct_models.get_num_qubits(self.true_model)
+        true_ham_dim = np.log2(np.shape(self.true_hamiltonian)[0])
         plot_probes = pickle.load(
             open(
                 self.plot_probes_path, 
@@ -810,10 +811,13 @@ class GrowthRule():
         # Store or return the generated probes
         if store_probes:
             self.probes_system = new_probes
-            if self.shared_probes == True:
+            if self.shared_probes:
                 # Assign probes for simulator 
                 self.probes_simulator = self.probes_system
+                keys = list(self.probes_simulator.keys())
+                self.log_print(["Using system probes as simulator probes. len keys = {}".format(len(keys))])
             else:
+                self.log_print(["Not using system probes as simulator probes"])
                 self.probes_simulator = self.simulator_probe_generation_function(
                     max_num_qubits=probe_maximum_number_qubits,
                     # num_probes=self.num_probes,

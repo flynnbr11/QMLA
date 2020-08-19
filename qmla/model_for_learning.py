@@ -180,6 +180,10 @@ class ModelInstanceForLearning():
         self.num_parameters = len(self.model_terms_matrices)
         self.model_dimension = qmla.construct_models.get_num_qubits(
             self.model_name)
+        self.log_print(["Getting num qubits"])
+        self.model_num_qubits = int(np.log2(np.shape(self.model_terms_matrices[0])[0]))
+        self.log_print(["model num qubits:", self.model_num_qubits])
+        self.log_print(["model dimension:", self.model_dimension])
 
         # Poterntially use different resources depending on relative model
         # complexity.
@@ -1293,11 +1297,11 @@ class ModelInstanceForLearning():
 
         times = self.experimental_measurement_times
         self.log_print(["Getting expectation values for times:", times])
-        model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
-        if model_num_qubits > 5:
+        # model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
+        if self.model_num_qubits > 5:
             # TODO compute U=e^{-iH} once then it doesn't really matter how many times computed here
             times = times[::10] # reduce times to compute 
-        plot_probe = self.plot_probes[model_num_qubits]
+        plot_probe = self.plot_probes[self.model_num_qubits]
 
         self.expectation_values = {
             t : self.growth_class.expectation_value(
