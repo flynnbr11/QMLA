@@ -91,7 +91,7 @@ class HeisenbergGenetic(
         self.iqle_mode = False
 
         self.max_num_models_by_shape = {
-            self.num_sites : 0.1(len(self.initial_models) * self.max_spawn_depth),
+            self.num_sites : 0.1*(len(self.initial_models) * self.max_spawn_depth),
             'other': 0
         }
         self.num_processes_to_parallelise_over = min(2*len(self.initial_models) + 1, 16)
