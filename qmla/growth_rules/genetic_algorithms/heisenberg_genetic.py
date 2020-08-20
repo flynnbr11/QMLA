@@ -71,8 +71,8 @@ class HeisenbergGenetic(
         # default test - 32 generations x 16 starters
         self.fitness_method = 'elo_ratings' # 'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' #  
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
-        self.max_spawn_depth = 2
-        self.initial_num_models = 6
+        self.max_spawn_depth = 16
+        self.initial_num_models = 14
 
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models

@@ -491,6 +491,9 @@ class GeneticAlgorithmQMLA():
             mod : model_fitnesses[mod] 
             for mod in truncated_model_list
         }
+        # keep the others with zero fitness, so the gene pool reflect them
+        for m in ranked_models[truncation_cutoff:]:
+            truncated_model_fitnesses[m] = 0 
 
         sum_fitnesses = np.sum(list(truncated_model_fitnesses.values()))
         self.log_print(
@@ -502,7 +505,7 @@ class GeneticAlgorithmQMLA():
         )
         model_probabilities = {
             self.chromosome_string(self.map_model_to_chromosome(mod)) : (truncated_model_fitnesses[mod] / sum_fitnesses)
-            for mod in truncated_model_list
+            for mod in truncated_model_fitnesses.keys()
         }
         self.log_print([
                 "Chromosome Selection probabilities:\n", model_probabilities

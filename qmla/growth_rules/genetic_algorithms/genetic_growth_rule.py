@@ -195,23 +195,6 @@ class Genetic(
             for m in ratings_by_name
         }
 
-        # log likelihoods evaluated against test data
-        # self.log_print(["Eval log likels:", evaluation_log_likelihoods])
-        # ll_to_score = {
-        #     a : -1/evaluation_log_likelihoods[a]
-        #     for a in evaluation_log_likelihoods
-        # }
-        # s = sum(ll_to_score.values())
-        # for a in ll_to_score:
-        #     ll_to_score[a] /= s
-
-        # sum_log_likelihoods = sum(evaluation_log_likelihoods.values())
-        # log_likelihoods = {
-        #     model_names_ids[mod] : ll_to_score[mod]
-        #     for mod in evaluation_log_likelihoods
-        # }
-        # self.log_print(["Eval log likels:", log_likelihoods])
-
         # New dictionaries which can be used as fitnesses:
         model_f_scores = {'fitness_type' : 'f_score'}
         model_hamming_distances = {'fitness_type' : 'hamming_distance'}
@@ -435,6 +418,7 @@ class Genetic(
         self.storage.fitness_df = self.fitness_df
         self.storage.true_model_chromosome = self.true_chromosome_string
         self.storage.ratings = self.ratings_class.ratings_df
+        self.storage.gene_pool = self.genetic_algorithm.gene_pool
 
         chromosomes = sorted(list(set(
             self.genetic_algorithm.previously_considered_chromosomes)))
