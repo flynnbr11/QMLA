@@ -62,8 +62,8 @@ class IsingGenetic(
         # default test - 32 generations x 16 starters
         self.fitness_method = 'elo_rating' # 'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' #  
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
-        self.max_spawn_depth = 2
-        self.initial_num_models = 10
+        self.max_spawn_depth = 16
+        self.initial_num_models = 14
 
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
@@ -121,8 +121,8 @@ class IsingGeneticTest(
         }
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(14)
-        self.max_spawn_depth = 16
+        self.initial_models = self.genetic_algorithm.random_initial_models(8)
+        self.max_spawn_depth = 2
 
 
         if self.tree_completed_initially:
@@ -131,9 +131,8 @@ class IsingGeneticTest(
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
-
         }
-        # self.timing_insurance_factor = 0.75
+        self.timing_insurance_factor = 0.5
 
 class IsingGeneticSingleLayer(
     IsingGenetic
