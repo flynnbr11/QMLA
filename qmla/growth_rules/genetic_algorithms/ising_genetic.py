@@ -199,5 +199,5 @@ class IsingGeneticSingleLayer(
         }
         
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.55
+        self.timing_insurance_factor = 0.5
 
