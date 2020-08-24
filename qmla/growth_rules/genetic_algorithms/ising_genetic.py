@@ -78,7 +78,6 @@ class IsingGenetic(
         self.fraction_particles_for_bf = 0.25
         self.fraction_own_experiments_for_bf = 0.5
         self.fraction_opponents_experiments_for_bf = 0.5
-        self.fitness_method = 'elo_ratings' 
         self.iqle_mode = False
 
         self.max_num_models_by_shape = {
@@ -122,7 +121,7 @@ class IsingGeneticTest(
 
         # test F map for random set of 10 models
         self.initial_models = self.genetic_algorithm.random_initial_models(8)
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 10
 
 
         if self.tree_completed_initially:

@@ -394,20 +394,7 @@ class GeneticAlgorithmQMLA():
         self, 
         model_fitnesses,
         **kwargs
-    ):
-        # try:
-        #     ranked_models = sorted(
-        #         model_fitnesses,
-        #         key=model_fitnesses.get,
-        #         reverse=True
-        #     )
-        # except:
-        #     self.log_print([
-        #         "Could not get ranked models. model fitnesses:", model_fitnesses
-        #     ])
-        # elite_models = ranked_models[:self.num_protected_elite_models]
-        # self.most_elite_models_by_generation[self.genetic_generation] = ranked_models[0]
-        
+    ):        
         elite_models = self.models_ranked_by_fitness[self.genetic_generation][:self.num_protected_elite_models]
         self.most_elite_models_by_generation[self.genetic_generation] = self.models_ranked_by_fitness[self.genetic_generation][0]
         # num_protected_elite_models_for_termination = 2
@@ -431,6 +418,9 @@ class GeneticAlgorithmQMLA():
                 == self.most_elite_models_by_generation[gen]
             )
             if unchanged and self.terminate_early_if_top_model_unchanged:
+                # TODO this allows for unusual case where top model unchanged in 5 generations, 
+                # but is improved upon in the subsequent generation.
+                # but since 5 generations are unchanged, termination is triggered and the new generation champion is winner
                 self.best_model_unchanged = True
                 self.log_print([
                     "Setting best_model_unchanged to {}".format(self.best_model_unchanged)

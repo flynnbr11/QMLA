@@ -208,11 +208,12 @@ class Genetic(
         model_elo_ratings['fitness_type'] = 'elo_ratings'
         model_points_distributed_by_ranking['fitness_type'] = 'ranking'
 
+        # TODO don't use available_fitness_data to fill fitness_df - get from full DF
         available_fitness_data = [
             model_f_scores, model_hamming_distances, 
             model_number_wins, model_win_ratio, 
             model_elo_ratings, model_points_distributed_by_ranking, 
-            log_likelihoods, 
+            # log_likelihoods, 
             # one_minus_pr0_diff
         ] 
 
@@ -228,7 +229,6 @@ class Genetic(
             hamming_dist = self.hamming_distance_model_comparison(
                 test_model = mod
             ) # for fitness use 1/H
-            log_likelihoods[mod] = -1 / model_storage_instance.evaluation_log_likelihood
             model_hamming_distances[mod] = (self.genetic_algorithm.num_terms - hamming_dist)/self.genetic_algorithm.num_terms
             model_f_scores[mod] = np.round(self.f_score_model_comparison(
                 test_model = mod), 2
@@ -250,7 +250,7 @@ class Genetic(
                         # from storagen instance
                         'akaike_info_criterion' : 1 / model_storage_instance.akaike_info_criterion, 
                         'bayesian_info_criterion' : (1 / model_storage_instance.bayesian_info_criterion)**2,
-                        'log_likelihood' : log_likelihoods[mod],
+                        'log_likelihood' : -1 / model_storage_instance.evaluation_log_likelihood,
                         'one_minus_pr0_diff' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
                         'eval_log_likelihood' : model_storage_instance.evaluation_log_likelihood, 
                         # relative to other models in this branch
@@ -419,6 +419,7 @@ class Genetic(
         self.storage.true_model_chromosome = self.true_chromosome_string
         self.storage.ratings = self.ratings_class.ratings_df
         self.storage.gene_pool = self.genetic_algorithm.gene_pool
+        self.storage.ratings = self.ratings_class.all_ratings
 
         chromosomes = sorted(list(set(
             self.genetic_algorithm.previously_considered_chromosomes)))
@@ -510,6 +511,7 @@ class Genetic(
     def growth_rule_specific_plots(
         self,
         save_directory,
+        champion_model_id, 
         qmla_id=0, 
     ):
         try:
@@ -602,6 +604,20 @@ class Genetic(
             self.log_print([
                 "failed to plot_models_ratings_against_generation"
             ])
+
+        try:
+            self.ratings_class.plot_rating_progress_single_model(
+                target_model_id = champion_model_id,
+                save_to_file  = os.path.join(
+                    save_directory, 
+                    "champion_ratings_progress.png"
+                )
+            )
+        except:
+            # pass
+            raise
+
+        
 
     def plot_correlation_fitness_with_f_score(
         self,

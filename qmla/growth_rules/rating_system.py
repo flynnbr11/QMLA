@@ -262,6 +262,185 @@ class RatingSystem():
             os.path.join(save_directory, 'elo_ratings_of_all_models.png')
         )
 
+    def plot_rating_progress_single_model(
+        self, 
+        **kwargs
+    ):
+        self.plot_rating_progress_single_model_static(
+            ratings_df = self.ratings_df, 
+            **kwargs
+        )
+
+    @staticmethod
+    def plot_rating_progress_single_model_static(
+        ratings_df, 
+        target_model_id, 
+        return_df=False, 
+        save_to_file=None
+    ):
+
+        # First isolate the ratings for this model
+        model_identifiers = ["a", "b"]
+        ratings_of_single_model = pd.DataFrame(
+            columns=[
+                'target', 'opponent', 
+                'initial_rating_target', 'initial_rating_opponent', 
+                'delta_r_target', 'final_rating_target',
+                'idx', 
+                'bayes_factor', 'generation', 'weight'
+            ]
+        )
+        for target in model_identifiers:
+            opponent = list(set(model_identifiers) - set(target))[0]
+
+            target_ratings = ratings_df[
+                ratings_df['model_{}'.format(target)] == target_model_id
+                ][[
+                    'model_{}'.format(target),
+                    'model_{}'.format(opponent),
+                    'r_{}_initial'.format(target),
+                    'r_{}_initial'.format(opponent),
+                    'delta_r_{}'.format(target),
+                    'r_{}_new'.format(target),
+                    'idx',
+                    'bayes_factor',
+                    'generation', 
+                    'weight',
+                    'winner'
+                ]
+            ]
+
+            target_ratings.rename(
+                columns={
+                    'model_{}'.format(target) : 'target', 
+                    'model_{}'.format(opponent) : 'opponent', 
+                    'r_{}_initial'.format(target) : 'initial_rating_target',
+                    'r_{}_initial'.format(opponent) : 'initial_rating_opponent', 
+                    'r_{}_new'.format(target) : 'final_rating_target',
+                    'delta_r_{}'.format(target) : 'delta_r_target'
+                }, 
+                inplace=True
+            )
+
+            ratings_of_single_model = ratings_of_single_model.append(target_ratings, ignore_index=True)
+
+        ratings_of_single_model['won_comparison'] = (ratings_of_single_model.winner == ratings_of_single_model.target)
+        ratings_of_single_model.sort_values('idx', inplace=True)
+        ratings_of_single_model['new_idx'] = list(range(len(ratings_of_single_model)))
+        
+        # Plot 3 perspectives on this data:
+        # 1. How rating changes
+        # 2. relative change per comparison
+        # 3. strength of evidence each comparison
+        
+        fig = plt.figure(
+            figsize=(15, 10),
+            constrained_layout=True,
+        )
+        gs = GridSpec(
+            nrows=3,
+            ncols=1,
+            hspace=0.2,
+        )
+
+
+        # Actual ratings
+        ax0 = plt.subplot(gs[0])
+        sns.lineplot(
+            data = ratings_of_single_model, 
+            x = 'new_idx', 
+            y = 'initial_rating_target',
+            label='Initial',
+            color='grey',
+            ax = ax0,
+        )
+
+        sns.lineplot(
+            data = ratings_of_single_model, 
+            x = 'new_idx', 
+            y = 'final_rating_target', 
+            label='Final',
+            color = 'blue', 
+            ax = ax0
+        )
+
+        sns.scatterplot(
+            data = ratings_of_single_model, 
+            x = 'new_idx', 
+            y = 'initial_rating_opponent',
+            label='Opponent', 
+            ax = ax0, 
+        )
+        ax0.legend()
+        ax0.set_ylabel('Rating')
+        ax0.set_xticks([])
+        ax0.set_xlabel("")
+
+        # Change in rating R
+        ax1 = plt.subplot(gs[1], sharex = ax0)
+        sns.barplot(
+            data = ratings_of_single_model, 
+            y = 'delta_r_target', 
+            x = 'new_idx',
+            hue='won_comparison',
+            palette=['red', 'green'],
+            ax = ax1
+        )
+        ax1.set_ylabel(r"$\Delta R$")
+        ax1.set_xticks([])
+        ax1.set_xlabel("")
+        ax1.get_legend().remove()
+
+        # Bayes factor comparisons
+        ax2 = plt.subplot(gs[2], sharex = ax0)
+        sns.barplot(
+            data = ratings_of_single_model, 
+            y = 'weight', 
+            x = 'new_idx',
+            hue='won_comparison',
+            palette=['red', 'green'],
+            ax = ax2
+        )
+        ax2.legend(title='Won')
+        ax2.set_ylabel(r"$log_{10}(BF)$")
+
+        generations = ratings_of_single_model.generation.unique()
+        print("Generations:", generations)
+        generation_change_indices = {
+            g : ratings_of_single_model[
+                ratings_of_single_model.generation == g].new_idx.max() + 0.5
+            for g in generations
+        }
+
+        # vertical lines separating generations
+        for ax in [ax0, ax1, ax2]:
+            for g in generation_change_indices.values():
+                ax.axvline(g,ls='--', c='grey', alpha=0.6, )
+
+        # label x-axis with generations
+        xtick_locations = [generation_change_indices[g] for g in generations]
+        xtick_locations.insert(0,0)
+        centred_xticks = [ 
+            np.mean([xtick_locations[i], xtick_locations[i+1] ]) 
+            for i in range(len(xtick_locations)-1) 
+        ]
+        ax2.set_xticklabels(generations)
+        ax2.set_xticks(centred_xticks)
+        ax2.set_xlabel("Generation")
+
+        
+        if save_to_file is not None: 
+            fig.savefig(save_to_file)
+        
+        if return_df:
+            return ratings_of_single_model
+        
+            return ratings_of_single_model
+
+
+
+
+
 
 class RateableModel():
     def __init__(
@@ -440,19 +619,27 @@ class ModifiedEloRating(ELORating):
             generation = spawn_step,      
         )
 
+
         this_round = pd.Series({
             'model_a' : model_a_id, 
             'model_b' : model_b_id, 
-            r'$R^{a}_{0}$'  : rating_a, 
-            r'$R^{b}_{0}$' : rating_b,
-            r'$R^{a}_{new}$' : rating_a_new, 
-            r'$R^{b}_{new}$' : rating_b_new,
-            r"$\Delta R^{a}$" : delta_a,
-            r"$\Delta R^{b}$" : delta_b,
+            # r'$R^{a}_{0}$'  : rating_a, 
+            # r'$R^{b}_{0}$' : rating_b,
+            # r'$R^{a}_{new}$' : rating_a_new, 
+            # r'$R^{b}_{new}$' : rating_b_new,
+            # r"$\Delta R^{a}$" : delta_a,
+            # r"$\Delta R^{b}$" : delta_b,
+            'r_a_initial'  : rating_a, 
+            'r_b_initial' : rating_b,
+            'r_a_new' : rating_a_new, 
+            'r_b_new' : rating_b_new,
+            'delta_r_a' : delta_a,
+            'delta_r_b' : delta_b,
             'bayes_factor' : bayes_factor,
             'weight' : bayes_factor_weight,
             'winner' : winner_id,
             'generation' : spawn_step, 
+            'idx' : len(self.ratings_df) # to track the order in which these ratings are recorded
         })
         
         for mod in [model_a, model_b]:
@@ -465,7 +652,7 @@ class ModifiedEloRating(ELORating):
                     'model_id' : mod.model_id, 
                     'generation' : spawn_step,
                     'rating' : mod.rating,
-                    'idx' : new_idx
+                    'idx' : new_idx,
                     
                 }
             )
@@ -477,3 +664,4 @@ class ModifiedEloRating(ELORating):
             this_round, 
             ignore_index=True
         )
+

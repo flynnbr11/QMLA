@@ -1654,7 +1654,8 @@ class QuantumModelLearningAgent():
         try:
             self.growth_class.growth_rule_specific_plots(
                 save_directory=self.qmla_controls.plots_directory,
-                qmla_id=self.qmla_controls.long_id
+                qmla_id=self.qmla_controls.long_id,
+                champion_model_id=self.champion_model_id, 
             )
         except:
             # TODO log print the reason for failure

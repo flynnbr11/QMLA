@@ -1285,6 +1285,7 @@ class GrowthRule():
     def growth_rule_specific_plots(
         self,
         save_directory, 
+        champion_model_id,
         **kwargs
     ):
         self.log_print(

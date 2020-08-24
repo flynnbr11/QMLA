@@ -409,10 +409,10 @@ else:
             )
 
 
-    qmla_instance.growth_class.growth_rule_specific_plots(
-        save_directory = qmla_controls.plots_directory,
-        qmla_id = qmla_controls.long_id
-    )
+    # qmla_instance.growth_class.growth_rule_specific_plots(
+    #     save_directory = qmla_controls.plots_directory,
+    #     qmla_id = qmla_controls.long_id
+    # )
 
     qmla_instance.store_bayes_factors_to_shared_csv(
         bayes_csv=str(qmla_controls.cumulative_csv)
