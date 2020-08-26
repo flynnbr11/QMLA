@@ -283,21 +283,6 @@ class Genetic(
                 self.fitness_df = self.fitness_df.append(
                     new_entry, ignore_index=True)
 
-            # for data in available_fitness_data:
-            #     # TODO everything in fitness_df should be accessible through fitness_by_f_score
-            #     # TODO remove fitness_df and tidy up (it is currently used for analysis in several places)
-            #     new_entry = pd.Series(
-            #         {
-            #             'generation' : self.spawn_step,
-            #             'f_score' : model_f_scores[mod], 
-            #             'fitness' : data[mod], 
-            #             'fitness_type' : data['fitness_type'],
-            #             'active_fitness_method' : self.fitness_method==data['fitness_type'],
-            #         }
-            #     )
-            #     self.fitness_df = self.fitness_df.append(
-            #         new_entry, ignore_index=True)
-
         # Extract fitness specified by user (growth rule's fitness_method attribute) 
         # to use for generating models within genetic algorithm
         fitnesses = self.fitness_by_f_score[

@@ -186,7 +186,7 @@ class IsingGeneticSingleLayer(
             rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
             self.initial_models[rand_idx] = self.true_model
 
-        self.branch_comparison_strategy = 'optimal_graph'
+        self.branch_comparison_strategy = 'all' # 'optimal_graph'
         self.tree_completed_initially = True
         if self.tree_completed_initially:
             self.max_spawn_depth = 1

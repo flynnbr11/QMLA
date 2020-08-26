@@ -207,13 +207,13 @@ def time_required(
 
             total_time_required += time_this_dimension
 
-        total_time_required = (
-            insurance_factor * np.round(total_time_required)
-        )
-        times_reqd['qmd'] = max(
-            minimum_allowed_time,
-            int(total_time_required)
-        )
+    total_time_required = (
+        insurance_factor * np.round(total_time_required)
+    )
+    times_reqd['qmd'] = max(
+        minimum_allowed_time,
+        int(total_time_required)
+    )
 
     # Get time for QHL
     try:
@@ -230,7 +230,6 @@ def time_required(
         hamiltonian_exponentiation_times[true_dimension]
         * num_particles
         * num_experiments
-        # * num_hamiltonians_per_model
     )
     times_reqd['qhl'] = max(
         minimum_allowed_time,

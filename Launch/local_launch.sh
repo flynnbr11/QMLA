@@ -41,8 +41,8 @@ debug_mode=0
 
 # growth_rule='HeisenbergGenetic'
 # growth_rule='IsingGenetic'
-growth_rule='IsingGeneticTest'
-# growth_rule='IsingGeneticSingleLayer'
+# growth_rule='IsingGeneticTest'
+growth_rule='IsingGeneticSingleLayer'
 # growth_rule='SimulatedNVCentre'
 # growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
