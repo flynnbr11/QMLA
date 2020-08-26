@@ -469,11 +469,13 @@ def correlation_fitness_f_score(
     except:
         print("ANALYSIS FAILURE: could not load fitness correlation CSV.")
         pass # allow to fail # todo just return exception
-    fig = sns.catplot(
+    fig, ax  = plt.subplots(figsize=(20, 8))
+    sns.catplot(
         y  = 'Correlation', 
         x = 'Method',
         data = fitness_correlations,
-        kind='box'
+        kind='box',
+        ax = ax, 
     )
     fig.savefig(
         os.path.join(

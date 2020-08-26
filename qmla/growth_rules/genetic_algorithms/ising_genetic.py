@@ -120,8 +120,8 @@ class IsingGeneticTest(
         }
 
         # test F map for random set of 10 models
-        self.initial_models = self.genetic_algorithm.random_initial_models(8)
-        self.max_spawn_depth = 10
+        self.initial_models = self.genetic_algorithm.random_initial_models(4)
+        self.max_spawn_depth = 2
 
 
         if self.tree_completed_initially:

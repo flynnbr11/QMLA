@@ -171,11 +171,11 @@ class Genetic(
         rankings = list(range(1, len(ranked_model_list) + 1))
         rankings.reverse()
         num_points = sum(rankings) # number of points to distribute
-        model_points_distributed_by_ranking = list(zip(
+        ranking_points = list(zip(
             ranked_models_by_name, 
             [r/num_points for r in rankings]
         ))
-        model_points_distributed_by_ranking = dict(model_points_distributed_by_ranking)
+        ranking_points = dict(ranking_points)
 
         # Model ratings  (Elo ratings)        
         precomputed_ratings = self.ratings_class.get_ratings(list(model_points.keys()))
@@ -206,13 +206,13 @@ class Genetic(
         # Alter finished dicts also useable as fitness
         # log_likelihoods['fitness_type'] = 'log_likelihoods'
         model_elo_ratings['fitness_type'] = 'elo_ratings'
-        model_points_distributed_by_ranking['fitness_type'] = 'ranking'
+        ranking_points['fitness_type'] = 'ranking'
 
         # TODO don't use available_fitness_data to fill fitness_df - get from full DF
         available_fitness_data = [
             model_f_scores, model_hamming_distances, 
             model_number_wins, model_win_ratio, 
-            model_elo_ratings, model_points_distributed_by_ranking, 
+            model_elo_ratings, ranking_points, 
             # log_likelihoods, 
             # one_minus_pr0_diff
         ] 
@@ -237,46 +237,66 @@ class Genetic(
             model_win_ratio[mod] = model_number_wins[mod]/sum_wins
 
             # store scores for offline analysis
+            this_model_fitnesses = {
+                'model' : mod, 
+                'model_id' : m, 
+                'generation' : self.spawn_step,
+                # absolute metrics (not available in real experiments)
+                'f_score' : model_f_scores[mod],
+                'hamming_distance' : model_hamming_distances[mod], 
+                # from storagen instance
+                'akaike_info_criterion' : 1 / model_storage_instance.akaike_info_criterion, 
+                'bayesian_info_criterion' : (1 / model_storage_instance.bayesian_info_criterion)**2,
+                'log_likelihood' : -1 / model_storage_instance.evaluation_log_likelihood,
+                'one_minus_pr0_diff' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
+                'eval_log_likelihood' : model_storage_instance.evaluation_log_likelihood, 
+                # relative to other models in this branch
+                'win_ratio' : model_win_ratio[mod], 
+                'elo_rating' : model_elo_ratings[mod], 
+                'original_elo_rating' : original_ratings_by_name[mod],
+                'ranking_points' : ranking_points[mod], 
+            }
+
             self.fitness_by_f_score = (
                 self.fitness_by_f_score.append(
-                    pd.Series(
-                    {
-                        'model' : mod, 
-                        'model_id' : m, 
-                        'generation' : self.spawn_step,
-                        # absolute metrics (not available in real experiments)
-                        'f_score' : model_f_scores[mod],
-                        'hamming_distance' : model_hamming_distances[mod], 
-                        # from storagen instance
-                        'akaike_info_criterion' : 1 / model_storage_instance.akaike_info_criterion, 
-                        'bayesian_info_criterion' : (1 / model_storage_instance.bayesian_info_criterion)**2,
-                        'log_likelihood' : -1 / model_storage_instance.evaluation_log_likelihood,
-                        'one_minus_pr0_diff' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
-                        'eval_log_likelihood' : model_storage_instance.evaluation_log_likelihood, 
-                        # relative to other models in this branch
-                        'win_ratio' : model_win_ratio[mod], 
-                        'elo_rating' : model_elo_ratings[mod], 
-                        'original_elo_rating' : original_ratings_by_name[mod],
-                        'model_points_distributed_by_ranking' : model_points_distributed_by_ranking[mod], 
-                    }), 
+                    pd.Series(this_model_fitnesses),
                     ignore_index=True
                 )
             )
 
-            for data in available_fitness_data:
-                # TODO everything in fitness_df should be accessible through fitness_by_f_score
-                # TODO remove fitness_df and tidy up (it is currently used for analysis in several places)
+            recorded_fitness_types = list(
+                this_model_fitnesses.keys()
+                - ['model', 'model_id', 'generation',
+                    'hamming_distance', 
+                ]
+            )
+            for f in recorded_fitness_types:
                 new_entry = pd.Series(
                     {
-                        'generation' : self.spawn_step,
-                        'f_score' : model_f_scores[mod], 
-                        'fitness' : data[mod], 
-                        'fitness_type' : data['fitness_type'],
-                        'active_fitness_method' : self.fitness_method==data['fitness_type'],
+                        'generation' : this_model_fitnesses['generation'],
+                        'f_score' : this_model_fitnesses['f_score'], 
+                        'fitness' : this_model_fitnesses[f], 
+                        'fitness_type' : f,
+                        'active_fitness_method' : self.fitness_method==f,
                     }
                 )
                 self.fitness_df = self.fitness_df.append(
                     new_entry, ignore_index=True)
+
+            # for data in available_fitness_data:
+            #     # TODO everything in fitness_df should be accessible through fitness_by_f_score
+            #     # TODO remove fitness_df and tidy up (it is currently used for analysis in several places)
+            #     new_entry = pd.Series(
+            #         {
+            #             'generation' : self.spawn_step,
+            #             'f_score' : model_f_scores[mod], 
+            #             'fitness' : data[mod], 
+            #             'fitness_type' : data['fitness_type'],
+            #             'active_fitness_method' : self.fitness_method==data['fitness_type'],
+            #         }
+            #     )
+            #     self.fitness_df = self.fitness_df.append(
+            #         new_entry, ignore_index=True)
 
         # Extract fitness specified by user (growth rule's fitness_method attribute) 
         # to use for generating models within genetic algorithm
