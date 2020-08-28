@@ -33,7 +33,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # if true_model is None:
         #     true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2'
         # true_model = qmla.construct_models.alph(true_model)
-        self.true_n_qubits = 5
+        self.true_n_qubits = 6
         self.available_axes = ['x', 'y', 'z']
         self._set_true_params()
         self.true_model = '+'.join(
@@ -141,9 +141,10 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         available_axes = self.available_axes
         # self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
-        self._setup_true_model_secular_approx(
-            n_qubits=n_qubits
-        ) 
+        # self._setup_true_model_secular_approx(
+        #     n_qubits=n_qubits
+        # ) 
+        self.true_model_terms_params = self._get_secular_approx_true_params(4, n_qubits)
         self._setup_available_terms_gali_model(
             n_qubits=n_qubits, 
             available_axes = available_axes
@@ -224,6 +225,39 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
                 available_terms.append(t)
         
         self.available_terms = available_terms
+
+    def _get_secular_approx_true_params(
+        self, 
+        num_qubits = 2,
+        total_num_qubits = 5, 
+    ):
+        nuclei_terms = {
+            'x' : 66e3, 
+            'y' : 66e3, 
+            'z' : 15e3
+        }
+        
+        true_params = {}      
+        # rotation of the spin
+        spin_term = 'pauliSet_1_z_d{N}'.format(N=total_num_qubits)
+        true_params[spin_term] = 2e9
+        
+        for n in range(2, 1+num_qubits):
+            coupling_term = 'pauliSet_1J{n}_zJz_d{N}'.format(
+                n=n, N=total_num_qubits)
+            true_params[coupling_term] = 0.2e6
+
+            # nuclei rotations
+            for pauli in ['x', 'y', 'z']:
+
+                    nuclei_rotation = 'pauliSet_{n}_{p}_d{N}'.format(
+                        n = n, 
+                        p = pauli, 
+                        N = total_num_qubits
+                    )
+                    true_params[nuclei_rotation] = nuclei_terms[pauli]
+
+        return true_params
 
     def get_prior(self, model_name, **kwargs):
         prior = qmla.shared_functionality.prior_distributions.prelearned_true_parameters_prior(

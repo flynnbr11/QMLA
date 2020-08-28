@@ -149,6 +149,8 @@ class IsingGeneticSingleLayer(
             **kwargs
         )
 
+        # pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5
+
         test_fitness_models = [
             # F=0
             'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', 
@@ -179,7 +181,7 @@ class IsingGeneticSingleLayer(
             # F = 1
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         ]
-        # 10 models per layer, fully connected -> 45 comparisons
+        # 10 models per layer, fully connected -> 45 comparisons using optimal_graph; 90 using all
         self.initial_models = list(np.random.choice(test_fitness_models, 14, replace=False))
 
         if self.true_model not in self.initial_models:
