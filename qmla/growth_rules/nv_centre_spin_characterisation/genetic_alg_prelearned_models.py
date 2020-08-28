@@ -33,7 +33,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # if true_model is None:
         #     true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2'
         # true_model = qmla.construct_models.alph(true_model)
-        self.true_n_qubits = 5
+        self.true_n_qubits = 6
         self.available_axes = ['x', 'y', 'z']
         self._set_true_params()
         self.true_model = '+'.join(
@@ -131,7 +131,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         }
         # self.num_processes_to_parallelise_over = 16
         self.num_processes_to_parallelise_over = min(16, len(self.initial_models))
-        self.timing_insurance_factor = 1
+        self.timing_insurance_factor = 1.25
 
     def _set_true_params(self):
 
