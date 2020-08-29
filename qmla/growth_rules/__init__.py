@@ -13,3 +13,5 @@ from qmla.growth_rules.presentation_plot_generation import *
 from qmla.growth_rules.nv_centre_spin_characterisation import * 
 from qmla.growth_rules.lattice_sets import * 
 from qmla.growth_rules.genetic_algorithms import * 
+
+from qmla.growth_rules.demo import * 

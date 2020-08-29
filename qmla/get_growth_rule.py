@@ -77,6 +77,8 @@ growth_classes = {
         GR.FermiHubbardLatticeSet,
 
     # Others
+    'Demonstration':
+        GR.Demonstration,
     'basic_lindbladian':
         GR.Lindbladian,
     'GrowthRule':

@@ -32,9 +32,11 @@ class FermiHubbardLatticeSet(
             '_2_site_chain', 
             '_3_site_chain', 
             '_3_site_lattice_fully_connected', 
-            '_4_site_lattice_fully_connected',
-            '_4_site_square',
-        ]
+            # '_4_site_lattice_fully_connected',
+            # '_4_site_square',
+        ] # TODO excluding 4 sites models for tests against other GRs -- reinstate afterwards
+
+
         # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
         self.available_lattices_by_name = {
             k : topology_predefined.__getattribute__(k)
