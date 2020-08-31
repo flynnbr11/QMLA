@@ -123,7 +123,7 @@ class BaseHeuristicQMLA(qi.Heuristic):
         new_experiment =  self.design_experiment(**kwargs)
         new_time = new_experiment['t']
         if new_time > 1e6: 
-            # TODO understamd cutoff at which time 
+            # TODO understand cutoff at which time 
             # calculation becomes unstable
             new_time = np.random.uniform(1e5, 1e6)
             # self.log_print([
