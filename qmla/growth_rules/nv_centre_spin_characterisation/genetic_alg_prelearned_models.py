@@ -33,7 +33,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # if true_model is None:
         #     true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2'
         # true_model = qmla.construct_models.alph(true_model)
-        self.true_n_qubits = 6
+        self.true_n_qubits = 5
         self.available_axes = ['x', 'y', 'z']
         self._set_true_params()
         self.true_model = '+'.join(
@@ -144,7 +144,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # self._setup_true_model_secular_approx(
         #     n_qubits=n_qubits
         # ) 
-        self.true_model_terms_params = self._get_secular_approx_true_params(3, n_qubits)
+        self.true_model_terms_params = self._get_secular_approx_true_params(4, n_qubits)
         self._setup_available_terms_gali_model(
             n_qubits=n_qubits, 
             available_axes = available_axes
