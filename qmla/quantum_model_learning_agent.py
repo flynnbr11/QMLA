@@ -1643,6 +1643,10 @@ class QuantumModelLearningAgent():
         champ_model = self.get_model_storage_instance_by_id(
             self.champion_model_id)
 
+        champ_model.compute_expectation_values(
+            times=self.times_to_plot,
+        )
+
         # Get metrics for all models tested
         for i in self.models_learned:
             # dict of all Bayes factors for each model considered.

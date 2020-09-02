@@ -23,3 +23,8 @@ class Demonstration(
         )
         self.true_model = 'pauliSet_1_x_d1+pauliSet_1_y_d1'
         self.max_num_probe_qubits = 3
+
+        self.true_model_terms_params = {
+            'pauliSet_1_x_d1' : 0.6, 
+            'pauliSet_1_y_d1' : 0.35, 
+        }

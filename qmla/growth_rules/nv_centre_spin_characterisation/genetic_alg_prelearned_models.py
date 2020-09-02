@@ -131,7 +131,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         }
         # self.num_processes_to_parallelise_over = 16
         self.num_processes_to_parallelise_over = min(16, len(self.initial_models))
-        self.timing_insurance_factor = 4
+        self.timing_insurance_factor = 3
 
     def _set_true_params(self):
 
