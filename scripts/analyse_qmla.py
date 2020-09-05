@@ -306,7 +306,8 @@ if gather_summary_results:
         )
     except:
         print("ANALYSIS FAILURE: Correlation plot b/w fitness and F-score.")
-        pass        
+        raise
+        # pass        
         
     # Find number of occurences of each model
     # quite costly so it is optional

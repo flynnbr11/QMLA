@@ -69,8 +69,9 @@ def plot_qmla_branches(q, return_graphs=False):
         # colour maps
         f_score_cmap = q.growth_class.f_score_cmap
 
-        bf_cmap = plt.cm.get_cmap('PRGn')
-        bf_cmap = qmla.utilities.truncate_colormap(bf_cmap, 0.05, 0.95)
+        # bf_cmap = plt.cm.get_cmap('PRGn')
+        # bf_cmap = qmla.utilities.truncate_colormap(bf_cmap, 0.05, 0.95)
+        bf_cmap = q.growth_class.bf_cmap
         min_bf = q.bayes_factors_df.log10_bayes_factor.min()
         max_bf = q.bayes_factors_df.log10_bayes_factor.max()
         norm = plt.Normalize(vmin = min_bf, vmax = max_bf)

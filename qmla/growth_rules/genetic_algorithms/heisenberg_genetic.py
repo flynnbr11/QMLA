@@ -86,7 +86,6 @@ class HeisenbergGenetic(
 
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.fitness_method = 'elo_ratings' # 'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' #  
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.max_spawn_depth = 16
         self.initial_num_models = 14
@@ -104,7 +103,6 @@ class HeisenbergGenetic(
         self.fraction_particles_for_bf = 0.25
         self.fraction_own_experiments_for_bf = 0.5
         self.fraction_opponents_experiments_for_bf = 0.5
-        self.fitness_method = 'elo_rating' 
         self.iqle_mode = False
 
         self.max_num_models_by_shape = {

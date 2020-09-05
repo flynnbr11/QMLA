@@ -65,7 +65,7 @@ class Genetic(
         ) # for use when ranking/rating models
 
         self.branch_champion_selection_stratgey = 'fitness' # 'ratings'
-        self.fitness_method = 'f_scores' # 'elo_ratings'
+        self.fitness_method = 'elo_rating'
         self.prune_completed_initially = True
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
@@ -125,6 +125,27 @@ class Genetic(
         self.max_time_to_consider = 15
         self.min_param = 0.35
         self.max_param = 0.65
+
+
+        self.fitness_mechanism_names = {
+            'f_score' : r"$F_1$", 
+            'hamming_distance' : r"$H$", 
+            'inverse_ll' : r"$g^L$", 
+            'inverse_ll_sq' : r"$-\frac{1}{L^2}$", 
+            'akaike_info_criterion' : r"$\frac{1}{AIC}$",
+            'aicc' :  r"$\frac{1}{AICc}$", 
+            'aic_sq' :  r"$\frac{1}{AIC^2}$",
+            'bayesian_info_criterion' : r"$\frac{1}{BIC}$", 
+            'bic_sq' : r"$\frac{1}{BIC^2}$",
+            'akaike_weight' : r"$g^{A}$", 
+            'bayes_weight' : r"$g^{B}$", 
+            'mean_residuals' : r"$g^{r}$", 
+            'mean_residuals_sq' : r"$(g^{r})^2$", 
+            'bf_points' : r"$g^{p}$",
+            'bf_rank' : r"$g^{R}$",  
+            'elo_rating' : r"$g^{E}$", 
+        }
+
 
     def nominate_champions(self):
         # Choose model with highest fitness on final generation
@@ -200,7 +221,7 @@ class Genetic(
         model_hamming_distances = {'fitness_type' : 'hamming_distance'}
         model_number_wins = {'fitness_type' : 'number_wins'}
         model_win_ratio = {'fitness_type' : 'win_ratio'}
-        one_minus_pr0_diff = {'fitness_type' : 'one_minus_pr0_diff'}
+        mean_residuals = {'fitness_type' : 'mean_residuals'}
         log_likelihoods = {'fitness_type' : 'log_likelihoods'}
 
         # Alter finished dicts also useable as fitness
@@ -209,13 +230,29 @@ class Genetic(
         ranking_points['fitness_type'] = 'ranking'
 
         # TODO don't use available_fitness_data to fill fitness_df - get from full DF
-        available_fitness_data = [
-            model_f_scores, model_hamming_distances, 
-            model_number_wins, model_win_ratio, 
-            model_elo_ratings, ranking_points, 
-            # log_likelihoods, 
-            # one_minus_pr0_diff
-        ] 
+        # available_fitness_data = [
+        #     model_f_scores, model_hamming_distances, 
+        #     model_number_wins, model_win_ratio, 
+        #     model_elo_ratings, ranking_points, 
+        #     # log_likelihoods, 
+        #     # mean_residuals
+        # ] 
+
+        model_instances = [
+            self.tree.model_storage_instances[m] for m in model_ids
+        ]
+        aic_values = {
+            model.model_id : model.akaike_info_criterion
+            for model in model_instances
+        }
+        aicc_values = {
+            model.model_id : model.akaike_info_criterion_c
+            for model in model_instances
+        }
+        min_aicc = min(aicc_values.values())
+        self.log_print([
+            "At generation {}, AIC of models: {}".format(self.spawn_step, aic_values)
+        ])
 
         # store info on each model for analysis
         for m in model_ids:
@@ -238,23 +275,31 @@ class Genetic(
 
             # store scores for offline analysis
             this_model_fitnesses = {
+                # When adding a new fitness fnc -- add a name in self.fitness_mechanism_names
                 'model' : mod, 
                 'model_id' : m, 
                 'generation' : self.spawn_step,
                 # absolute metrics (not available in real experiments)
                 'f_score' : model_f_scores[mod],
                 'hamming_distance' : model_hamming_distances[mod], 
-                # from storagen instance
+                # from storage instance
+                # 'eval_log_likelihood' : model_storage_instance.evaluation_log_likelihood, 
+                'inverse_ll' : -1 / model_storage_instance.evaluation_log_likelihood,
+                'inverse_ll_sq' : (-1 / model_storage_instance.evaluation_log_likelihood)**2,
                 'akaike_info_criterion' : 1 / model_storage_instance.akaike_info_criterion, 
+                'aicc' : 1 / model_storage_instance.akaike_info_criterion_c, 
+                'aic_sq' : (1 / model_storage_instance.akaike_info_criterion)**2, 
                 'bayesian_info_criterion' : (1 / model_storage_instance.bayesian_info_criterion)**2,
-                'log_likelihood' : -1 / model_storage_instance.evaluation_log_likelihood,
-                'one_minus_pr0_diff' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
-                'eval_log_likelihood' : model_storage_instance.evaluation_log_likelihood, 
+                'bic_sq' : (1 / model_storage_instance.bayesian_info_criterion)**2,
+                'akaike_weight' : np.e**( (min_aicc - model_storage_instance.akaike_info_criterion_c)/2),
+                'bayes_weight' : np.e**(-1*model_storage_instance.bayesian_info_criterion/2),
+                'mean_residuals' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
+                'mean_residuals_sq' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
                 # relative to other models in this branch
-                'win_ratio' : model_win_ratio[mod], 
+                'bf_points' : model_win_ratio[mod], 
+                'bf_rank' : ranking_points[mod], 
                 'elo_rating' : model_elo_ratings[mod], 
-                'original_elo_rating' : original_ratings_by_name[mod],
-                'ranking_points' : ranking_points[mod], 
+                # 'original_elo_rating' : original_ratings_by_name[mod],
             }
 
             self.fitness_by_f_score = (
@@ -277,6 +322,7 @@ class Genetic(
                         'f_score' : this_model_fitnesses['f_score'], 
                         'fitness' : this_model_fitnesses[f], 
                         'fitness_type' : f,
+                        'fitness_type_name' : self.fitness_mechanism_names[f],
                         'active_fitness_method' : self.fitness_method==f,
                     }
                 )
@@ -311,11 +357,9 @@ class Genetic(
         model_list,
         **kwargs
     ):       
-        # Analyse the previous generation using results passed from QMLA
-        # genetic_algorithm_fitnesses = self.analyse_generation(**kwargs)
+        # Analysis of the previous generation is called by the growth rule tree. 
         genetic_algorithm_fitnesses = self.model_fitness_by_generation[self.spawn_step]
       
-        # self.spawn_step += 1
         self.log_print([
             "Spawn step:", self.spawn_step,
         ])
@@ -650,7 +694,8 @@ class Genetic(
                     
                     corr = {
                         'Generation' : g,
-                        'Method' : t, 
+                        'Method' : self.fitness_mechanism_names[t], 
+                        # 'Method' : t, 
                         'Correlation' : corr
                     }
                     correlations = correlations.append(
@@ -835,7 +880,8 @@ class Genetic(
         )
         label_fontsize = 10
         # TODO get f score cmap from growth rule
-        f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"])
+        # f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"])
+        f_score_cmap = self.f_score_cmap
 
         # Bar plots for probability of gene being selected, coloured by f score
         ax = fig.add_subplot(gs[0,0])

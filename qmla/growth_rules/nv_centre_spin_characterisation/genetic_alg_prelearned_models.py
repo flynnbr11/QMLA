@@ -100,13 +100,16 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Genetic algorithm options
         self.tree_completed_initially =  False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
-        self.fitness_method = 'one_minus_pr0_diff' # 'elo_rating'  # 'f_score'
-        # self.fitness_method = 'bayesian_info_criterion' # 'akaike_info_criterion'
+        self.fitness_method = 'mean_residuals_squared' 
 
         test = False
+        single_gen_force_true_model = True
         if test:
             num_models_per_generation = 4
             self.max_spawn_depth = 3
+        elif single_gen_force_true_model:
+            num_models_per_generation = 6
+            self.max_spawn_depth = 1
         else:
             num_models_per_generation =  12*self.true_n_qubits # TODO INCREASE NUM EVAL POINTS
             self.max_spawn_depth =  10*self.true_n_qubits
@@ -116,6 +119,10 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         ]
         if self.tree_completed_initially:
             self.initial_models = self.qhl_models
+        # if single_gen_force_true_model:
+        #     if self.true_model not in self.initial_models:
+        #         self.initial_models[-1] = self.true_model
+                
 
         # Logistics
         self.force_evaluation = True

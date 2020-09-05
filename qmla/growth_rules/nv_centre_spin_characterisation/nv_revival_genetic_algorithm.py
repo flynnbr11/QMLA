@@ -51,7 +51,6 @@ class NVCentreRevivalSimulation(
         # Genetic algorithm options
         self.tree_completed_initially = False
         self.branch_comparison_strategy = 'optimal_graph'
-        self.fitness_method =  'elo_ratings'  # 'f_score'
 
         num_models_per_generation =  14
         self.max_spawn_depth = 10

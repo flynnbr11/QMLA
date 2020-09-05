@@ -67,7 +67,6 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         # Genetic algorithm options
         self.tree_completed_initially = False
         # self.branch_comparison_strategy = 'optimal_graph'
-        self.fitness_method =  'elo_ratings'  # 'f_score'
 
         num_models_per_generation = 14
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)

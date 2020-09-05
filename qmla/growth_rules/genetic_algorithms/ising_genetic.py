@@ -60,7 +60,6 @@ class IsingGenetic(
 
         self.max_num_probe_qubits = self.num_sites
         # default test - 32 generations x 16 starters
-        self.fitness_method = 'elo_rating' # 'win_ratio'  # 'number_wins'  # 'ranking' # 'f_score' # 'hamming_distance' #  
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.max_spawn_depth = 16
         self.initial_num_models = 14
@@ -182,8 +181,8 @@ class IsingGeneticSingleLayer(
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
         ]
         # 10 models per layer, fully connected -> 45 comparisons using optimal_graph; 90 using all
-        self.initial_models = list(np.random.choice(test_fitness_models, 14, replace=False))
 
+        self.initial_models = list(np.random.choice(test_fitness_models, 15, replace=False))
         if self.true_model not in self.initial_models:
             rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
             self.initial_models[rand_idx] = self.true_model

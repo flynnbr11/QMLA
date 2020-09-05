@@ -204,16 +204,6 @@ class RatingSystem():
         # f_score_cmap = plt.cm.get_cmap('Accent')
         f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"]) # TODO pass from GR initialisation
 
-        # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.6, 1.0)
-
-
-
-        # colour_by_f = {
-        #     # np.round(f, 2) : my_cmap[ np.where( available_f_scores == f ) ][0]
-        #     np.round(f, 2) : f_score_cmap[ np.where( available_f_scores == f ) ][0]
-        #     for f in available_f_scores
-        # }
-
         model_coloured_by_f = {
             # m : colour_by_f[ qmla.utilities.round_nearest(f_scores[m], f_granularity) ]
             m : f_score_cmap(f_scores[m])
@@ -609,7 +599,7 @@ class ModifiedEloRating(ELORating):
         model_a.update_rating(
             opponent_id = model_b_id, 
             winner_id = winner_id,
-            new_rating = rating_a_new       ,
+            new_rating = rating_a_new,
             generation = spawn_step,      
         )
         model_b.update_rating(

@@ -601,6 +601,7 @@ class ModelInstanceForLearning():
         learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
         learned_info['akaike_info_criterion'] = self.akaike_info_criterion
+        learned_info['akaike_info_criterion_c'] = self.akaike_info_criterion_c
         learned_info['bayesian_info_criterion'] = self.bayesian_info_criterion
         learned_info['evaluation_median_likelihood'] = self.evaluation_median_likelihood
         learned_info['evaluation_pr0_diffs'] = self.evaluation_pr0_diffs
@@ -777,10 +778,27 @@ class ModelInstanceForLearning():
                 np.median(evaluation_updater.normalization_record),
                 2
             )
-            self.evaluation_pr0_diffs = np.array(evaluation_qinfer_model.store_p0_diffs)
+            self.evaluation_pr0_diffs = np.array(evaluation_qinfer_model.store_p0_diffs)[:,0]
         
         
-        self.akaike_info_criterion = 2*len(self.model_terms_names) - 2*self.evaluation_log_likelihood
+        n_terms = len(self.model_terms_names)
+        n_samples = len(self.evaluation_normalization_record)
+
+        self.akaike_info_criterion = 2*n_terms - 2*self.evaluation_log_likelihood
+        try:
+            self.akaike_info_criterion_c = (
+                self.akaike_info_criterion 
+                + 2*(n_terms**2 + n_terms)/(n_samples - n_terms - 1)
+            )
+        except:
+            # when n_samples - n_terms - 1 == 0 
+            # TODO this is made up to avoid errors - find a better way
+            # AICc should not be trusted in these cases b/c sample size is so small 
+            self.akaike_info_criterion_c = (
+                self.akaike_info_criterion 
+                + 2*(n_terms**2 + n_terms)/(n_samples - n_terms)
+            )
+
         self.bayesian_info_criterion = (
             self.num_parameters * np.log(self.num_evaluation_points)
             - 2*self.evaluation_log_likelihood
