@@ -263,7 +263,7 @@ class GeneticAlgorithmQMLA():
         selected_entry = self.chrom_pair_df.loc[selected_id]
         # Drop so it can't be chosen again
         self.chrom_pair_df.drop(selected_id, inplace=True)
-        self.log_print("[chrom pair df has {} options remaining".format(len(self.chrom_pair_df))])
+        self.log_print(["chrom pair df has {} options remaining".format(len(self.chrom_pair_df))])
 
         selection = {
             'chromosome_1' : selected_entry['c1'], 
