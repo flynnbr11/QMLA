@@ -538,28 +538,36 @@ class GeneticAlgorithmQMLA():
             for cut1 in range(1, len(c1)-2):
                 # every possible cut down these two chromosomes is equally probable of being selected
                 # therefore the same pair can be selected twice with different cuts
-                this_pair_df = pd.DataFrame(
-                    np.array([
-                        [
-                            c1, c2, 
-                            np.round(pair_prob, 2), 
-                            cut1, 
-                            chromosome_probabilities[c1], chromosome_probabilities[c2],
-                            force_mutation
-                        ]
-                    ]),
-                    columns=[
-                        'c1', 'c2', 
-                        'probability', 
-                        'cut1', 'c1_prob', 
-                        'c2_prob',
-                        'force_mutation'
-                    ]
+                # this_pair_df = pd.DataFrame(
+                #     np.array([
+                #         [
+                #             c1, c2, 
+                #             np.round(pair_prob, 2), 
+                #             cut1, 
+                #             chromosome_probabilities[c1], chromosome_probabilities[c2],
+                #             force_mutation
+                #         ]
+                #     ]),
+                #     columns=[
+                #         'c1', 'c2', 
+                #         'probability', 
+                #         'cut1', 'c1_prob', 
+                #         'c2_prob',
+                #         'force_mutation'
+                #     ]
+                # )
+                this_pair_df = pd.Series(
+                    {
+                        'c1' : c1, 
+                        'c2' : c2, 
+                        'probability' : np.round(pair_prob, 2), 
+                        'cut1' : cut1, 
+                        'c1_prob' : chromosome_probabilities[c1], 
+                        'c2_prob' : chromosome_probabilities[c2],
+                        'force_mutation' : force_mutation
+                    }
                 )
-                self.chrom_pair_df = self.chrom_pair_df.append(
-                    this_pair_df, 
-                    ignore_index=True
-                )
+                self.chrom_pair_df.loc[len(self.chrom_pair_df)] = this_pair_df
         self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
         self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         self.log_print([
