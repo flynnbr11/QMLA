@@ -253,7 +253,7 @@ class GeneticAlgorithmQMLA():
         self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         pair_ids = list(self.chrom_pair_df.index)
         pair_probs = [ self.chrom_pair_df.loc[i].probability for i in pair_ids]
-        # self.log_print( ["Number available pairs:", len(pair_ids)] )
+        self.log_print( ["Number available pairs:", len(pair_ids)] )
 
         # randomly select a pair from list of pairs
         selected_id = np.random.choice(
@@ -262,7 +262,9 @@ class GeneticAlgorithmQMLA():
         )
         selected_entry = self.chrom_pair_df.loc[selected_id]
         # Drop so it can't be chosen again
-        self.chrom_pair_df = self.chrom_pair_df.drop(selected_id, inplace=True, )
+        self.chrom_pair_df.drop(selected_id, inplace=True)
+        self.log_print("[chrom pair df has {} options remaining".format(len(self.chrom_pair_df))])
+
         selection = {
             'chromosome_1' : selected_entry['c1'], 
             'chromosome_2' : selected_entry['c2'],
@@ -558,6 +560,27 @@ class GeneticAlgorithmQMLA():
                     this_pair_df, 
                     ignore_index=True
                 )
+        self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
+        self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
+        self.log_print([
+            "starting chromosome pair dataframe setup has len {}, e.g. \n {}".format(
+                len(self.chrom_pair_df), self.chrom_pair_df[:10]
+            )
+        ])
+
+        pair_idx = self.chrom_pair_df.index
+        probabilities = self.chrom_pair_df.probability
+
+        pair_selection_order = np.random.choice(
+            a = pair_idx,
+            size = len(pair_idx), 
+            p = probabilities,
+            replace=False
+        )
+        self.log_print([
+            "pair_selection_order: \n", repr(pair_selection_order)
+        ])
+        return pair_selection_order
 
     ######################
     # Implement entire genetic algorithm iteration
@@ -597,18 +620,39 @@ class GeneticAlgorithmQMLA():
         chromosome_selection_probabilities = self.get_selection_probabilities(
             model_fitnesses = model_fitnesses,
         )
-
-        self.prepare_chromosome_pair_dataframe(
+        t_init = time.time()
+        pair_selection_order = iter(self.prepare_chromosome_pair_dataframe(
             chromosome_probabilities=chromosome_selection_probabilities
-        )
+        ))
+        init_num_chrom_pairs = len(self.chrom_pair_df)
+        self.log_print(["Time to prepare chromosome pair df for gen {} = {}".format(
+            self.genetic_generation, time.time()-t_init
+        )])
 
         self.unique_pair_combinations_considered = []
         num_loops_to_find_new_chromosome = 0
         force_mutation = False
         num_genes_to_force_mutate = 0
-        
+        t_init = time.time()
         while len(proposed_chromosomes) < num_models_for_next_generation:
-            selection = self.selection()
+            # selection = self.selection()
+            try:
+                selected_id = next(pair_selection_order)
+            except:
+                self.log_print([
+                    "no pairs remaining." #  TODO now what?
+                ])
+                raise
+            selected_entry = self.chrom_pair_df.loc[selected_id]
+            selection = {
+                'chromosome_1' : selected_entry['c1'], 
+                'chromosome_2' : selected_entry['c2'],
+                'other_data' : { 
+                    'cut' : int(selected_entry['cut1']),
+                    'force_mutation' : bool(selected_entry['force_mutation'])
+                }
+            }
+
             suggested_chromosomes = self.crossover(
                 selection = selection
             )
@@ -639,6 +683,9 @@ class GeneticAlgorithmQMLA():
                         'generation' : self.genetic_generation,
                     })
                     self.birth_register.loc[len(self.birth_register)] = birth
+                    self.log_print([
+                        "Registering birth"
+                    ])
 
             if len(self.chrom_pair_df) == 0 :
                 # already tried every available pair 
@@ -654,13 +701,13 @@ class GeneticAlgorithmQMLA():
 
         # chop extra chromosomes if generated
         proposed_chromosomes = proposed_chromosomes[:num_models_for_next_generation]
-        self.log_print(
-            [
-                "Proposed chromosome list now has {} elements.".format(
-                    len(proposed_chromosomes)
-                )
-            ]
-        )
+        self.log_print([
+            "Proposed chromosome list now has {} elements after {} trials over {} seconds.".format(
+                len(proposed_chromosomes), 
+                init_num_chrom_pairs - len(self.chrom_pair_df), 
+                time.time() - t_init
+            )
+        ])
         self.previously_considered_chromosomes.extend([
             self.chromosome_string(r) for r in proposed_chromosomes
             ]

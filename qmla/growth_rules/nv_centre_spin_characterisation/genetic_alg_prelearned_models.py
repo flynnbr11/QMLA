@@ -102,11 +102,11 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method = 'rs_median' # 'mean_residuals_squared' 
 
-        test = False
+        test = True
         single_gen_force_true_model = False
         if test:
             num_models_per_generation = 4
-            self.max_spawn_depth = 3
+            self.max_spawn_depth = 2
         elif single_gen_force_true_model:
             num_models_per_generation = 6
             self.max_spawn_depth = 1
@@ -307,10 +307,6 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             num_eval_points = self.num_eval_points,
             **kwargs
         )
-
-        self.log_print([
-            "Evaluation data:", eval_data
-        ])
 
         return eval_data
 
