@@ -7,6 +7,7 @@ import csv
 import pandas as pd
 import seaborn as sns
 
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
@@ -36,9 +37,10 @@ def bayes_factor_f_score_heatmap(bayes_factors_df):
         tight_layout=True
     )
     gs = GridSpec(
-        nrows=2,
+        nrows=1,
         ncols=2,
-        height_ratios=[6, 1]
+        width_ratios=[11, 1]
+        # height_ratios=[6, 1]
     )
 
     bayes_factor_by_f_score = pd.pivot_table(
@@ -51,36 +53,39 @@ def bayes_factor_f_score_heatmap(bayes_factors_df):
 
     mask = np.tri(bayes_factor_by_f_score.shape[0], k=0).T
     ax1 = fig.add_subplot(gs[0,0])
-    ax2 = fig.add_subplot(gs[0,1])
-    cbar_ax = fig.add_subplot(gs[1,:])
+    # ax2 = fig.add_subplot(gs[0,1])
+    cbar_ax = fig.add_subplot(gs[:,1])
 
     sns.heatmap(
         bayes_factor_by_f_score,
-        cmap='RdYlGn',
+        # cmap='RdYlGn',
+        cmap=matplotlib.cm.PRGn, # TODO get from GR?
         mask=mask,
         annot=True, 
         ax = ax1,
         cbar_ax = cbar_ax,
-        cbar_kws={"orientation": "horizontal"}
+        cbar_kws={
+            # "orientation": "horizontal"
+            "orientation": "vertical"
+        }
     )
     ax1.set_ylabel('$F(a)$')
     ax1.set_xlabel('$F(b)$')
     ax1.set_title('$F(A) > F(B)$')
 
-
-    mask = np.tri(bayes_factor_by_f_score.shape[0], k=-1)
-    sns.heatmap(
-        bayes_factor_by_f_score,
-        cmap='RdYlGn',
-        mask=mask,
-        annot=True, 
-        ax = ax2,
-        cbar_ax = cbar_ax,
-        cbar_kws={"orientation": "horizontal"}
-    )
-    ax2.set_ylabel('$F(a)$')
-    ax2.set_xlabel('$F(b)$')
-    ax2.set_title('$F(A) \leq F(B)$')
+    # mask = np.tri(bayes_factor_by_f_score.shape[0], k=-1)
+    # sns.heatmap(
+    #     bayes_factor_by_f_score,
+    #     cmap='RdYlGn',
+    #     mask=mask,
+    #     annot=True, 
+    #     ax = ax2,
+    #     cbar_ax = cbar_ax,
+    #     cbar_kws={"orientation": "horizontal"}
+    # )
+    # ax2.set_ylabel('$F(a)$')
+    # ax2.set_xlabel('$F(b)$')
+    # ax2.set_title('$F(A) \leq F(B)$')
 
     cbar_ax.set_title('$log_{10} BF$', fontsize=20)
 

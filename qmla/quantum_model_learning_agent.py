@@ -2669,7 +2669,8 @@ class QuantumModelLearningAgent():
         plt.clf()
         s = sns.heatmap(
             bayes_factor_by_id,
-            cmap='RdYlGn',
+            # cmap='RdYlGn',
+            cmap=self.growth_class.bf_cmap, 
             mask=mask,
             annot=False
         )

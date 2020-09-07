@@ -44,8 +44,6 @@ class GeneticAlgorithmQMLA():
         else:
             self.true_model = true_model
 
-
-
         self.true_chromosome = self.map_model_to_chromosome(self.true_model)
         self.true_chromosome_string = self.chromosome_string(
             self.true_chromosome
@@ -264,7 +262,7 @@ class GeneticAlgorithmQMLA():
         )
         selected_entry = self.chrom_pair_df.loc[selected_id]
         # Drop so it can't be chosen again
-        self.chrom_pair_df = self.chrom_pair_df.drop(selected_id)
+        self.chrom_pair_df = self.chrom_pair_df.drop(selected_id, inplace=True, )
         selection = {
             'chromosome_1' : selected_entry['c1'], 
             'chromosome_2' : selected_entry['c2'],

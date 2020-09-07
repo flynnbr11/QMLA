@@ -465,7 +465,6 @@ class GrowthRule():
         }
         self.num_processes_to_parallelise_over = 6
         self.timing_insurance_factor = 1
-        # self.f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"])
         self.f_score_cmap = matplotlib.cm.Spectral
         self.bf_cmap = matplotlib.cm.PRGn
 

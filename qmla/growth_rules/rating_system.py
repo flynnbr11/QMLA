@@ -146,6 +146,7 @@ class RatingSystem():
     def plot_models_ratings_against_generation(
         self, 
         f_scores,
+        f_score_cmap,
         save_directory,
     ):
 
@@ -193,16 +194,17 @@ class RatingSystem():
 
         # First prepare a dictionary to map model id to a colour corresponding to F-score
         f_granularity = 0.05
-        f_score_colour_map = plt.cm.Spectral
+        # f_score_colour_map = plt.cm.Spectral
+        # f_score_colour_map = f_score_cmap
 
         available_f_scores = np.linspace(0, 1, 1 + (1/f_granularity) )
-        my_cmap = f_score_colour_map(available_f_scores)
+        # my_cmap = f_score_colour_map(available_f_scores)
 
         # f_score_cmap = plt.cm.get_cmap('Blues')
         # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
         # f_score_cmap = plt.cm.get_cmap('tab20c_r')
         # f_score_cmap = plt.cm.get_cmap('Accent')
-        f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"]) # TODO pass from GR initialisation
+        # f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"]) # TODO pass from GR initialisation
 
         model_coloured_by_f = {
             # m : colour_by_f[ qmla.utilities.round_nearest(f_scores[m], f_granularity) ]
@@ -243,7 +245,6 @@ class RatingSystem():
             norm=plt.Normalize(vmin=0, vmax=1)
         )
         sm.set_array(available_f_scores)
-
         
         plt.colorbar(sm, cax=ax, orientation='vertical')
         ax.set_ylabel('F-score',  fontsize=label_fontsize)

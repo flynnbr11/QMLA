@@ -666,7 +666,8 @@ class Genetic(
         try:
             self.ratings_class.plot_models_ratings_against_generation(
                 f_scores = self.model_f_scores, 
-                save_directory = save_directory
+                save_directory = save_directory,
+                f_score_cmap=self.f_score_cmap
             )
         except:
             self.log_print([
