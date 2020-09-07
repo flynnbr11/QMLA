@@ -100,7 +100,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Genetic algorithm options
         self.tree_completed_initially =  False
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
-        self.fitness_method = 'mean_residuals_squared' 
+        self.fitness_method = 'rs_median_sq' # 'mean_residuals_squared' 
 
         test = False
         single_gen_force_true_model = False
