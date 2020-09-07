@@ -102,7 +102,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
         self.fitness_method = 'rs_median' # 'mean_residuals_squared' 
 
-        test = True
+        test = False
         single_gen_force_true_model = False
         if test:
             num_models_per_generation = 4
