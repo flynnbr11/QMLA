@@ -691,12 +691,16 @@ class Genetic(
                     corr = this_type_this_gen['f_score'].corr(
                         this_type_this_gen['fitness']
                     )
+                    cov = this_type_this_gen['f_score'].cov(
+                        this_type_this_gen['fitness']
+                    )
                     
                     corr = {
                         'Generation' : g,
                         'Method' : self.fitness_mechanism_names[t], 
                         # 'Method' : t, 
-                        'Correlation' : corr
+                        'Correlation' : corr,
+                        'Covariance' : cov, 
                     }
                     correlations = correlations.append(
                         pd.Series(corr),

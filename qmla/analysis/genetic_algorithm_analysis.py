@@ -482,4 +482,19 @@ def correlation_fitness_f_score(
             save_directory, "fitness_f_score_correlations.png"
         )
     )
+    fig, ax  = plt.subplots(figsize=(20, 8))
+    sns.boxplot(
+        y  = 'Covariance', 
+        x = 'Method',
+        data = fitness_correlations,
+        # kind='box',
+        ax = ax, 
+    )
+    fig.savefig(
+        os.path.join(
+            save_directory, "fitness_f_score_covariance.png"
+        )
+    )
+
+
 
