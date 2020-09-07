@@ -139,13 +139,21 @@ class Genetic(
             'bic_sq' : r"$\frac{1}{BIC^2}$",
             'akaike_weight' : r"$g^{A}$", 
             'bayes_weight' : r"$g^{B}$", 
-            'mean_residuals' : r"$g^{r}$", 
-            'mean_residuals_sq' : r"$(g^{r})^2$", 
+            'mean_residuals' : r"$r_{\mu}$", 
+            'mean_residuals_sq' : r"$r_{\mu}^2$", 
+            'rs_mean' : r"$1-\overline{r}$",
+            'rs_median' : r"$g^{r}$", # r"$1-\tilde{r}$",
+            'rs_mean_sq' : r"$(1-\overline{r})^2$",
+            'rs_median_sq' : r"$(1-\tilde{r})^2$",
+            # 'rs_mean_sq' : r"a",
+            # 'rs_median_sq' : r"b",
             'bf_points' : r"$g^{p}$",
             'bf_rank' : r"$g^{R}$",  
             'elo_rating' : r"$g^{E}$", 
         }
-
+        self.log_print([
+            "fitness_mechanism_names:", self.fitness_mechanism_names
+        ])
 
     def nominate_champions(self):
         # Choose model with highest fitness on final generation
@@ -293,8 +301,12 @@ class Genetic(
                 'bic_sq' : (1 / model_storage_instance.bayesian_info_criterion)**2,
                 'akaike_weight' : np.e**( (min_aicc - model_storage_instance.akaike_info_criterion_c)/2),
                 'bayes_weight' : np.e**(-1*model_storage_instance.bayesian_info_criterion/2),
-                'mean_residuals' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
+                'mean_residuals' : 1 - model_storage_instance.evaluation_mean_pr0_diff,
                 'mean_residuals_sq' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
+                'rs_mean' : 1 - model_storage_instance.evaluation_residual_squares['mean'],
+                'rs_median' : 1 - model_storage_instance.evaluation_residual_squares['median'],
+                'rs_mean_sq' : (1 - model_storage_instance.evaluation_residual_squares['mean'])**2,
+                'rs_median_sq' : (1 - model_storage_instance.evaluation_residual_squares['median'])**2,
                 # relative to other models in this branch
                 'bf_points' : model_win_ratio[mod], 
                 'bf_rank' : ranking_points[mod], 
@@ -316,18 +328,25 @@ class Genetic(
                 ]
             )
             for f in recorded_fitness_types:
-                new_entry = pd.Series(
-                    {
-                        'generation' : this_model_fitnesses['generation'],
-                        'f_score' : this_model_fitnesses['f_score'], 
-                        'fitness' : this_model_fitnesses[f], 
-                        'fitness_type' : f,
-                        'fitness_type_name' : self.fitness_mechanism_names[f],
-                        'active_fitness_method' : self.fitness_method==f,
-                    }
-                )
-                self.fitness_df = self.fitness_df.append(
-                    new_entry, ignore_index=True)
+                try:
+                    new_entry = pd.Series(
+                        {
+                            'generation' : this_model_fitnesses['generation'],
+                            'f_score' : this_model_fitnesses['f_score'], 
+                            'fitness' : this_model_fitnesses[f], 
+                            'fitness_type' : f,
+                            'fitness_type_name' : self.fitness_mechanism_names[f],
+                            'active_fitness_method' : self.fitness_method==f,
+                        }
+                    )
+                    self.fitness_df = self.fitness_df.append(
+                        new_entry, ignore_index=True)
+                except:
+                    self.log_print([
+                        "fitness name keys:", list(self.fitness_mechanism_names.keys())
+                        # "f={}; type name = {}".format(f, self.fitness_mechanism_names[f])
+                    ])
+                    raise
 
         # Extract fitness specified by user (growth rule's fitness_method attribute) 
         # to use for generating models within genetic algorithm

@@ -609,6 +609,9 @@ class ModelInstanceForLearning():
         learned_info['evaluation_median_pr0_diff'] = np.median(self.evaluation_pr0_diffs)
         learned_info['num_evaluation_points'] = self.num_evaluation_points
         learned_info['qinfer_model_likelihoods'] = self.qinfer_model.store_likelihoods
+        learned_info['evaluation_likelihoods'] = self.evaluation_likelihoods
+        learned_info['evaluation_residual_squares'] = self.evaluation_residual_squares
+        learned_info['evaluation_summarise_likelihoods'] = self.evaluation_summarise_likelihoods
         learned_info['qinfer_pr0_diff_from_true'] = np.array(
             self.qinfer_model.store_p0_diffs)
         learned_info['expectation_values'] = self.expectation_values
@@ -738,7 +741,7 @@ class ModelInstanceForLearning():
         evaluation_updater._log_total_likelihood = 0.0
         evaluation_updater._normalization_record = []
         eval_epoch = 0
-
+        self.log_print(["Evaluating on {} experiments".format(len(evaluation_experiments))])
         for experiment in evaluation_experiments:
             t = experiment['t'].item()
             probe_id = experiment['probe_id'].item()
@@ -780,7 +783,6 @@ class ModelInstanceForLearning():
             )
             self.evaluation_pr0_diffs = np.array(evaluation_qinfer_model.store_p0_diffs)[:,0]
         
-        
         n_terms = len(self.model_terms_names)
         n_samples = len(self.evaluation_normalization_record)
 
@@ -803,7 +805,23 @@ class ModelInstanceForLearning():
             self.num_parameters * np.log(self.num_evaluation_points)
             - 2*self.evaluation_log_likelihood
         )
-
+        self.evaluation_likelihoods = evaluation_qinfer_model.store_likelihoods
+        self.evaluation_summarise_likelihoods = evaluation_qinfer_model.summarise_likelihoods
+        
+        self.evaluation_residual_squares = {
+            'mean' : np.mean( 
+                (
+                    np.array(self.evaluation_summarise_likelihoods['system']) 
+                    - np.array(self.evaluation_summarise_likelihoods['particles_mean'])
+                )**2 
+            ),
+            'median' : np.median( 
+                (
+                    np.array(self.evaluation_summarise_likelihoods['system']) 
+                    - np.array(self.evaluation_summarise_likelihoods['particles_median'])
+                )**2 
+            ),
+        }
 
         self.log_print([
             "Model {} evaluation ll:{} AIC:{}".format(   

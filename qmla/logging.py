@@ -8,10 +8,15 @@ __all__ = [
 def _time_seconds():
     r"""return current time in h:m:s format for logging."""
     now = datetime.date.today()
-    hour = datetime.datetime.now().hour
-    minute = datetime.datetime.now().minute
-    second = datetime.datetime.now().second
-    time = str(str(hour) + ':' + str(minute) + ':' + str(second))
+    time = str(
+        "{}_{}/{}:{}:{}".format(
+            now.strftime("%b"), 
+            now.day, 
+            datetime.datetime.now().hour, 
+            datetime.datetime.now().minute, 
+            datetime.datetime.now().second
+        )
+    )
     return time
 
 

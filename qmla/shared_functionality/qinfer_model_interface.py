@@ -110,10 +110,14 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._truename = truename
         self._true_dim = qmla.construct_models.get_num_qubits(self._truename)
         self.true_param_dict = true_param_dict 
-        self.store_likelihoods = {x : {} for x in ['system', 'simulator']}
+        self.store_likelihoods = {x : {} for x in ['system', 'simulator_median', 'simulator_mean']}
+        self.likelihood_calls = {_ : 0 for _ in ['system', 'simulator']}
         self.summarise_likelihoods = {
             x : []
-            for x in ['system', 'particles_median', 'particles_std', 'particles_lower_quartile', 'particles_upper_quartile']
+            for x in [
+                'system', 
+                'particles_median', 'particles_mean',
+                'particles_std', 'particles_lower_quartile', 'particles_upper_quartile']
         }
         self.store_p0_diffs = []
         self.debug_mode = debug_mode
@@ -523,16 +527,20 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         
         if self.true_evolution: 
             self.log_print_debug(["Storing system likelihoods"])
-            self.store_likelihoods['system'][self._a] = pr0
+            self.store_likelihoods['system'][self.likelihood_calls['system']] = pr0
             self.summarise_likelihoods['system'].append(np.median(pr0))
+            self.likelihood_calls['system'] += 1 
         else:
-            self.store_likelihoods['simulator'][self._a] = pr0
-            diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self._a] )
+            self.store_likelihoods['simulator_mean'][self.likelihood_calls['simulator']] = np.mean(pr0)
+            self.store_likelihoods['simulator_median'][self.likelihood_calls['simulator']] = np.median(pr0)
+            diff_p0 = np.abs( pr0 - self.store_likelihoods['system'][self.likelihood_calls['simulator']] )
             self.store_p0_diffs.append( [np.median(diff_p0), np.std(diff_p0)] )
+            self.summarise_likelihoods['particles_mean'].append( np.median(pr0) )
             self.summarise_likelihoods['particles_median'].append( np.median(pr0) )
             self.summarise_likelihoods['particles_std'].append( np.std(pr0) )
             self.summarise_likelihoods['particles_lower_quartile'].append( np.percentile(pr0, 25) )
             self.summarise_likelihoods['particles_upper_quartile'].append( np.percentile(pr0, 75) )
+            self.likelihood_calls['simulator'] += 1 
         self.log_print_debug(["Stored likelihoods"])
         if self.evaluation_model:
             self.log_print_debug([
