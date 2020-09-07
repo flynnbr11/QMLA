@@ -103,7 +103,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.fitness_method = 'mean_residuals_squared' 
 
         test = False
-        single_gen_force_true_model = True
+        single_gen_force_true_model = False
         if test:
             num_models_per_generation = 4
             self.max_spawn_depth = 3
