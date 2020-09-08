@@ -540,17 +540,18 @@ class GeneticAlgorithmQMLA():
             min_cut_pt = int(len(c1)*0.33)
             max_cut_pt = int(len(c1)*0.66) + 1
             # for cut1 in range(1, len(c1)-2):
-            for cut1 in range(min_cut_pt, max_cut_pt):
-                this_pair_df = {
-                    'c1' : c1, 
-                    'c2' : c2, 
-                    'probability' : np.round(pair_prob, 2), 
-                    'cut1' : cut1, 
-                    'c1_prob' : chromosome_probabilities[c1], 
-                    'c2_prob' : chromosome_probabilities[c2],
-                    'force_mutation' : force_mutation
-                }
-                pair_data.append(this_pair_df)
+            if pair_prob > 0:
+                for cut1 in range(min_cut_pt, max_cut_pt):
+                    this_pair_df = {
+                        'c1' : c1, 
+                        'c2' : c2, 
+                        'probability' : np.round(pair_prob, 2), 
+                        'cut1' : cut1, 
+                        'c1_prob' : chromosome_probabilities[c1], 
+                        'c2_prob' : chromosome_probabilities[c2],
+                        'force_mutation' : force_mutation
+                    }
+                    pair_data.append(this_pair_df)
         self.chrom_pair_df = pd.DataFrame.from_dict(pair_data)                
         # normalise probabilities
         self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
@@ -567,9 +568,6 @@ class GeneticAlgorithmQMLA():
 
         n_samples = int(len(probabilities)/2)
         self.log_print(["Getting {} samples from chromosome probabilities".format(n_samples)])
-        self.log_print([
-            "pair_idx : \n {} \n probs : \n {}".format(pair_idx, probabilities)
-        ])
         t1 = time.time()
         pair_selection_order = np.random.choice(
             a = pair_idx,
