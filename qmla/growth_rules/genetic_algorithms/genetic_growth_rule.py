@@ -306,8 +306,8 @@ class Genetic(
                 'mean_residuals_sq' : (1 - model_storage_instance.evaluation_mean_pr0_diff)**2,
                 'rs_mean' : 1 - model_storage_instance.evaluation_residual_squares['mean'],
                 'rs_median' : 1 - model_storage_instance.evaluation_residual_squares['median'],
-                'rs_mean_sq' : (1 - model_storage_instance.evaluation_residual_squares['mean'])**2,
-                'rs_median_sq' : (1 - model_storage_instance.evaluation_residual_squares['median'])**2,
+                'rs_mean_sq' : (1 - model_storage_instance.evaluation_residual_squares['mean_sq']),
+                'rs_median_sq' : (1 - model_storage_instance.evaluation_residual_squares['median_sq']),
                 # relative to other models in this branch
                 'bf_points' : model_win_ratio[mod], 
                 'bf_rank' : ranking_points[mod], 
@@ -620,7 +620,7 @@ class Genetic(
                 "failed to plot_fitness_v_fscore"
             ])
             pass 
-        
+
         try:
             self.plot_fitness_v_generation(
                 save_to_file = os.path.join(

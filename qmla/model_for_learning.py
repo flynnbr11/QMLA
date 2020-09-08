@@ -817,9 +817,21 @@ class ModelInstanceForLearning():
                 (
                     np.array(self.evaluation_summarise_likelihoods['system']) 
                     - np.array(self.evaluation_summarise_likelihoods['particles_mean'])
-                )**2 
+                ) 
             ),
             'median' : np.median( 
+                (
+                    np.array(self.evaluation_summarise_likelihoods['system']) 
+                    - np.array(self.evaluation_summarise_likelihoods['particles_median'])
+                )
+            ),
+            'mean_sq' : np.mean( 
+                (
+                    np.array(self.evaluation_summarise_likelihoods['system']) 
+                    - np.array(self.evaluation_summarise_likelihoods['particles_mean'])
+                )**2 
+            ),
+            'median_sq' : np.median( 
                 (
                     np.array(self.evaluation_summarise_likelihoods['system']) 
                     - np.array(self.evaluation_summarise_likelihoods['particles_median'])

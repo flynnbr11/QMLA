@@ -414,9 +414,9 @@ else:
     #     qmla_id = qmla_controls.long_id
     # )
 
-    qmla_instance.store_bayes_factors_to_shared_csv(
-        bayes_csv=str(qmla_controls.cumulative_csv)
-    )
+    # qmla_instance.store_bayes_factors_to_shared_csv(
+    #     bayes_csv=str(qmla_controls.cumulative_csv)
+    # )
 
     results_file = qmla_controls.results_file
     pickle.dump(
