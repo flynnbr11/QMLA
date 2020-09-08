@@ -527,6 +527,7 @@ class GeneticAlgorithmQMLA():
 
         # Construct df of pairs of chromosomes from the gene pool, where the probability of that 
         # pair being selected is the product of their individual fitnesses
+        t2 = time.time()
         self.chrom_pair_df = pd.DataFrame(
             columns = ['c1', 'c2', 'probability', 'cut1', 'c1_prob', 'c2_prob', 'force_mutation'] 
         )
@@ -571,13 +572,14 @@ class GeneticAlgorithmQMLA():
         self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
         self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         self.log_print([
-            "starting chromosome pair dataframe setup has len {}, e.g. \n {}".format(
-                len(self.chrom_pair_df), self.chrom_pair_df[:10]
+            "starting chromosome pair dataframe setup took {} sec and has len {}".format(
+                np.round(time.time() - t2, 3),
+                len(self.chrom_pair_df)
             )
         ])
 
-        pair_idx = self.chrom_pair_df.index
-        probabilities = self.chrom_pair_df.probability
+        pair_idx = self.chrom_pair_df.index.values
+        probabilities = self.chrom_pair_df.probability.values
 
         # pair_selection_order = np.random.choice(
         #     a = pair_idx,
@@ -585,15 +587,30 @@ class GeneticAlgorithmQMLA():
         #     p = probabilities,
         #     replace=False
         # )
-
-        pair_selection_order = multidimensional_shifting(
-            1, 
-            np.shape(np.where(probabilities != 0))[1], 
-            pair_idx, 
-            probabilities
-        )
+        n_samples = int(len(probabilities)/2)
+        self.log_print(["Getting {} samples from chromosome probabilities".format(n_samples)])
         self.log_print([
-            "pair_selection_order: \n", repr(pair_selection_order)
+            "pair_idx : \n {} \n probs : \n {}".format(pair_idx, probabilities)
+        ])
+        t1 = time.time()
+        pair_selection_order = np.random.choice(
+            a = pair_idx,
+            size = n_samples, 
+            p = probabilities,
+            replace=False
+        )
+        # pair_selection_order = multidimensional_shifting(
+        #     1, 
+        #     n_samples,
+        #     # np.shape(np.where(probabilities != 0))[1], 
+        #     pair_idx, 
+        #     probabilities
+        # )
+        self.log_print([
+            "after {} s, pair_selection_order: \n {}".format(
+                np.round(time.time() - t1, 3), 
+                repr(pair_selection_order)
+            ) 
         ])
         return pair_selection_order
 
@@ -719,7 +736,7 @@ class GeneticAlgorithmQMLA():
         self.log_print([
             "Proposed chromosome list now has {} elements after {} trials over {} seconds.".format(
                 len(proposed_chromosomes), 
-                init_num_chrom_pairs - len(self.chrom_pair_df), 
+                init_num_chrom_pairs - len(list(pair_selection_order)), 
                 time.time() - t_init
             )
         ])
