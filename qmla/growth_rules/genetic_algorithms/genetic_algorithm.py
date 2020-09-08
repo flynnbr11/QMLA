@@ -537,8 +537,8 @@ class GeneticAlgorithmQMLA():
         pair_data = []
         for c1,c2 in chromosome_combinations:
             pair_prob = chromosome_probabilities[c1] * chromosome_probabilities[c2] # TODO better way to get pair prob?
-            min_cut_pt = int(len(c1)*0.33)
-            max_cut_pt = int(len(c1)*0.66) + 1
+            min_cut_pt = int(len(c1)*0.25)
+            max_cut_pt = int(len(c1)*0.75) + 1
             # for cut1 in range(1, len(c1)-2):
             if pair_prob > 0:
                 for cut1 in range(min_cut_pt, max_cut_pt):
@@ -557,7 +557,8 @@ class GeneticAlgorithmQMLA():
         self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
         self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         self.log_print([
-            "starting chromosome pair dataframe setup took {} sec and has len {}".format(
+            "starting chromosome pair dataframe setup. {} combinations in total. took {} sec and has len {}".format(
+                len(chromosome_combinations),
                 np.round(time.time() - t2, 3),
                 len(self.chrom_pair_df)
             )
@@ -566,7 +567,7 @@ class GeneticAlgorithmQMLA():
         pair_idx = self.chrom_pair_df.index.values
         probabilities = self.chrom_pair_df.probability.values
 
-        n_samples = int(len(probabilities)/2)
+        n_samples = len(probabilities)
         self.log_print(["Getting {} samples from chromosome probabilities".format(n_samples)])
         t1 = time.time()
         pair_selection_order = np.random.choice(
