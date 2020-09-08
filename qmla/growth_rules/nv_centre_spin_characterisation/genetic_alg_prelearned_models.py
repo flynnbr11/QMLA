@@ -319,3 +319,41 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
     ):
         posterior_distribution = self.get_prior(model_name = model_name)
         return posterior_distribution
+
+
+class NVPrelearnedTest(
+    NVCentreGenticAlgorithmPrelearnedParameters
+):
+    def __init__(
+        self,
+        growth_generation_rule,
+        true_model=None,
+        **kwargs
+    ):
+        r""" as above but few models/generations to test on"""
+        self.true_n_qubits = 6
+        self.available_axes = ['x', 'y', 'z']
+        self._set_true_params()
+        self.true_model = '+'.join(
+            (self.true_model_terms_params.keys())
+        )
+        self.true_model = qmla.construct_models.alph(self.true_model)
+
+        # Add genetic algorithm parameters to kwargs, which the Genetic GR passes to GA class
+        kwargs['selection_truncation_rate'] = 1 / self.true_n_qubits
+        kwargs['unchanged_elite_num_generations_cutoff'] = 3*self.true_n_qubits
+        kwargs['num_protected_elite_models'] = 1
+
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            true_model = self.true_model,
+            # genes = self.available_terms,
+            **kwargs
+        )
+        num_models_per_generation = 4
+        self.max_spawn_depth = 2
+
+        self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
+        self.initial_models = [ 
+            qmla.construct_models.alph(m) for m in self.initial_models
+        ]

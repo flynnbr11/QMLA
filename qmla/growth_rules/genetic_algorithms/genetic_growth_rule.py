@@ -56,7 +56,8 @@ class Genetic(
         self.genes = genes
         self.true_model = true_model
         self.log_print([
-            "Genes:", genes
+            "Starting genetic GR"
+            # "Genes:", genes
         ])
 
         self.ratings_class = qmla.growth_rules.rating_system.ModifiedEloRating(
@@ -151,9 +152,9 @@ class Genetic(
             'bf_rank' : r"$g^{R}$",  
             'elo_rating' : r"$g^{E}$", 
         }
-        self.log_print([
-            "fitness_mechanism_names:", self.fitness_mechanism_names
-        ])
+        # self.log_print([
+        #     "fitness_mechanism_names:", self.fitness_mechanism_names
+        # ])
 
     def nominate_champions(self):
         # Choose model with highest fitness on final generation

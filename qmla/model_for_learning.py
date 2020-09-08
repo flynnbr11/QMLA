@@ -413,8 +413,12 @@ class ModelInstanceForLearning():
 
         self._finalise_learning()
         self.compute_likelihood_after_parameter_learning()
+        t1 = time.time()
         self._model_plots()
+        self.log_print(["Time to do plots: {} sec".format(np.round(time.time() - t1, 3))])
+        t2 = time.time()
         self.model_heuristic.finalise_heuristic()
+        self.log_print(["Time to finalise heuristic: {} sec".format(np.round(time.time() - t2, 3))])
 
     def _record_experiment_updates(self, update_step):
         r"""Update tracking infrastructure."""

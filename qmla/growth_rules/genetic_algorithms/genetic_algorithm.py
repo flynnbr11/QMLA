@@ -528,47 +528,31 @@ class GeneticAlgorithmQMLA():
         # Construct df of pairs of chromosomes from the gene pool, where the probability of that 
         # pair being selected is the product of their individual fitnesses
         t2 = time.time()
-        self.chrom_pair_df = pd.DataFrame(
-            columns = ['c1', 'c2', 'probability', 'cut1', 'c1_prob', 'c2_prob', 'force_mutation'] 
-        )
+        # self.chrom_pair_df = pd.DataFrame(
+        #     columns = ['c1', 'c2', 'probability', 'cut1', 'c1_prob', 'c2_prob', 'force_mutation'] 
+        # )
         chromosome_combinations = list(
             itertools.combinations(list(chromosome_probabilities.keys()), 2)
         )
+        pair_data = []
         for c1,c2 in chromosome_combinations:
             pair_prob = chromosome_probabilities[c1] * chromosome_probabilities[c2] # TODO better way to get pair prob?
-            for cut1 in range(1, len(c1)-2):
-                # every possible cut down these two chromosomes is equally probable of being selected
-                # therefore the same pair can be selected twice with different cuts
-                # this_pair_df = pd.DataFrame(
-                #     np.array([
-                #         [
-                #             c1, c2, 
-                #             np.round(pair_prob, 2), 
-                #             cut1, 
-                #             chromosome_probabilities[c1], chromosome_probabilities[c2],
-                #             force_mutation
-                #         ]
-                #     ]),
-                #     columns=[
-                #         'c1', 'c2', 
-                #         'probability', 
-                #         'cut1', 'c1_prob', 
-                #         'c2_prob',
-                #         'force_mutation'
-                #     ]
-                # )
-                this_pair_df = pd.Series(
-                    {
-                        'c1' : c1, 
-                        'c2' : c2, 
-                        'probability' : np.round(pair_prob, 2), 
-                        'cut1' : cut1, 
-                        'c1_prob' : chromosome_probabilities[c1], 
-                        'c2_prob' : chromosome_probabilities[c2],
-                        'force_mutation' : force_mutation
-                    }
-                )
-                self.chrom_pair_df.loc[len(self.chrom_pair_df)] = this_pair_df
+            min_cut_pt = int(len(c1)*0.33)
+            max_cut_pt = int(len(c1)*0.66) + 1
+            # for cut1 in range(1, len(c1)-2):
+            for cut1 in range(min_cut_pt, max_cut_pt):
+                this_pair_df = {
+                    'c1' : c1, 
+                    'c2' : c2, 
+                    'probability' : np.round(pair_prob, 2), 
+                    'cut1' : cut1, 
+                    'c1_prob' : chromosome_probabilities[c1], 
+                    'c2_prob' : chromosome_probabilities[c2],
+                    'force_mutation' : force_mutation
+                }
+                pair_data.append(this_pair_df)
+        self.chrom_pair_df = pd.DataFrame.from_dict(pair_data)                
+        # normalise probabilities
         self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
         self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         self.log_print([
@@ -581,12 +565,6 @@ class GeneticAlgorithmQMLA():
         pair_idx = self.chrom_pair_df.index.values
         probabilities = self.chrom_pair_df.probability.values
 
-        # pair_selection_order = np.random.choice(
-        #     a = pair_idx,
-        #     size = len(pair_idx), 
-        #     p = probabilities,
-        #     replace=False
-        # )
         n_samples = int(len(probabilities)/2)
         self.log_print(["Getting {} samples from chromosome probabilities".format(n_samples)])
         self.log_print([
@@ -607,8 +585,10 @@ class GeneticAlgorithmQMLA():
         #     probabilities
         # )
         self.log_print([
-            "after {} s, pair_selection_order: \n {}".format(
+            "after {} s, pair_selection_order has {} elements ({} unique): \n {}".format(
                 np.round(time.time() - t1, 3), 
+                len(pair_selection_order), 
+                len(set(pair_selection_order)),
                 repr(pair_selection_order)
             ) 
         ])
@@ -653,12 +633,13 @@ class GeneticAlgorithmQMLA():
             model_fitnesses = model_fitnesses,
         )
         t_init = time.time()
-        pair_selection_order = iter(self.prepare_chromosome_pair_dataframe(
+        pair_selection_order = self.prepare_chromosome_pair_dataframe(
             chromosome_probabilities=chromosome_selection_probabilities
-        ))
-        init_num_chrom_pairs = len(self.chrom_pair_df)
-        self.log_print(["Time to prepare chromosome pair df for gen {} = {}".format(
-            self.genetic_generation, time.time()-t_init
+        )
+        init_num_chrom_pairs = len(pair_selection_order)
+        pair_selection_order = iter(pair_selection_order)
+        self.log_print(["Time to prepare chromosome pair df for gen {} = {} sec".format(
+            self.genetic_generation, np.round(time.time()-t_init, 3)
         )])
 
         self.unique_pair_combinations_considered = []

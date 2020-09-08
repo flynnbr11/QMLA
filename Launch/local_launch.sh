@@ -21,7 +21,7 @@ further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
 number_best_models_further_qhl=5
-plot_level=6
+plot_level=2
 debug_mode=0
 
 ###############
@@ -34,7 +34,8 @@ debug_mode=0
 # growth_rule='NVCentreRevivals'
 # growth_rule='NVCentreRevivalsSimulated'
 # growth_rule='NVCentreNQubitBath'
-growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
+# growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
+growth_rule='NVPrelearnedTest'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
