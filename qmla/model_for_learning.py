@@ -813,18 +813,18 @@ class ModelInstanceForLearning():
         self.evaluation_summarise_likelihoods = evaluation_qinfer_model.summarise_likelihoods
         
         self.evaluation_residual_squares = {
-            'mean' : np.mean( 
+            'mean' : np.mean(np.abs( 
                 (
                     np.array(self.evaluation_summarise_likelihoods['system']) 
                     - np.array(self.evaluation_summarise_likelihoods['particles_mean'])
                 ) 
-            ),
-            'median' : np.median( 
+            )),
+            'median' : np.median(np.abs(
                 (
                     np.array(self.evaluation_summarise_likelihoods['system']) 
                     - np.array(self.evaluation_summarise_likelihoods['particles_median'])
                 )
-            ),
+            )),
             'mean_sq' : np.mean( 
                 (
                     np.array(self.evaluation_summarise_likelihoods['system']) 
