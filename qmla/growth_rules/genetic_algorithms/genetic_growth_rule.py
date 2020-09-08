@@ -606,6 +606,7 @@ class Genetic(
             self.log_print([
                 "failed to plot_fitness_v_fscore_by_generation"
             ])
+            pass
 
         try:
             self.plot_fitness_v_fscore(
@@ -618,6 +619,8 @@ class Genetic(
             self.log_print([
                 "failed to plot_fitness_v_fscore"
             ])
+            pass 
+        
         try:
             self.plot_fitness_v_generation(
                 save_to_file = os.path.join(

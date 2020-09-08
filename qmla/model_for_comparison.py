@@ -185,10 +185,18 @@ class ModelInstanceForComparison():
         # Reconstruct the updater from results of learning
         self.reconstruct_updater = True  # optionally just load it
         if self.reconstruct_updater:
-            posterior_distribution = qi.MultivariateNormalDistribution(
-                self.estimated_mean_params,
-                self.covariance_mtx_final
-            )
+
+
+            try:
+                posterior_distribution = qi.MultivariateNormalDistribution(
+                    self.estimated_mean_params,
+                    self.covariance_mtx_final # TODO this can cause problems - some models have singular cov mt
+                )
+            except:
+                self.log_print([
+                    "cov mtx is singular in trying to reconstruct SMC updater.\n",
+                    self.covariance_mtx_final
+                ])
 
             num_particles_for_bf = max(
                 5,
