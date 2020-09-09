@@ -674,26 +674,28 @@ except:
 #######################################
 try:
     tree_plot_log = str(directory_to_analyse + 'tree_plot_log.txt')
-    sys.stdout = open(
-        tree_plot_log, 'w'
-    )
-
-    qmla.analysis.plot_tree_multiple_instances(
-        results_csv=results_csv,
-        latex_mapping_file=latex_mapping_file,
-        avg_type='medians',
-        all_bayes_csv=all_bayes_csv,
-        growth_generator=growth_generator,
-        entropy=0,
-        inf_gain=0,
-        save_to_file=os.path.join(
-            results_directories['performance'], 
-            'DAG_multi_qmla.png'
+    attempt_tree_plot = False
+    if attempt_tree_plot:
+        sys.stdout = open(
+            tree_plot_log, 'w'
         )
-    )
 
-    sys.stdout = sys.__stdout__
-    sys.stderr = sys.__stderr__
+        qmla.analysis.plot_tree_multiple_instances(
+            results_csv=results_csv,
+            latex_mapping_file=latex_mapping_file,
+            avg_type='medians',
+            all_bayes_csv=all_bayes_csv,
+            growth_generator=growth_generator,
+            entropy=0,
+            inf_gain=0,
+            save_to_file=os.path.join(
+                results_directories['performance'], 
+                'DAG_multi_qmla.png'
+            )
+        )
+
+        sys.stdout = sys.__stdout__
+        sys.stderr = sys.__stderr__
 
 except ValueError:
     pass

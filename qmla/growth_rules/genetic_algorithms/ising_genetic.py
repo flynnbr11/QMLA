@@ -182,7 +182,7 @@ class IsingGeneticSingleLayer(
         ]
         # 10 models per layer, fully connected -> 45 comparisons using optimal_graph; 90 using all
 
-        self.initial_models = list(np.random.choice(test_fitness_models, 5, replace=False))
+        self.initial_models = list(np.random.choice(test_fitness_models, 15, replace=False))
         if self.true_model not in self.initial_models:
             rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
             self.initial_models[rand_idx] = self.true_model
