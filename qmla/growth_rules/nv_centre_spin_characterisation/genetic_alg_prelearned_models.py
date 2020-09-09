@@ -351,7 +351,7 @@ class NVPrelearnedTest(
             **kwargs
         )
         num_models_per_generation = 4
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 4
 
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 

@@ -1643,9 +1643,22 @@ class QuantumModelLearningAgent():
         champ_model = self.get_model_storage_instance_by_id(
             self.champion_model_id)
 
+        # compute full dynamics for branch champions
         champ_model.compute_expectation_values(
             times=self.times_to_plot,
         )
+        self.branch_champions = [
+            self.branches[b].champion_id for b in self.branches
+        ]
+        self.log_print([
+            "Branch champions:", self.branch_champions 
+        ])
+        for bc in self.branch_champions:
+            bc_mod = self.get_model_storage_instance_by_id(bc)
+            bc_mod.compute_expectation_values(
+                times = self.times_to_plot
+            )
+
 
         # Get metrics for all models tested
         for i in self.models_learned:
