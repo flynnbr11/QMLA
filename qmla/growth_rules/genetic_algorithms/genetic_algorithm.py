@@ -521,7 +521,7 @@ class GeneticAlgorithmQMLA():
                 'chromosome' : c, 
                 'f_score' : self.model_f_score(model), 
                 'probability' : chromosome_probabilities[c],
-                'generation' : self.genetic_generation
+                'generation' : self.genetic_generation,
             })
             self.gene_pool.loc[len(self.gene_pool)] = gene_probability
 

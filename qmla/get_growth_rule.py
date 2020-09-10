@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import inspect
 
 import qmla.growth_rules as GR
 
@@ -7,104 +8,8 @@ __all__ = [
     'get_growth_generator_class'
 ]
 
-growth_classes = {
-    # Experimental paper growth rules
-    'NVExperimentalData':
-        GR.NVCentreExperimentalData,
-    'ExperimentNVCentre':
-        GR.ExperimentNVCentre,
-    'ExperimentNVCentreNoTransvereTerms':
-        GR.ExperimentNVCentreNoTransvereTerms,
-    'ExpAlternativeNV':
-        GR.ExpAlternativeNV,
-    'NV_alternative_model_2':
-        GR.ExpAlternativeNV_second,
-    'ExperimentNVCentreVaryTrueModel':
-        GR.ExperimentNVCentreVaryTrueModel,
-    'ExperimentFullAccessNV':
-        GR.ExperimentFullAccessNV,
-    'NVLargeSpinBath':
-        GR.NVLargeSpinBath,
-    'ExperimentReducedNV':
-        GR.ExperimentReducedNV,
-    'SimulatedNVCentre':
-        GR.SimulatedNVCentre,
-    'TestSimulatedNVCentre':
-        GR.TestSimulatedNVCentre,
-    'NVCentreSimulatedShortDynamicsGenticAlgorithm' : 
-        GR.NVCentreSimulatedShortDynamicsGenticAlgorithm, 
-    'NVCentreExperimentalShortDynamicsGenticAlgorithm':
-        GR.NVCentreExperimentalShortDynamicsGenticAlgorithm,
-    'NVCentreSimulatedLongDynamicsGenticAlgorithm' :
-        GR.NVCentreSimulatedLongDynamicsGenticAlgorithm,
-    'NVCentreGenticAlgorithmPrelearnedParameters' : 
-        GR.NVCentreGenticAlgorithmPrelearnedParameters, 
-    'NVPrelearnedTest' : 
-        GR.NVPrelearnedTest, 
-    'ExperimentNVCentreNQubits':
-        GR.ExperimentNVCentreNQubits,
-    'NVCentreRevivals' : 
-        GR.NVCentreRevivals,
-    'NVCentreRevivalsSimulated' : 
-        GR.NVCentreRevivalsSimulated,
-    'NVCentreNQubitBath' : 
-        GR.NVCentreNQubitBath, 
-    'NVCentreRevivalSimulation' : 
-        GR.NVCentreRevivalSimulation,
-
-    # Theoretical paper growth rules
-    'IsingPredetermined':
-        GR.IsingPredetermined,
-    'IsingProbabilistic':
-        GR.IsingProbabilistic,
-    'IsingSharedField':
-        GR.IsingSharedField,
-    'HeisenbergXYZPredetermined':
-        GR.HeisenbergXYZPredetermined,
-    'HeisenbergXYZProbabilistic':
-        GR.HeisenbergXYZProbabilistic,
-    'HeisenbergSharedField':
-        GR.HeisenbergSharedField,
-    'FermiHubbardPredetermined':
-        GR.FermiHubbardPredetermined,
-    'FermiHubbardProbabilistic':
-        GR.FermiHubbardProbabilistic,
-    'LatticeSet':
-        GR.LatticeSet,
-    'IsingLatticeSet':
-        GR.IsingLatticeSet,
-    'HeisenbergLatticeSet':
-        GR.HeisenbergLatticeSet,
-    'FermiHubbardLatticeSet':
-        GR.FermiHubbardLatticeSet,
-
-    # Others
-    'Demonstration':
-        GR.Demonstration,
-    'basic_lindbladian':
-        GR.Lindbladian,
-    'GrowthRule':
-        GR.GrowthRule,
-    'Presentation':
-        GR.PresentationPlotGeneration,
-    'Genetic':
-        GR.Genetic,
-    'GeneticTest':
-        GR.GeneticTest,
-    'HeisenbergGenetic':
-        GR.HeisenbergGenetic,
-    'IsingGenetic':
-        GR.IsingGenetic,
-    'IsingGeneticTest':
-        GR.IsingGeneticTest,
-    'IsingGeneticSingleLayer':
-        GR.IsingGeneticSingleLayer,
-    'TestReducedParticlesBayesFactors':
-        GR.TestReducedParticlesBayesFactors,
-    'TestAllParticlesBayesFactors':
-        GR.TestAllParticlesBayesFactors,
-}
-
+# Get a dict of all the available growth rules
+growth_classes = dict(inspect.getmembers(GR, inspect.isclass))
 
 def get_growth_generator_class(
     growth_generation_rule,

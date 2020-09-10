@@ -5,7 +5,7 @@
 ###############
 # QMLA run configuration
 ###############
-num_instances=1
+num_instances=3
 run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -44,7 +44,9 @@ debug_mode=0
 # growth_rule='HeisenbergGenetic'
 # growth_rule='IsingGenetic '
 # growth_rule='IsingGeneticTest'
-growth_rule='IsingGeneticSingleLayer'
+# growth_rule='IsingGeneticSingleLayer'
+# growth_rule='GenAlgObjectiveFncTest'
+growth_rule='ObjFncElo'
 # growth_rule='SimulatedNVCentre'
 # growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'

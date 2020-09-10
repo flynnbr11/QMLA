@@ -290,6 +290,7 @@ class GrowthRule():
         self.fraction_opponents_experiments_for_bf = 1.0
         self.fraction_particles_for_bf = 1.0 # testing whether reduced num particles for BF can work 
         self.force_evaluation = False
+        self.exclude_evaluation = False
 
         # Plotting
         self.plot_time_increment = None

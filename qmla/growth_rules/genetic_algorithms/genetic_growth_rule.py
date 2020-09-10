@@ -26,12 +26,8 @@ __all__ = [
     'GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms'
 ]
 
-# flatten list of lists # TODO replace calls with calls to qmla.utilities.flatten
-def flatten(l): return [item for sublist in l for item in sublist]
-
 def hamming_distance(str1, str2):
     return sum(c1 != c2 for c1, c2 in zip(str1, str2))
-
 
 class Genetic(
     growth_rule.GrowthRule
@@ -485,7 +481,9 @@ class Genetic(
         self.storage.fitness_df = self.fitness_df
         self.storage.true_model_chromosome = self.true_chromosome_string
         self.storage.ratings = self.ratings_class.ratings_df
-        self.storage.gene_pool = self.genetic_algorithm.gene_pool
+        gene_pool = self.genetic_algorithm.gene_pool
+        gene_pool['objective_function'] = self.fitness_mechanism_names[self.fitness_method]
+        self.storage.gene_pool = gene_pool
         self.storage.ratings = self.ratings_class.all_ratings
 
         chromosomes = sorted(list(set(

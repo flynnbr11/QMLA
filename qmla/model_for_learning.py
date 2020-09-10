@@ -667,12 +667,16 @@ class ModelInstanceForLearning():
         evaluation_experiments = evaluation_data['experiments']
         self.num_evaluation_points = len(evaluation_experiments)
 
+
         if not self.growth_class.force_evaluation and self.num_experiments < 20:
             # TODO make optional robustly in GR or pass dev arg to QMLA
             # instance.
             self.log_print(
                 ["<20 experiments; presumed dev mode. Not evaluating all models"])
             evaluation_experiments = evaluation_experiments[::10]
+        if self.growth_class.exclude_evaluation: 
+            evaluation_experiments = evaluation_experiments[::10]
+
 
         self.log_print([
             "Evaluation experiments len {}. First 5 elements:\n{}".format(

@@ -171,6 +171,7 @@ def generate_combined_datasets(
     misc_gr_data = pd.DataFrame()
     unique_chromosomes = pd.DataFrame()
     lattice_record = pd.DataFrame()
+    gene_pool = pd.DataFrame()
 
     # cycle through files
     for f in filenames:
@@ -203,14 +204,21 @@ def generate_combined_datasets(
             raise
             # pass
 
-
         try:
             fit_f = storage.growth_rule_storage.fitness_df
             fit_f['qmla_id'] = storage.qmla_id
             fitness_df = fitness_df.append(fit_f, ignore_index=True)
         except:
             pass                   
-        
+
+        try:
+            gp = storage.growth_rule_storage.gene_pool
+            gp['qmla_id'] = storage.qmla_id
+            gp['time'] = storage.Time
+            gene_pool = gene_pool.append(gp, ignore_index=True)
+        except:
+            pass                   
+
         try:
             # NOTE chromosomes cast to integers when written to CSV
             # so they may be shorter than chomosome 
@@ -234,9 +242,6 @@ def generate_combined_datasets(
             lattice_record = lattice_record.append(instance_lattice, ignore_index=True)
         except:
             pass                   
-
-        
-
 
     # Store datasets and add their name to the list
     datasets_generated = []
@@ -284,6 +289,15 @@ def generate_combined_datasets(
     except:
         pass
     
+
+    try:
+        gene_pool.to_csv(
+            os.path.join( combined_datasets_directory, 'gene_pool.csv')
+        )
+        datasets_generated.append('gene_pool')
+    except:
+        pass
+
     try:
         unique_chromosomes.to_csv(
             os.path.join( combined_datasets_directory, 'unique_chromosomes.csv'),
