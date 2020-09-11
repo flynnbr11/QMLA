@@ -172,6 +172,7 @@ def generate_combined_datasets(
     unique_chromosomes = pd.DataFrame()
     lattice_record = pd.DataFrame()
     gene_pool = pd.DataFrame()
+    birth_register = pd.DataFrame()
 
     # cycle through files
     for f in filenames:
@@ -220,9 +221,18 @@ def generate_combined_datasets(
             pass                   
 
         try:
+            br = storage.growth_rule_storage.birth_register
+            br['qmla_id'] = storage.qmla_id
+            br['time'] = storage.Time
+            birth_register = birth_register.append(br, ignore_index=True)
+        except:
+            pass                   
+
+        try:
             # NOTE chromosomes cast to integers when written to CSV
             # so they may be shorter than chomosome 
             # and should be recast to chromosome length
+            # TODO just store via to_pickle, then read_pickle, and they will work. s
             uc = storage.growth_rule_storage.unique_chromosomes
             uc['qmla_id'] = storage.qmla_id
             uc['true_chromosome'] = storage.growth_rule_storage.true_model_chromosome
@@ -289,10 +299,18 @@ def generate_combined_datasets(
     except:
         pass
     
+    try:
+        birth_register.to_pickle(
+            os.path.join( combined_datasets_directory, 'birth_register.p')
+        )
+        datasets_generated.append('birth_register')
+    except:
+        raise
+        pass
 
     try:
-        gene_pool.to_csv(
-            os.path.join( combined_datasets_directory, 'gene_pool.csv')
+        gene_pool.to_pickle(
+            os.path.join( combined_datasets_directory, 'gene_pool.p')
         )
         datasets_generated.append('gene_pool')
     except:

@@ -341,8 +341,8 @@ class NVPrelearnedTest(
 
         # Add genetic algorithm parameters to kwargs, which the Genetic GR passes to GA class
         kwargs['selection_truncation_rate'] = 1 / self.true_n_qubits
-        kwargs['unchanged_elite_num_generations_cutoff'] = 3*self.true_n_qubits
-        kwargs['num_protected_elite_models'] = 1
+        kwargs['unchanged_elite_num_generations_cutoff'] = 2*self.true_n_qubits
+        kwargs['num_protected_elite_models'] = 2
 
         super().__init__(
             growth_generation_rule=growth_generation_rule,

@@ -74,7 +74,7 @@ class GeneticAlgorithmQMLA():
                 'child', 'chromosome_child', 
                 'parent_a', 'parent_b', 
                 'chromosome_parent_a', 'chromosome_parent_b', 
-                'generation'
+                'generation', 'f_score'
             ]
         )
         self.gene_pool = pd.DataFrame(columns=[
@@ -528,9 +528,6 @@ class GeneticAlgorithmQMLA():
         # Construct df of pairs of chromosomes from the gene pool, where the probability of that 
         # pair being selected is the product of their individual fitnesses
         t2 = time.time()
-        # self.chrom_pair_df = pd.DataFrame(
-        #     columns = ['c1', 'c2', 'probability', 'cut1', 'c1_prob', 'c2_prob', 'force_mutation'] 
-        # )
         chromosome_combinations = list(
             itertools.combinations(list(chromosome_probabilities.keys()), 2)
         )
@@ -693,6 +690,7 @@ class GeneticAlgorithmQMLA():
                         'parent_a' : self.map_chromosome_to_model( selection['chromosome_1']),
                         'parent_b' : self.map_chromosome_to_model( selection['chromosome_2']),
                         'generation' : self.genetic_generation,
+                        'f_score' : self.chromosome_f_score(c)
                     })
                     self.birth_register.loc[len(self.birth_register)] = birth
                     self.log_print([

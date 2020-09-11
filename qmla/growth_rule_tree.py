@@ -532,8 +532,6 @@ class BranchQMLA():
             self.log_print(["Champion set by fitness. Ranked models:", self.ranked_models])
             self.is_branch_champion_set = True
 
-
-
         if self.result_counter > 1 and not self.is_branch_champion_set:
             self.log_print([
                 "On branch {}, no outright champion after {} considerations. \

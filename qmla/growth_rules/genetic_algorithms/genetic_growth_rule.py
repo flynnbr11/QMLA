@@ -70,6 +70,7 @@ class Genetic(
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.num_probes = 50
         self.max_num_qubits = 7
+        self.hypothetical_final_generation  = False
 
         self.qhl_models = [
             'pauliSet_1J2_zJz_d3+pauliSet_1J3_yJy_d3+pauliSet_1J3_zJz_d3+pauliSet_2J3_xJx_d3+pauliSet_2J3_zJz_d3',
@@ -152,8 +153,15 @@ class Genetic(
 
     def nominate_champions(self):
         # Choose model with highest fitness on final generation
-        self.champion_model = self.models_ranked_by_fitness[self.spawn_step][0]
+        # if self.hypothetical_final_generation:
+        #     self.log_print(["Running hypothetical step to get some models"])
+        #     hypothetical_models = self.genetic_algorithm.genetic_algorithm_step(
+        #         model_fitnesses = self.model_fitness_by_generation[self.spawn_step], 
+        #         num_pairs_to_sample = self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
+        #     )
+        #     self.log_print(["hypothetical generation models:", hypothetical_models])
 
+        self.champion_model = self.models_ranked_by_fitness[self.spawn_step][0]
         self.log_print([
             "Final generation:", self.spawn_step, 
             "\nModel rankings on final generation:",
@@ -388,7 +396,6 @@ class Genetic(
 
     def finalise_model_learning(self, **kwargs):
         return
-        # self.analyse_generation(**kwargs)
 
     def hamming_distance_model_comparison(
         self, 
@@ -476,6 +483,15 @@ class Genetic(
     def growth_rule_finalise(
         self
     ):        
+        # hypothetical generation_models
+        if self.hypothetical_final_generation:
+            self.log_print(["Running hypothetical step to get some models"])
+            hypothetical_models = self.genetic_algorithm.genetic_algorithm_step(
+                model_fitnesses = self.model_fitness_by_generation[self.spawn_step-1], 
+                num_pairs_to_sample = self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
+            )
+            self.log_print(["hypothetical generation models:", hypothetical_models])
+
         self.storage.fitness_correlations = self.fitness_correlations
         self.storage.fitness_by_f_score = self.fitness_by_f_score
         self.storage.fitness_df = self.fitness_df
@@ -484,6 +500,9 @@ class Genetic(
         gene_pool = self.genetic_algorithm.gene_pool
         gene_pool['objective_function'] = self.fitness_mechanism_names[self.fitness_method]
         self.storage.gene_pool = gene_pool
+        birth_register = self.genetic_algorithm.birth_register
+        birth_register['objective_function'] = self.fitness_mechanism_names[self.fitness_method]
+        self.storage.birth_register = birth_register
         self.storage.ratings = self.ratings_class.all_ratings
 
         chromosomes = sorted(list(set(

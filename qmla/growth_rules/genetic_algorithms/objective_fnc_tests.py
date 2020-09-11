@@ -64,20 +64,22 @@ class GenAlgObjectiveFncTest(
         ]
         # 10 models per layer, fully connected -> 45 comparisons using optimal_graph; 90 using all
 
-        # num_models = 14
-        # self.initial_models = list(np.random.choice(self.test_fitness_models, num_models, replace=False))
+        num_models =  len(self.test_fitness_models) # 4
+        self.initial_models = list(np.random.choice(self.test_fitness_models, num_models, replace=False))
+        self.log_print(["Num models for GA: ", len(self.initial_models)])
         # if self.true_model not in self.initial_models:
         #     rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
         #     self.initial_models[rand_idx] = self.true_model
 
-        self.initial_models = self.test_fitness_models # a batch of 14 models to feed every GR
+        # self.initial_models = self.test_fitness_models # a batch of 14 models to feed every GR
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' # 'all' 
-        self.max_spawn_depth = 3
+        self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
         }
+        self.hypothetical_final_generation = True
         
         self.num_processes_to_parallelise_over = 16
         self.timing_insurance_factor = 0.75
