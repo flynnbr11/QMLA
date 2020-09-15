@@ -214,7 +214,7 @@ class ObjFncResiduals(GenAlgObjectiveFncTest):
         self.fraction_opponents_experiments_for_bf = 0
         self.fraction_own_experiments_for_bf = 0.05
         self.max_spawn_depth = 32
-        self.initial_num_models = 14
+        self.initial_num_models = 31
 
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
