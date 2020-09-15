@@ -11,14 +11,14 @@ import sklearn
 
 from qmla.growth_rules.genetic_algorithms.genetic_growth_rule import \
     Genetic, hamming_distance, GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
-from qmla.growth_rules.genetic_algorithms.ising_genetic import IsingGenetic, IsingXXZGenetic
+from qmla.growth_rules.genetic_algorithms.ising_genetic import IsingGenetic, HeisenbergGeneticXXZ
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
 
 
-class ObjectiveFncTestIsingXXZ(
+class ObjectiveFncTestHeisXXZ(
     # IsingGenetic
-    IsingXXZGenetic
+    HeisenbergGeneticXXZ
 ):
 
     def __init__(
@@ -59,22 +59,8 @@ class ObjectiveFncTestIsingXXZ(
             'pauliSet_3J4_zJz_d4': 0.5991799876475146
         }
 
-        num_models =  len(self.test_fitness_models) # 4
-        self.initial_models = list(np.random.choice(self.test_fitness_models, num_models, replace=False))
-        self.log_print(["Num models for GA: ", len(self.initial_models)])
-        self.branch_comparison_strategy = 'minimal' # 'optimal_graph' # 'all' 
-        self.max_spawn_depth = 1
-        self.initial_num_models = len(self.initial_models)
-        self.max_num_models_by_shape = {
-            self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
-            'other': 0
-        }
-        self.hypothetical_final_generation = True
-        self.max_time_to_consider = 100
-        self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.75
 
-class ObjectiveFncTestIsingZ(
+class ObjectiveFncTestIsing(
     IsingGenetic
 ):
 
@@ -90,35 +76,21 @@ class ObjectiveFncTestIsingZ(
             **kwargs
         )
 
-        self.test_fitness_models = [
-            # 14 randomly selected models, sorted by increasing F-score.
-            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', 
-            'pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
-            # 0.2 <= f < 0.3
-            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2
-            'pauliSet_1J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 0.3 <= f < 0.4
-            'pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
-            # 0.4 <= f < 0.5
-            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 0.5 <= f < 0.6
-            'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 0.6 <= f < 0.7
-            'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            'pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 0.7 <= f < 0.8
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',            
-            # 0.8 <= f < 0.9
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            # 0.9 <= f < 1
-            'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            # F = 1
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5' # F=1
+        self.test_fitness_models =[
+            'pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J4_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5',
+            'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_3J5_zJz_d5',
+            'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5'
         ]
         self.true_model_terms_params = {
             'pauliSet_1J2_zJz_d5' : 0.44,
@@ -128,15 +100,11 @@ class ObjectiveFncTestIsingZ(
             'pauliSet_3J5_zJz_d5' : 0.4
         }
 
-        num_models =  len(self.test_fitness_models) # 4
-        self.initial_models = list(np.random.choice(self.test_fitness_models, num_models, replace=False))
-        self.log_print(["Num models for GA: ", len(self.initial_models)])
-
 
 class GenAlgObjectiveFncTest(
     # switch between these parent classes to change target to test obj fncs against
-    # ObjectiveFncTestIsingXXZ
-    ObjectiveFncTestIsingZ 
+    ObjectiveFncTestHeisXXZ
+    # ObjectiveFncTestIsing 
 ):
 
     def __init__(
@@ -150,6 +118,11 @@ class GenAlgObjectiveFncTest(
             true_model = true_model, 
             **kwargs
         )
+
+        num_models = len(self.test_fitness_models)
+        self.initial_models = list(np.random.choice(self.test_fitness_models, num_models, replace=False))
+        self.log_print(["Num models for GA: ", len(self.initial_models)])
+
         self.branch_comparison_strategy = 'minimal' # 'optimal_graph' # 'all' 
         self.max_spawn_depth = 1
         self.initial_num_models = len(self.initial_models)
@@ -158,7 +131,7 @@ class GenAlgObjectiveFncTest(
             'other': 0
         }
         self.hypothetical_final_generation = True
-        self.max_time_to_consider = 100
+        self.max_time_to_consider = 50
         self.num_processes_to_parallelise_over = 16
         self.timing_insurance_factor = 0.75
 
@@ -195,7 +168,8 @@ class ObjFncAIC(GenAlgObjectiveFncTest):
             true_model = true_model, 
             **kwargs
         )
-        self.fitness_method = 'akaike_weight'
+        # self.fitness_method = 'akaike_weight'
+        self.fitness_method = 'aicc_sq' # 'akaike_info_criterion'
         self.branch_comparison_strategy = 'minimal'
         self.force_evaluation = True
         self.fraction_particles_for_bf = 0.05
@@ -214,7 +188,7 @@ class ObjFncBIC(GenAlgObjectiveFncTest):
             true_model = true_model, 
             **kwargs
         )
-        self.fitness_method = 'bayes_weight'
+        self.fitness_method = 'bic_sq' # 'bayes_weight'
         self.branch_comparison_strategy = 'minimal'
         self.force_evaluation = True
         self.fraction_particles_for_bf = 0.05

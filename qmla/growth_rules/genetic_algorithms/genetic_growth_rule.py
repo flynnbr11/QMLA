@@ -131,8 +131,9 @@ class Genetic(
             'inverse_ll' : r"$g^L$", 
             'inverse_ll_sq' : r"$-\frac{1}{L^2}$", 
             'akaike_info_criterion' : r"$\frac{1}{AIC}$",
-            'aicc' :  r"$\frac{1}{AICc}$", 
             'aic_sq' :  r"$\frac{1}{AIC^2}$",
+            'aicc' :  r"$\frac{1}{AICc}$", 
+            'aicc_sq' :  r"$\frac{1}{AICc^2}$",
             'bayesian_info_criterion' : r"$\frac{1}{BIC}$", 
             'bic_sq' : r"$\frac{1}{BIC^2}$",
             'akaike_weight' : r"$g^{A}$", 
@@ -300,7 +301,8 @@ class Genetic(
                 'akaike_info_criterion' : 1 / model_storage_instance.akaike_info_criterion, 
                 'aicc' : 1 / model_storage_instance.akaike_info_criterion_c, 
                 'aic_sq' : (1 / model_storage_instance.akaike_info_criterion)**2, 
-                'bayesian_info_criterion' : (1 / model_storage_instance.bayesian_info_criterion)**2,
+                'aicc_sq' : (1 / model_storage_instance.akaike_info_criterion_c)**2, 
+                'bayesian_info_criterion' : (1 / model_storage_instance.bayesian_info_criterion),
                 'bic_sq' : (1 / model_storage_instance.bayesian_info_criterion)**2,
                 'akaike_weight' : np.e**( (min_aicc - model_storage_instance.akaike_info_criterion_c)/2),
                 'bayes_weight' : np.e**(-1*model_storage_instance.bayesian_info_criterion/2),
@@ -504,6 +506,7 @@ class Genetic(
         self.storage.gene_pool = gene_pool
         birth_register = self.genetic_algorithm.birth_register
         birth_register['objective_function'] = self.fitness_mechanism_names[self.fitness_method]
+        birth_register['max_time_considered'] = self.max_time_to_consider
         self.storage.birth_register = birth_register
         self.storage.ratings = self.ratings_class.all_ratings
 

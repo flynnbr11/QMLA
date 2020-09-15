@@ -202,7 +202,7 @@ class IsingGeneticSingleLayer(
         self.timing_insurance_factor = 0.75
 
 
-class IsingXXZGenetic(
+class HeisenbergGeneticXXZ(
     IsingGenetic
 ):
 
@@ -224,6 +224,13 @@ class IsingXXZGenetic(
             true_model = true_model,
             **kwargs
         )
+        self.true_model_terms_params = {
+            'pauliSet_1J2_zJz_d5' : 0.44,
+            'pauliSet_1J3_zJz_d5' : 0.68,
+            'pauliSet_2J3_zJz_d5' : 0.57,
+            'pauliSet_2J5_zJz_d5' : 0.35,
+            'pauliSet_3J5_zJz_d5' : 0.4
+        }
 
         # test F map for random set of 10 models
         num_models = 4
