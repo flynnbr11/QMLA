@@ -144,7 +144,6 @@ class QuantumModelLearningAgent():
             self.qmla_id,
         )
         self.redis_databases['any_job_failed'].set('Status', 0)
-        print("[QMLA] Redis databases set.")
 
         # Logistics
         self.models_learned = []

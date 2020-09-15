@@ -485,6 +485,8 @@ class Genetic(
     ):        
         # hypothetical generation_models
         if self.hypothetical_final_generation:
+            # TODO this will cause a crash in QHL mode since. 
+            # in general this should be turned off so not worth a large fix
             self.log_print(["Running hypothetical step to get some models"])
             hypothetical_models = self.genetic_algorithm.genetic_algorithm_step(
                 model_fitnesses = self.model_fitness_by_generation[self.spawn_step-1], 
@@ -522,20 +524,17 @@ class Genetic(
                 'f_score' : np.round(self.f_score_from_chromosome_string(c), 3) 
             })
             self.unique_chromosomes.loc[len(self.unique_chromosomes)] = chrom_data
-        self.log_print(["self.unique_chromosomes:", self.unique_chromosomes])
+        self.log_print(["self.unique_chromosomes:\n", self.unique_chromosomes])
         self.storage.unique_chromosomes = self.unique_chromosomes
-
 
         dud_chromosome = str('1' +'0'*self.genetic_algorithm.num_terms)
         if dud_chromosome in chromosomes:
-            self.log_print(
-                [
-                    "{} in previous chromosomes:\n{}".format(
-                        dud_chromosome, 
-                        self.genetic_algorithm.previously_considered_chromosomes
-                    )
-                ]
-            )
+            self.log_print([
+                "{} in previous chromosomes:\n{}".format(
+                    dud_chromosome, 
+                    self.genetic_algorithm.previously_considered_chromosomes
+                )
+            ])
         chromosome_numbers = sorted([int(c,2) for c in chromosomes])
         # self.growth_rule_specific_data_to_store['chromosomes_tested'] = chromosome_numbers
         try:

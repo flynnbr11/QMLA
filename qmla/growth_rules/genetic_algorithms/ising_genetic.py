@@ -25,11 +25,12 @@ class IsingGenetic(
         true_model=None,
         **kwargs
     ):
-        self.base_terms = [
-            'z',
-        ]
-        true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
-        true_model = qmla.construct_models.alph(true_model)
+        if true_model is None:
+            self.base_terms = [
+                'z',
+            ]
+            true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
+            true_model = qmla.construct_models.alph(true_model)
         
         super().__init__(
             growth_generation_rule=growth_generation_rule,
@@ -201,4 +202,37 @@ class IsingGeneticSingleLayer(
         self.timing_insurance_factor = 0.75
 
 
+class IsingXXZGenetic(
+    IsingGenetic
+):
+
+    def __init__(
+        self,
+        growth_generation_rule,
+        true_model = None, 
+        **kwargs
+    ):
+        if true_model is None: 
+            true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4'
+            true_model = qmla.construct_models.alph(true_model)
+            self.base_terms = [
+                'x', 'z',
+            ]
+        
+        super().__init__(
+            growth_generation_rule=growth_generation_rule,
+            true_model = true_model,
+            **kwargs
+        )
+
+        # test F map for random set of 10 models
+        num_models = 4
+        self.initial_models = self.genetic_algorithm.random_initial_models(num_models)
+        self.max_spawn_depth = 2
+        self.initial_num_models = len(self.initial_models)
+        self.max_num_models_by_shape = {
+            self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
+            'other': 0
+        }
+        self.timing_insurance_factor = 0.5
 
