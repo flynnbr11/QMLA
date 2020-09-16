@@ -278,6 +278,7 @@ class ObjFncElo(GenAlgObjectiveFncTest):
 
         # pickle some elo graphs
         num_models = 28
+        # num_models = 14
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models)
 
         self.fitness_method = 'elo_rating'

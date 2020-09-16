@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import GridSpec
 
+import qmla.shared_functionality.elo_graphs
+
 def generate_graph(
     model_list, 
     num_connections
@@ -232,25 +234,25 @@ def find_efficient_comparison_pairs(model_names):
         for  m in model_names
     }
 
-    graph_size = len(model_names)
-    graph_pickle_file = os.path.abspath(
-        os.path.join(
-            "..", 
-            "qmla", "shared_functionality", "elo_graphs",
-            'optimal_graph_{}_nodes.p'.format(graph_size)
-        )
+    n_nodes = len(model_names)
+    path_elements = qmla.shared_functionality.elo_graphs.__file__.split('/')
+    path_elements = path_elements[:-1]
+    print("path elements:", path_elements)
+    path_elements.append("optimal_graph_{}_nodes.p".format(n_nodes))
+    graph_pickle_file = os.path.abspath('/'.join(path_elements)) #  os.path.abspath(os.path.join(*path_elements))
 
-    )
-    # graph_pickle_file = os.path.join(
-    #     os.getcwd(), 
-    #     'elo_graphs', 
-    #     'optimal_graph_{}_nodes.p'.format(graph_size)
+    # graph_pickle_file = os.path.abspath(
+    #     os.path.join(
+    #         "..", 
+    #         "qmla", "shared_functionality", "elo_graphs",
+    #         'optimal_graph_{}_nodes.p'.format(n_nodes)
+    #     )
     # )
     print("Graph pickle file:", graph_pickle_file)
     try:
         graph_data = pickle.load(open(graph_pickle_file, 'rb'))
         graph_retrieved = True
-        print("Retrieved graph of size ", graph_size)
+        print("Retrieved graph of size ", n_nodes)
     except:
         print("Failed to retrieve graph")
         graph_retrieved = False
