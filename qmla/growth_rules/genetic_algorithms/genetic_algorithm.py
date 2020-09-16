@@ -563,7 +563,10 @@ class GeneticAlgorithmQMLA():
 
         pair_idx = self.chrom_pair_df.index.values
         probabilities = self.chrom_pair_df.probability.values
-        probabilities = probabilities[probabilities > 0] # only keep nonzero probs
+        
+        # only keep nonzero probs
+        pair_idx = pair_idx[probabilities > 0]
+        probabilities = probabilities[probabilities > 0] 
 
         n_samples = len(probabilities)
         self.log_print(["Getting {} samples from chromosome probabilities".format(n_samples)])
