@@ -243,5 +243,5 @@ class HeisenbergGeneticXXZ(
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
         }
-        self.timing_insurance_factor = 1
+        self.timing_insurance_factor = 0.5
 
