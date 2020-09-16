@@ -5,6 +5,7 @@ import pickle
 import itertools
 import copy
 import scipy
+import time
 import math
 import pandas as pd
 import seaborn as sns
@@ -119,17 +120,20 @@ def generate_configurations(model_list, num_iterations_per_graph=10, yield_resul
     max_num_connections = math.ceil(0.75 * worst_case) # if above 3/4 fully connected, just use fully connected
     if worst_case == max_num_connections:
         allowable_num_connections = [int(worst_case)]
+    elif num_models > 15:
+        # realistically will use at least 4*N, though it would be great to get below
+        allowable_num_connections = list(range(4*num_models, max_num_connections, 1))
     else:
         allowable_num_connections = list(range(num_models, max_num_connections, 1))
-
 
     # max distance allowed between any pair of models
     # do not allow d<2 as this will force a fully connected graph
     # do not allow very distantly-connected graphs
     # as we want to make sure models have competed in close range
-    max_distances = list( range(2, math.ceil(num_models/2)) )
+    # max_distances = list( range(2, math.ceil(num_models/2)) )
+    max_distances = list( range(2, 5) )
     if len(max_distances) == 0:
-        max_distances = [num_models -1]
+        max_distances = [num_models-1]
         
     # minimal connectivity for any node in graph
     # eg with 10 nodes, such that all nodes are connected to at least 4 others
@@ -140,13 +144,8 @@ def generate_configurations(model_list, num_iterations_per_graph=10, yield_resul
     ))
     if len(min_connections) == 0 :
         min_connections = [1]
-
     
-#     print("allowable connections:", allowable_num_connections)
-#     print("max_distances:", max_distances)
-#     print("min_connections:", min_connections)
-    all_configs = []
-    
+    all_configs = []   
     for s in allowable_num_connections:        
         for d in max_distances:
             for min_conn in min_connections:
@@ -155,17 +154,15 @@ def generate_configurations(model_list, num_iterations_per_graph=10, yield_resul
                 )
                 if len(max_connections)==0:
                     max_connections = [min_conn]
-#                 print("max connections:", max_connections, "for min=", min_conn)
                 for max_conn in max_connections:
 
                     config = [s, d, min_conn, max_conn]
                     
                     for i in range(num_iterations_per_graph):
-#                         all_configs.append(config)
                         yield config
-#     return all_configs
 
-def attempt_minimal_graph(model_list, num_iterations_per_graph = 50):
+
+def attempt_minimal_graph(model_list, num_iterations_per_graph = 10):
     r"""
     Try to construct a minimally complex graph that satisfies user requirements. 
     
@@ -178,14 +175,17 @@ def attempt_minimal_graph(model_list, num_iterations_per_graph = 50):
     :param list model_list: list of ints corresponding to models
     :return graph_result: (if graph found) data about the optimal graph.   
     """
+    t_init = time.time()
     availabe_configs = generate_configurations(
         model_list = model_list,
         num_iterations_per_graph = num_iterations_per_graph
     )
+    print("Getting configurations to loop through took {} sec".format(time.time() - t_init))
 
     minimal_graph_found = False
     counter = 0
     fail_counter = 0
+    t_init = time.time()
     try:
         while not minimal_graph_found:
             config = next(availabe_configs)
@@ -199,12 +199,12 @@ def attempt_minimal_graph(model_list, num_iterations_per_graph = 50):
                     graph_result = graph_result,
                     config = config,
                 )
-
             except:
                 fail_counter += 1
             counter += 1
     except:
         pass
+    print("Checking configurations took {} sec".format(time.time() - t_init))
     
     if minimal_graph_found:
         print("Found a useful graph after {} attempts.".format(counter))
@@ -231,26 +231,57 @@ def find_efficient_comparison_pairs(model_names):
         model_names.index(m) : m
         for  m in model_names
     }
-    
-    model_id_list = list(model_id_names.keys())
-    try_get_graph = attempt_minimal_graph(
-        model_list = model_id_list, 
-        num_iterations_per_graph = 50
+
+    graph_size = len(model_names)
+    graph_pickle_file = os.path.abspath(
+        os.path.join(
+            "..", 
+            "qmla", "shared_functionality", "elo_graphs",
+            'optimal_graph_{}_nodes.p'.format(graph_size)
+        )
+
     )
+    # graph_pickle_file = os.path.join(
+    #     os.getcwd(), 
+    #     'elo_graphs', 
+    #     'optimal_graph_{}_nodes.p'.format(graph_size)
+    # )
+    print("Graph pickle file:", graph_pickle_file)
+    try:
+        graph_data = pickle.load(open(graph_pickle_file, 'rb'))
+        graph_retrieved = True
+        print("Retrieved graph of size ", graph_size)
+    except:
+        print("Failed to retrieve graph")
+        graph_retrieved = False
+
+    model_id_list = list(model_id_names.keys())
     
-    if not try_get_graph:
-        print("A graph was not found; fully connecting model list.")
-        model_pairs = list(itertools.combinations(model_names, 2))
-        graph=None
+    if not graph_retrieved:
+    
+        try_get_graph = attempt_minimal_graph(
+            model_list = model_id_list, 
+            num_iterations_per_graph = 50
+        )
+    
+        if not try_get_graph:
+            print("A graph was not found; fully connecting model list.")
+            model_pairs = list(itertools.combinations(model_names, 2))
+            graph=None
+            return model_pairs, graph
+
+        # networkx.draw(graph)
+        graph_data = try_get_graph
+        pickle.dump(
+            graph_data,
+            open(graph_pickle_file, 'wb')
+        )
+        print("Storing to {}: {}".format(graph_pickle_file, graph_data))
         
-    if try_get_graph:
-        print("A graph was found")
-        graph = try_get_graph['graph']
-        networkx.draw(graph)
-        
-        connections = try_get_graph['connections']
-        model_pairs = [ 
-            ( model_id_names[m1], model_id_names[m2] ) for m1, m2 in connections
-        ]
+    graph = graph_data['graph']
+    connections = graph_data['connections']
+    model_pairs = [ 
+        ( model_id_names[m1], model_id_names[m2] ) for m1, m2 in connections
+    ]
     
     return model_pairs, graph

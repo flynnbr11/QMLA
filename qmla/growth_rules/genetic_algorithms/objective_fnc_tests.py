@@ -275,6 +275,11 @@ class ObjFncElo(GenAlgObjectiveFncTest):
             true_model = true_model, 
             **kwargs
         )
+
+        # pickle some elo graphs
+        num_models = 28
+        self.initial_models = self.genetic_algorithm.random_initial_models(num_models)
+
         self.fitness_method = 'elo_rating'
         self.branch_comparison_strategy = 'optimal_graph' # 'all'
         self.force_evaluation = False
