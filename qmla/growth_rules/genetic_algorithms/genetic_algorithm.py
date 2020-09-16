@@ -567,6 +567,11 @@ class GeneticAlgorithmQMLA():
         # only keep nonzero probs
         pair_idx = pair_idx[probabilities > 0]
         probabilities = probabilities[probabilities > 0] 
+        self.log_print([
+            "probabilities: ", probabilities, 
+            "\n sum:", np.sum(probabilities)
+        ])
+        probabilities /= np.sum(probabilities)
 
         n_samples = len(probabilities)
         self.log_print(["Getting {} samples from chromosome probabilities".format(n_samples)])

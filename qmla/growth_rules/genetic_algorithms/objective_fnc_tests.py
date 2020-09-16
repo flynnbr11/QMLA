@@ -168,8 +168,8 @@ class ObjFncAIC(GenAlgObjectiveFncTest):
             true_model = true_model, 
             **kwargs
         )
-        self.fitness_method = 'akaike_weight'
-        # self.fitness_method = 'aicc_sq' # 'akaike_info_criterion'
+        # self.fitness_method = 'akaike_weight'
+        self.fitness_method = 'aicc_sq' # 'akaike_info_criterion'
         self.branch_comparison_strategy = 'minimal'
         self.force_evaluation = True
         self.fraction_particles_for_bf = 0.05
@@ -188,7 +188,7 @@ class ObjFncBIC(GenAlgObjectiveFncTest):
             true_model = true_model, 
             **kwargs
         )
-        self.fitness_method = 'bic_sq' # 'bayes_weight'
+        self.fitness_method = 'bic_sq'  # 'bayes_weight' # 
         self.branch_comparison_strategy = 'minimal'
         self.force_evaluation = True
         self.fraction_particles_for_bf = 0.05

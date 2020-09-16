@@ -233,13 +233,15 @@ class HeisenbergGeneticXXZ(
         }
 
         # test F map for random set of 10 models
-        num_models = 4
+        num_models = 28
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models)
-        self.max_spawn_depth = 2
+        self.max_spawn_depth = 32
+        self.fitness_method = 'elo_rating'
+        self.branch_comparison_strategy = 'optimal_graph'
         self.initial_num_models = len(self.initial_models)
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
         }
-        self.timing_insurance_factor = 0.5
+        self.timing_insurance_factor = 1
 
