@@ -244,7 +244,7 @@ class HeisenbergGeneticXXZ(
 
         # Residuals
         self.fitness_method = 'rs_mean_sq'
-        self.max_time_to_consider = 50
+        self.max_time_to_consider = 20
         self.branch_comparison_strategy = 'minimal'
         self.force_evaluation = True
         self.fraction_particles_for_bf = 0.05
