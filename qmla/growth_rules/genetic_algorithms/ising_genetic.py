@@ -247,6 +247,7 @@ class HeisenbergGeneticXXZ(
         self.max_time_to_consider = 20
         self.branch_comparison_strategy = 'minimal'
         self.force_evaluation = True
+        self.iqle_mode = True
         self.fraction_particles_for_bf = 0.05
         self.fraction_opponents_experiments_for_bf = 0
         self.fraction_own_experiments_for_bf = 0.05
