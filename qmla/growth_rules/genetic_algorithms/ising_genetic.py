@@ -225,11 +225,13 @@ class HeisenbergGeneticXXZ(
             **kwargs
         )
         self.true_model_terms_params = {
-            'pauliSet_1J2_zJz_d5' : 0.44,
-            'pauliSet_1J3_zJz_d5' : 0.68,
-            'pauliSet_2J3_zJz_d5' : 0.57,
-            'pauliSet_2J5_zJz_d5' : 0.35,
-            'pauliSet_3J5_zJz_d5' : 0.4
+            # for some reason these parameters proved harder to learn from than random, but give nice dynamics
+            'pauliSet_1J2_zJz_d4': 0.43722955243277917,
+            'pauliSet_1J3_zJz_d4': 0.2957906134497596,
+            'pauliSet_2J3_xJx_d4': 0.40887449013538046,
+            'pauliSet_2J3_zJz_d4': 0.48639558326136945,
+            'pauliSet_2J4_xJx_d4': 0.5226264170733737,
+            'pauliSet_3J4_zJz_d4': 0.5991799876475146
         }
 
         # test F map for random set of 10 models
@@ -242,6 +244,7 @@ class HeisenbergGeneticXXZ(
 
         # Residuals
         self.fitness_method = 'rs_mean_sq'
+        self.max_time_to_consider = 50
         self.branch_comparison_strategy = 'minimal'
         self.force_evaluation = True
         self.fraction_particles_for_bf = 0.05

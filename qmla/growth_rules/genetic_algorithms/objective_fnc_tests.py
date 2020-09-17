@@ -50,14 +50,6 @@ class ObjectiveFncTestHeisXXZ(
             'pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
             'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_3J4_zJz_d4'
         ]
-        self.true_model_terms_params = {
-            'pauliSet_1J2_zJz_d4': 0.43722955243277917,
-            'pauliSet_1J3_zJz_d4': 0.2957906134497596,
-            'pauliSet_2J3_xJx_d4': 0.40887449013538046,
-            'pauliSet_2J3_zJz_d4': 0.48639558326136945,
-            'pauliSet_2J4_xJx_d4': 0.5226264170733737,
-            'pauliSet_3J4_zJz_d4': 0.5991799876475146
-        }
 
 
 class ObjectiveFncTestIsing(
