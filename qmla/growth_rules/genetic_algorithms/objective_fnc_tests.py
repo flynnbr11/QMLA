@@ -269,16 +269,16 @@ class ObjFncElo(GenAlgObjectiveFncTest):
         )
 
         # pickle some elo graphs
-        num_models = 28
-        # num_models = 14
-        self.initial_models = self.genetic_algorithm.random_initial_models(num_models)
+        # num_models = 28
+        # # num_models = 14
+        # self.initial_models = self.genetic_algorithm.random_initial_models(num_models)
 
         self.fitness_method = 'elo_rating'
         self.branch_comparison_strategy = 'optimal_graph' # 'all'
         self.force_evaluation = False
         self.exclude_evaluation = True
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_opponents_experiments_for_bf = 0.5
-        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_particles_for_bf = 0.2
+        self.fraction_opponents_experiments_for_bf = 0.2
+        self.fraction_own_experiments_for_bf = self.fraction_opponents_experiments_for_bf
 
 
