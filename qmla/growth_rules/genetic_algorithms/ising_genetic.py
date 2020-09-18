@@ -212,12 +212,20 @@ class HeisenbergGeneticXXZ(
         true_model = None, 
         **kwargs
     ):
+        xyz = False # whether to use HeixXYZ model; False gives HeisXXZ
         if true_model is None: 
-            true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4'
+            if xyz:
+                true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4'
+                self.base_terms = [
+                    'x', 'y', 'z',
+                ]
+            else:
+                true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4'
+                self.base_terms = [
+                    'x', 'z',
+                ]
+            
             true_model = qmla.construct_models.alph(true_model)
-            self.base_terms = [
-                'x', 'z',
-            ]
         
         super().__init__(
             growth_generation_rule=growth_generation_rule,
@@ -225,13 +233,16 @@ class HeisenbergGeneticXXZ(
             **kwargs
         )
         self.true_model_terms_params = {
-            # for some reason these parameters proved harder to learn from than random, but give nice dynamics
+            # parameters for interesing HeisXXZ true model
             'pauliSet_1J2_zJz_d4': 0.43722955243277917,
             'pauliSet_1J3_zJz_d4': 0.2957906134497596,
             'pauliSet_2J3_xJx_d4': 0.40887449013538046,
             'pauliSet_2J3_zJz_d4': 0.48639558326136945,
             'pauliSet_2J4_xJx_d4': 0.5226264170733737,
-            'pauliSet_3J4_zJz_d4': 0.5991799876475146
+            'pauliSet_3J4_zJz_d4': 0.5991799876475146,
+            'pauliSet_1J2_yJy_d4' : 0.35,
+            'pauliSet_1J4_yJy_d4' : 0.25,
+            'pauliSet_3J4_yJy_d4' : 0.8,
         }
 
         # test F map for random set of 10 models
@@ -256,7 +267,7 @@ class HeisenbergGeneticXXZ(
         self.max_time_to_consider = 50
         self.iqle_mode = True
         self.max_spawn_depth = 32
-        self.initial_num_models = 14 # 28
+        self.initial_num_models = 28
 
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
