@@ -236,20 +236,16 @@ class HeisenbergGeneticXXZ(
 
         # test F map for random set of 10 models
         # Elo method
-        num_models = 28
-        self.initial_models = self.genetic_algorithm.random_initial_models(num_models)
-        self.max_spawn_depth = 16
         self.fitness_method = 'elo_rating'
         self.branch_comparison_strategy = 'optimal_graph'
-        self.force_evaluation = True
-        self.fraction_particles_for_bf = 0.2
-        self.fraction_opponents_experiments_for_bf = 0.2
-        self.fraction_own_experiments_for_bf = 0.2
+        self.force_evaluation = False
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_opponents_experiments_for_bf = 0.25
+        self.fraction_own_experiments_for_bf = 0.25
         self.timing_insurance_factor = 0.25
 
         # Residuals
         # self.fitness_method = 'rs_mean_sq'
-        # self.max_time_to_consider = 50
         # self.branch_comparison_strategy = 'minimal'
         # self.force_evaluation = True
         # self.fraction_particles_for_bf = 0.05
@@ -257,9 +253,10 @@ class HeisenbergGeneticXXZ(
         # self.fraction_own_experiments_for_bf = 0.05
         # self.timing_insurance_factor = 0.125
 
+        self.max_time_to_consider = 50
         self.iqle_mode = True
         self.max_spawn_depth = 32
-        self.initial_num_models = 28
+        self.initial_num_models = 14 # 28
 
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
