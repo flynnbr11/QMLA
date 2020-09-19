@@ -123,9 +123,14 @@ class ModelInstanceForComparison():
                     encoding='latin1'
                 )
             except BaseException:
-                learned_model_info = pickle.loads(
-                    learned_models_info_db.get(model_id_str)
-                )
+                try:
+                    learned_model_info = pickle.loads(
+                        learned_models_info_db.get(model_id_str)
+                    )
+                except:
+                    self.log_print([
+                        "Failed to unload model data for comparison"
+                    ])
 
         # Assign parameters from model learned info, retrieved from database
         self.model_name = learned_model_info['name']

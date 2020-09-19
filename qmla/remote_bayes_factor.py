@@ -101,6 +101,7 @@ def remote_bayes_factor_calculation(
     active_branches_learning_models = redis_databases['active_branches_learning_models']
     active_branches_bayes = redis_databases['active_branches_bayes']
     active_interbranch_bayes = redis_databases['active_interbranch_bayes']
+    any_job_failed_db = redis_databases['any_job_failed']
 
     # Retrieve data from databases
     qmla_core_info_dict = pickle.loads(
@@ -111,34 +112,53 @@ def remote_bayes_factor_calculation(
     plot_level = qmla_core_info_dict['plot_level']
 
     # Get model instances
-    model_a = qmla.model_for_comparison.ModelInstanceForComparison(
-        model_id=model_a_id,
-        qid=qid,
-        log_file=log_file,
-        host_name=host_name,
-        port_number=port_number,
-    )
-    model_b = qmla.model_for_comparison.ModelInstanceForComparison(
-        model_id=model_b_id,
-        qid=qid,
-        log_file=log_file,
-        host_name=host_name,
-        port_number=port_number,
-    )
+    try:
+        model_a = qmla.model_for_comparison.ModelInstanceForComparison(
+            model_id=model_a_id,
+            qid=qid,
+            log_file=log_file,
+            host_name=host_name,
+            port_number=port_number,
+        )
+        model_b = qmla.model_for_comparison.ModelInstanceForComparison(
+            model_id=model_b_id,
+            qid=qid,
+            log_file=log_file,
+            host_name=host_name,
+            port_number=port_number,
+        )
+    except:
+        log_print([
+            "Failed to instantiate models"
+        ])
+        any_job_failed_db.set('Status', 1)
 
     # Take a copy of each updater before updates (for plotting later)
-    updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
-    updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
-
+    try:
+        updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
+        updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
+    except:
+        log_print([
+            "Failed to copy updaters"
+        ])
+        any_job_failed_db.set('Status', 1)
+        
     # Update the models with the times trained by the other model.
-    log_l_a = model_a.update_log_likelihood(
-        new_times = model_b.times_learned_over,
-        new_experimental_params = model_b.track_experiment_parameters
-    )
-    log_l_b = model_b.update_log_likelihood(
-        new_times = model_a.times_learned_over,
-        new_experimental_params = model_a.track_experiment_parameters
-    )
+    try:
+        log_l_a = model_a.update_log_likelihood(
+            new_times = model_b.times_learned_over,
+            new_experimental_params = model_b.track_experiment_parameters
+        )
+        log_l_b = model_b.update_log_likelihood(
+            new_times = model_a.times_learned_over,
+            new_experimental_params = model_a.track_experiment_parameters
+        )
+    except:
+        log_print([
+            "Failed to compute log likelihoods"
+        ])
+        any_job_failed_db.set('Status', 1)
+
     bayes_factor = np.exp( log_l_a - log_l_b )
 
     # should be no difference in BF times
