@@ -189,9 +189,9 @@ def remote_learn_model_parameters(
                 "info which failed to save: \n",
                 updated_model_info
             ])
-        except:
+        except Exception as e:
             log_print([
-                "Failed at the updated_model_info stage (?)"
+                "Failed at the updated_model_info stage (?). Error: \n".format(e)
             ])
             any_job_failed_db.set('Status', 1)
             # pass
@@ -201,9 +201,9 @@ def remote_learn_model_parameters(
                 updated_model_info,
                 protocol=4
             )
-        except:
+        except Exception as e:
             log_print([
-                "Failed at the compression stage"
+                "Failed at the compression stage. Error: \n {}".format(e)
             ])
             pass
             any_job_failed_db.set('Status', 1)
@@ -216,9 +216,9 @@ def remote_learn_model_parameters(
             log_print([
                 "Managed to store it this time... "
             ])
-        except:
+        except Exception as e:
             log_print([
-                "Failed at the storage stage."
+                "Failed at the storage stage. Error: \n {}".format(e)
             ])
             pass
 

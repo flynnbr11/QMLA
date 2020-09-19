@@ -120,9 +120,9 @@ def remote_bayes_factor_calculation(
             host_name=host_name,
             port_number=port_number,
         )
-    except:
+    except Exception as e:
         log_print([
-            "BF Failed to instantiate model {}".format(model_a_id)
+            "BF Failed to instantiate model {}. Error: \n {}".format(model_a_id, e)
         ])
         any_job_failed_db.set('Status', 1)
     try:
@@ -133,9 +133,9 @@ def remote_bayes_factor_calculation(
             host_name=host_name,
             port_number=port_number,
         )
-    except:
+    except Exception as e:
         log_print([
-            "BF Failed to instantiate model {}".format(model_b_id)
+            "BF Failed to instantiate model {}. Error: \n {}".format(model_b_id, e)
         ])
         any_job_failed_db.set('Status', 1)
 
