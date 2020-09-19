@@ -190,7 +190,11 @@ def remote_learn_model_parameters(
                 updated_model_info
             ])
         except:
-            pass
+            log_print([
+                "Failed at the updated_model_info stage (?)"
+            ])
+            any_job_failed_db.set('Status', 1)
+            # pass
 
         try:
             compressed_info = pickle.dumps(
@@ -202,19 +206,23 @@ def remote_learn_model_parameters(
                 "Failed at the compression stage"
             ])
             pass
-        
+            any_job_failed_db.set('Status', 1)
+
         try:
             learned_models_info_db.set(
                 str(model_id),
                 compressed_info
             )
+            log_print([
+                "Managed to store it this time... "
+            ])
         except:
             log_print([
                 "Failed at the storage stage."
             ])
             pass
 
-        any_job_failed_db.set('Status', 1)
+            any_job_failed_db.set('Status', 1)
 
     # Update databases to record that this model has finished.
     active_branches_learning_models.incr(int(branch_id), 1)
