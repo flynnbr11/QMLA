@@ -120,6 +120,12 @@ def remote_bayes_factor_calculation(
             host_name=host_name,
             port_number=port_number,
         )
+    except:
+        log_print([
+            "BF Failed to instantiate model {}".format(model_a_id)
+        ])
+        any_job_failed_db.set('Status', 1)
+    try:
         model_b = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_b_id,
             qid=qid,
@@ -129,7 +135,7 @@ def remote_bayes_factor_calculation(
         )
     except:
         log_print([
-            "Failed to instantiate models"
+            "BF Failed to instantiate model {}".format(model_b_id)
         ])
         any_job_failed_db.set('Status', 1)
 
@@ -139,7 +145,7 @@ def remote_bayes_factor_calculation(
         updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
     except:
         log_print([
-            "Failed to copy updaters"
+            "BF Failed to copy updaters"
         ])
         any_job_failed_db.set('Status', 1)
         
@@ -155,7 +161,7 @@ def remote_bayes_factor_calculation(
         )
     except:
         log_print([
-            "Failed to compute log likelihoods"
+            "BF Failed to compute log likelihoods"
         ])
         any_job_failed_db.set('Status', 1)
 
