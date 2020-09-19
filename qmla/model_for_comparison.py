@@ -243,6 +243,10 @@ class ModelInstanceForComparison():
         # Delete extra data now that everything useful is extracted
         del qmla_core_info_dict, learned_model_info
 
+        self.log_print([
+            "Instantiated."
+        ])
+
     ##########
     # Section: update for Bayes factor
     ##########
