@@ -54,6 +54,7 @@ class ModelInstanceForComparison():
         self,
         model_id,
         qid,
+        opponent, 
         qmla_core_info_database=None,
         learned_model_info=None,
         host_name='localhost',
@@ -63,6 +64,7 @@ class ModelInstanceForComparison():
         self.log_file = log_file
         self.qmla_id = qid
         self.model_id = model_id
+        self.opponent = opponent
 
         # Get essential data
         if qmla_core_info_database is None:
@@ -349,7 +351,7 @@ class ModelInstanceForComparison():
     ):
         r"""Wrapper for :func:`~qmla.print_to_log`"""
         if log_identifier is None: 
-            log_identifier="ModelForComparison {}".format(self.model_id)
+            log_identifier="ModelForComparison {} (vs {})".format(self.model_id, self.opponent)
             
         qmla.logging.print_to_log(
             to_print_list=to_print_list,

@@ -116,6 +116,7 @@ def remote_bayes_factor_calculation(
         model_a = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_a_id,
             qid=qid,
+            opponent=model_b_id, 
             log_file=log_file,
             host_name=host_name,
             port_number=port_number,
@@ -130,6 +131,7 @@ def remote_bayes_factor_calculation(
         model_b = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_b_id,
             qid=qid,
+            opponent=model_a_id, 
             log_file=log_file,
             host_name=host_name,
             port_number=port_number,
