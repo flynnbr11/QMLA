@@ -184,6 +184,37 @@ def remote_learn_model_parameters(
             "Failed to add learned_models_info_db for model:",
             model_id
         ])
+        try:
+            log_print([
+                "info which failed to save: \n",
+                updated_model_info
+            ])
+        except:
+            pass
+
+        try:
+            compressed_info = pickle.dumps(
+                updated_model_info,
+                protocol=4
+            )
+        except:
+            log_print([
+                "Failed at the compression stage"
+            ])
+            pass
+        
+        try:
+            learned_models_info_db.set(
+                str(model_id),
+                compressed_info
+            )
+        except:
+            log_print([
+                "Failed at the storage stage."
+            ])
+            pass
+
+        any_job_failed_db.set('Status', 1)
 
     # Update databases to record that this model has finished.
     active_branches_learning_models.incr(int(branch_id), 1)
