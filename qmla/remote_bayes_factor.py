@@ -125,6 +125,7 @@ def remote_bayes_factor_calculation(
             "BF Failed to instantiate model {}. Error: \n {}".format(model_a_id, e)
         ])
         any_job_failed_db.set('Status', 1)
+        raise
     try:
         model_b = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_b_id,
@@ -138,6 +139,7 @@ def remote_bayes_factor_calculation(
             "BF Failed to instantiate model {}. Error: \n {}".format(model_b_id, e)
         ])
         any_job_failed_db.set('Status', 1)
+        raise
 
     # Take a copy of each updater before updates (for plotting later)
     try:
@@ -148,6 +150,7 @@ def remote_bayes_factor_calculation(
             "BF Failed to copy updaters"
         ])
         any_job_failed_db.set('Status', 1)
+        raise
         
     # Update the models with the times trained by the other model.
     try:
@@ -164,6 +167,7 @@ def remote_bayes_factor_calculation(
             "BF Failed to compute log likelihoods"
         ])
         any_job_failed_db.set('Status', 1)
+        raise
 
     bayes_factor = np.exp( log_l_a - log_l_b )
 
