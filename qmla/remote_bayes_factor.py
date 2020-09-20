@@ -165,11 +165,11 @@ def remote_bayes_factor_calculation(
         )
     except Exception as e:
         log_print([
-            "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
+            "BF Failed to instantiate model {}. Error: {}".format(model_b_id, e)
         ])
         try:
             log_print([
-                "Trying to get model {} again.".format(model_a_id)
+                "Trying to get model {} again.".format(model_b_id)
             ])
             model_b = qmla.model_for_comparison.ModelInstanceForComparison(
                 model_id=model_b_id,
@@ -278,20 +278,34 @@ def remote_bayes_factor_calculation(
             np.round(np.log10(bayes_factor), 2)
         )
     ])
-    if bayes_factor < 1e-160:
-        bayes_factor = 1e-160
-    elif bayes_factor > 1e160:
-        bayes_factor = 1e160
+    try:
+        if bayes_factor < 1e-160:
+            bayes_factor = 1e-160
+        elif bayes_factor > 1e160:
+            bayes_factor = 1e160
 
-    pair_id = construct_models.unique_model_pair_identifier(
-        model_a_id, model_b_id
-    )
+        pair_id = construct_models.unique_model_pair_identifier(
+            model_a_id, model_b_id
+        )
+    except Exception as e:
+        log_print([
+            "BF Failed to set bf as max value. Error: ", e
+        ])
+        any_job_failed_db.set('Status', 1)
+        raise
 
-    if float(model_a_id) < float(model_b_id):
-        # so that BF in database always refers to (low/high), not (high/low).
-        bayes_factors_db.set(pair_id, bayes_factor)
-    else:
-        bayes_factors_db.set(pair_id, (1.0 / bayes_factor))
+    try:
+        if float(model_a_id) < float(model_b_id):
+            # so that BF in database always refers to (low/high), not (high/low).
+            bayes_factors_db.set(pair_id, bayes_factor)
+        else:
+            bayes_factors_db.set(pair_id, (1.0 / bayes_factor))
+    except Exception as e:
+        log_print([
+            "BF Failed to set bf on redis bf db. Error: ", e
+        ])
+        any_job_failed_db.set('Status', 1)
+        raise
 
     # Record winner if BF > threshold
     try:
@@ -308,7 +322,7 @@ def remote_bayes_factor_calculation(
             ])
     except Exception as e:
         log_print([
-            "BF Failed to set bf on redis db. Error: ", e
+            "BF Failed to set bf on redis winner db. Error: ", e
         ])
         any_job_failed_db.set('Status', 1)
         raise
