@@ -87,7 +87,7 @@ def remote_bayes_factor_calculation(
             log_file=log_file,
             log_identifier='BF ({}/{})'.format(model_a_id, model_b_id)
         )
-    log_print(["BF Start on branch", branch_id])
+    log_print(["BF start on branch", branch_id])
     time_start = time.time()
 
     # Access databases
@@ -257,7 +257,7 @@ def remote_bayes_factor_calculation(
                 "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
 
             ])
-    except:
+    except Exception as e:
         log_print([
             "BF Failed to set bf on redis db. Error: ", e
         ])
@@ -278,7 +278,10 @@ def remote_bayes_factor_calculation(
         raise
 
     log_print([
-        "Finished. rq time: ", str(time.time() - time_start),
+        "BF finished on branch {}. rq time: {}".format(
+            branch_id, 
+            str(time.time() - time_start),
+        )
     ])
 
     del model_a, model_b
