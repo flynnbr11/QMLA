@@ -91,21 +91,30 @@ def remote_bayes_factor_calculation(
     time_start = time.time()
 
     # Access databases
-    redis_databases = rds.get_redis_databases_by_qmla_id(
-        host_name, port_number, qid)
-    qmla_core_info_database = redis_databases['qmla_core_info_database']
-    learned_models_info_db = redis_databases['learned_models_info_db']
-    learned_models_ids = redis_databases['learned_models_ids']
-    bayes_factors_db = redis_databases['bayes_factors_db']
-    bayes_factors_winners_db = redis_databases['bayes_factors_winners_db']
-    active_branches_learning_models = redis_databases['active_branches_learning_models']
-    active_branches_bayes = redis_databases['active_branches_bayes']
-    active_interbranch_bayes = redis_databases['active_interbranch_bayes']
-    any_job_failed_db = redis_databases['any_job_failed']
+    try:
+        redis_databases = rds.get_redis_databases_by_qmla_id(
+            host_name, port_number, qid)
+        qmla_core_info_database = redis_databases['qmla_core_info_database']
+        learned_models_info_db = redis_databases['learned_models_info_db']
+        learned_models_ids = redis_databases['learned_models_ids']
+        bayes_factors_db = redis_databases['bayes_factors_db']
+        bayes_factors_winners_db = redis_databases['bayes_factors_winners_db']
+        active_branches_learning_models = redis_databases['active_branches_learning_models']
+        active_branches_bayes = redis_databases['active_branches_bayes']
+        active_interbranch_bayes = redis_databases['active_interbranch_bayes']
+        any_job_failed_db = redis_databases['any_job_failed']
 
-    # Retrieve data from databases
-    qmla_core_info_dict = pickle.loads(
-        redis_databases['qmla_core_info_database']['qmla_settings'])
+        # Retrieve data from databases
+        qmla_core_info_dict = pickle.loads(
+            redis_databases['qmla_core_info_database']['qmla_settings'])
+    except Exception as e:
+        log_print([
+            "BF Failed (branch {}) to retrieve redis databases. Error: {}".format(
+                branch_id, e
+            )
+        ])
+        any_job_failed_db.set('Status', 1)
+        raise
 
     # Whether to build plots
     save_plots_of_posteriors = False
@@ -226,7 +235,7 @@ def remote_bayes_factor_calculation(
 
     # Present result
     log_print([
-        "BF computed on brach {}: A:{}; B:{}; log10 BF={}".format(
+        "BF computed on branch {}: A:{}; B:{}; log10 BF={}".format(
             branch_id, 
             model_a_id,
             model_b_id,
