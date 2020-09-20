@@ -2331,8 +2331,10 @@ class QuantumModelLearningAgent():
         for tree in list(self.trees.values()):
             starting_models, models_to_compare = tree.get_initial_models()
             self.log_print([
-                "First branch for {} has starting models: {}".format(
-                    tree.growth_rule, starting_models
+                "First branch for {} has ( {} unique ) starting models: {}".format(
+                    len(set(starting_models)), 
+                    tree.growth_rule, 
+                    starting_models
                 ),
                 "models_to_compare:", models_to_compare
             ])
