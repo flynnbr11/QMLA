@@ -1248,11 +1248,12 @@ class QuantumModelLearningAgent():
                     self.compare_models_within_branch(branch_id)
                 elif ctr % 10 == 0:
                     self.log_print([
-                        "Ctr {} branch {} has {} of {} models learned".format(
+                        "Ctr {} branch {} has {} of {} models learned; model_learning_complete: {}".format(
                         ctr, 
                         branch_id,
                         int(num_models_learned_on_branch),
-                        self.branches[branch_id].num_models
+                        self.branches[branch_id].num_models,
+                        self.branches[branch_id].model_learning_complete
                     )])
 
             for branchID_bytes in active_branches_bayes.keys():
@@ -1293,11 +1294,12 @@ class QuantumModelLearningAgent():
                         )
                 elif ctr % 10 == 0:
                     self.log_print([
-                        "Ctr {} branch {} has {} out of {} comparisons complete".format(
+                        "Ctr {} branch {} has {} out of {} comparisons complete; comparisons_complete: {}".format(
                         ctr,
                         branch_id, 
                         int(num_comparisons_complete_on_branch),
-                        self.branches[branch_id].num_model_pairs
+                        self.branches[branch_id].num_model_pairs,
+                        self.branches[branch_id].comparisons_complete
                     )])
             ctr += 1
 
