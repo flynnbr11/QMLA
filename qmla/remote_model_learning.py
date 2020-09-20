@@ -78,6 +78,7 @@ def remote_learn_model_parameters(
         "Starting QHL for Model {} on branch {}".format(model_id, branch_id)
     ])
     time_start = time.time()
+    num_redis_retries = 5
 
     # Access databases
     redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
@@ -170,68 +171,39 @@ def remote_learn_model_parameters(
     )
 
     # Store the (compressed) result set on the redis database.
-    try:
-        learned_models_info_db.set(
-            str(model_id),
-            compressed_info
-        )
-        log_print([
-            "Redis learned_models_info_db added to db for model:",
-            str(model_id)
-        ])
-    except BaseException:
-        log_print([
-            "Model learning failed to add learned_models_info_db for model:",
-            model_id
-        ])
-        try:
-            log_print([
-                "info which failed to save: \n",
-                updated_model_info
-            ])
-        except Exception as e:
-            log_print([
-                "Model learning failed at the updated_model_info stage (?). Error:".format(e)
-            ])
-            any_job_failed_db.set('Status', 1)
-            # pass
-
-        try:
-            compressed_info = pickle.dumps(
-                updated_model_info,
-                protocol=4
-            )
-        except Exception as e:
-            log_print([
-                "Model learning failed at the compression stage. Error: {}".format(e)
-            ])
-            pass
-            any_job_failed_db.set('Status', 1)
-
+    for k in range(num_redis_retries):
         try:
             learned_models_info_db.set(
                 str(model_id),
                 compressed_info
             )
             log_print([
-                "Managed to store it this time... "
+                "learned_models_info_db added to db for model {} after {} attempts".format(
+                    str(model_id),
+                    k
+                )
             ])
+            break
         except Exception as e:
-            log_print([
-                "Model learning failed at the storage stage. Error: {}".format(e)
-            ])
-            any_job_failed_db.set('Status', 1)
-            pass
+            if k == num_redis_retries - 1:
+                log_print([
+                    "Model learning failed at the storage stage. Error: {}".format(e)
+                ])
+                any_job_failed_db.set('Status', 1)
+                pass
 
     # Update databases to record that this model has finished.
-    try:
-        active_branches_learning_models.incr(int(branch_id), 1)
-        learned_models_ids.set(str(model_id), 1)
-    except Exception as e:
-        log_print([
-            "Model learning failed to update branch info. Error: ", e
-        ])
-        any_job_failed_db.set('Status', 1)
+    for k in range(num_redis_retries):
+        try:
+            active_branches_learning_models.incr(int(branch_id), 1)
+            learned_models_ids.set(str(model_id), 1)
+            break
+        except Exception as e:
+            if k == num_redis_retries-1:
+                log_print([
+                    "Model learning failed to update branch info. Error: ", e
+                ])
+                any_job_failed_db.set('Status', 1)
 
     if remote:
         del updated_model_info
