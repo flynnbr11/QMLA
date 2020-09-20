@@ -197,6 +197,12 @@ def remote_learn_model_parameters(
         try:
             active_branches_learning_models.incr(int(branch_id), 1)
             learned_models_ids.set(str(model_id), 1)
+            log_print([
+                "Updated model/branch learned on redis db  {}/{}".format(
+                    model_id, 
+                    branch_id
+                )
+            ])
             break
         except Exception as e:
             if k == num_redis_retries-1:
