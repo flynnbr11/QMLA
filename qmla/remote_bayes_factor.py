@@ -147,9 +147,9 @@ def remote_bayes_factor_calculation(
     try:
         updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
         updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
-    except:
+    except Exception as e:
         log_print([
-            "BF Failed to copy updaters"
+            "BF Failed to copy updaters. Error: {}".format(e)
         ])
         any_job_failed_db.set('Status', 1)
         raise
@@ -164,9 +164,9 @@ def remote_bayes_factor_calculation(
             new_times = model_a.times_learned_over,
             new_experimental_params = model_a.track_experiment_parameters
         )
-    except:
+    except Exception as e:
         log_print([
-            "BF Failed to compute log likelihoods"
+            "BF Failed to compute log likelihoods. Error: ", e
         ])
         any_job_failed_db.set('Status', 1)
         raise
