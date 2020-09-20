@@ -88,56 +88,44 @@ def remote_bayes_factor_calculation(
             log_identifier='BF ({}/{})'.format(model_a_id, model_b_id)
         )
     log_print(["BF start on branch", branch_id])
+    num_redis_retries # TODO this is a hideous hack to get around redis database temporary failures
     time_start = time.time()
 
     # Access databases
-    try:
-        redis_databases = rds.get_redis_databases_by_qmla_id(
-            host_name, port_number, qid)
-        qmla_core_info_database = redis_databases['qmla_core_info_database']
-        learned_models_info_db = redis_databases['learned_models_info_db']
-        learned_models_ids = redis_databases['learned_models_ids']
-        bayes_factors_db = redis_databases['bayes_factors_db']
-        bayes_factors_winners_db = redis_databases['bayes_factors_winners_db']
-        active_branches_learning_models = redis_databases['active_branches_learning_models']
-        active_branches_bayes = redis_databases['active_branches_bayes']
-        active_interbranch_bayes = redis_databases['active_interbranch_bayes']
-        any_job_failed_db = redis_databases['any_job_failed']
+    for k in range(num_redis_retries):
+        try:
+            redis_databases = rds.get_redis_databases_by_qmla_id(
+                host_name, port_number, qid)
+            qmla_core_info_database = redis_databases['qmla_core_info_database']
+            learned_models_info_db = redis_databases['learned_models_info_db']
+            learned_models_ids = redis_databases['learned_models_ids']
+            bayes_factors_db = redis_databases['bayes_factors_db']
+            bayes_factors_winners_db = redis_databases['bayes_factors_winners_db']
+            active_branches_learning_models = redis_databases['active_branches_learning_models']
+            active_branches_bayes = redis_databases['active_branches_bayes']
+            active_interbranch_bayes = redis_databases['active_interbranch_bayes']
+            any_job_failed_db = redis_databases['any_job_failed']
 
-        # Retrieve data from databases
-        qmla_core_info_dict = pickle.loads(
-            redis_databases['qmla_core_info_database']['qmla_settings'])
-    except Exception as e:
-        log_print([
-            "BF Failed (branch {}) to retrieve redis databases. Error: {}".format(
-                branch_id, e
-            )
-        ])
-        any_job_failed_db.set('Status', 1)
-        raise
+            # Retrieve data from databases
+            qmla_core_info_dict = pickle.loads(
+                redis_databases['qmla_core_info_database']['qmla_settings'])
+        except Exception as e:
+            if k == num_redis_retries-1:
+                log_print([
+                    "BF Failed (branch {}) to retrieve redis databases. Error: {}".format(
+                        branch_id, e
+                    )
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
 
     # Whether to build plots
     save_plots_of_posteriors = False
-    plot_level = qmla_core_info_dict['plot_level']
+    plot_level = qmla_core_info_dict['plot_level']  
 
     # Get model instances
-    try:
-        model_a = qmla.model_for_comparison.ModelInstanceForComparison(
-            model_id=model_a_id,
-            qid=qid,
-            opponent=model_b_id, 
-            log_file=log_file,
-            host_name=host_name,
-            port_number=port_number,
-        )
-    except Exception as e:
-        log_print([
-            "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
-        ])
+    for k in range(num_redis_retries):
         try:
-            log_print([
-                "Trying to get model {} again.".format(model_a_id)
-            ])
             model_a = qmla.model_for_comparison.ModelInstanceForComparison(
                 model_id=model_a_id,
                 qid=qid,
@@ -146,31 +134,16 @@ def remote_bayes_factor_calculation(
                 host_name=host_name,
                 port_number=port_number,
             )
-            log_print(["Got model {} at second attempt.".format(model_a_id)])
         except Exception as e:
-            log_print([
-                "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
-            ])
-            any_job_failed_db.set('Status', 1)
-            raise
+            if k == num_redis_retries -1:
+                log_print([
+                    "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
 
-    try:
-        model_b = qmla.model_for_comparison.ModelInstanceForComparison(
-            model_id=model_b_id,
-            qid=qid,
-            opponent=model_a_id, 
-            log_file=log_file,
-            host_name=host_name,
-            port_number=port_number,
-        )
-    except Exception as e:
-        log_print([
-            "BF Failed to instantiate model {}. Error: {}".format(model_b_id, e)
-        ])
+    for k in range(num_redis_retries):
         try:
-            log_print([
-                "Trying to get model {} again.".format(model_b_id)
-            ])
             model_b = qmla.model_for_comparison.ModelInstanceForComparison(
                 model_id=model_b_id,
                 qid=qid,
@@ -179,45 +152,62 @@ def remote_bayes_factor_calculation(
                 host_name=host_name,
                 port_number=port_number,
             )
-            log_print(["Got model {} at second attempt.".format(model_b_id)])
         except Exception as e:
-            log_print([
-                "BF Failed to instantiate model {} at second attempt. Error: {}".format(model_b_id, e)
-            ])
-            any_job_failed_db.set('Status', 1)
-            raise
+            if k == num_redis_retries -1:
+                log_print([
+                    "BF Failed to instantiate model {}. Error: {}".format(model_b_id, e)
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
 
     log_print([
         "Both models instantiated on branch {}.".format(branch_id)
     ])
 
     # Take a copy of each updater before updates (for plotting later)
-    try:
-        updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
-        updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
-    except Exception as e:
-        log_print([
-            "BF Failed to copy updaters. Error: {}".format(e)
-        ])
-        any_job_failed_db.set('Status', 1)
-        raise
+    for k in range(num_redis_retries):
+        try:
+            updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
+            updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
+        except Exception as e:
+            if k == num_redis_retries-1:
+                log_print([
+                    "BF Failed to copy updaters. Error: {}".format(e)
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
         
     # Update the models with the times trained by the other model.
-    try:
-        log_l_a = model_a.update_log_likelihood(
-            new_times = model_b.times_learned_over,
-            new_experimental_params = model_b.track_experiment_parameters
-        )
-        log_l_b = model_b.update_log_likelihood(
-            new_times = model_a.times_learned_over,
-            new_experimental_params = model_a.track_experiment_parameters
-        )
-    except Exception as e:
-        log_print([
-            "BF Failed to compute log likelihoods. Error: ", e
-        ])
-        any_job_failed_db.set('Status', 1)
-        raise
+    for k in range(num_redis_retries):
+        try:
+            log_l_a = model_a.update_log_likelihood(
+                new_times = model_b.times_learned_over,
+                new_experimental_params = model_b.track_experiment_parameters
+            )
+        except Exception as e:
+            if k == num_redis_retries - 1:
+                log_print([
+                    "BF Failed to compute log likelihood for {}. Error: {}".format(
+                        model_a_id, e
+                    )
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
+    for k in range(num_redis_retries):
+        try:
+            log_l_b = model_b.update_log_likelihood(
+                new_times = model_a.times_learned_over,
+                new_experimental_params = model_a.track_experiment_parameters
+            )
+        except Exception as e:
+            if k == num_redis_retries - 1:
+                log_print([
+                    "BF Failed to compute log likelihood for {}. Error: {}".format(
+                        model_b_id, k
+                    )
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
 
     bayes_factor = np.exp( log_l_a - log_l_b )
 
@@ -278,67 +268,66 @@ def remote_bayes_factor_calculation(
             np.round(np.log10(bayes_factor), 2)
         )
     ])
-    try:
-        if bayes_factor < 1e-160:
-            bayes_factor = 1e-160
-        elif bayes_factor > 1e160:
-            bayes_factor = 1e160
+    if bayes_factor < 1e-160:
+        bayes_factor = 1e-160
+    elif bayes_factor > 1e160:
+        bayes_factor = 1e160
 
-        pair_id = construct_models.unique_model_pair_identifier(
-            model_a_id, model_b_id
-        )
-    except Exception as e:
-        log_print([
-            "BF Failed to set bf as max value. Error: ", e
-        ])
-        any_job_failed_db.set('Status', 1)
-        raise
+    pair_id = construct_models.unique_model_pair_identifier(
+        model_a_id, model_b_id
+    )
 
-    try:
-        if float(model_a_id) < float(model_b_id):
-            # so that BF in database always refers to (low/high), not (high/low).
-            bayes_factors_db.set(pair_id, bayes_factor)
-        else:
-            bayes_factors_db.set(pair_id, (1.0 / bayes_factor))
-    except Exception as e:
-        log_print([
-            "BF Failed to set bf on redis bf db. Error: ", e
-        ])
-        any_job_failed_db.set('Status', 1)
-        raise
+    for k in range(num_redis_retries):
+        try:
+            if float(model_a_id) < float(model_b_id):
+                # so that BF in database always refers to (low/high), not (high/low).
+                bayes_factors_db.set(pair_id, bayes_factor)
+            else:
+                bayes_factors_db.set(pair_id, (1.0 / bayes_factor))
+        except Exception as e:
+            if k == num_redis_retries-1:
+                log_print([
+                    "BF Failed to set bf on redis bf db. Error: ", e
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
 
     # Record winner if BF > threshold
-    try:
-        if bayes_factor > bayes_threshold:
-            bayes_factors_winners_db.set(pair_id, 'a')
-        elif bayes_factor < (1.0 / bayes_threshold):
-            bayes_factors_winners_db.set(pair_id, 'b')
-        else:
-            log_print(["Neither model much better."])
-            log_print([
-                "Renorm record A: \n {}".format(model_a.qinfer_updater._normalization_record),
-                "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
+    for k in range(num_redis_retries):
+        try:
+            if bayes_factor > bayes_threshold:
+                bayes_factors_winners_db.set(pair_id, 'a')
+            elif bayes_factor < (1.0 / bayes_threshold):
+                bayes_factors_winners_db.set(pair_id, 'b')
+            else:
+                log_print(["Neither model much better."])
+                log_print([
+                    "Renorm record A: \n {}".format(model_a.qinfer_updater._normalization_record),
+                    "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
 
-            ])
-    except Exception as e:
-        log_print([
-            "BF Failed to set bf on redis winner db. Error: ", e
-        ])
-        any_job_failed_db.set('Status', 1)
-        raise
+                ])
+        except Exception as e:
+            if k == num_redis_retries-1:
+                log_print([
+                    "BF Failed to set bf on redis winner db. Error: ", e
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
 
     # Record this result to the branch
-    try:
-        if branch_id is not None:
-            active_branches_bayes.incr(int(branch_id), 1)
-        else:
-            active_interbranch_bayes.set(pair_id, True)
-    except Exception as e:
-        log_print([
-            "BF Failed to compute log likelihoods. Error: ", e
-        ])
-        any_job_failed_db.set('Status', 1)
-        raise
+    for k in range(num_redis_retries):
+        try:
+            if branch_id is not None:
+                active_branches_bayes.incr(int(branch_id), 1)
+            else:
+                active_interbranch_bayes.set(pair_id, True)
+        except Exception as e:
+            if k == num_redis_retries - 1:
+                log_print([
+                    "BF Failed to compute log likelihoods. Error: ", e
+                ])
+                any_job_failed_db.set('Status', 1)
+                raise
 
     log_print([
         "BF finished on branch {}. rq time: {}".format(
