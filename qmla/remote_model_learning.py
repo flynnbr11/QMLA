@@ -128,14 +128,14 @@ def remote_learn_model_parameters(
 
     except NameError:
         log_print([
-            "QHL failed for model id {}. Setting job failure construct_models.".format(
+            "Model learning failed. QHL failed for model id {}. Setting job failure construct_models.".format(
                 model_id)
         ])
         any_job_failed_db.set('Status', 1)
         raise
     except BaseException:
         log_print([
-            "QHL failed for model id {}. Setting job failure construct_models.".format(
+            "Model learning failed. QHL failed for model id {}. Setting job failure construct_models.".format(
                 model_id)
         ])
         any_job_failed_db.set('Status', 1)
@@ -181,7 +181,7 @@ def remote_learn_model_parameters(
         ])
     except BaseException:
         log_print([
-            "Failed to add learned_models_info_db for model:",
+            "Model learning failed to add learned_models_info_db for model:",
             model_id
         ])
         try:
@@ -191,7 +191,7 @@ def remote_learn_model_parameters(
             ])
         except Exception as e:
             log_print([
-                "Failed at the updated_model_info stage (?). Error:".format(e)
+                "Model learning failed at the updated_model_info stage (?). Error:".format(e)
             ])
             any_job_failed_db.set('Status', 1)
             # pass
@@ -203,7 +203,7 @@ def remote_learn_model_parameters(
             )
         except Exception as e:
             log_print([
-                "Failed at the compression stage. Error: {}".format(e)
+                "Model learning failed at the compression stage. Error: {}".format(e)
             ])
             pass
             any_job_failed_db.set('Status', 1)
@@ -218,15 +218,20 @@ def remote_learn_model_parameters(
             ])
         except Exception as e:
             log_print([
-                "Failed at the storage stage. Error: {}".format(e)
+                "Model learning failed at the storage stage. Error: {}".format(e)
             ])
             pass
 
             any_job_failed_db.set('Status', 1)
 
     # Update databases to record that this model has finished.
-    active_branches_learning_models.incr(int(branch_id), 1)
-    learned_models_ids.set(str(model_id), 1)
+    try:
+        active_branches_learning_models.incr(int(branch_id), 1)
+        learned_models_ids.set(str(model_id), 1)
+    except Exception as e:
+        log_print([
+            "Model learning failed to update branch info. Error: ", e
+        ])
 
     if remote:
         del updated_model_info

@@ -223,7 +223,8 @@ def remote_bayes_factor_calculation(
 
     # Present result
     log_print([
-        "BF computed: A:{}; B:{}; log10 BF={}".format(
+        "BF computed on brach {}: A:{}; B:{}; log10 BF={}".format(
+            branch_id, 
             model_a_id,
             model_b_id,
             np.round(np.log10(bayes_factor), 2)
