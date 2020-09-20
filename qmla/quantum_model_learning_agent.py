@@ -2336,7 +2336,7 @@ class QuantumModelLearningAgent():
                     tree.growth_rule, 
                     starting_models
                 ),
-                "models_to_compare:", models_to_compare
+                # "models_to_compare:", models_to_compare
             ])
             self.new_branch(
                 model_list=starting_models,
