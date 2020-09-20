@@ -1248,10 +1248,11 @@ class QuantumModelLearningAgent():
                     self.compare_models_within_branch(branch_id)
                 elif ctr % 10 == 0:
                     self.log_print([
-                        "Ctr {} branch {} has {} models learned".format(
+                        "Ctr {} branch {} has {} of {} models learned".format(
                         ctr, 
                         branch_id,
-                        int(num_models_learned_on_branch)
+                        int(num_models_learned_on_branch),
+                        self.branches[branch_id].num_models
                     )])
 
             for branchID_bytes in active_branches_bayes.keys():
@@ -1292,10 +1293,11 @@ class QuantumModelLearningAgent():
                         )
                 elif ctr % 10 == 0:
                     self.log_print([
-                        "Ctr {} branch {} has {} comparisons complete".format(
+                        "Ctr {} branch {} has {} out of {} comparisons complete".format(
                         ctr,
                         branch_id, 
-                        int(num_comparisons_complete_on_branch)
+                        int(num_comparisons_complete_on_branch),
+                        self.branches[branch_id].num_model_pairs
                     )])
             ctr += 1
 
@@ -2332,9 +2334,10 @@ class QuantumModelLearningAgent():
             starting_models, models_to_compare = tree.get_initial_models()
             # TODO genetic alg giving some non-unique initial model sets
             self.log_print([
-                "First branch for {} has ( {} unique ) starting models: {}".format(
-                    len(set(starting_models)), 
+                "First branch for {} has ( {}/{} unique ) starting models: {}".format(
                     tree.growth_rule, 
+                    len(set(starting_models)), 
+                    len(starting_models),
                     starting_models
                 ),
                 # "models_to_compare:", models_to_compare
