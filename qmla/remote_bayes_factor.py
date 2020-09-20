@@ -88,7 +88,7 @@ def remote_bayes_factor_calculation(
             log_identifier='BF ({}/{})'.format(model_a_id, model_b_id)
         )
     log_print(["BF start on branch", branch_id])
-    num_redis_retries # TODO this is a hideous hack to get around redis database temporary failures
+    num_redis_retries = 5 # TODO this is a hideous hack to get around redis database temporary failures
     time_start = time.time()
 
     # Access databases
