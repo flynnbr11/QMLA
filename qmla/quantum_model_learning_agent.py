@@ -1210,6 +1210,7 @@ class QuantumModelLearningAgent():
         self.log_print([
             "Entering while loop: learning/comparing/spawning models."
         ])
+        ctr = 0
         while self.tree_count_completed < self.tree_count:
             # get most recent branches on redis database
             branch_ids_on_db = list(
@@ -1245,6 +1246,13 @@ class QuantumModelLearningAgent():
                         mod.model_update_learned_values()
                     # launch comparisons
                     self.compare_models_within_branch(branch_id)
+                elif ctr % 1000 == 0:
+                    self.log_print([
+                        "Ctr {} branch {} has {} models learned".format(
+                        ctr, 
+                        branch_id,
+                        num_models_learned_on_branch
+                    )])
 
             for branchID_bytes in active_branches_bayes.keys():
                 branch_id = int(branchID_bytes)
@@ -1282,6 +1290,14 @@ class QuantumModelLearningAgent():
                         self.spawn_from_branch(
                             branch_id=branch_id,
                         )
+                elif ctr % 1000 == 0:
+                    self.log_print([
+                        "Ctr {} branch {} has {} comparisons complete".format(
+                        ctr,
+                        branch_id, 
+                        num_comparisons_complete_on_branch
+                    )])
+            ctr += 1
 
         self.log_print([
             "{} trees have completed. Waiting on final comparisons".format(
