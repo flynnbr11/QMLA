@@ -142,6 +142,9 @@ def remote_bayes_factor_calculation(
         ])
         any_job_failed_db.set('Status', 1)
         raise
+    log_print([
+        "Both models instantiated no branch {}.".format(branch_id)
+    ])
 
     # Take a copy of each updater before updates (for plotting later)
     try:

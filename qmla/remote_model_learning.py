@@ -220,9 +220,8 @@ def remote_learn_model_parameters(
             log_print([
                 "Model learning failed at the storage stage. Error: {}".format(e)
             ])
-            pass
-
             any_job_failed_db.set('Status', 1)
+            pass
 
     # Update databases to record that this model has finished.
     try:
@@ -232,6 +231,7 @@ def remote_learn_model_parameters(
         log_print([
             "Model learning failed to update branch info. Error: ", e
         ])
+        any_job_failed_db.set('Status', 1)
 
     if remote:
         del updated_model_info
