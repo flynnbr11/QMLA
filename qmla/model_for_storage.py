@@ -186,20 +186,23 @@ class ModelInstanceForStorage():
             # everything can be done locally if learned_info is provided
             model_id_float = float(self.model_id)
             model_id_str = str(model_id_float)
-            try:
-                learned_info = pickle.loads(
-                    learned_models_info_db.get(model_id_str),
-                    encoding='latin1'
-                )
-            except BaseException:
-                self.log_print([
-                    "Unable to load learned info",
-                    "model_id_str: ", model_id_str,
-                    "model id: ", self.model_id,
-                    "learned info keys:, ", learned_models_info_db.keys(),
-                    "learned info:, ", learned_models_info_db.get(
-                        model_id_str)
-                ])
+            for k in range(num_redis_retries):
+                try:
+                    learned_info = pickle.loads(
+                        learned_models_info_db.get(model_id_str),
+                        encoding='latin1'
+                    )
+                    break
+                except Exception as e:
+                    if k  == num_redis_retries -1 :
+                        self.log_print([
+                            "Unable to load learned info",
+                            "model_id_str: ", model_id_str,
+                            "model id: ", self.model_id,
+                            "learned info keys:, ", learned_models_info_db.keys(),
+                            # "learned info:, ", learned_models_info_db.get(
+                            #     model_id_str)
+                        ])
 
         # Load results: assign attribute of this class for everything stored
         # in learned_info_dict() of ModelInstanceForStorage.
