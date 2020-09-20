@@ -134,8 +134,26 @@ def remote_bayes_factor_calculation(
         log_print([
             "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
         ])
-        any_job_failed_db.set('Status', 1)
-        raise
+        try:
+            log_print([
+                "Trying to get model {} again.".format(model_a_id)
+            ])
+            model_a = qmla.model_for_comparison.ModelInstanceForComparison(
+                model_id=model_a_id,
+                qid=qid,
+                opponent=model_b_id, 
+                log_file=log_file,
+                host_name=host_name,
+                port_number=port_number,
+            )
+            log_print(["Got model {} at second attempt.".format(model_a_id)])
+        except Exception as e:
+            log_print([
+                "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
+            ])
+            any_job_failed_db.set('Status', 1)
+            raise
+
     try:
         model_b = qmla.model_for_comparison.ModelInstanceForComparison(
             model_id=model_b_id,
@@ -147,12 +165,30 @@ def remote_bayes_factor_calculation(
         )
     except Exception as e:
         log_print([
-            "BF Failed to instantiate model {}. Error: {}".format(model_b_id, e)
+            "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
         ])
-        any_job_failed_db.set('Status', 1)
-        raise
+        try:
+            log_print([
+                "Trying to get model {} again.".format(model_a_id)
+            ])
+            model_b = qmla.model_for_comparison.ModelInstanceForComparison(
+                model_id=model_b_id,
+                qid=qid,
+                opponent=model_a_id, 
+                log_file=log_file,
+                host_name=host_name,
+                port_number=port_number,
+            )
+            log_print(["Got model {} at second attempt.".format(model_b_id)])
+        except Exception as e:
+            log_print([
+                "BF Failed to instantiate model {} at second attempt. Error: {}".format(model_b_id, e)
+            ])
+            any_job_failed_db.set('Status', 1)
+            raise
+
     log_print([
-        "Both models instantiated no branch {}.".format(branch_id)
+        "Both models instantiated on branch {}.".format(branch_id)
     ])
 
     # Take a copy of each updater before updates (for plotting later)
