@@ -266,7 +266,7 @@ class HeisenbergGeneticXXZ(
 
         self.max_time_to_consider = 50
         self.iqle_mode = True
-        self.max_spawn_depth = 6 # 6 for debug 32
+        self.max_spawn_depth = 32 # 6 # 6 for debug 32
         self.initial_num_models = 28
 
         self.initial_models = self.genetic_algorithm.random_initial_models(

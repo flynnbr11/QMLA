@@ -157,7 +157,7 @@ class QuantumModelLearningAgent():
             'job_crashes': 0,
             'jobs_finished': 0,
         }
-        self.sleep_duration = 10
+        self.sleep_duration = 2
 
     def _true_model_definition(self):
         r""" Information related to true (target) model."""
@@ -1246,7 +1246,7 @@ class QuantumModelLearningAgent():
                         mod.model_update_learned_values()
                     # launch comparisons
                     self.compare_models_within_branch(branch_id)
-                elif ctr % 100 == 0:
+                elif ctr % 10 == 0:
                     self.log_print([
                         "Ctr {} branch {} has {} models learned".format(
                         ctr, 
@@ -1290,7 +1290,7 @@ class QuantumModelLearningAgent():
                         self.spawn_from_branch(
                             branch_id=branch_id,
                         )
-                elif ctr % 100 == 0:
+                elif ctr % 10 == 0:
                     self.log_print([
                         "Ctr {} branch {} has {} comparisons complete".format(
                         ctr,
@@ -2330,6 +2330,7 @@ class QuantumModelLearningAgent():
         # Set up one tree per growth rule
         for tree in list(self.trees.values()):
             starting_models, models_to_compare = tree.get_initial_models()
+            # TODO genetic alg giving some non-unique initial model sets
             self.log_print([
                 "First branch for {} has ( {} unique ) starting models: {}".format(
                     len(set(starting_models)), 
