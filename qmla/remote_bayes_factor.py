@@ -123,7 +123,7 @@ def remote_bayes_factor_calculation(
         )
     except Exception as e:
         log_print([
-            "BF Failed to instantiate model {}. Error: \n {}".format(model_a_id, e)
+            "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
         ])
         any_job_failed_db.set('Status', 1)
         raise
@@ -138,7 +138,7 @@ def remote_bayes_factor_calculation(
         )
     except Exception as e:
         log_print([
-            "BF Failed to instantiate model {}. Error: \n {}".format(model_b_id, e)
+            "BF Failed to instantiate model {}. Error: {}".format(model_b_id, e)
         ])
         any_job_failed_db.set('Status', 1)
         raise
@@ -245,23 +245,37 @@ def remote_bayes_factor_calculation(
         bayes_factors_db.set(pair_id, (1.0 / bayes_factor))
 
     # Record winner if BF > threshold
-    if bayes_factor > bayes_threshold:
-        bayes_factors_winners_db.set(pair_id, 'a')
-    elif bayes_factor < (1.0 / bayes_threshold):
-        bayes_factors_winners_db.set(pair_id, 'b')
-    else:
-        log_print(["Neither model much better."])
-        log_print([
-            "Renorm record A: \n {}".format(model_a.qinfer_updater._normalization_record),
-            "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
+    try:
+        if bayes_factor > bayes_threshold:
+            bayes_factors_winners_db.set(pair_id, 'a')
+        elif bayes_factor < (1.0 / bayes_threshold):
+            bayes_factors_winners_db.set(pair_id, 'b')
+        else:
+            log_print(["Neither model much better."])
+            log_print([
+                "Renorm record A: \n {}".format(model_a.qinfer_updater._normalization_record),
+                "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
 
+            ])
+    except:
+        log_print([
+            "BF Failed to set bf on redis db. Error: ", e
         ])
+        any_job_failed_db.set('Status', 1)
+        raise
 
     # Record this result to the branch
-    if branch_id is not None:
-        active_branches_bayes.incr(int(branch_id), 1)
-    else:
-        active_interbranch_bayes.set(pair_id, True)
+    try:
+        if branch_id is not None:
+            active_branches_bayes.incr(int(branch_id), 1)
+        else:
+            active_interbranch_bayes.set(pair_id, True)
+    except Exception as e:
+        log_print([
+            "BF Failed to compute log likelihoods. Error: ", e
+        ])
+        any_job_failed_db.set('Status', 1)
+        raise
 
     log_print([
         "Finished. rq time: ", str(time.time() - time_start),

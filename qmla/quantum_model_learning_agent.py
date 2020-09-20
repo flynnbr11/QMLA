@@ -1253,9 +1253,10 @@ class QuantumModelLearningAgent():
                 )
                 if (
                     not self.branches[branch_id].comparisons_complete
-                    and
-                    int(
-                        num_comparisons_complete_on_branch) == self.branches[branch_id].num_model_pairs
+                    and (
+                        int( num_comparisons_complete_on_branch) 
+                        == self.branches[branch_id].num_model_pairs
+                    )
                 ):
                     self.branches[branch_id].comparisons_complete = True
                     # analyse resulting bayes factors
