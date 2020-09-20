@@ -109,6 +109,7 @@ def remote_bayes_factor_calculation(
             # Retrieve data from databases
             qmla_core_info_dict = pickle.loads(
                 redis_databases['qmla_core_info_database']['qmla_settings'])
+            break
         except Exception as e:
             if k == num_redis_retries-1:
                 log_print([
@@ -134,6 +135,7 @@ def remote_bayes_factor_calculation(
                 host_name=host_name,
                 port_number=port_number,
             )
+            break
         except Exception as e:
             if k == num_redis_retries -1:
                 log_print([
@@ -152,6 +154,7 @@ def remote_bayes_factor_calculation(
                 host_name=host_name,
                 port_number=port_number,
             )
+            break
         except Exception as e:
             if k == num_redis_retries -1:
                 log_print([
@@ -169,6 +172,7 @@ def remote_bayes_factor_calculation(
         try:
             updater_a_copy = copy.deepcopy(model_a.qinfer_updater)
             updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
+            break
         except Exception as e:
             if k == num_redis_retries-1:
                 log_print([
@@ -184,6 +188,7 @@ def remote_bayes_factor_calculation(
                 new_times = model_b.times_learned_over,
                 new_experimental_params = model_b.track_experiment_parameters
             )
+            break
         except Exception as e:
             if k == num_redis_retries - 1:
                 log_print([
@@ -199,6 +204,7 @@ def remote_bayes_factor_calculation(
                 new_times = model_a.times_learned_over,
                 new_experimental_params = model_a.track_experiment_parameters
             )
+            break
         except Exception as e:
             if k == num_redis_retries - 1:
                 log_print([
@@ -284,6 +290,7 @@ def remote_bayes_factor_calculation(
                 bayes_factors_db.set(pair_id, bayes_factor)
             else:
                 bayes_factors_db.set(pair_id, (1.0 / bayes_factor))
+            break
         except Exception as e:
             if k == num_redis_retries-1:
                 log_print([
@@ -306,6 +313,7 @@ def remote_bayes_factor_calculation(
                     "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
 
                 ])
+            break
         except Exception as e:
             if k == num_redis_retries-1:
                 log_print([
@@ -321,6 +329,7 @@ def remote_bayes_factor_calculation(
                 active_branches_bayes.incr(int(branch_id), 1)
             else:
                 active_interbranch_bayes.set(pair_id, True)
+            break
         except Exception as e:
             if k == num_redis_retries - 1:
                 log_print([
