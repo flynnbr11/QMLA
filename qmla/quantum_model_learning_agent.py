@@ -1246,12 +1246,12 @@ class QuantumModelLearningAgent():
                         mod.model_update_learned_values()
                     # launch comparisons
                     self.compare_models_within_branch(branch_id)
-                elif ctr % 1000 == 0:
+                elif ctr % 100 == 0:
                     self.log_print([
                         "Ctr {} branch {} has {} models learned".format(
                         ctr, 
                         branch_id,
-                        num_models_learned_on_branch
+                        int(num_models_learned_on_branch)
                     )])
 
             for branchID_bytes in active_branches_bayes.keys():
@@ -1290,12 +1290,12 @@ class QuantumModelLearningAgent():
                         self.spawn_from_branch(
                             branch_id=branch_id,
                         )
-                elif ctr % 1000 == 0:
+                elif ctr % 100 == 0:
                     self.log_print([
                         "Ctr {} branch {} has {} comparisons complete".format(
                         ctr,
                         branch_id, 
-                        num_comparisons_complete_on_branch
+                        int(num_comparisons_complete_on_branch)
                     )])
             ctr += 1
 

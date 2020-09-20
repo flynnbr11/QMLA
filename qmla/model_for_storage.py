@@ -148,12 +148,35 @@ class ModelInstanceForStorage():
             return
 
         self.values_updated = True
-        redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
-            self.redis_host_name,
-            self.redis_port_number,
-            self.qmla_id
-        )
-        learned_models_info_db = redis_databases['learned_models_info_db']
+        num_redis_retries = 5
+        for k in range(num_redis_retries):
+            try:
+                redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
+                    self.redis_host_name,
+                    self.redis_port_number,
+                    self.qmla_id
+                )
+                break
+            except Exception as e:
+                if k == num_redis_retries-1:
+                    log_print([
+                        "Failed to retrieve redis databases. Error: ", e
+                    ])
+                    any_job_failed_db.set('Status', 1)
+                    raise
+
+        for k in range(num_redis_retries):
+            try:
+                learned_models_info_db = redis_databases['learned_models_info_db']
+                break
+            except Exception as e:
+                if k == num_redis_retries-1:
+                    log_print([
+                        "Failed to retrieve model stored data. Error: ", e
+                    ])
+                    any_job_failed_db.set('Status', 1)
+                    raise
+
         self.log_print([
             "Updating learned info for model {}".format(self.model_id)
         ])
