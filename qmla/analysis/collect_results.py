@@ -173,6 +173,7 @@ def generate_combined_datasets(
     lattice_record = pd.DataFrame()
     gene_pool = pd.DataFrame()
     birth_register = pd.DataFrame()
+    gen_alg_summary = pd.DataFrame()
 
     # cycle through files
     for f in filenames:
@@ -227,6 +228,21 @@ def generate_combined_datasets(
             birth_register = birth_register.append(br, ignore_index=True)
         except:
             pass                   
+
+        try:
+            gs = pd.Series({
+                'qmla_id' : storage.qmla_id, 
+                'champ_f_score' : storage.Fscore, 
+                'num_models' : storage.NumModels, 
+                'champ_terms_latex' : storage.ConstituentTerms, 
+                'champ_terms' : storage.NameAlphabetical.split('+'), 
+                'true_found' : bool(storage.CorrectModel),
+                'num_generations' : storage.growth_rule_storage.birth_register.generation.max(),
+                'time_taken' : storage.Time
+            })
+            gen_alg_summary = gen_alg_summary.append(gs, ignore_index=True)
+        except:
+            pass
 
         try:
             # NOTE chromosomes cast to integers when written to CSV
@@ -305,7 +321,14 @@ def generate_combined_datasets(
         )
         datasets_generated.append('birth_register')
     except:
-        raise
+        pass
+
+    try:
+        gen_alg_summary.to_pickle(
+            os.path.join( combined_datasets_directory, 'gen_alg_summary.p')
+        )
+        datasets_generated.append('gen_alg_summary')
+    except:
         pass
 
     try:
