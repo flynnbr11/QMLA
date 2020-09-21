@@ -212,7 +212,7 @@ class HeisenbergGeneticXXZ(
         true_model = None, 
         **kwargs
     ):
-        xyz = False # whether to use HeixXYZ model; False gives HeisXXZ
+        xyz = True # whether to use HeixXYZ model; False gives HeisXXZ
         if true_model is None: 
             if xyz:
                 true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4'
