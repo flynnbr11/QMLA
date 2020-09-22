@@ -1246,7 +1246,7 @@ class QuantumModelLearningAgent():
                         mod.model_update_learned_values()
                     # launch comparisons
                     self.compare_models_within_branch(branch_id)
-                elif ctr % 10 == 0:
+                elif ctr % 100 == 0:
                     self.log_print([
                         "Ctr {} branch {} has {} of {} models learned; model_learning_complete: {}".format(
                         ctr, 
@@ -1292,7 +1292,7 @@ class QuantumModelLearningAgent():
                         self.spawn_from_branch(
                             branch_id=branch_id,
                         )
-                elif ctr % 10 == 0:
+                elif ctr % 100 == 0:
                     self.log_print([
                         "Ctr {} branch {} has {} out of {} comparisons complete; comparisons_complete: {}".format(
                         ctr,

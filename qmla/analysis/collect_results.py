@@ -340,8 +340,8 @@ def generate_combined_datasets(
         pass
 
     try:
-        unique_chromosomes.to_csv(
-            os.path.join( combined_datasets_directory, 'unique_chromosomes.csv'),
+        unique_chromosomes.to_pickle(
+            os.path.join( combined_datasets_directory, 'unique_chromosomes.p'),
         )
         datasets_generated.append('unique_chromosomes')
     except:
