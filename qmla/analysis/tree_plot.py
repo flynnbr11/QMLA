@@ -510,7 +510,7 @@ def plot_GrowthRuleTree(
         labels,
         title=legend_title,
         # mode="expand",
-        ncol=min(6, len(handles)),
+        ncol=min(4, len(handles)),
         loc='lower center'
     )
 
