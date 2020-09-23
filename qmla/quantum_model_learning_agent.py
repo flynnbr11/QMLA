@@ -2999,7 +2999,7 @@ class QuantumModelLearningAgent():
 
 
     def _plot_model_terms(self, colour_by = 'binary'):
-        if not self.plot_level >= 1:
+        if self.plot_level < 1:
             return
         
         # Prepare dataframes
@@ -3017,7 +3017,6 @@ class QuantumModelLearningAgent():
 
         branch_cols = ['model_id', 'f_score'] + unique_branches
         models_branches = pd.DataFrame(columns=branch_cols)
-
 
         for model_id in self.model_database.model_id:
 
@@ -3063,11 +3062,10 @@ class QuantumModelLearningAgent():
         # Plot as heatmap
         fig, ax = plt.subplots(figsize=(15,10))
 
-
         if colour_by == 'f_score':
             sns.heatmap(
                 piv_table,
-                cmap=f_score_cmap, 
+                cmap=self.growth_class.f_score_cmap, 
                 ax = ax,
                 cbar_kws={'label': 'F-score', }
             )
@@ -3082,7 +3080,6 @@ class QuantumModelLearningAgent():
 
 
         ax.tick_params(which='y', rotation=0)
-        f_score_cmap = self.growth_class.f_score_cmap
         fontsize = 20
         ax.tick_params(
             top=True, 

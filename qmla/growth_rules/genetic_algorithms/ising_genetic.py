@@ -215,7 +215,8 @@ class HeisenbergGeneticXXZ(
         xyz = True # whether to use HeixXYZ model; False gives HeisXXZ
         if true_model is None: 
             if xyz:
-                true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4'
+                # true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4'
+                true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
                 self.base_terms = [
                     'x', 'y', 'z',
                 ]
@@ -234,15 +235,28 @@ class HeisenbergGeneticXXZ(
         )
         self.true_model_terms_params = {
             # parameters for interesing HeisXXZ true model
-            'pauliSet_1J2_zJz_d4': 0.43722955243277917,
-            'pauliSet_1J3_zJz_d4': 0.2957906134497596,
-            'pauliSet_2J3_xJx_d4': 0.40887449013538046,
-            'pauliSet_2J3_zJz_d4': 0.48639558326136945,
-            'pauliSet_2J4_xJx_d4': 0.5226264170733737,
-            'pauliSet_3J4_zJz_d4': 0.5991799876475146,
-            'pauliSet_1J2_yJy_d4' : 0.35,
-            'pauliSet_1J4_yJy_d4' : 0.25,
-            'pauliSet_3J4_yJy_d4' : 0.8,
+            'pauliSet_1J2_zJz_d4': 0.4,
+            'pauliSet_1J3_zJz_d4': 0.3,
+            'pauliSet_3J4_zJz_d4': 0.2,
+            
+            'pauliSet_2J3_xJx_d4': 0.1,
+            'pauliSet_2J4_xJx_d4': 0.6,
+            'pauliSet_3J4_xJx_d4' : 0.7,
+
+            'pauliSet_2J3_yJy_d4': 0.8,
+            'pauliSet_1J2_yJy_d4' : 0.9,
+            'pauliSet_1J4_yJy_d4' : 0.5,
+
+
+            # 'pauliSet_1J2_zJz_d4': 0.43722955243277917,
+            # 'pauliSet_1J3_zJz_d4': 0.2957906134497596,
+            # 'pauliSet_2J3_xJx_d4': 0.40887449013538046,
+            # 'pauliSet_2J3_zJz_d4': 0.48639558326136945,
+            # 'pauliSet_2J4_xJx_d4': 0.5226264170733737,
+            # 'pauliSet_3J4_zJz_d4': 0.5991799876475146,
+            # 'pauliSet_1J2_yJy_d4' : 0.35,
+            # 'pauliSet_1J4_yJy_d4' : 0.25,
+            # 'pauliSet_3J4_yJy_d4' : 0.8,
         }
 
         # test F map for random set of 10 models
@@ -264,7 +278,7 @@ class HeisenbergGeneticXXZ(
         # self.fraction_own_experiments_for_bf = 0.05
         # self.timing_insurance_factor = 0.125
 
-        self.max_time_to_consider = 50
+        self.max_time_to_consider = 60
         self.iqle_mode = True
         self.max_spawn_depth = 32 # 6 # 6 for debug 32
         self.initial_num_models = 28

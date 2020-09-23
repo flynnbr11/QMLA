@@ -389,6 +389,7 @@ def plot_GrowthRuleTree(
     G,
     n_cmap,
     e_cmap,
+    include_legend=True, 
     e_alphas=[], nonadj_alpha=0.1,
     label_padding=0.4,
     arrow_size=0.02, widthscale=1.0,
@@ -502,7 +503,7 @@ def plot_GrowthRuleTree(
     if 'Branch Champion' in labels:
         legend_title = 'Champion Type'
     else:
-        legend_title = '# QMD wins'
+        legend_title = '# QMLA wins'
 
     legend_num_wins = plt.legend(
         handles,
@@ -607,17 +608,18 @@ def plot_GrowthRuleTree(
         edge_vmax=None,  # 0.85
     )
 
-    plt.legend(
-        model_handles,
-        model_labels,
-        bbox_to_anchor=(0.5, 1.0, 1, 0),
-        # bbox_to_anchor=(1.1, 1.05),
-        handler_map=handler_map,
-        loc=1,
-        title=model_legend_title
-    )._legend_box.align = 'left'
+    if include_legend:
+        plt.legend(
+            model_handles,
+            model_labels,
+            bbox_to_anchor=(0.5, 1.0, 1, 0),
+            # bbox_to_anchor=(1.1, 1.05),
+            handler_map=handler_map,
+            loc=1,
+            title=model_legend_title
+        )._legend_box.align = 'left'
 
-    plt.gca().add_artist(legend_num_wins)
+        plt.gca().add_artist(legend_num_wins)
     plt.colorbar(
         edges_for_cmap,
         orientation="horizontal",
@@ -626,7 +628,7 @@ def plot_GrowthRuleTree(
     )
 
     plot_title = str(
-        "Quantum Model Development Tree"
+        "Quantum Model Learning Agent Tree"
     )
     plt.title(plot_title)
 

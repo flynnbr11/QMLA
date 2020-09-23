@@ -136,7 +136,7 @@ def nv_spin_interaction(
     **kwargs
 ):
     term = name
-    num_qubits = construct_models.get_num_qubits(term)
+    num_qubits = qmla.construct_models.get_num_qubits(term)
     t_str = 'T' * (num_qubits - 1)
     p_str = 'P' * num_qubits
     separate_terms = term.split(p_str)
