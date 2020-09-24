@@ -53,21 +53,36 @@ class ObjectiveFncTestHeisXXZ(
             'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_3J4_zJz_d4'
         ]
         self.xyz_test_fitness_models = [
-            'pauliSet_1J2_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4',
-            'pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4',
-            'pauliSet_1J2_yJy_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
-            'pauliSet_1J2_zJz_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
-            'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4'
+            'pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_yJy_d4',
+            'pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4',
+            'pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4',
+            'pauliSet_1J2_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4',
+            'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
         ]
+
         self.test_fitness_models = self.xyz_test_fitness_models
 
 
