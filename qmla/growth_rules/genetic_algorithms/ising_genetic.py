@@ -286,6 +286,8 @@ class HeisenbergGeneticXXZ(
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
+        # self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.uniform_prior
+        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
         self.initial_num_models = len(self.initial_models)
         self.max_num_models_by_shape = {

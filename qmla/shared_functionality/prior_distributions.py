@@ -105,6 +105,32 @@ def gaussian_prior(
 
     return dist
 
+
+def uniform_prior(
+    model_name,
+    param_minimum=0,
+    param_maximum=1,
+    default_sigma=None,
+    random_mean=False,  # if set to true, chooses a random mean between given uniform min/max
+    prior_specific_terms={},
+    log_file='qmd.log',
+    log_identifier=None,
+    **kwargs
+):
+
+    individual_terms = construct_models.get_constituent_names_from_name(
+        model_name
+    )
+    num_terms = len(individual_terms)
+    available_specific_terms = list(prior_specific_terms.keys())
+
+    u = [[param_minimum, param_maximum]]*num_terms
+    u = np.array(u)
+    dist = qinfer.UniformDistribution(u)
+    return dist
+
+
+
 def prelearned_true_parameters_prior(
     model_name, 
     true_parameters, 

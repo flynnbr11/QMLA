@@ -10,8 +10,8 @@ run_qhl=1 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=1000 # number of experiments
-prt=3000 # number of particles
+exp=100 # number of experiments
+prt=300 # number of particles
 
 ###############
 # QMLA settings
@@ -21,7 +21,7 @@ further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
 number_best_models_further_qhl=5
-plot_level=2
+plot_level=6
 debug_mode=0
 
 ###############
