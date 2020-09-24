@@ -321,8 +321,6 @@ def n_qubit_hahn_evolution(
     from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
     inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
 
-
-
     # inversion_gate = make_inversion_gate_rotate_y(num_qubits)
 
     # want to evolve for t, then apply Hahn inversion gate, 
