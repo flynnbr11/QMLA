@@ -235,28 +235,28 @@ class HeisenbergGeneticXXZ(
         )
         self.true_model_terms_params = {
             # parameters for interesing HeisXXZ true model
-            'pauliSet_1J2_zJz_d4': 0.4,
-            'pauliSet_1J3_zJz_d4': 0.3,
-            'pauliSet_3J4_zJz_d4': 0.2,
+            # 'pauliSet_1J2_zJz_d4': 0.4,
+            # 'pauliSet_1J3_zJz_d4': 0.3,
+            # 'pauliSet_3J4_zJz_d4': 0.2,
             
-            'pauliSet_2J3_xJx_d4': 0.1,
-            'pauliSet_2J4_xJx_d4': 0.6,
-            'pauliSet_3J4_xJx_d4' : 0.7,
+            # 'pauliSet_2J3_xJx_d4': 0.1,
+            # 'pauliSet_2J4_xJx_d4': 0.6,
+            # 'pauliSet_3J4_xJx_d4' : 0.7,
 
-            'pauliSet_2J3_yJy_d4': 0.8,
-            'pauliSet_1J2_yJy_d4' : 0.9,
-            'pauliSet_1J4_yJy_d4' : 0.5,
+            # 'pauliSet_2J3_yJy_d4': 0.8,
+            # 'pauliSet_1J2_yJy_d4' : 0.9,
+            # 'pauliSet_1J4_yJy_d4' : 0.5,
 
-
-            # 'pauliSet_1J2_zJz_d4': 0.43722955243277917,
-            # 'pauliSet_1J3_zJz_d4': 0.2957906134497596,
-            # 'pauliSet_2J3_xJx_d4': 0.40887449013538046,
-            # 'pauliSet_2J3_zJz_d4': 0.48639558326136945,
-            # 'pauliSet_2J4_xJx_d4': 0.5226264170733737,
-            # 'pauliSet_3J4_zJz_d4': 0.5991799876475146,
-            # 'pauliSet_1J2_yJy_d4' : 0.35,
-            # 'pauliSet_1J4_yJy_d4' : 0.25,
-            # 'pauliSet_3J4_yJy_d4' : 0.8,
+            # reasonably interesting dynamics within 0.5 \pm 0.25
+            'pauliSet_1J2_yJy_d4': 0.5215104901916923,
+            'pauliSet_1J2_zJz_d4': 0.677532102219103,
+            'pauliSet_1J3_zJz_d4': 0.2856421361482581,
+            'pauliSet_1J4_yJy_d4': 0.2520347900489445,
+            'pauliSet_2J3_xJx_d4': 0.2805221884243438,
+            'pauliSet_2J3_yJy_d4': 0.6289731115726565,
+            'pauliSet_2J4_xJx_d4': 0.3658869278936159,
+            'pauliSet_3J4_xJx_d4': 0.464429107089917,
+            'pauliSet_3J4_zJz_d4': 0.3901210315999691
         }
 
         # test F map for random set of 10 models
