@@ -226,6 +226,43 @@ class GeneticAlgorithmQMLA():
                 new_models.append(mod)
         return new_models
 
+    def rand_model_f(self):
+        
+        r = 0
+        while r == 0 :
+            r = np.random.randint(2**self.num_terms)
+        
+        b = bin(r)[2:].zfill(self.num_terms)
+        b_array = np.array([int(i) for i in list(b)])
+        f = sklearn.metrics.f1_score(
+            b_array, 
+            self.true_chromosome
+        )
+        return f, b_array
+
+    def random_models_sorted_by_f_score(
+        self,
+        num_models=14, 
+    ):
+        n_runs = 1e3 # first sample ~1000 random numbers 
+        some_models = [
+            self.rand_model_f() for _ in range(int(n_runs))
+        ]
+        f_scores = np.array(some_models)[:, 0]
+        chromosomes =  np.array(some_models)[:,1]
+
+        # then choose from those randomly generated models
+        random_chroms = np.random.choice(chromosomes, num_models)
+        random_models = [self.map_chromosome_to_model(c) for c in random_chroms]
+        models_w_f = list(zip(random_models, [self.model_f_score(m) for m in random_models]))
+        sorted_by_f = sorted(models_w_f, key = lambda x: x[1])
+        sorted_models = np.array(sorted_by_f)[:, 0]
+        sorted_models = list(sorted_models)
+        just_f = np.array(models_w_f)[:, 1]
+        just_f = [float(a) for a in just_f]
+
+        return sorted_models        
+
     ######################
     # Selection functions
     ######################

@@ -32,9 +32,11 @@ class ObjectiveFncTestHeisXXZ(
             true_model = true_model, 
             **kwargs
         )
+        # 14 randomly selected models, sorted by increasing F-score.
+        # call to genetic_algorithm.random_models_sorted_by_f_score(), 
+        # stored here so comparisons are based on the same input set
 
         self.xxz_test_fitness_models = [
-            # 14 randomly selected models, sorted by increasing F-score.
             'pauliSet_1J3_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',
             'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4',
             'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4',
@@ -50,8 +52,23 @@ class ObjectiveFncTestHeisXXZ(
             'pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
             'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_3J4_zJz_d4'
         ]
-        
-        self.test_fitness_models = self.xxz_test_fitness_models
+        self.xyz_test_fitness_models = [
+            'pauliSet_1J2_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4',
+            'pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_yJy_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4',
+            'pauliSet_1J2_zJz_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4',
+            'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4'
+        ]
+        self.test_fitness_models = self.xyz_test_fitness_models
 
 
 class ObjectiveFncTestIsing(
