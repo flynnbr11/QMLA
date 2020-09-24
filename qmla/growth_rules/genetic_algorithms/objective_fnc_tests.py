@@ -141,6 +141,7 @@ class GenAlgObjectiveFncTest(
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
         }
+        self.check_champion_reducibility = False
         self.hypothetical_final_generation = True
         self.max_time_to_consider = 50
         self.num_processes_to_parallelise_over = 16
