@@ -201,10 +201,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # self.model_dimension = qmla.construct_models.get_num_qubits(self.model_name)
         self.model_dimension = int(np.log2(self._oplist[0].shape[0]))
         self._true_dim = int(np.log2(self.true_hamiltonian.shape[0]))
-        self.log_print(["\nModel {} dimension: {}. \nTrue model {}, has dimension: {}".format(
-            self.model_name,  self.model_dimension, 
-            self._truename, self._true_dim)
-        ])
+        self.log_print(["\nModel {} dimension: {}. ".format(
+            self.model_name,  self.model_dimension
+        )])
         if true_oplist is not None and trueparams is None:
             raise(
                 ValueError(

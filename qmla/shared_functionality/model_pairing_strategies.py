@@ -237,17 +237,9 @@ def find_efficient_comparison_pairs(model_names):
     n_nodes = len(model_names)
     path_elements = qmla.shared_functionality.elo_graphs.__file__.split('/')
     path_elements = path_elements[:-1]
-    print("path elements:", path_elements)
     path_elements.append("optimal_graph_{}_nodes.p".format(n_nodes))
     graph_pickle_file = os.path.abspath('/'.join(path_elements)) #  os.path.abspath(os.path.join(*path_elements))
 
-    # graph_pickle_file = os.path.abspath(
-    #     os.path.join(
-    #         "..", 
-    #         "qmla", "shared_functionality", "elo_graphs",
-    #         'optimal_graph_{}_nodes.p'.format(n_nodes)
-    #     )
-    # )
     print("Graph pickle file:", graph_pickle_file)
     try:
         graph_data = pickle.load(open(graph_pickle_file, 'rb'))

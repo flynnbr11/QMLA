@@ -217,13 +217,6 @@ def remote_bayes_factor_calculation(
 
     bayes_factor = np.exp( log_l_a - log_l_b )
 
-    # should be no difference in BF times
-    diff_in_bf_times = (
-        list ( set(model_a.bf_times) - set(model_b.bf_times) ) 
-        + list (set(model_b.bf_times) - set(model_a.bf_times) )
-    )
-    log_print(["Difference in times:", diff_in_bf_times])
-
     # Plot the posterior of the true model only
     if (
         save_plots_of_posteriors

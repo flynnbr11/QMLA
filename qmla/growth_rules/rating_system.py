@@ -31,9 +31,19 @@ class RatingSystem():
         model_id,
         initial_rating=None,
         generation_born=0,
+        force_new_rating=False, 
     ):
         if model_id in self.models.keys():
             print("Model already present; not adding.")
+            if force_new_rating:
+                # move rating e.g. to align with others in batch
+                print("Reassigning rating for model {} to {} points".format(model_id, initial_rating))
+                self.models[model_id].update_rating(
+                    opponent_id=None, 
+                    winner_id=None, 
+                    new_rating=initial_rating,
+                )
+
             return
         print("Adding {} with starting rating {}".format(model_id, initial_rating))
         if initial_rating is None:
@@ -44,16 +54,6 @@ class RatingSystem():
             generation_born = generation_born
         )
         self.models[model_id] = new_model
-        # latest = pd.Series({
-        #     'model_id' : new_model.model_id, 
-        #     'generation' : generation_born,
-        #     'rating' : new_model.rating,
-        #     'idx' : 0
-        # })
-        # self.all_ratings = self.all_ratings.append(
-        #     latest, ignore_index=True
-        # )
-
         
     def get_ratings(
         self,
@@ -89,6 +89,7 @@ class RatingSystem():
         self, 
         model_pairs_bayes_factors,
         spawn_step=0,
+        force_new_rating=False,
     ):
         print("Ratings batch update for spawn step ", spawn_step)
         models = list(set(qmla.utilities.flatten(list(model_pairs_bayes_factors.keys()))))
@@ -110,16 +111,13 @@ class RatingSystem():
             # starting with rating of worst model already present
             self.add_ranking_model(
                 model_id = model, 
-                initial_rating = min_rating
+                initial_rating = min_rating,
+                force_new_rating=force_new_rating,
             )
 
         for model_id in models:
             # update ratings df for plotting so 
             # start of next generation is end of previous one
-            # new_idx = len(
-            #     self.all_ratings[ (self.all_ratings.model_id == model_id) 
-            #     & (self.all_ratings.generation == spawn_step)]
-            # )
             latest = pd.Series(
                 {
                     'model_id' : model_id, 

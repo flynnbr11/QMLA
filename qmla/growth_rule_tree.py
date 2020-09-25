@@ -99,10 +99,10 @@ class GrowthRuleTree():
             pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
                 model_names=self.initial_models
             )
-            self.log_print(
-                [
-                    "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
-                        len(pairs_to_compare))])
+            self.log_print([
+                "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
+                    len(pairs_to_compare)),
+            ])
             self.graphs[self.spawn_step] = graph
         elif self.growth_class.branch_comparison_strategy == 'minimal':
             # TODO very few connections, only used to avoid crash
@@ -194,6 +194,8 @@ class GrowthRuleTree():
 
         model_list = list(set(model_list))
         model_list = [qmla.construct_models.alph(mod) for mod in model_list]
+        if isinstance(pairs_to_compare, list):
+            pairs_to_compare = [ (min(p), max(p) ) for p in pairs_to_compare ]
         return model_list, pairs_to_compare
 
     def finalise_tree(self, **kwargs):
@@ -405,6 +407,10 @@ class BranchQMLA():
                 "Comparison pairs passed:", pairs_to_compare
             ])
             self.pairs_to_compare = pairs_to_compare
+        # order pairs so they read (low, high)
+        self.pairs_to_compare = [ 
+            (min(p), max(p) ) for p in self.pairs_to_compare 
+        ]
         self.num_model_pairs = len(self.pairs_to_compare)
 
         # Models already considered on a previous branch
@@ -471,7 +477,8 @@ class BranchQMLA():
         # Update the GR ratings system
         self.growth_class.ratings_class.batch_update(
             model_pairs_bayes_factors=bayes_factors,
-            spawn_step=self.tree.spawn_step
+            spawn_step=self.tree.spawn_step,
+            force_new_rating=True # try to force new ratings
         )
 
         # Use growth rule's reasoning to decide if a champion can be set

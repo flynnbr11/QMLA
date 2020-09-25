@@ -726,7 +726,7 @@ class GeneticAlgorithmQMLA():
                             len(proposed_chromosomes),
                             num_models_for_next_generation
                         ),
-                        "Selection:", selection
+                        "new chromosome:", c
                     ])
                     birth = pd.Series({
                         'child' : self.map_chromosome_to_model(c), 

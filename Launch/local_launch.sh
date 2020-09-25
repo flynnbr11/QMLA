@@ -6,12 +6,12 @@
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=1 # perform QHL on known (true) model
+run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=250 # number of experiments
-prt=1500 # number of particles
+exp=2 # number of experiments
+prt=10 # number of particles
 
 ###############
 # QMLA settings
@@ -42,11 +42,11 @@ debug_mode=0
 # growth_rule='Demonstration'
 
 # growth_rule='HeisenbergGenetic'
-growth_rule='HeisenbergGeneticXXZ'
+# growth_rule='HeisenbergGeneticXXZ'
 # growth_rule='IsingGenetic'
 # growth_rule='IsingGeneticTest'
 # growth_rule='HeisenbergGeneticXXZ'
-# growth_rule='IsingGeneticSingleLayer'
+growth_rule='IsingGeneticSingleLayer'
 # growth_rule='GenAlgObjectiveFncTest'
 # growth_rule='ObjFncResiduals'
 # growth_rule='ObjFncElo'
