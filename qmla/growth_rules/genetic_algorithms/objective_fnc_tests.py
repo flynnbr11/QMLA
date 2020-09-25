@@ -261,9 +261,6 @@ class ObjFncBFP(GenAlgObjectiveFncTest):
         self.branch_comparison_strategy = 'all'
         self.force_evaluation = False
         self.exclude_evaluation = True
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_opponents_experiments_for_bf = 0.5
-        self.fraction_own_experiments_for_bf = 0.5
 
 
 class ObjFncRank(GenAlgObjectiveFncTest):
@@ -282,9 +279,6 @@ class ObjFncRank(GenAlgObjectiveFncTest):
         self.branch_comparison_strategy = 'all'
         self.force_evaluation = False
         self.exclude_evaluation = True
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_opponents_experiments_for_bf = 0.5
-        self.fraction_own_experiments_for_bf = 0.5
 
 
 class ObjFncElo(GenAlgObjectiveFncTest):
