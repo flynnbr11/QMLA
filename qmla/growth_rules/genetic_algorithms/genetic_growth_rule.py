@@ -713,8 +713,8 @@ class Genetic(
                     )
                 )
         except:
-            # pass
-            raise
+            pass
+            # raise
 
         
 
