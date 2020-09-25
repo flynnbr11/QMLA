@@ -598,6 +598,7 @@ class Genetic(
         self,
         save_directory,
         champion_model_id, 
+        true_model_id,
         qmla_id=0, 
     ):
         try:
@@ -703,6 +704,14 @@ class Genetic(
                     "champion_ratings_progress.png"
                 )
             )
+            if true_model_id != -1 and true_model_id != champion_model_id:
+                self.ratings_class.plot_rating_progress_single_model(
+                    target_model_id = true_model_id,
+                    save_to_file  = os.path.join(
+                        save_directory, 
+                        "true_model_ratings_progress.png"
+                    )
+                )
         except:
             # pass
             raise

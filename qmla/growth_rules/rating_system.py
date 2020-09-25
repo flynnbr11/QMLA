@@ -417,18 +417,11 @@ class RatingSystem():
         ax2.set_xticks(centred_xticks)
         ax2.set_xlabel("Generation")
 
-        
         if save_to_file is not None: 
             fig.savefig(save_to_file)
         
         if return_df:
             return ratings_of_single_model
-        
-            return ratings_of_single_model
-
-
-
-
 
 
 class RateableModel():

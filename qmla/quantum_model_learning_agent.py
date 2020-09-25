@@ -1692,6 +1692,7 @@ class QuantumModelLearningAgent():
             self.growth_class.growth_rule_specific_plots(
                 save_directory=self.qmla_controls.plots_directory,
                 qmla_id=self.qmla_controls.long_id,
+                true_model_id = self.true_model_id, 
                 champion_model_id=self.champion_model_id, 
             )
         except:
