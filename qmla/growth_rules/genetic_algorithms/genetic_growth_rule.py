@@ -714,9 +714,7 @@ class Genetic(
                 )
         except:
             pass
-            # raise
-
-        
+            # raise     
 
     def plot_correlation_fitness_with_f_score(
         self,

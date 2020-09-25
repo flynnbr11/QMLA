@@ -264,9 +264,9 @@ class HeisenbergGeneticXXZ(
         self.fitness_method = 'elo_rating'
         self.branch_comparison_strategy = 'optimal_graph'
         self.force_evaluation = False
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_opponents_experiments_for_bf = 0.5
-        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_opponents_experiments_for_bf = 0.25
+        self.fraction_own_experiments_for_bf = 0.25
         self.timing_insurance_factor = 0.3
 
         # Residuals
