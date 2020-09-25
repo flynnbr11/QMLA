@@ -38,9 +38,9 @@ class LatticeSet(
         self.initial_models = None # so that QMLA will call generate_models first
         # self.true_model = self.model_from_lattice(self.available_lattices[0])
         self.max_time_to_consider = 45
-        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_own_experiments_for_bf = 0.25
         self.fraction_opponents_experiments_for_bf = self.fraction_own_experiments_for_bf
-        self.fraction_particles_for_bf = 0.5
+        self.fraction_particles_for_bf = 0.25
 
         self.lattice_names = [
             '_2_site_chain', 
@@ -85,7 +85,6 @@ class LatticeSet(
             'other' : 0
         }
         self.num_processes_to_parallelise_over = len(self.available_lattices)
-
 
     def model_from_lattice(
         self, 
