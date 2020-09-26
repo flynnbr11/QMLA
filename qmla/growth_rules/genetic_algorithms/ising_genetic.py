@@ -235,28 +235,28 @@ class HeisenbergGeneticXXZ(
         )
         self.true_model_terms_params = {
             # parameters for interesing HeisXXZ true model
-            'pauliSet_1J2_zJz_d4': 0.4,
-            'pauliSet_1J3_zJz_d4': 0.3,
-            'pauliSet_3J4_zJz_d4': 0.2,
+            # 'pauliSet_1J2_zJz_d4': 0.4,
+            # 'pauliSet_1J3_zJz_d4': 0.3,
+            # 'pauliSet_3J4_zJz_d4': 0.2,
             
-            'pauliSet_2J3_xJx_d4': 0.1,
-            'pauliSet_2J4_xJx_d4': 0.6,
-            'pauliSet_3J4_xJx_d4' : 0.7,
+            # 'pauliSet_2J3_xJx_d4': 0.1,
+            # 'pauliSet_2J4_xJx_d4': 0.6,
+            # 'pauliSet_3J4_xJx_d4' : 0.7,
 
-            'pauliSet_2J3_yJy_d4': 0.8,
-            'pauliSet_1J2_yJy_d4' : 0.9,
-            'pauliSet_1J4_yJy_d4' : 0.5,
+            # 'pauliSet_2J3_yJy_d4': 0.8,
+            # 'pauliSet_1J2_yJy_d4' : 0.9,
+            # 'pauliSet_1J4_yJy_d4' : 0.5,
 
             # reasonably interesting dynamics within 0.5 \pm 0.25
-            # 'pauliSet_1J2_yJy_d4': 0.5215104901916923,
-            # 'pauliSet_1J2_zJz_d4': 0.677532102219103,
-            # 'pauliSet_1J3_zJz_d4': 0.2856421361482581,
-            # 'pauliSet_1J4_yJy_d4': 0.2520347900489445,
-            # 'pauliSet_2J3_xJx_d4': 0.2805221884243438,
-            # 'pauliSet_2J3_yJy_d4': 0.6289731115726565,
-            # 'pauliSet_2J4_xJx_d4': 0.3658869278936159,
-            # 'pauliSet_3J4_xJx_d4': 0.464429107089917,
-            # 'pauliSet_3J4_zJz_d4': 0.3901210315999691
+            'pauliSet_1J2_yJy_d4': 0.5215104901916923,
+            'pauliSet_1J2_zJz_d4': 0.677532102219103,
+            'pauliSet_1J3_zJz_d4': 0.2856421361482581,
+            'pauliSet_1J4_yJy_d4': 0.2520347900489445,
+            'pauliSet_2J3_xJx_d4': 0.2805221884243438,
+            'pauliSet_2J3_yJy_d4': 0.6289731115726565,
+            'pauliSet_2J4_xJx_d4': 0.3658869278936159,
+            'pauliSet_3J4_xJx_d4': 0.464429107089917,
+            'pauliSet_3J4_zJz_d4': 0.3901210315999691
         }
 
         # test F map for random set of 10 models
@@ -264,9 +264,9 @@ class HeisenbergGeneticXXZ(
         self.fitness_method = 'elo_rating'
         self.branch_comparison_strategy = 'optimal_graph'
         self.force_evaluation = False
-        self.fraction_particles_for_bf = 0.25
-        self.fraction_opponents_experiments_for_bf = 0.25
-        self.fraction_own_experiments_for_bf = 0.25
+        self.fraction_particles_for_bf = 0.2
+        self.fraction_opponents_experiments_for_bf = 0.2
+        self.fraction_own_experiments_for_bf = 0.2
         self.timing_insurance_factor = 0.3
 
         # Residuals

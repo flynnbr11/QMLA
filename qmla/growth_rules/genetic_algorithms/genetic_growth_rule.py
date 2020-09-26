@@ -701,7 +701,7 @@ class Genetic(
                 target_model_id = champion_model_id,
                 save_to_file  = os.path.join(
                     save_directory, 
-                    "champion_ratings_progress.png"
+                    "ratings_progress_champion.png"
                 )
             )
             if true_model_id != -1 and true_model_id != champion_model_id:
@@ -709,7 +709,7 @@ class Genetic(
                     target_model_id = true_model_id,
                     save_to_file  = os.path.join(
                         save_directory, 
-                        "true_model_ratings_progress.png"
+                        "ratings_progress_true_model.png"
                     )
                 )
         except:
