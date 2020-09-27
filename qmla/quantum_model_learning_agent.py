@@ -790,12 +790,10 @@ class QuantumModelLearningAgent():
             pair_list = list(itertools.combinations(
                 model_id_list, 2
             ))
-            self.log_print(
-                [
-                    "BF Pair list not provided; generated from model list:",
-                    pair_list
-                ]
-            )
+        self.log_print([
+            "compare_model_set with BF pair list:",
+            pair_list
+        ])
 
         remote_jobs = []
         for pair in pair_list:
@@ -824,9 +822,15 @@ class QuantumModelLearningAgent():
                 "\n pair list:", pair_list
             ])
             for job in remote_jobs:
+                self.log_print([
+                    "Monitoring job {}".format(job)
+                ])
                 while not job.is_finished:
                     if job.is_failed:
-                        raise NameError("Remote QML failure")
+                        self.log_print([
+                            "Model comparison job failed:", job
+                        ])
+                        raise NameError("Remote job failure")
                     time.sleep(self.sleep_duration)
         else:
             self.log_print([

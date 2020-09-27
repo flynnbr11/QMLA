@@ -409,7 +409,7 @@ class BranchQMLA():
             self.pairs_to_compare = pairs_to_compare
         # order pairs so they read (low, high)
         self.pairs_to_compare = [ 
-            (min(p), max(p) ) for p in self.pairs_to_compare 
+            ( min(p), max(p) ) for p in self.pairs_to_compare 
         ]
         self.num_model_pairs = len(self.pairs_to_compare)
 

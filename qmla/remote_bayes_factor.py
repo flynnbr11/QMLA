@@ -85,7 +85,7 @@ def remote_bayes_factor_calculation(
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=log_file,
-            log_identifier='BF ({}/{})'.format(model_a_id, model_b_id)
+            log_identifier='BF ({}/{})'.format(int(model_a_id), int(model_b_id))
         )
     log_print(["BF start on branch", branch_id])
     num_redis_retries = 5 # TODO this is a hideous hack to get around redis database temporary failures
