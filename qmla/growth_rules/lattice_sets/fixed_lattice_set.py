@@ -38,6 +38,7 @@ class LatticeSet(
         self.initial_models = None # so that QMLA will call generate_models first
         # self.true_model = self.model_from_lattice(self.available_lattices[0])
         self.max_time_to_consider = 45
+        self.check_champion_reducibility = False
         self.fraction_own_experiments_for_bf = 0.25
         self.fraction_opponents_experiments_for_bf = self.fraction_own_experiments_for_bf
         self.fraction_particles_for_bf = 0.25
