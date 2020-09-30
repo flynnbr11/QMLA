@@ -274,7 +274,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             default_parameter = 0, 
             default_width = 1e-1, 
             # fraction_true_parameter_width = 1e-6, # works v well with 1e-6 -> testing higher error
-            fraction_true_parameter_width=0.1, 
+            fraction_true_parameter_width=0.05, 
             log_file = self.log_file, 
             log_identifier= 'PrelearnedPrior'
         )
