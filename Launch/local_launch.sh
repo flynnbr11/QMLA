@@ -44,7 +44,7 @@ debug_mode=0
 # growth_rule='HeisenbergGenetic'
 # growth_rule='HeisenbergGeneticXXZ'
 # growth_rule='IsingGenetic'
-growth_rule='IsingGeneticTest'
+# growth_rule='IsingGeneticTest'
 # growth_rule='HeisenbergGeneticXXZ'
 # growth_rule='IsingGeneticSingleLayer'
 # growth_rule='GenAlgObjectiveFncTest'
@@ -58,7 +58,7 @@ growth_rule='IsingGeneticTest'
 # growth_rule='NVCentreSimulatedLongDynamicsGenticAlgorithm'
 
 
-# growth_rule='IsingLatticeSet'
+growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='NVLargeSpinBath'
 # growth_rule='GeneticTest'
