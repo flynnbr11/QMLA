@@ -272,8 +272,9 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             true_parameters = self.true_model_terms_params, 
             prior_specific_terms=self.gaussian_prior_means_and_widths,
             default_parameter = 0, 
-            default_width = 1e-1, #0.05, 
-            fraction_true_parameter_width = 1e-6, #0.01,
+            default_width = 1e-1, 
+            # fraction_true_parameter_width = 1e-6, # works v well with 1e-6 -> testing higher error
+            fraction_true_parameter_width=0.1, 
             log_file = self.log_file, 
             log_identifier= 'PrelearnedPrior'
         )
@@ -317,6 +318,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         cov_mt, 
         **kwargs
     ):
+        # Make this slightly wider to simulate some error in model learning
         posterior_distribution = self.get_prior(model_name = model_name)
         return posterior_distribution
 

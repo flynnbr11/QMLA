@@ -2980,28 +2980,6 @@ class QuantumModelLearningAgent():
                 'probes_bloch_sphere.png'
             )
         )
-        # import qutip as qt
-        # bloch = qt.Bloch()
-        # for i in range(self.probe_number):
-        #     state = self.probes_system[i, 1]
-        #     a = state[0]
-        #     b = state[1]
-        #     A = a * qt.basis(2, 0)
-        #     B = b * qt.basis(2, 1)
-        #     vec = (A + B)
-        #     print(vec)
-        #     bloch.add_states(vec)
-
-        # if save:
-        #     bloch.save(
-        #         os.path.join(
-        #             self.qmla_controls.plots_directory,
-        #             'probes_bloch_sphere.png'
-        #         )
-        #     )
-        # else:
-        #     bloch.show()
-
 
     def _plot_model_terms(self, colour_by = 'binary'):
         if self.plot_level < 1:
@@ -3063,7 +3041,6 @@ class QuantumModelLearningAgent():
             data = model_reference_database    
         ).transpose()
 
-
         # Plot as heatmap
         fig, ax = plt.subplots(figsize=(15,10))
 
@@ -3083,7 +3060,6 @@ class QuantumModelLearningAgent():
                 ax = ax,
             )
 
-
         ax.tick_params(which='y', rotation=0)
         fontsize = 20
         ax.tick_params(
@@ -3102,7 +3078,6 @@ class QuantumModelLearningAgent():
                 self.qmla_controls.plots_directory, "composition_of_models.png".format(
                     self.qmla_controls.long_id)
             )
-
         )
 
 

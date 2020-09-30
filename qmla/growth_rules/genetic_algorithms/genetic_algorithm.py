@@ -69,14 +69,6 @@ class GeneticAlgorithmQMLA():
         self.best_model_unchanged = False
         self.unchanged_elite_num_generations_cutoff = unchanged_elite_num_generations_cutoff
         self.selection_truncation_rate = selection_truncation_rate
-        self.birth_register = pd.DataFrame(
-            columns=[
-                'child', 'chromosome_child', 
-                'parent_a', 'parent_b', 
-                'chromosome_parent_a', 'chromosome_parent_b', 
-                'generation', 'f_score'
-            ]
-        )
         self.gene_pool = pd.DataFrame(columns=[
             'model', 'chromosome', 'f_score', 'probability', 'generation'
         ])
@@ -201,6 +193,14 @@ class GeneticAlgorithmQMLA():
         self.initial_number_models = num_models
         self.chromosomes_at_generation[0] = []
         self.previously_considered_chromosomes = []
+        self.birth_register = pd.DataFrame(
+            columns=[
+                'child', 'chromosome_child', 
+                'parent_a', 'parent_b', 
+                'chromosome_parent_a', 'chromosome_parent_b', 
+                'generation', 'f_score'
+            ]
+        ) # TODO this is awful - this stuff shouldn't be initialised in this function
 
         while len(new_models) < num_models:
             # generate random number and 
@@ -215,15 +215,24 @@ class GeneticAlgorithmQMLA():
                 r = list(r)
                 r = np.array([int(i) for i in r])
                 mod = self.map_chromosome_to_model(r)
-
+                chrom  = self.chromosome_string(r)
+                f = self.chromosome_f_score(chrom)
                 self.previously_considered_chromosomes.append(
-                    self.chromosome_string(r)
+                    chrom
                 )
                 self.chromosomes_at_generation[0].append(
-                    self.chromosome_string(r)
+                    chrom
                 )
-
                 new_models.append(mod)
+
+                birth = pd.Series({
+                    'child' : mod, 
+                    'chromosome_child' : chrom, 
+                    'generation' : 0, 
+                    'f_score' : f,
+                })
+                self.birth_register.loc[len(self.birth_register)] = birth
+
         return new_models
 
     def rand_model_f(self):
