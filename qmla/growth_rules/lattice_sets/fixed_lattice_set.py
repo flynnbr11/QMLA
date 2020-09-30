@@ -55,6 +55,10 @@ class LatticeSet(
             '_4_site_square',
             '_6_site_grid'
         ]
+        self.rerun_lattices = [
+            '_5_site_lattice_fully_connected',
+            '_6_site_grid'
+        ]
         # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
         self.available_lattices_by_name = {
             k : topology_predefined.__getattribute__(k)
@@ -69,10 +73,11 @@ class LatticeSet(
         if self._shared_true_parameters:
             lattice_idx = -1
         else:
-            lattice_idx = self.qmla_id % len(self.available_lattices)  
-
-
-        self.true_lattice_name = self.lattice_names[ lattice_idx ]
+            # lattice_idx = self.qmla_id % len(self.available_lattices)  
+            # Rerunning subset with more resources
+            lattice_idx = self.qmla_id % len(self.rerun_lattices)  
+        # self.true_lattice_name = self.lattice_names[ lattice_idx ]
+        self.true_lattice_name = self.rerun_lattices[ lattice_idx ]
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)
 
