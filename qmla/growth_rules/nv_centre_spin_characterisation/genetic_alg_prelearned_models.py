@@ -44,7 +44,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Add genetic algorithm parameters to kwargs, which the Genetic GR passes to GA class
         kwargs['selection_truncation_rate'] = 1 / self.true_n_qubits
         kwargs['unchanged_elite_num_generations_cutoff'] = 3*self.true_n_qubits
-        kwargs['num_protected_elite_models'] = 1
+        kwargs['num_protected_elite_models'] = 2
 
 
         super().__init__(
@@ -274,7 +274,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             default_parameter = 0, 
             default_width = 1e-1, 
             # fraction_true_parameter_width = 1e-6, # works v well with 1e-6 -> testing higher error
-            fraction_true_param_found_within = 0.01,
+            fraction_true_param_found_within = 1e-7,
             fraction_true_parameter_width=0.02, 
             log_file = self.log_file, 
             log_identifier= 'PrelearnedPrior'
@@ -342,11 +342,6 @@ class NVPrelearnedTest(
         )
         self.true_model = qmla.construct_models.alph(self.true_model)
 
-        # Add genetic algorithm parameters to kwargs, which the Genetic GR passes to GA class
-        kwargs['selection_truncation_rate'] = 1 / self.true_n_qubits
-        kwargs['unchanged_elite_num_generations_cutoff'] = 2*self.true_n_qubits
-        kwargs['num_protected_elite_models'] = 2
-
         super().__init__(
             growth_generation_rule=growth_generation_rule,
             true_model = self.true_model,
@@ -354,7 +349,7 @@ class NVPrelearnedTest(
             **kwargs
         )
         num_models_per_generation = 4
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 3
 
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 

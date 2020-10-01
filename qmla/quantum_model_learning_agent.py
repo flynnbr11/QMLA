@@ -3070,16 +3070,13 @@ class QuantumModelLearningAgent():
             labelrotation=0,
             labelsize=fontsize
         )
-
         ax.set_ylabel('Model ID', fontsize=2*fontsize)
 
         fig.savefig(
             os.path.join(
-                self.qmla_controls.plots_directory, "composition_of_models.png".format(
-                    self.qmla_controls.long_id)
+                self.qmla_controls.plots_directory, "composition_of_models.png"
             )
         )
-
 
     def _plot_dynamics_all_models_on_branches(self, branches=None):
 

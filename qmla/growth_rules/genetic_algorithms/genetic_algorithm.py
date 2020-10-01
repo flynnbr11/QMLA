@@ -55,7 +55,7 @@ class GeneticAlgorithmQMLA():
         self.previously_considered_chromosomes = []
         self.chromosomes_at_generation = {}
         self.delta_f_by_generation = {}
-        self.genetic_generation = 0
+        self.genetic_generation = 1
         self.log_file = log_file
         self.log_print([
             "Genes: {} \n Base chromosome: {}".format(self.genes, self.basic_chromosome)
@@ -71,6 +71,9 @@ class GeneticAlgorithmQMLA():
         self.selection_truncation_rate = selection_truncation_rate
         self.gene_pool = pd.DataFrame(columns=[
             'model', 'chromosome', 'f_score', 'probability', 'generation'
+        ])
+        self.elite_models = pd.DataFrame(columns=[
+            'model', 'chromosome', 'f_score', 'generation', 'elite_position'
         ])
 
         # specifying which functionality to use
@@ -228,7 +231,7 @@ class GeneticAlgorithmQMLA():
                 birth = pd.Series({
                     'child' : mod, 
                     'chromosome_child' : chrom, 
-                    'generation' : 0, 
+                    'generation' : 1, 
                     'f_score' : f,
                 })
                 self.birth_register.loc[len(self.birth_register)] = birth
@@ -442,6 +445,22 @@ class GeneticAlgorithmQMLA():
         **kwargs
     ):        
         elite_models = self.models_ranked_by_fitness[self.genetic_generation][:self.num_protected_elite_models]
+        self.log_print([
+            "Elite models at generation {}: {}".format(
+                self.genetic_generation, elite_models
+            )
+        ])
+        for m in elite_models:
+            self.elite_models = self.elite_models.append(
+                pd.Series({
+                    'model' : m, 
+                    'generation' : self.genetic_generation, 
+                    'elite_position' : elite_models.index(m) + 1,
+                    'chromosome' : self.map_model_to_chromosome(m),
+                    'f_score' : self.model_f_score(m)                    
+                }),
+                ignore_index=True
+            )
         self.most_elite_models_by_generation[self.genetic_generation] = self.models_ranked_by_fitness[self.genetic_generation][0]
         # num_protected_elite_models_for_termination = 2
 
@@ -654,7 +673,6 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         **kwargs
     ):
-        self.genetic_generation += 1
         self.fitness_at_generation[self.genetic_generation] = model_fitnesses
         self.models_ranked_by_fitness[self.genetic_generation] = sorted(
             model_fitnesses,
@@ -792,6 +810,8 @@ class GeneticAlgorithmQMLA():
                 "({} unique)".format(len(set(list(new_models))))
             ]
         )
+
+        self.genetic_generation += 1
         return new_models
 
 
