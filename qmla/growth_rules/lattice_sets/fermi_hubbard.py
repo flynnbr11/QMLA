@@ -56,7 +56,7 @@ class FermiHubbardLatticeSet(
         else:
             lattice_idx = self.qmla_id % len(self.available_lattices)  
             # Rerunning subset with more resources
-            lattice_idx = self.qmla_id % len(self.rerun_lattices)  
+            # lattice_idx = self.qmla_id % len(self.rerun_lattices)  
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
         # self.true_lattice_name = self.rerun_lattices[ lattice_idx ]
 
