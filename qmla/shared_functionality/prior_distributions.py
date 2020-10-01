@@ -138,6 +138,7 @@ def prelearned_true_parameters_prior(
     default_parameter=0, 
     default_width = 0.05, 
     fraction_true_parameter_width=1e-7,
+    fraction_true_param_found_within=1e-4,
     log_file = 'qmla.log', 
     log_identifier= 'PrelearnedPrior',
     **kwargs
@@ -153,7 +154,11 @@ def prelearned_true_parameters_prior(
 
     for term in individual_terms:
         if term in true_parameters:
-            param = true_parameters[term]
+            true_param = true_parameters[term]
+            minp = (1 - fraction_true_param_found_within)*true_param
+            maxp = (1 + fraction_true_param_found_within)*true_param
+            # param = true_parameters[term]
+            param = np.random.uniform(minp, maxp)
             width = fraction_true_parameter_width * param
         else:
             try:
@@ -162,7 +167,7 @@ def prelearned_true_parameters_prior(
             except:
                 param = default_parameter
                 width = default_width
-            
+
         means.append(param)
         sigmas.append(width)
     
@@ -173,11 +178,7 @@ def prelearned_true_parameters_prior(
         means,
         cov_mtx
     )
-
     return dist
-    
-    
-    
 
 
 def plot_prior(
