@@ -6,7 +6,12 @@ import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation
 from qmla import construct_models
 
-class GrowthRuleTemplate(
+
+def test_evolution_fnc(**kwargs):
+    print("In test fnc")
+    return 1
+
+class GRTest(
     growth_rule.GrowthRule  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
@@ -23,6 +28,8 @@ class GrowthRuleTemplate(
             growth_generation_rule=growth_generation_rule,
             **kwargs
         )
+        self.log_print(["Initialising test GR"])
+        self.expectation_value_function = test_evolution_fnc
         self.initial_models = ['pauliSet_xJx_1J2_d2']
         self.tree_completed_initially = False
         self.true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2'
@@ -61,3 +68,4 @@ class GrowthRuleTemplate(
             return True
         else:
             return False
+

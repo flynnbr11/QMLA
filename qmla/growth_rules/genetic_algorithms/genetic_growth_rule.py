@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import seaborn as sns
 
+import qmla.shared_functionality.latex_figure as lfig
 from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
@@ -373,6 +374,10 @@ class Genetic(
         )
         self.model_fitness_by_generation[self.spawn_step] = genetic_algorithm_fitnesses
 
+        self.genetic_algorithm.consolidate_generation(
+            model_fitnesses = genetic_algorithm_fitnesses
+        )
+
         # return genetic_algorithm_fitnesses
         return self.models_ranked_by_fitness[self.spawn_step]
 
@@ -684,6 +689,19 @@ class Genetic(
             self.log_print([
                 "failed to plot_generational_metrics"
             ])
+        
+        try:
+            self.plot_selection_probabilities(
+                save_to_file = os.path.join(
+                    save_directory, 
+                    'selection_probabilities.png'
+                )
+
+            )
+        except Exception as e:
+            self.log_print([
+                "failed to plot pie charts of selection probabilities. with exception:", e
+            ])
 
         try:
             self.ratings_class.plot_models_ratings_against_generation(
@@ -691,10 +709,11 @@ class Genetic(
                 save_directory = save_directory,
                 f_score_cmap=self.f_score_cmap
             )
-        except:
+        except Exception as e:
             self.log_print([
-                "failed to plot_models_ratings_against_generation"
+                "failed to plot_models_ratings_against_generation with error ", e
             ])
+            raise
 
         try:
             self.ratings_class.plot_rating_progress_single_model(
@@ -982,6 +1001,30 @@ class Genetic(
 
         # Save figure
         fig.savefig(save_to_file)
+
+
+    
+    def plot_selection_probabilities(self, save_to_file): 
+        generations = sorted(self.genetic_algorithm.gene_pool.generation.unique())
+        self.log_print(["[plot_selection_probabilities] generations:", generations])
+        lf = lfig.LatexFigure(auto_gridspec=len(generations))
+
+        for g in generations:
+            ax = lf.new_axis()
+            this_gen_genes = self.genetic_algorithm.gene_pool[
+                self.genetic_algorithm.gene_pool.generation == g
+            ]
+            f_scores = this_gen_genes.f_score
+            colours = [self.f_score_cmap(f) for f in f_scores]
+            probabilities = this_gen_genes.probability    
+            
+            ax.pie(
+                probabilities, 
+                colors = colours, 
+                radius=2,
+            )
+        lf.save(save_to_file)
+
 
     def plot_generational_metrics(self, save_to_file):
 

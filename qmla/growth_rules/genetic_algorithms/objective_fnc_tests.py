@@ -17,7 +17,6 @@ import qmla.construct_models
 
 
 class ObjectiveFncTestHeisXXZ(
-    # IsingGenetic
     HeisenbergGeneticXXZ
 ):
 
@@ -84,6 +83,7 @@ class ObjectiveFncTestHeisXXZ(
         ]
 
         self.test_fitness_models = self.xyz_test_fitness_models
+        self.test_fitness_models = self.xxz_test_fitness_models
 
 
 class ObjectiveFncTestIsing(
@@ -146,6 +146,7 @@ class GenAlgObjectiveFncTest(
         )
 
         num_models = len(self.test_fitness_models)
+        # num_models = 10
         self.initial_models = list(np.random.choice(self.test_fitness_models, num_models, replace=False))
         self.log_print(["Num models for GA: ", len(self.initial_models)])
 

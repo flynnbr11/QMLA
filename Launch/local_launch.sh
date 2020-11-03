@@ -6,12 +6,12 @@
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=1 # perform QHL on known (true) model
+run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=2 # number of experiments
-prt=10 # number of particles
+exp=5 # number of experiments
+prt=20 # number of particles
 
 ###############
 # QMLA settings
@@ -21,7 +21,7 @@ further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
 number_best_models_further_qhl=5
-plot_level=3
+plot_level=2
 debug_mode=0
 
 ###############
@@ -30,13 +30,14 @@ debug_mode=0
 # use_alt_growth_rules=1 # note this is redundant locally, currently
 ###############
 
+# growth_rule='AnalyticalLikelihood'
+# growth_rule='IsingLatticeSet'
 # growth_rule='TestSimulatedNVCentre'
 # growth_rule='NVCentreRevivals'
 # growth_rule='NVCentreRevivalsSimulated'
 # growth_rule='NVCentreNQubitBath'
-growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
+# growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
 # growth_rule='NVPrelearnedTest'
-# growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='FermiHubbardLatticeSet'
 # growth_rule='Demonstration'
@@ -46,7 +47,7 @@ growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
 # growth_rule='IsingGenetic'
 # growth_rule='IsingGeneticTest'
 # growth_rule='HeisenbergGeneticXXZ'
-# growth_rule='IsingGeneticSingleLayer'
+growth_rule='IsingGeneticSingleLayer'
 # growth_rule='GenAlgObjectiveFncTest'
 # growth_rule='ObjFncResiduals'
 # growth_rule='ObjFncElo'
@@ -57,7 +58,8 @@ growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
 # growth_rule='NVCentreRevivalSimulation'
 # growth_rule='NVCentreSimulatedLongDynamicsGenticAlgorithm'
 
-
+# growth_rule='GrowthRuleTemplate'
+# growth_rule='GRTest'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 # growth_rule='NVLargeSpinBath'
@@ -77,6 +79,11 @@ for item in ${alt_growth_rules[*]}
 do
     growth_rules_command+=" -agr $item" 
 done
+
+if (( "$run_qhl" == 1 )) 
+then	
+    plot_level=6
+fi
 
 ###############
 # Parameters from here downwards uses the parameters

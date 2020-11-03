@@ -9,6 +9,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import matplotlib
+import qmla.shared_functionality.latex_figure as lfig
 
 import qmla.utilities
 
@@ -146,6 +147,7 @@ class RatingSystem():
         f_scores,
         f_score_cmap,
         save_directory,
+        show_fscore_cmap=False,
     ):
 
         all_model_ratings_by_generation = pd.DataFrame()
@@ -192,17 +194,7 @@ class RatingSystem():
 
         # First prepare a dictionary to map model id to a colour corresponding to F-score
         f_granularity = 0.05
-        # f_score_colour_map = plt.cm.Spectral
-        # f_score_colour_map = f_score_cmap
-
         available_f_scores = np.linspace(0, 1, 1 + (1/f_granularity) )
-        # my_cmap = f_score_colour_map(available_f_scores)
-
-        # f_score_cmap = plt.cm.get_cmap('Blues')
-        # f_score_cmap = qmla.utilities.truncate_colormap(f_score_cmap, 0.25, 1.0)
-        # f_score_cmap = plt.cm.get_cmap('tab20c_r')
-        # f_score_cmap = plt.cm.get_cmap('Accent')
-        # f_score_cmap = matplotlib.colors.ListedColormap(["sienna", "red", "darkorange", "gold", "blue"]) # TODO pass from GR initialisation
 
         model_coloured_by_f = {
             # m : colour_by_f[ qmla.utilities.round_nearest(f_scores[m], f_granularity) ]
@@ -211,45 +203,57 @@ class RatingSystem():
         }
 
         # Plot
-        fig, ax = plt.subplots(figsize=(15,10), constrained_layout=True)
-        gs = GridSpec(
-            nrows=1, ncols=2,
-            width_ratios=[10,1]
+        widths = [1]
+        if show_fscore_cmap:
+            widths.append(0.1)
+            legend_axis = (0,1)
+        else:
+            legend_axis = None
+        lf = lfig.LatexFigure(
+            # via https://github.com/flynnbr11/lfig-py
+            use_gridspec=True, 
+            gridspec_layout=(1,len(widths)),
+            gridspec_params = {
+                'width_ratios' : widths,
+            },
+            legend_axis=legend_axis
         )
-
-        ax = fig.add_subplot(gs[0,0])
+        ax = lf.new_axis()
         sns.lineplot(
             x = 'generation', 
             y = 'rating', 
             hue = 'model_id', 
             data = all_model_ratings_by_generation, 
             palette=model_coloured_by_f,
-            legend=False
+            legend=False,
+            ax = ax
         )
         for g in self.all_ratings.generation.unique():
             ax.axvline(g, ls='--', c='black')
         ax.axhline(self.initial_rating, ls=':', color='black')
 
         label_fontsize = 25
-        ax.set_xlabel('Generation', fontsize = label_fontsize)
-        ax.set_ylabel('Modified Elo rating', fontsize=label_fontsize)
+        ax.set_xlabel('Generation', 
+            # fontsize = label_fontsize
+        )
+        ax.set_ylabel(
+            r"$R$"
+        )
         ax.set_xticks(list(self.all_ratings.generation.unique()))
 
-        # color bar
-        ax = fig.add_subplot(gs[0,1])
-        sm = plt.cm.ScalarMappable(
-            # cmap = f_score_colour_map, 
-            cmap = f_score_cmap, 
-            norm=plt.Normalize(vmin=0, vmax=1)
-        )
-        sm.set_array(available_f_scores)
-        
-        plt.colorbar(sm, cax=ax, orientation='vertical')
-        ax.set_ylabel('F-score',  fontsize=label_fontsize)
+        if show_fscore_cmap:
+            ax = lf.legend_ax
+            sm = plt.cm.ScalarMappable(
+                cmap = f_score_cmap, 
+                norm=plt.Normalize(vmin=0, vmax=1)
+            )
+            sm.set_array(available_f_scores)
+            plt.colorbar(sm, cax=ax, orientation='vertical')
+            ax.set_ylabel('F-score',  
+                # fontsize=label_fontsize
+            )
 
-        fig.savefig(
-            os.path.join(save_directory, 'elo_ratings_of_all_models.png')
-        )
+        lf.save(os.path.join(save_directory, 'elo_ratings_of_all_models.png'))
 
     def plot_rating_progress_single_model(
         self, 

@@ -16,12 +16,17 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import GridSpec
-
+import qmla.shared_functionality.latex_figure as lfig
 import qmla
 
-def plot_qmla_branches(q, return_graphs=False):
+def plot_qmla_branches(
+    q, 
+    show_fscore_cmap=False,
+    return_graphs=False
+):
     trees = list(q.trees.values())
     q.log_print(["Plotting QMLA branch graphs. Trees:", trees])
+    plt.rcParams.update(lfig.get_latex_rc_params(font_scale=1.5,))
 
     for tree in trees:
         # tree = trees[0] # TODO loop over trees
@@ -45,32 +50,32 @@ def plot_qmla_branches(q, return_graphs=False):
             nrows = 2
         else:
             nrows = int( np.ceil(num_branches / ncols))  
-        total_ncols = ncols + 2 # extra for cmaps
-        q.log_print(["nrows/ncols={},{}".format(nrows, ncols)])
+        
+        # Generate plot
         plt.clf()
+        lf = lfig.LatexFigure()
         fig = plt.figure( 
-            figsize=(15, 10),
+            figsize=lf.size,
             constrained_layout=True
         )
         widths = [1]*ncols
         widths.append(0.1)
-        widths.append(0.1)
+        if show_fscore_cmap:
+           widths.append(0.1)
+        total_ncols = len(widths)
         
-        size_scaler = min(3, 8 / num_branches)
-        label_fontsize = 20*size_scaler
+        size_scaler = min(2, 4 / num_branches)
+        label_fontsize = 15*size_scaler
 
         gs = GridSpec(
             nrows = nrows,
             ncols = total_ncols,
             width_ratios = widths,
-    #         wspace = 0.,
+            wspace=0.25, 
         )
 
         # colour maps
         f_score_cmap = q.growth_class.f_score_cmap
-
-        # bf_cmap = plt.cm.get_cmap('PRGn')
-        # bf_cmap = qmla.utilities.truncate_colormap(bf_cmap, 0.05, 0.95)
         bf_cmap = q.growth_class.bf_cmap
         min_bf = q.bayes_factors_df.log10_bayes_factor.min()
         max_bf = q.bayes_factors_df.log10_bayes_factor.max()
@@ -112,9 +117,8 @@ def plot_qmla_branches(q, return_graphs=False):
                     colour = colour
                 )    
 
-
-    #         pos = nx.spring_layout(graph)
-            pos = nx.kamada_kawai_layout(graph)
+            pos = nx.kamada_kawai_layout(graph) # could use spring_layout or other
+            # pos = nx.spring_layout(graph)
             labels = nx.get_node_attributes(graph, 'model_id')
             node_colours = [ graph.nodes[m]['colour'] for m in models]
             edge_colours = [ graph.edges[e]['colour'] for e in graph.edges ]
@@ -137,8 +141,7 @@ def plot_qmla_branches(q, return_graphs=False):
                 ax = ax,
                 alpha = 1,
                 width=4
-            )
-            
+            )           
             
             # summarise this graph in a text box
             node_edges = { n : len(graph.edges(n)) for n in graph.nodes}
@@ -194,22 +197,28 @@ def plot_qmla_branches(q, return_graphs=False):
             graphs[branch.branch_id] =  graph
 
         # BF cmap
-        ax = fig.add_subplot(gs[:, total_ncols-2])
+        ax = fig.add_subplot(gs[:, total_ncols-1-int(show_fscore_cmap)])
         fig.colorbar(bf_cmapper, cax = ax)
-
-        ax.set_title(r"$log_{10}(BF)$", fontsize=label_fontsize, loc='center')
-    #     ax.yaxis.set_label_position("left")
+        ax.set_title(
+            r"$log_{10}(BF)$", 
+            # fontsize=label_fontsize, 
+            loc='center'
+        )
 
         # F score
-        ax = fig.add_subplot(gs[:, total_ncols-1])
+        if show_fscore_cmap:
+            ax = fig.add_subplot(gs[:, total_ncols-1])
 
-        sm = plt.cm.ScalarMappable(
-            cmap = f_score_cmap, 
-            norm=plt.Normalize(vmin=0, vmax=1)
-        )
-        sm.set_array([])
-        fig.colorbar(sm, cax=ax, orientation='vertical')
-        ax.set_ylabel(r"F-score", fontsize=label_fontsize, )
+            sm = plt.cm.ScalarMappable(
+                cmap = f_score_cmap, 
+                norm=plt.Normalize(vmin=0, vmax=1)
+            )
+            sm.set_array([])
+            fig.colorbar(sm, cax=ax, orientation='vertical')
+            ax.set_ylabel(
+                r"F-score", 
+                # fontsize=label_fontsize, 
+            )
 
         # Save figure
         save_file = 'graphs_of_branches_{}.png'.format(tree.growth_rule)

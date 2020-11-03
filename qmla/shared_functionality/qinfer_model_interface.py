@@ -478,6 +478,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             if self.true_evolution:
                 t_init = time.time()
                 # self.log_print(["Getting system pr0"])
+                self.log_print_debug([
+                    "Getting system Pr0 w/ params ", params
+                ])
                 pr0 = self.get_system_pr0_array(
                     times=times,
                     particles=params,
@@ -487,6 +490,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             else:
                 t_init = time.time()
                 # self.log_print(["Getting simulator pr0"])
+                self.log_print_debug([
+                    "Getting simulator Pr0 w/ params ", params
+                ])
                 pr0 = self.get_simulator_pr0_array(
                     times=times,
                     particles=params,
@@ -920,3 +926,55 @@ class QInferInterfaceJordanWigner(QInferModelQMLA):
             raise ValueError(
                 "get_probe must either act on simulator or system, received {}".format(probe_set)
             )
+
+
+class QInferInterfaceAnalytical(QInferModelQMLA):
+    r"""
+    Analytically computes the likleihood for an exemplary case. 
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def get_system_pr0_array(
+        self, 
+        times,
+        particles, 
+    ):
+
+        pr0 = np.empty([len(particles), len(times)])
+        t = times[0]
+        self.log_print_debug([
+            "(sys) particles:", particles,
+            "time: ", t,
+            "\n shapes: prt={} \t times={}".format(np.shape(particles), np.shape(times))
+        ])
+
+        for evoId in range(len(particles)):
+            particle = particles[evoId][0]
+            for t_id in range(len(times)):
+                pr0[evoId][t_id] = (np.cos(particle * t / 2))**2
+
+        return pr0
+
+    def get_simulator_pr0_array(
+        self, 
+        particles, 
+        times,
+        # **kwargs
+    ):
+        pr0 = np.empty([len(particles), len(times)])
+        t = times[0]
+        self.log_print_debug([
+            "(sim) particles:", particles,
+            "time: ", t,
+            "\n shapes: prt={} \t times={}".format(np.shape(particles), np.shape(times))
+        ])
+
+        for evoId in range(len(particles)):
+            particle = particles[evoId]  
+            for t_id in range(len(times)):
+                pr0[evoId][t_id] = (np.cos(particle * t / 2))**2
+
+        return pr0
+

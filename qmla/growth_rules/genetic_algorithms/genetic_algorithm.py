@@ -577,6 +577,11 @@ class GeneticAlgorithmQMLA():
             "Setting up chromosome pair dataframe with initial probabilities", 
             chromosome_probabilities
         ])
+        if len(chromosome_probabilities) == 1:
+            self.log_print([
+                "There is only one chromosome; not constructing selection database."
+            ])
+            return
 
         # Register gene pool
         for c in chromosome_probabilities:
@@ -616,8 +621,11 @@ class GeneticAlgorithmQMLA():
                     pair_data.append(this_pair_df)
         self.chrom_pair_df = pd.DataFrame.from_dict(pair_data)                
         # normalise probabilities
-        self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
-        self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
+        try:
+            self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
+            self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
+        except:
+            self.log_print(["Failing at final generation. chrom pair df:", self.chrom_pair_df])
         self.log_print([
             "starting chromosome pair dataframe setup. {} combinations in total. took {} sec and has len {}".format(
                 len(chromosome_combinations),
@@ -626,6 +634,7 @@ class GeneticAlgorithmQMLA():
             )
         ])
 
+    def get_pair_selection_order(self):
         pair_idx = self.chrom_pair_df.index.values
         probabilities = self.chrom_pair_df.probability.values
         
@@ -647,13 +656,6 @@ class GeneticAlgorithmQMLA():
             p = probabilities,
             replace=False
         )
-        # pair_selection_order = multidimensional_shifting(
-        #     1, 
-        #     n_samples,
-        #     # np.shape(np.where(probabilities != 0))[1], 
-        #     pair_idx, 
-        #     probabilities
-        # )
         self.log_print([
             "after {} s, pair_selection_order has {} elements ({} unique): \n {}".format(
                 np.round(time.time() - t1, 3), 
@@ -668,9 +670,9 @@ class GeneticAlgorithmQMLA():
     # Implement entire genetic algorithm iteration
     ######################
 
-    def genetic_algorithm_step(
-        self,
-        model_fitnesses,
+    def consolidate_generation(
+        self, 
+        model_fitnesses, 
         **kwargs
     ):
         self.fitness_at_generation[self.genetic_generation] = model_fitnesses
@@ -682,36 +684,56 @@ class GeneticAlgorithmQMLA():
         self.log_print([
             "GA step. model ranked by fitness:", self.models_ranked_by_fitness[self.genetic_generation]
         ])
-        input_models = list(model_fitnesses.keys())
-        num_models_for_next_generation = len(input_models)
-        self.log_print([
-            "Num models reqd for generation:", num_models_for_next_generation
-        ])
 
-        elite_models = self.get_elite_models(
+        self.get_elite_models(
             model_fitnesses = model_fitnesses,
             num_protected_elite_models = 2
         )
+
+        self.chromosome_selection_probabilities = self.get_selection_probabilities(
+            model_fitnesses = model_fitnesses,
+        )
+        t_init = time.time()
+        self.prepare_chromosome_pair_dataframe(
+            chromosome_probabilities=self.chromosome_selection_probabilities
+        )
+        self.log_print(["Time to prepare chromosome pair df for gen {} = {} sec".format(
+            self.genetic_generation, 
+            np.round(time.time()-t_init, 3)
+        )])
+
+    def genetic_algorithm_step(
+        self,
+        model_fitnesses,
+        **kwargs
+    ):
+        # self.consolidate_generation(
+        #     model_fitnesses, 
+        # )
+
+        # get the order to iterate through chromosome pairs
+        pair_selection_order = self.get_pair_selection_order()
+        init_num_chrom_pairs = len(pair_selection_order)
+        pair_selection_order = iter(pair_selection_order)
+
+        elite_models = list(self.elite_models[
+            self.elite_models.generation == self.genetic_generation
+        ].model)
+        self.log_print([
+            "elite models to start off with:", elite_models
+        ])
         proposed_chromosomes = [
             self.chromosome_string(
                 self.map_model_to_chromosome(mod)
             ) for mod in elite_models
         ] # list of chromosome strings to return
 
-        chromosome_selection_probabilities = self.get_selection_probabilities(
-            model_fitnesses = model_fitnesses,
-        )
-        t_init = time.time()
-        pair_selection_order = self.prepare_chromosome_pair_dataframe(
-            chromosome_probabilities=chromosome_selection_probabilities
-        )
-        init_num_chrom_pairs = len(pair_selection_order)
-        pair_selection_order = iter(pair_selection_order)
-        self.log_print(["Time to prepare chromosome pair df for gen {} = {} sec".format(
-            self.genetic_generation, np.round(time.time()-t_init, 3)
-        )])
+        input_models = list(model_fitnesses.keys())
+        num_models_for_next_generation = len(input_models)
+        self.log_print([
+            "Num models reqd for generation:", num_models_for_next_generation
+        ])
 
-        self.unique_pair_combinations_considered = []
         num_loops_to_find_new_chromosome = 0
         force_mutation = False
         num_genes_to_force_mutate = 0
@@ -777,20 +799,20 @@ class GeneticAlgorithmQMLA():
                     "Redrawing chromosome pair selection dataframe, enforcing mutation on {} genes".format(num_genes_to_force_mutate)
                 ])
                 self.prepare_chromosome_pair_dataframe(
-                    chromosome_probabilities=chromosome_selection_probabilities,
+                    chromosome_probabilities=self.chromosome_selection_probabilities,
                     force_mutation=True
                     # force_mutation=num_genes_to_force_mutate
                 )
 
         # chop extra chromosomes if generated
         proposed_chromosomes = proposed_chromosomes[:num_models_for_next_generation]
-        self.log_print([
-            "Proposed chromosome list now has {} elements after {} trials over {} seconds.".format(
-                len(proposed_chromosomes), 
-                init_num_chrom_pairs - len(list(pair_selection_order)), 
-                time.time() - t_init
-            )
-        ])
+        # self.log_print([
+        #     "Proposed chromosome list now has {} elements after {} trials over {} seconds.".format(
+        #         len(proposed_chromosomes), 
+        #         init_num_chrom_pairs - len(list(pair_selection_order)), 
+        #         time.time() - t_init
+        #     )
+        # ])
         self.previously_considered_chromosomes.extend([
             self.chromosome_string(r) for r in proposed_chromosomes
             ]

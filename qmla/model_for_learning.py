@@ -6,6 +6,7 @@ import copy
 import scipy
 import random
 import logging
+import pandas as pd
 
 import qinfer as qi
 import matplotlib.pyplot as plt
@@ -291,6 +292,7 @@ class ModelInstanceForLearning():
         self.qhl_final_param_uncertainties = {}
 
         # Miscellaneous
+        self.progress_tracker = pd.DataFrame()
         self.all_params_for_q_loss = list(
             set(list(self.true_param_dict.keys())).union(
                 self.model_terms_names)
@@ -400,7 +402,11 @@ class ModelInstanceForLearning():
                 sys.exit()
 
             # Track learning
-            self._record_experiment_updates(update_step=update_step)
+            self._record_experiment_updates(
+                update_step=update_step, 
+                new_experiment=new_experiment, 
+                datum=datum_from_experiment
+            )
 
             # Terminate
             if (
@@ -420,24 +426,27 @@ class ModelInstanceForLearning():
         self.model_heuristic.finalise_heuristic()
         self.log_print(["Time to finalise heuristic: {} sec".format(np.round(time.time() - t2, 3))])
 
-    def _record_experiment_updates(self, update_step):
+    def _record_experiment_updates(
+        self, 
+        update_step, 
+        new_experiment=None,
+        datum=None, 
+    ):
         r"""Update tracking infrastructure."""
 
         cov_mt = self.qinfer_updater.est_covariance_mtx()
         param_estimates = self.qinfer_updater.est_mean()
 
         # Data used in plots
+        volume = np.abs(qi.utils.ellipsoid_volume(
+            invA=cov_mt
+        ))
         self.volume_by_epoch = np.append(
-            self.volume_by_epoch,
-            qi.utils.ellipsoid_volume(
-                invA=cov_mt
-            )
+            self.volume_by_epoch, volume
         )
         self.track_param_means.append(param_estimates)
         self.track_param_uncertainties.append(
-            np.sqrt(
-                np.diag(cov_mt)
-            )
+            np.sqrt(np.diag(cov_mt))
         )
         self.track_norm_cov_matrices.append(np.linalg.norm(cov_mt))
         if self.qinfer_updater.just_resampled:
@@ -464,6 +473,42 @@ class ModelInstanceForLearning():
 
             quadratic_loss += (learned_param - true_param)**2
         self.quadratic_losses_record.append(quadratic_loss)
+
+        if new_experiment is None:
+            exp_time = None
+            probe_id = None
+            total_likelihood = None
+        else:
+            exp_time = new_experiment['t'][0]
+            probe_id = new_experiment['probe_id']
+            total_likelihood = self.qinfer_updater.normalization_record[-1][0]
+
+        try:
+            residual_median = self.qinfer_model.store_p0_diffs[-1][0]
+            residual_std = self.qinfer_model.store_p0_diffs[-1][1]
+        except:
+            residual_median = None
+            residual_std = None
+
+        experiment_summary = pd.Series({
+            'model_id' : self.model_id, 
+            'model_name' : self.model_name_latex,
+            'experiment_id' : update_step+1, # update_step counts from 0 
+            'parameters_true' : self.true_model_params, 
+            'parameters_estimates' : param_estimates, 
+            'parameters_uncertainties' : self.track_param_uncertainties[-1], 
+            'volume' : volume, 
+            'quadratic_loss' : quadratic_loss, 
+            'experiment_time' : exp_time,
+            'probe_id' : probe_id, 
+            'residual_median' : residual_median,
+            'residual_std_dev' : residual_std,
+            'just_resampled' : self.qinfer_updater.just_resampled,
+            'effective_sample_size' : self.qinfer_updater.n_ess,
+            'datum' : datum,
+            'total_likelihood' : total_likelihood, 
+        })
+        self.progress_tracker = self.progress_tracker.append(experiment_summary, ignore_index=True)
 
     def _finalise_learning(self):
         r"""Record and log final result."""
@@ -523,6 +568,19 @@ class ModelInstanceForLearning():
             * qmla.construct_models.compute(term)
             for term in self.qhl_final_param_estimates
         ])
+        
+        # Record parameter estimates
+        pe = pd.DataFrame(self.track_param_estimate_v_epoch)
+        pu = pd.DataFrame(self.track_param_uncertainty_v_epoch)
+        pu.index.rename('experiment_id', inplace=True)
+        pe.index.rename('experiment_id', inplace=True)
+        pu.rename(
+            columns = { d : 'uncertainty_{}'.format(d) for d in pu.keys()},
+            inplace=True
+        )
+        self.parameter_estimates = pu.join(pe, on='experiment_id')
+        
+        # Compute dynamics 
         self._compute_expectation_values()
 
 
@@ -619,6 +677,8 @@ class ModelInstanceForLearning():
         learned_info['qinfer_pr0_diff_from_true'] = np.array(
             self.qinfer_model.store_p0_diffs)
         learned_info['expectation_values'] = self.expectation_values
+        learned_info['progress_tracker'] = self.progress_tracker
+        learned_info['parameter_estimates'] = self.parameter_estimates
 
         # additionally wanted by comparison class
         learned_info['name'] = self.model_name
