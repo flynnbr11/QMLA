@@ -9,7 +9,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import matplotlib
-import qmla.shared_functionality.latex_figure as lfig
+try:
+    import lfig # most up to date system version
+except:
+    import qmla.shared_functionality.latex_figure as lfig
 
 import qmla.utilities
 

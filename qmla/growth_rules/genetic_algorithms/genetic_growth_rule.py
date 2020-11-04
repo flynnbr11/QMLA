@@ -14,7 +14,10 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import seaborn as sns
 
-import qmla.shared_functionality.latex_figure as lfig
+try:
+    import lfig # most up to date system version
+except:
+    import qmla.shared_functionality.latex_figure as lfig
 from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
@@ -661,9 +664,9 @@ class Genetic(
                     'ratings.png'.format(qmla_id)
                 )
             )
-        except:
+        except Exception as e:
             self.log_print([
-                "failed to plot_model_ratings"
+                "failed to plot_model_ratings. exception:", e
             ])
 
         try:
@@ -860,46 +863,43 @@ class Genetic(
         plt.savefig(save_to_file)
 
     def plot_model_ratings(self, save_to_file):
-        # plt.clf()
-        # fig, ax = plt.subplots()
-        # for model in self.ratings_class.models.values():
-        #     model_id = model.model_id
-        #     # TODO get model name
-        #     ax.plot(
-        #         model.rating_history,
-        #         label= "{}".format(model_id)
-        #     )        
-        # ax.set_ylabel('Rating')
-        # ax.legend()
-        # fig.savefig(save_to_file)
         plt.clf()
         ratings = self.ratings_class.all_ratings
         generations = [int(g) for g in ratings.generation.unique()]
         num_generations = len(generations)
 
-        fig, axes = plt.subplots(figsize=(15, 5*num_generations), constrained_layout=True)
-        gs = GridSpec(nrows=num_generations, ncols = 1, )
+        lf = lfig.LatexFigure(
+            use_gridspec=True, 
+            gridspec_layout=(num_generations, 1)
+        )
 
-        # TODO : linestyle and colour unique for each model ID and tracks across subplots
+        # TODO : unique linestyle and colour combo for each model ID and tracks across subplots
+        ratings['Model ID'] = ratings['model_id']
 
-        row = -1
         for gen in generations:
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
-                
-            r = ratings[ratings.generation==gen]
+            ax = lf.new_axis()
+
+            this_gen_ratings = ratings[ratings.generation==gen]
+            colours = {
+                m : self.f_score_cmap(self.model_f_scores[m])
+                for m in this_gen_ratings['model_id']
+            }
             sns.lineplot(
                 x = 'idx', 
                 y = 'rating', 
-                hue = 'model_id', 
-                hue_order = sorted(r.model_id.unique()),
-                data=r, 
+                hue = r'Model ID', 
+                hue_order = sorted(this_gen_ratings.model_id.unique()),
+                data=this_gen_ratings, 
                 ax = ax,
                 legend='full',
-                palette = 'Dark2'
+                palette = colours, 
             )
+
             ax.set_title('Generation {}'.format(gen), pad = -15)   
-        fig.savefig(save_to_file)
+            ax.set_xlabel("")
+            ax.set_ylabel("Elo rating")
+            ax.legend(bbox_to_anchor=(1, 1))
+        lf.save(save_to_file)
 
 
     def plot_fitness_v_fscore(self, save_to_file):

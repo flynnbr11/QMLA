@@ -467,7 +467,7 @@ class GrowthRule():
         self.num_processes_to_parallelise_over = 6
         self.timing_insurance_factor = 1
         # self.f_score_cmap = matplotlib.cm.Spectral
-        self.f_score_cmap = matplotlib.cm.RdYlBu
+        self.f_score_cmap = matplotlib.cm.RdBu
         self.bf_cmap = matplotlib.cm.PRGn
 
     ##########

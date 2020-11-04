@@ -16,7 +16,11 @@ import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import GridSpec
-import qmla.shared_functionality.latex_figure as lfig
+try:
+    import lfig # most up to date system version
+except:
+    import qmla.shared_functionality.latex_figure as lfig
+
 import qmla
 
 def plot_qmla_branches(
