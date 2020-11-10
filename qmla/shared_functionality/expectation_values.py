@@ -42,7 +42,7 @@ def probability_from_default_expectation_value(
     :return: probability of measuring the input state after Hamiltonian evolution
     """
 
-    if np.shape(ham)[0] >= 128: 
+    if np.shape(ham)[0] >= 128 and t < 50: 
         # use sparse for >=5 qubits
         sparse_ham = sparse.csc_matrix(-1j*ham*t)
         try:
@@ -64,6 +64,16 @@ def probability_from_default_expectation_value(
                 log_file=log_file, log_identifier=log_identifier
             )
             raise
+
+    # try:
+    #     unitary = linalg.expm(-1j * ham * t)
+    #     u_psi = np.dot(unitary, state)
+    # except:
+    #     log_print(
+    #         [ "Failed to build unitary for ham:\n {}".format(ham) ],
+    #         log_file=log_file, log_identifier=log_identifier
+    #     )
+    #     raise
 
 
 
