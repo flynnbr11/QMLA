@@ -148,6 +148,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 'likelihood' : 0, 
             }
         self.calls_to_likelihood = 0 
+        self.single_experiment_timings = {
+            k : {} for k in ['system', 'simulator']
+        }
         try:
             self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
                 growth_generation_rule=self.growth_generation_rule,
@@ -513,6 +516,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             )
         )
         self.timings[timing_marker]['likelihood_array'] += time.time() - t_init
+        self.single_experiment_timings[timing_marker]['likelihood'] = time.time() - t_likelihood_start
+
         self.log_print_debug([
             '\ntrue_evo:', self.true_evolution,
             '\nevolution times:', times,
@@ -529,7 +534,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
 
-        
+        t_storage_start = time.time()
         if self.true_evolution: 
             self.log_print_debug(["Storing system likelihoods"])
             self.store_likelihoods['system'][self.likelihood_calls['system']] = pr0
@@ -546,7 +551,15 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             self.summarise_likelihoods['particles_lower_quartile'].append( np.percentile(pr0, 25) )
             self.summarise_likelihoods['particles_upper_quartile'].append( np.percentile(pr0, 75) )
             self.likelihood_calls['simulator'] += 1 
+        self.single_experiment_timings[timing_marker]['storage'] = time.time() - t_storage_start
+        self.log_print_debug([
+            "Setting single_experiment_timings for {}[{}] -> {}".format(
+                timing_marker, 'storage', time.time() - t_storage_start
+            )
+        ])
+
         self.log_print_debug(["Stored likelihoods"])
+
         if self.evaluation_model:
             self.log_print_debug([
                 "\nSystem evolution {}. t={} Likelihood={}".format(

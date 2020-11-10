@@ -375,10 +375,12 @@ class ModelInstanceForLearning():
 
             # Call updater to update distribution based on datum
             try:
+                update_start = time.time()
                 self.qinfer_updater.update(
                     datum_from_experiment,
                     new_experiment
                 )
+                update_time = time.time() - update_start
             except RuntimeError as e:
                 import sys
                 self.log_print([
@@ -405,7 +407,8 @@ class ModelInstanceForLearning():
             self._record_experiment_updates(
                 update_step=update_step, 
                 new_experiment=new_experiment, 
-                datum=datum_from_experiment
+                datum=datum_from_experiment,
+                update_time=update_time,
             )
 
             # Terminate
@@ -431,6 +434,7 @@ class ModelInstanceForLearning():
         update_step, 
         new_experiment=None,
         datum=None, 
+        update_time=0,
     ):
         r"""Update tracking infrastructure."""
 
@@ -489,6 +493,17 @@ class ModelInstanceForLearning():
         except:
             residual_median = None
             residual_std = None
+        
+        if update_time ==0: 
+            storage_time = 0 
+            likelihood_time = 0 
+        else:
+            try:
+                storage_time = self.qinfer_model.single_experiment_timings['simulator']['storage']
+                likelihood_time = self.qinfer_model.single_experiment_timings['simulator']['likelihood']
+            except Exception as e:
+                raise
+                self.log_print(["Can't find storage/likelihood time. Exception : ", e])
 
         experiment_summary = pd.Series({
             'model_id' : self.model_id, 
@@ -507,6 +522,9 @@ class ModelInstanceForLearning():
             'effective_sample_size' : self.qinfer_updater.n_ess,
             'datum' : datum,
             'total_likelihood' : total_likelihood, 
+            'update_time' : update_time, 
+            'storage_time' : storage_time, 
+            'likelihood_time' : likelihood_time
         })
         self.progress_tracker = self.progress_tracker.append(experiment_summary, ignore_index=True)
 
