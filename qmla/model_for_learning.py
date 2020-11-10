@@ -508,6 +508,7 @@ class ModelInstanceForLearning():
         experiment_summary = pd.Series({
             'model_id' : self.model_id, 
             'model_name' : self.model_name_latex,
+            'num_qubits' : self.model_num_qubits,
             'experiment_id' : update_step+1, # update_step counts from 0 
             'parameters_true' : self.true_model_params, 
             'parameters_estimates' : param_estimates, 
