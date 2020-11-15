@@ -7,7 +7,7 @@ import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 import qmla.construct_models
 from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas
 plt.switch_backend('agg')
@@ -125,8 +125,8 @@ def average_parameter_estimates(
     directory_name,
     results_path,
     results_file_name_start='results',
-    growth_generator=None,
-    unique_growth_classes=None,
+    exploration_rule=None,
+    unique_exploration_classes=None,
     top_number_models=2,
     true_params_dict=None,
     save_to_file=None,
@@ -143,8 +143,8 @@ def average_parameter_estimates(
 
     :param directory_name: path to directory where results .p files are stored.
     :param results_patha: path to CSV with all results for this run.
-    :param growth_generator: the name of the growth generation rule used. 
-    :param unique_growth_classes: dict with single instance of each growth rule class
+    :param exploration_rule: the name of the exploration strategy used. 
+    :param unique_exploration_classes: dict with single instance of each exploration strategy class
         used in this run.
     :param top_number_models: Number of models to compute averages for 
         (top by number of instance wins). 
@@ -177,7 +177,7 @@ def average_parameter_estimates(
     num_experiments_by_name = {}
 
     latex_terms = {}
-    growth_rules = {}
+    exploration_strategys = {}
 
     for f in pickled_files:
         fname = directory_name + '/' + str(f)
@@ -195,19 +195,19 @@ def average_parameter_estimates(
             parameter_estimates_from_qmd[alph] = [track_parameter_estimates]
             num_experiments_by_name[alph] = result['NumExperiments']
 
-        if alph not in list(growth_rules.keys()):
+        if alph not in list(exploration_strategies.keys()):
             try:
-                growth_rules[alph] = result['GrowthGenerator']
+                exploration_strategys[alph] = result['ExplorationRule']
             except BaseException:
-                growth_rules[alph] = growth_generator
+                exploration_strategys[alph] = exploration_rule
 
-    unique_growth_rules = list(set(list(growth_rules.values())))
-    growth_classes = {}
-    for g in list(growth_rules.keys()):
+    unique_exploration_strategys = list(set(list(exploration_strategies.values())))
+    exploration_classes = {}
+    for g in list(exploration_strategies.keys()):
         try:
-            growth_classes[g] = unique_growth_classes[growth_rules[g]]
+            exploration_classes[g] = unique_exploration_classes[exploration_strategys[g]]
         except BaseException:
-            growth_classes[g] = None
+            exploration_classes[g] = None
 
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
@@ -278,7 +278,7 @@ def average_parameter_estimates(
             if col == ncols:
                 col = 0
                 row += 1
-            latex_terms[term] = growth_classes[name].latex_name(term)
+            latex_terms[term] = exploration_classes[name].latex_name(term)
             averages = np.array(
                 [avg_parameters[term][e] for e in epochs]
             )
@@ -289,7 +289,7 @@ def average_parameter_estimates(
             param_lw = 3
             try:
                 true_val = true_params_dict[term]
-                true_term_latex = growth_classes[name].latex_name(term)
+                true_term_latex = exploration_classes[name].latex_name(term)
                 ax.axhline(
                     true_val,
                     label=str('True value'),
@@ -337,10 +337,10 @@ def average_parameter_estimates(
             # )
 
 
-            latex_term = growth_classes[name].latex_name(term)
+            latex_term = exploration_classes[name].latex_name(term)
             ax.set_title(str(latex_term))
 
-        latex_name = growth_classes[name].latex_name(name)
+        latex_name = exploration_classes[name].latex_name(name)
 
         if save_directory is not None:
             save_file = os.path.join(
@@ -363,7 +363,7 @@ def cluster_results_and_plot(
     true_expec_path,
     plot_probe_path,
     true_params_path,
-    growth_generator,
+    exploration_rule,
     upper_x_limit=None,
     save_param_clusters_to_file=None,
     save_param_values_to_file=None,
@@ -372,7 +372,7 @@ def cluster_results_and_plot(
     plot_prefix='', 
 ):
     from matplotlib import cm
-    growth_class = qmla.get_growth_rule.get_growth_generator_class(growth_generator)
+    exploration_class = qmla.get_exploration_strategy.get_exploration_class(exploration_rule)
     results_csv = pd.read_csv(path_to_results)
     unique_champions = list(
         set(list(results_csv['NameAlphabetical']))
@@ -382,14 +382,14 @@ def cluster_results_and_plot(
         open(true_params_path, 'rb')
     )
     try:
-        growth_generator = true_info_dict['growth_generator']
+        exploration_rule = true_info_dict['exploration_rule']
     except BaseException:
         pass
 
     true_params_dict = true_info_dict['params_dict']
     if true_params_dict is not None:
         for k in list(true_params_dict.keys()):
-            latex_key = growth_class.latex_name(
+            latex_key = exploration_class.latex_name(
                 name=k
             )
             true_params_dict[latex_key] = true_params_dict[k]
@@ -480,7 +480,7 @@ def cluster_results_and_plot(
                     all_centroids_of_each_param[terms[i]] = [
                         this_model_clusters[j][i]]
 
-            latex_mod_name = growth_class.latex_name(
+            latex_mod_name = exploration_class.latex_name(
                 name=mod
             )
             cluster_description = str(
@@ -496,7 +496,7 @@ def cluster_results_and_plot(
             )
 
     for k in list(all_centroids_of_each_param.keys()):
-        latex_term = growth_class.latex_name(name=k)
+        latex_term = exploration_class.latex_name(name=k)
         all_centroids_of_each_param[latex_term] = all_centroids_of_each_param[k]
         all_centroids_of_each_param.pop(k)
 
@@ -508,7 +508,7 @@ def cluster_results_and_plot(
     term_colours = {}
     latex_terms = {}
     for term in all_possible_params:
-        latex_rep = growth_class.latex_name(name=term)
+        latex_rep = exploration_class.latex_name(name=term)
 
         latex_terms[term] = latex_rep
 
@@ -608,7 +608,7 @@ def cluster_results_and_plot(
             cluster = clusters_by_model[mod][cluster_description]
             ax = axes[row, col]
             for term in sorted(cluster.keys()):
-                label = growth_class.latex_name(
+                label = exploration_class.latex_name(
                     name=term
                 )
                 ax.axhline(
@@ -648,7 +648,7 @@ def cluster_results_and_plot(
         model_descriptions=all_clusters_descriptions,
         true_expec_vals_path=true_expec_path,
         plot_probe_path=plot_probe_path,
-        growth_generator=growth_generator,
+        exploration_rule=exploration_rule,
         upper_x_limit=upper_x_limit,  # can play with this
         save_to_file=save_redrawn_expectation_values,
         save_directory = save_directory,
@@ -658,7 +658,7 @@ def replot_expectation_values(
     params_dictionary_list,  # list of params_dicts
     true_expec_vals_path,
     plot_probe_path,
-    growth_generator,
+    exploration_rule,
     upper_x_limit=None,
     model_descriptions=None,
     save_to_file=None,
@@ -675,11 +675,11 @@ def replot_expectation_values(
     # print("[replot] ",
     #     "\ntrue_expec_vals_path", true_expec_vals_path,
     #     "\nplot_probe_path", plot_probe_path,
-    #     "\ngrowth_generator", growth_generator,
+    #     "\nexploration_rule", exploration_rule,
     #     "\nmeasurement_method", measurement_method
     # )
-    growth_class = qmla.get_growth_rule.get_growth_generator_class(
-        growth_generation_rule=growth_generator
+    exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+        exploration_rules=exploration_rule
     )
     sim_colours = ['b', 'g', 'c', 'y', 'm', 'k']
     plot_probes = pickle.load(open(plot_probe_path, 'rb'))
@@ -747,7 +747,7 @@ def replot_expectation_values(
 
         sim_exp_vals = {}
         for t in sim_times:
-            sim_exp_vals[t] = growth_class.expectation_value(
+            sim_exp_vals[t] = exploration_class.expectation_value(
                 ham=sim_ham,
                 state=probe,
                 t=t
@@ -761,7 +761,7 @@ def replot_expectation_values(
             model_label = model_descriptions[list_id]
         else:
             sim_op_string = p_str.join(sim_ops_names)
-            latex_name = growth_class.latex_name(name=sim_op_string)
+            latex_name = exploration_class.latex_name(name=sim_op_string)
             model_label = latex_name
 
         ax.plot(
@@ -877,7 +877,7 @@ def plot_parameter_estimates(
         try:
             if use_experimental_data == False:
                 y_true = qmd.true_param_dict[term]
-                true_term_latex = qmd.growth_class.latex_name(
+                true_term_latex = qmd.exploration_class.latex_name(
                     name=term
                 )
                 true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
@@ -893,7 +893,7 @@ def plot_parameter_estimates(
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
         x = range(1, 1 + len(param_estimate_by_term[term]))
-        latex_term = mod.growth_class.latex_name(term)
+        latex_term = mod.exploration_class.latex_name(term)
         latex_term = latex_term[:-1] + r'^{\prime}' + '$'
         # print("[pQMD] latex_term:", latex_term)
         ax.scatter(

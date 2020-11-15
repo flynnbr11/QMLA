@@ -70,7 +70,7 @@ parser.add_argument(
     default=None
 )
 parser.add_argument(
-    '-ggr', '--growth_generation_rule',
+    '-ggr', '--exploration_rules',
     help='Rule applied for generation of new models during QMD. \
     Corresponding functions must be built into model_generation',
     type=str,
@@ -149,9 +149,9 @@ arguments = parser.parse_args()
 results_directory = arguments.results_directory
 output_file_name = arguments.output_file_name
 
-growth_generation_rule = arguments.growth_generation_rule
-growth_class = qmla.get_growth_generator_class(
-    growth_generation_rule=growth_generation_rule,
+exploration_rules = arguments.exploration_rules
+exploration_class = qmla.get_exploration_class(
+    exploration_rules=exploration_rules,
     use_experimental_data=arguments.experimental_data,
     log_file=arguments.log_file
 )
@@ -159,11 +159,11 @@ growth_class = qmla.get_growth_generator_class(
 variables = vars(arguments)
 # and some others arguments not explicitly set in launch script
 
-# variables['measurement_type'] = growth_class.measurement_type
-variables['expectation_value_func'] = growth_class.expectation_value_function.__name__
-variables['heuristic'] = growth_class.model_heuristic_function.__name__
-variables['probe_generation_function'] = growth_class.probe_generation_function.__name__
-variables['plot_probe_generation_function'] = growth_class.plot_probe_generation_function.__name__
+# variables['measurement_type'] = exploration_class.measurement_type
+variables['expectation_value_func'] = exploration_class.expectation_value_function.__name__
+variables['heuristic'] = exploration_class.model_heuristic_function.__name__
+variables['probe_generation_function'] = exploration_class.probe_generation_function.__name__
+variables['plot_probe_generation_function'] = exploration_class.plot_probe_generation_function.__name__
 
 qmla.analysis.combine_analysis_plots(
     results_directory=results_directory,

@@ -25,61 +25,61 @@ plot_level=6
 debug_mode=0
 
 ###############
-# Choose a growth rule 
+# Choose a exploration strategy 
 # This will determine how QMLA proceeds. 
-# use_alt_growth_rules=1 # note this is redundant locally, currently
+# use_alt_exploration_strategys=1 # note this is redundant locally, currently
 ###############
 
-# growth_rule='AnalyticalLikelihood'
-# growth_rule='IsingLatticeSet'
-# growth_rule='TestSimulatedNVCentre'
-# growth_rule='NVCentreRevivals'
-# growth_rule='NVCentreRevivalsSimulated'
-# growth_rule='NVCentreNQubitBath'
-# growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
-# growth_rule='NVPrelearnedTest'
-# growth_rule='HeisenbergLatticeSet'
-# growth_rule='FermiHubbardLatticeSet'
-growth_rule='ThesisLatticeDemo'
-# growth_rule='IsingLatticeSet'
-# growth_rule='Demonstration'
+# exploration_strategy='AnalyticalLikelihood'
+# exploration_strategy='IsingLatticeSet'
+# exploration_strategy='TestSimulatedNVCentre'
+# exploration_strategy='NVCentreRevivals'
+# exploration_strategy='NVCentreRevivalsSimulated'
+# exploration_strategy='NVCentreNQubitBath'
+# exploration_strategy='NVCentreGenticAlgorithmPrelearnedParameters'
+# exploration_strategy='NVPrelearnedTest'
+# exploration_strategy='HeisenbergLatticeSet'
+# exploration_strategy='FermiHubbardLatticeSet'
+exploration_strategy='ThesisLatticeDemo'
+# exploration_strategy='IsingLatticeSet'
+# exploration_strategy='Demonstration'
 
-# growth_rule='HeisenbergGenetic'
-# growth_rule='HeisenbergGeneticXXZ'
-# growth_rule='IsingGenetic'
-# growth_rule='IsingGeneticTest'
-# growth_rule='HeisenbergGeneticXXZ'
-# growth_rule='IsingGeneticSingleLayer'
-# growth_rule='GenAlgObjectiveFncTest'
-# growth_rule='ObjFncResiduals'
-# growth_rule='ObjFncElo'
-# growth_rule='SimulatedNVCentre'
-# growth_rule='ExperimentNVCentreNQubits'
-# growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
-# growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
-# growth_rule='NVCentreRevivalSimulation'
-# growth_rule='NVCentreSimulatedLongDynamicsGenticAlgorithm'
+# exploration_strategy='HeisenbergGenetic'
+# exploration_strategy='HeisenbergGeneticXXZ'
+# exploration_strategy='IsingGenetic'
+# exploration_strategy='IsingGeneticTest'
+# exploration_strategy='HeisenbergGeneticXXZ'
+# exploration_strategy='IsingGeneticSingleLayer'
+# exploration_strategy='GenAlgObjectiveFncTest'
+# exploration_strategy='ObjFncResiduals'
+# exploration_strategy='ObjFncElo'
+# exploration_strategy='SimulatedNVCentre'
+# exploration_strategy='ExperimentNVCentreNQubits'
+# exploration_strategy='NVCentreSimulatedShortDynamicsGenticAlgorithm'
+# exploration_strategy='NVCentreExperimentalShortDynamicsGenticAlgorithm'
+# exploration_strategy='NVCentreRevivalSimulation'
+# exploration_strategy='NVCentreSimulatedLongDynamicsGenticAlgorithm'
 
-# growth_rule='GrowthRuleTemplate'
-# growth_rule='GRTest'
-# growth_rule='IsingLatticeSet'
-# growth_rule='HeisenbergLatticeSet'
-# growth_rule='NVLargeSpinBath'
-# growth_rule='GeneticTest'
-# growth_rule='Genetic'
-# growth_rule='NVExperimentalData'
+# exploration_strategy='ExplorationStrategyTemplate'
+# exploration_strategy='GRTest'
+# exploration_strategy='IsingLatticeSet'
+# exploration_strategy='HeisenbergLatticeSet'
+# exploration_strategy='NVLargeSpinBath'
+# exploration_strategy='GeneticTest'
+# exploration_strategy='Genetic'
+# exploration_strategy='NVExperimentalData'
 
-alt_growth_rules=(
+alt_exploration_strategys=(
     # 'IsingLatticeSet'
     # 'HeisenbergLatticeSet'
     # 'FermiHubbardLatticeSet'
     # 'GeneticTest'
 )
 
-growth_rules_command=""
-for item in ${alt_growth_rules[*]}
+exploration_strategys_command=""
+for item in ${alt_exploration_strategys[*]}
 do
-    growth_rules_command+=" -agr $item" 
+    exploration_strategys_command+=" -agr $item" 
 done
 
 if (( "$run_qhl" == 1 )) 
@@ -117,13 +117,13 @@ git_commit=$(git rev-parse HEAD)
 
 python3 ../scripts/set_qmla_params.py \
     -dir=$this_run_directory \
-    -ggr=$growth_rule \
+    -ggr=$exploration_strategy \
     -prt=$prt \
     -runinfo=$run_info_file \
     -sysmeas=$system_measurements_file \
     -plotprobes=$plot_probe_file \
     -log=$log_for_entire_run \
-    $growth_rules_command 
+    $exploration_strategys_command 
 
 echo "Generated configuration."
 
@@ -143,7 +143,7 @@ python3 ../../../../scripts/analyse_qmla.py \
     -fqhl=0 \
     -runinfo=$run_info_file \
     -sysmeas=$system_measurements_file \
-    -ggr=$growth_rule \
+    -ggr=$exploration_strategy \
     -plotprobes=$plot_probe_file \
     -latex=$latex_mapping_file \
     -gs=1
@@ -154,7 +154,7 @@ python3 ../../../../scripts/generate_results_pdf.py \
     -p=$prt \
     -e=$exp \
     -log=$log_for_entire_run \
-    -ggr=$growth_rule \
+    -ggr=$exploration_strategy \
     -run_desc=\"localdevelopemt\" \
     -git_commit=$git_commit \
     -qhl=$run_qhl \
@@ -192,8 +192,8 @@ do
         -sysmeas=$system_measurements_file \
         -plotprobes=$plot_probe_file \
         -latex=$latex_mapping_file \
-        -ggr=$growth_rule \
-        $growth_rules_command \
+        -ggr=$exploration_strategy \
+        $exploration_strategys_command \
         > $this_run_directory/output.txt
 done
 
@@ -242,8 +242,8 @@ then
             -system_measurements_file=$system_measurements_file \
             -plotprobes=$plot_probe_file \
             -latex=$latex_mapping_file \
-            -ggr=$growth_rule \
-            $growth_rules_command 
+            -ggr=$exploration_strategy \
+            $exploration_strategys_command 
     done
     echo "
     cd $this_run_directory
@@ -255,7 +255,7 @@ then
         -qhl=0 \
         -fqhl=1 \
         -true_expec=$system_measurements_file \
-        -ggr=$growth_rule \
+        -ggr=$exploration_strategy \
         -plot_probes=$plot_probe_file \
         -params=$run_info_file \
         -latex=$latex_mapping_file

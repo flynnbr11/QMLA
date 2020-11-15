@@ -79,7 +79,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-ggr', '--growth_generation_rule',
+    '-ggr', '--exploration_rules',
     help='Rule applied for generation of new models during QMD. \
     Corresponding functions must be built into model_generation',
     type=str,
@@ -119,10 +119,10 @@ qhl_mode = bool(arguments.qhl_mode)
 further_qhl_mode = bool(arguments.further_qhl_mode)
 run_info_file = arguments.run_info_file
 system_measurements_file = arguments.system_measurements_file
-growth_generator = arguments.growth_generation_rule
+exploration_rule = arguments.exploration_rules
 gather_summary_results = bool(arguments.gather_summary_results)
-true_growth_class = qmla.get_growth_generator_class(
-    growth_generation_rule=growth_generator,
+true_exploration_class = qmla.get_exploration_class(
+    exploration_rules=exploration_rule,
     log_file=log_file
 )
 latex_mapping_file = arguments.latex_mapping_file
@@ -142,8 +142,8 @@ if run_info_file is not None:
     true_model = true_params_info['true_model']
 else:
     true_params_dict = None
-    true_model = true_growth_class.true_model
-true_model_latex = true_growth_class.latex_name(
+    true_model = true_exploration_class.true_model
+true_model_latex = true_exploration_class.latex_name(
     true_model
 )
 if not directory_to_analyse.endswith('/'):
@@ -151,7 +151,7 @@ if not directory_to_analyse.endswith('/'):
 
 # Directories to store analyses in
 results_directories = {
-    'growth_rule' : os.path.join(directory_to_analyse, 'growth_rule_plots'),
+    'exploration_strategy' : os.path.join(directory_to_analyse, 'exploration_strategy_plots'),
     'meta' : os.path.join(directory_to_analyse, 'meta'),
     'champions' : os.path.join(directory_to_analyse, 'champion_models'),
     'performance' : os.path.join(directory_to_analyse, 'performance'),
@@ -188,34 +188,34 @@ for file in os.listdir(directory_to_analyse):
     ):
         pickled_files.append(file)
 
-growth_rules = {}
+exploration_strategys = {}
 for f in pickled_files:
     fname = directory_to_analyse + '/' + str(f)
     result = pickle.load(open(fname, 'rb'))
     alph = result['NameAlphabetical']
-    if alph not in list(growth_rules.keys()):
-        growth_rules[alph] = result['GrowthGenerator']
+    if alph not in list(exploration_strategies.keys()):
+        exploration_strategys[alph] = result['ExplorationRule']
 
-unique_growth_classes = {}
-unique_growth_rules = true_params_info['all_growth_rules']
-for g in unique_growth_rules:
+unique_exploration_classes = {}
+unique_exploration_strategys = true_params_info['all_exploration_strategys']
+for g in unique_exploration_strategys:
     try:
-        unique_growth_classes[g] = qmla.get_growth_generator_class(
-            growth_generation_rule=g
+        unique_exploration_classes[g] = qmla.get_exploration_class(
+            exploration_rules=g
         )
     except BaseException:
-        unique_growth_classes[g] = None
+        unique_exploration_classes[g] = None
 
 # First get model scores (number of wins per model)
 model_score_results = qmla.analysis.get_model_scores(
     directory_name=directory_to_analyse,
-    unique_growth_classes=unique_growth_classes,
+    unique_exploration_classes=unique_exploration_classes,
     collective_analysis_pickle_file=results_collection_file,
 )
 model_scores = model_score_results['scores']
-growth_rules = model_score_results['growth_rules']
-growth_classes = model_score_results['growth_classes']
-unique_growth_classes = model_score_results['unique_growth_classes']
+exploration_strategys = model_score_results['exploration_strategys']
+exploration_classes = model_score_results['exploration_classes']
+unique_exploration_classes = model_score_results['unique_exploration_classes']
 median_coeff_determination = model_score_results['avg_coeff_determination']
 f_scores = model_score_results['f_scores']
 latex_coeff_det = model_score_results['latex_coeff_det']
@@ -302,7 +302,7 @@ if gather_summary_results:
     try:
         qmla.analysis.correlation_fitness_f_score(
             combined_datasets_directory = results_directories['combined_datasets'],
-            save_directory = results_directories['growth_rule']
+            save_directory = results_directories['exploration_strategy']
         )
     except:
         print("ANALYSIS FAILURE: Correlation plot b/w fitness and F-score.")
@@ -316,7 +316,7 @@ if gather_summary_results:
         try:
             qmla.analysis.count_model_occurences(
                 latex_map=latex_mapping_file,
-                true_model_latex=true_growth_class.latex_name(
+                true_model_latex=true_exploration_class.latex_name(
                     true_model
                 ),
                 save_counts_dict=str(
@@ -347,8 +347,8 @@ try:
         results_path=results_csv,
         results_file_name_start=results_file_name_start,
         true_expectation_value_path=system_measurements_file,
-        growth_generator=growth_generator,
-        unique_growth_classes=unique_growth_classes,
+        exploration_rule=exploration_rule,
+        unique_exploration_classes=unique_exploration_classes,
         top_number_models=arguments.top_number_models,
         probes_plot_file=probes_plot_file,
         collective_analysis_pickle_file=results_collection_file,
@@ -386,8 +386,8 @@ try:
         results_path=results_csv,
         top_number_models=arguments.top_number_models,
         results_file_name_start=results_file_name_start,
-        growth_generator=growth_generator,
-        unique_growth_classes=unique_growth_classes,
+        exploration_rule=exploration_rule,
+        unique_exploration_classes=unique_exploration_classes,
         true_params_dict=true_params_dict,
         save_to_file=str(
             directory_to_analyse +
@@ -407,7 +407,7 @@ try:
         true_expec_path=system_measurements_file,
         plot_probe_path=probes_plot_file,
         true_params_path=run_info_file,
-        growth_generator=growth_generator,
+        exploration_rule=exploration_rule,
         save_param_values_to_file=str(
             plot_desc + 'clusters_by_param.png'),
         save_param_clusters_to_file=str(
@@ -429,15 +429,15 @@ except BaseException:
 try:
     qmla.analysis.plot_scores(
         scores=model_scores,
-        growth_classes=growth_classes,
-        unique_growth_classes=unique_growth_classes,
-        growth_rules=growth_rules,
+        exploration_classes=exploration_classes,
+        unique_exploration_classes=unique_exploration_classes,
+        exploration_strategys=exploration_strategys,
         plot_r_squared=False,
         coefficients_of_determination=median_coeff_determination,
         coefficient_determination_latex_name=latex_coeff_det,
         f_scores=f_scores,
         true_model=true_model,
-        growth_generator=growth_generator,
+        exploration_rule=exploration_rule,
         save_file=os.path.join(results_directories['performance'], 'model_wins.png')
     )
 except:
@@ -554,7 +554,7 @@ except BaseException:
 try:
     qmla.analysis.generational_analysis(
         combined_results = combined_results, 
-        save_directory = results_directories['growth_rule'],
+        save_directory = results_directories['exploration_strategy'],
     )
 except:
     print("ANALYSIS FAILURE: generational analysis.")
@@ -563,9 +563,9 @@ except:
 try:
     qmla.analysis.r_sqaured_average(
         results_path=results_csv,
-        growth_class=true_growth_class,
+        exploration_class=true_exploration_class,
         top_number_models=arguments.top_number_models,
-        growth_classes_by_name=growth_classes,
+        all_exploration_classes=exploration_classes,
         save_to_file = os.path.join(
             results_directories['champions'], 
             str(plot_desc + 'r_squared_avg.png')
@@ -581,8 +581,8 @@ except BaseException:
 try:
     qmla.analysis.average_quadratic_losses(
         results_path=results_csv,
-        growth_classes=unique_growth_classes,
-        growth_generator=growth_generator,
+        exploration_classes=unique_exploration_classes,
+        exploration_rule=exploration_rule,
         top_number_models=arguments.top_number_models,
         save_to_file = os.path.join(
             results_directories['champions'], 
@@ -596,7 +596,7 @@ except:
 try:
     qmla.analysis.volume_average(
         results_path=results_csv,
-        growth_class=true_growth_class,
+        exploration_class=true_exploration_class,
         top_number_models=arguments.top_number_models,
         save_to_file = os.path.join(
             results_directories['performance'], 
@@ -624,7 +624,7 @@ try:
     qmla.analysis.plot_bayes_factors_v_true_model(
         results_csv_path=all_bayes_csv,
         correct_mod=true_model,
-        growth_generator=growth_generator,
+        exploration_rule=exploration_rule,
         save_to_file=os.path.join(
             results_directories['performance'],
             'bayes_comparisons_true_model.png'
@@ -636,7 +636,7 @@ except:
 
 
 #######################################
-# Growth rule specific 
+# Exploration Strategy specific 
 ## genetic algorithm ananlytics
 #######################################
 
@@ -662,7 +662,7 @@ except:
 try:
     qmla.analysis.genetic_alg_fitness_plots(
         combined_datasets_directory= results_directories['combined_datasets'],
-        save_directory = results_directories['growth_rule'],
+        save_directory = results_directories['exploration_strategy'],
     )
 except:
     print("ANALYSIS FAILURE: [genetic algorithm] Fitness measures.")
@@ -685,7 +685,7 @@ try:
             latex_mapping_file=latex_mapping_file,
             avg_type='medians',
             all_bayes_csv=all_bayes_csv,
-            growth_generator=growth_generator,
+            exploration_rule=exploration_rule,
             entropy=0,
             inf_gain=0,
             save_to_file=os.path.join(

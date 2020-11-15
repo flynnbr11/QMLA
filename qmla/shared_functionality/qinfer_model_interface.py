@@ -10,7 +10,7 @@ import qinfer as qi
 import time
 
 import qmla.shared_functionality.experimental_data_processing
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 import qmla.memory_tests
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
@@ -35,7 +35,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         employed within QMLA.
         Bayesian inference relies on comparisons likelihoods
         of the target and candidate system. 
-    This class, specified by a growth rule, defines how to 
+    This class, specified by a exploration strategy, defines how to 
         compute the likelihood for the user's system. 
         Most functionality is inherited from QInfer, but methods listed 
         here are edited for QMLA's needs. 
@@ -61,8 +61,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     :param dict sim_probe_dict: set of probe states to be used during training
         for the simulator, indexed by (probe_id, num_qubits). Usually the same as 
         the system probes, but not always. 
-    :param str growth_generator: string corresponding to a unique growth rule,
-        used to generate a GrowthRule_ instance.
+    :param str exploration_rule: string corresponding to a unique exploration strategy,
+        used to generate a ExplorationStrategy_ instance.
     :param dict experimental_measurements: fixed measurements of the target system, 
         indexed by time.
     :param list experimental_measurement_times: times indexed in experimental_measurements.
@@ -83,7 +83,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         num_probes,
         probe_dict,
         sim_probe_dict,
-        growth_generation_rule,
+        exploration_rules,
         experimental_measurements,
         experimental_measurement_times,
         log_file,
@@ -97,7 +97,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.model_name = model_name
         self.log_file = log_file
         self.qmla_id = qmla_id
-        self.growth_generation_rule = growth_generation_rule
+        self.exploration_rules = exploration_rules
         self._oplist = oplist
         self._a = 0
         self._b = 0
@@ -152,21 +152,21 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             k : {} for k in ['system', 'simulator']
         }
         try:
-            self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
-                growth_generation_rule=self.growth_generation_rule,
+            self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+                exploration_rules=self.exploration_rules,
                 log_file=self.log_file,
                 qmla_id=self.qmla_id, 
             )
         except BaseException:
             self.log_print([
-                "Could not instantiate growth rule {}. Terminating".foramt(
-                    self.growth_generation_rule
+                "Could not instantiate exploration strategy {}. Terminating".foramt(
+                    self.exploration_rules
                 )
             ])
             raise
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
-        self.iqle_mode = self.growth_class.iqle_mode 
+        self.iqle_mode = self.exploration_class.iqle_mode 
         self.comparison_model = comparison_model
         self.evaluation_model = evaluation_model
         if self.evaluation_model:
@@ -579,7 +579,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # TODO compute e^(-iH) once for true Hamiltonian and use that rather than computing every step. 
 
         For user specific data, or method to compute system data, replace this function 
-            in growth_rule.qinfer_model_class. 
+            in exploration_strategy.qinfer_model_class. 
         Here we pass the true operator list and true parameters to 
             default_pr0_from_modelparams_times_.
 
@@ -631,7 +631,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         Compute pr0 array for the simulator. 
 
         For user specific data, or method to compute simulator data, replace this function 
-            in growth_rule.qinfer_model_class. 
+            in exploration_strategy.qinfer_model_class. 
         Here we pass the candidate model's operators and particles
             to default_pr0_from_modelparams_times_.
 
@@ -704,10 +704,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
         :returns np.ndarray pr0: list of probabilities (one for each particle).
             The calculation, meaning and interpretation of these probabilities 
-            depends on the user defined GrowthRule.expectation_value function. 
+            depends on the user defined ExplorationStrategy.expectation_value function. 
             By default, it is the expecation value:
                 | < probe.transpose | e^{-iHt} | probe > |**2,
-                but can be replaced in the GrowthRule_.  
+                but can be replaced in the ExplorationStrategy_.  
         """
 
         from rq import timeouts
@@ -779,7 +779,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     t = random.randint(1e6, 3e6)
                 try:
                     t_init = time.time()
-                    prob_meas_input_state = self.growth_class.expectation_value(
+                    prob_meas_input_state = self.exploration_class.expectation_value(
                         ham=ham,
                         t=t,
                         state=probe,

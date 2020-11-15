@@ -20,21 +20,21 @@ parser = argparse.ArgumentParser(
 # Add parser arguments, ie command line arguments for QMD
 # QMLA parameters -- fundamentals such as number of particles etc
 parser.add_argument(
-    '-ggr', '--growth_generation_rule',
+    '-ggr', '--exploration_rules',
     help='Rule applied for generation of new models during QMD. \
     Corresponding functions must be built into model_generation',
     type=str,
     default='two_qubit_ising_rotation_hyperfine'
 )
 parser.add_argument(
-    '-use_agr', '--use_alternative_growth_rules',
-    help='Whether to use the alternative growth rules provided.',
+    '-use_agr', '--use_alternative_exploration_strategys',
+    help='Whether to use the alternative exploration strategies provided.',
     type=int,
     default=1
 )
 parser.add_argument(
-    '-agr', '--alternative_growth_rules',
-    help='Growth rules to form other trees.',
+    '-agr', '--alternative_exploration_strategys',
+    help='Exploration Strategies to form other trees.',
     # type=str,
     action='append',
     default=[],
@@ -148,8 +148,8 @@ hamiltonian_exponentiation_times = {
 # Functions
 
 def time_required(
-    growth_generator,  # ie true growth generator for QHL
-    growth_rules,
+    exploration_rule,  # ie true growth generator for QHL
+    exploration_strategys,
     num_particles,
     num_experiments,
     num_processes=1,
@@ -168,15 +168,15 @@ def time_required(
 
     parallelisability = {}
 
-    print("growth rules:", growth_rules)
+    print("exploration strategies:", exploration_strategys)
 #  print("num models by shape:", generator_max_num_models_by_shape)
     total_time_required = 0
-    for gen in growth_rules:
+    for gen in exploration_strategys:
         try:
-            growth_class = qmla.get_growth_generator_class(
-                growth_generation_rule=gen
+            exploration_class = qmla.get_exploration_class(
+                exploration_rules=gen
             )
-            generator_max_num_models_by_shape = growth_class.max_num_models_by_shape
+            generator_max_num_models_by_shape = exploration_class.max_num_models_by_shape
             print("Got time required from growth generator {}".format(gen))
             print(
                 "Num models by num qubits:",
@@ -184,8 +184,8 @@ def time_required(
         except BaseException:
             generator_max_num_models_by_shape = max_num_models_by_shape[gen]
 
-        parallelisability[gen] = growth_class.num_processes_to_parallelise_over
-        max_num_qubits = growth_class.max_num_qubits
+        parallelisability[gen] = exploration_class.num_processes_to_parallelise_over
+        max_num_qubits = exploration_class.max_num_qubits
 
         for q in range(1, max_num_qubits + 1):
             time_per_hamiltonian = hamiltonian_exponentiation_times[q]
@@ -217,7 +217,7 @@ def time_required(
 
     # Get time for QHL
     try:
-        true_model = growth_class.true_model
+        true_model = exploration_class.true_model
     except BaseException:
         raise
     highest_parallelisability = max(parallelisability.values())
@@ -248,7 +248,7 @@ def time_required(
         int(further_qhl_time)
     )
     for k in ['qmd', 'qhl', 'fqhl']:
-        times_reqd[k] *= growth_class.timing_insurance_factor
+        times_reqd[k] *= exploration_class.timing_insurance_factor
         times_reqd[k] =  max(
             minimum_allowed_time,
             int(times_reqd[k])
@@ -259,14 +259,14 @@ def time_required(
 
 
 arguments = parser.parse_args()
-growth_generator = arguments.growth_generation_rule
-alternative_growth_rules = arguments.alternative_growth_rules
-all_growth_rules = [growth_generator]
-use_alternative_growth_rules = bool(
-    arguments.use_alternative_growth_rules
+exploration_rule = arguments.exploration_rules
+alternative_exploration_strategys = arguments.alternative_exploration_strategys
+all_exploration_strategys = [exploration_rule]
+use_alternative_exploration_strategys = bool(
+    arguments.use_alternative_exploration_strategys
 )
-if use_alternative_growth_rules == True:
-    all_growth_rules.extend(alternative_growth_rules)
+if use_alternative_exploration_strategys == True:
+    all_exploration_strategys.extend(alternative_exploration_strategys)
 num_particles = arguments.num_particles
 num_experiments = arguments.num_experiments
 num_bayes_times = arguments.num_bayes_times
@@ -280,11 +280,11 @@ num_processes_env_var = arguments.num_processes_env_var
 minimum_allowed_time = arguments.minimum_allowed_time
 time_insurance_factor = float(arguments.time_insurance_factor)
 
-# print("all growth rules:", all_growth_rules)
-# print("alternative_growth_rules:", alternative_growth_rules)
+# print("all exploration strategies:", all_exploration_strategys)
+# print("alternative_exploration_strategys:", alternative_exploration_strategys)
 time_reqd = time_required(
-    growth_generator=growth_generator,  # true generator
-    growth_rules=all_growth_rules,
+    exploration_rule=exploration_rule,  # true generator
+    exploration_strategys=all_exploration_strategys,
     num_particles=num_particles,
     insurance_factor=time_insurance_factor,
     num_experiments=num_experiments,
@@ -298,7 +298,7 @@ time_reqd = time_required(
 # print(
 # 	"Timing heuristic function:",
 #   "\nInsurance factor:", time_insurance_factor,
-#   "\nuse_alt_growth_rules:", use_alternative_growth_rules,
+#   "\nuse_alt_exploration_strategys:", use_alternative_exploration_strategys,
 # 	"\nQMD:", time_reqd['qmd'],
 # 	"\nQHL:", time_reqd['qhl'],
 # 	"\nFurtherQHL:", time_reqd['fqhl'],

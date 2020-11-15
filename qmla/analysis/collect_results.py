@@ -104,7 +104,7 @@ def collect_results_store_csv(
 #         result_id = result['QID']
 
 #         try:
-#             correlations = pd.DataFrame(result['GrowthRuleStorageData']['fitness_correlations'])
+#             correlations = pd.DataFrame(result['ExplorationStrategyStorageData']['fitness_correlations'])
 #             correlations['qmla_id'] = result_id
 #             fitness_correlations = fitness_correlations.append(
 #                 correlations, 
@@ -184,14 +184,14 @@ def generate_combined_datasets(
         bayes_factors = bayes_factors.append(bf, ignore_index=True)
 
         try:
-            fit_cor = storage.growth_rule_storage.fitness_correlations
+            fit_cor = storage.exploration_strategy_storage.fitness_correlations
             fit_cor['qmla_id'] = storage.qmla_id
             fitness_correlations = fitness_correlations.append(fit_cor, ignore_index=True)
         except:
             pass
         
         try:
-            fit_f = storage.growth_rule_storage.fitness_by_f_score
+            fit_f = storage.exploration_strategy_storage.fitness_by_f_score
             fit_f['qmla_id'] = storage.qmla_id
             fitness_by_f_score = fitness_by_f_score.append(fit_f, ignore_index=True)
         except:
@@ -207,14 +207,14 @@ def generate_combined_datasets(
             # pass
 
         try:
-            fit_f = storage.growth_rule_storage.fitness_df
+            fit_f = storage.exploration_strategy_storage.fitness_df
             fit_f['qmla_id'] = storage.qmla_id
             fitness_df = fitness_df.append(fit_f, ignore_index=True)
         except:
             pass                   
 
         try:
-            gp = storage.growth_rule_storage.gene_pool
+            gp = storage.exploration_strategy_storage.gene_pool
             gp['qmla_id'] = storage.qmla_id
             gp['time'] = storage.Time
             gene_pool = gene_pool.append(gp, ignore_index=True)
@@ -222,7 +222,7 @@ def generate_combined_datasets(
             pass                   
 
         try:
-            br = storage.growth_rule_storage.birth_register
+            br = storage.exploration_strategy_storage.birth_register
             br['qmla_id'] = storage.qmla_id
             br['time'] = storage.Time
             birth_register = birth_register.append(br, ignore_index=True)
@@ -237,7 +237,7 @@ def generate_combined_datasets(
                 'champ_terms_latex' : storage.ConstituentTerms, 
                 'champ_terms' : storage.NameAlphabetical.split('+'), 
                 'true_found' : bool(storage.CorrectModel),
-                'num_generations' : storage.growth_rule_storage.birth_register.generation.max(),
+                'num_generations' : storage.exploration_strategy_storage.birth_register.generation.max(),
                 'time_taken' : storage.Time
             })
             gen_alg_summary = gen_alg_summary.append(gs, ignore_index=True)
@@ -249,9 +249,9 @@ def generate_combined_datasets(
             # so they may be shorter than chomosome 
             # and should be recast to chromosome length
             # TODO just store via to_pickle, then read_pickle, and they will work. s
-            uc = storage.growth_rule_storage.unique_chromosomes
+            uc = storage.exploration_strategy_storage.unique_chromosomes
             uc['qmla_id'] = storage.qmla_id
-            uc['true_chromosome'] = storage.growth_rule_storage.true_model_chromosome
+            uc['true_chromosome'] = storage.exploration_strategy_storage.true_model_chromosome
             num_terms = uc.num_terms.unique()[0]
             # method to retrieve full chromosome (also will store as float -- do this during application)
             uc['full_chromosome'] = [format( int( str(c), 2),  '0{}b'.format(num_terms)) for c in uc.chromosome ] 
@@ -262,7 +262,7 @@ def generate_combined_datasets(
             pass
 
         try:
-            instance_lattice = storage.growth_rule_storage.lattice_record
+            instance_lattice = storage.exploration_strategy_storage.lattice_record
             instance_lattice['qmla_id'] = storage.qmla_id
             instance_lattice['true_model_found'] = storage.TrueModelFound
             lattice_record = lattice_record.append(instance_lattice, ignore_index=True)
@@ -308,10 +308,10 @@ def generate_combined_datasets(
         pass
 
     try:
-        growth_rule_data.to_csv(
-            os.path.join( combined_datasets_directory, 'growth_rule_data.csv')
+        exploration_strategy_data.to_csv(
+            os.path.join( combined_datasets_directory, 'exploration_strategy_data.csv')
         )
-        datasets_generated.append('growth_rule_data')
+        datasets_generated.append('exploration_strategy_data')
     except:
         pass
     

@@ -24,7 +24,7 @@ def remote_learn_model_parameters(
     name,
     model_id,
     branch_id,
-    growth_generator,
+    exploration_rule,
     qmla_core_info_dict=None,
     remote=False,
     host_name='localhost',
@@ -51,9 +51,9 @@ def remote_learn_model_parameters(
     :param str name: model name string
     :param int model_id: unique model id
     :param int branch_id: QMLA branch where the model was generated
-    :param str growth_generator: string corresponding to a unique growth rule,
-        used by get_growth_generator_class to generate a
-        GrowthRule (or subclass) instance.
+    :param str exploration_rule: string corresponding to a unique exploration strategy,
+        used by get_exploration_class to generate a
+        ExplorationStrategy (or subclass) instance.
     :param dict qmla_core_info_dict: crucial data for QMLA, such as number
         of experiments/particles etc. Default None: core info is stored on the
         redis database so can be retrieved there on a server; if running locally,
@@ -109,7 +109,7 @@ def remote_learn_model_parameters(
         model_name=name,
         qid=qid,
         log_file=log_file,
-        growth_generator=growth_generator,
+        exploration_rule=exploration_rule,
         host_name=host_name,
         port_number=port_number,
     )

@@ -65,10 +65,10 @@ def model_pool_f_scores(
     storage_instance, 
     ax, 
 ):
-    all_models = copy.deepcopy(storage_instance.growth_rule_storage.fitness_by_f_score)
+    all_models = copy.deepcopy(storage_instance.exploration_strategy_storage.fitness_by_f_score)
     all_models['model_type'] = 'Candidate'
 
-    generations = storage_instance.growth_rule_storage.fitness_by_f_score.generation.unique()
+    generations = storage_instance.exploration_strategy_storage.fitness_by_f_score.generation.unique()
     f_score_generation_champions = {}
 
     for g in generations:

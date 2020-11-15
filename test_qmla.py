@@ -4,8 +4,8 @@ import qmla
 
 
 def test_qmla_attributes():
-    growth_rule = qmla.growth_rules.HeisenbergXYZProbabilistic(
-        growth_generation_rule = 'HeisenbergXYZProbabilistic'
+    exploration_strategy = qmla.exploration_strategies.HeisenbergXYZProbabilistic(
+        exploration_rules = 'HeisenbergXYZProbabilistic'
     )
 
     instance = qmla.QuantumModelLearningAgent()

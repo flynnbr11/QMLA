@@ -1,1 +1,0 @@
-from qmla.growth_rules.thesis_demos.ising_demo import * 

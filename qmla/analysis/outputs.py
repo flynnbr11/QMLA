@@ -30,8 +30,8 @@ def plot_dynamics_multiple_models(
     dataset=None,
     true_expectation_value_path=None,
     probes_plot_file=None,
-    growth_generator=None,
-    unique_growth_classes=None,
+    exploration_rule=None,
+    unique_exploration_classes=None,
     top_number_models=2,
     save_true_expec_vals_alone_plot=True,
     collective_analysis_pickle_file=None,
@@ -54,8 +54,8 @@ def plot_dynamics_multiple_models(
         values.
     :param probes_plot_file: path to file with specific probes (states) to use
         for plotting purposes for consistency.  
-    :param growth_generator: the name of the growth generation rule used. 
-    :param unique_growth_classes: dict with single instance of each growth rule class
+    :param exploration_rule: the name of the exploration strategy used. 
+    :param unique_exploration_classes: dict with single instance of each exploration strategy class
         used in this run.
     :param top_number_models: Number of models to compute averages for 
         (top by number of instance wins). 
@@ -111,7 +111,7 @@ def plot_dynamics_multiple_models(
         ):
             pickled_files.append(file)
     num_results_files = len(pickled_files)
-    growth_rules = {}
+    exploration_strategys = {}
     for f in pickled_files:
         fname = directory_name + '/' + str(f)
         result = pickle.load(open(fname, 'rb'))
@@ -123,22 +123,22 @@ def plot_dynamics_multiple_models(
         else:
             expectation_values_by_name[alph] = [expec_values]
 
-        if alph not in list(growth_rules.keys()):
-            growth_rules[alph] = result['GrowthGenerator']
+        if alph not in list(exploration_strategies.keys()):
+            exploration_strategys[alph] = result['ExplorationRule']
 
-    growth_classes = {}
-    for g in list(growth_rules.keys()):
+    exploration_classes = {}
+    for g in list(exploration_strategies.keys()):
         try:
-            growth_classes[g] = unique_growth_classes[growth_rules[g]]
+            exploration_classes[g] = unique_exploration_classes[exploration_strategys[g]]
         except BaseException:
-            growth_classes[g] = None
+            exploration_classes[g] = None
 
     try:
-        true_model = unique_growth_classes[growth_generator].true_model
+        true_model = unique_exploration_classes[exploration_rule].true_model
     except BaseException:
-        print("Couldn't find growth rule of {} in \n {}".format(
-            growth_generator,
-            unique_growth_classes
+        print("Couldn't find exploration strategy of {} in \n {}".format(
+            exploration_rule,
+            unique_exploration_classes
         )
         )
         raise
@@ -314,7 +314,7 @@ def plot_dynamics_multiple_models(
         higher_iqr_r_sq = 1 - (higher_iqr_sum_residuals /
                                higher_iqr_sum_of_squares)
 
-        name = growth_classes[term].latex_name(term)
+        name = exploration_classes[term].latex_name(term)
         try:
             description = str(
                 name +
@@ -542,7 +542,7 @@ def plot_dynamics_multiple_models(
     if return_results == True:
         expectation_values_by_latex_name = {}
         for term in winning_models:
-            latex_name = unique_growth_classes[growth_generator].latex_name(
+            latex_name = unique_exploration_classes[exploration_rule].latex_name(
                 term)
             expectation_values_by_latex_name[latex_name] = expectation_values_by_name[term]
 

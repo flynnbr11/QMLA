@@ -16,12 +16,12 @@ __all__ = [
 ]
 
 def set_shared_parameters(
-    growth_class,
+    exploration_class,
     run_info_file=None,
-    all_growth_rules=[],
+    all_exploration_strategys=[],
     run_directory='',
     num_particles=100,
-    probe_max_num_qubits_all_growth_rules=12,
+    probe_max_num_qubits_all_exploration_strategys=12,
     generate_evaluation_experiments=True,
 ):
     r"""
@@ -43,23 +43,23 @@ def set_shared_parameters(
         list of parameters of the true model
     :RunData params_dict: 
         dict of parameters of the true model
-    :RunData growth_generator: 
-        growth rule (name) of true model
-    :RunData all_growth_rules: 
-        list of all growth rules (names) which are to 
+    :RunData exploration_rule: 
+        exploration strategy (name) of true model
+    :RunData all_exploration_strategys: 
+        list of all exploration strategies (names) which are to 
         be performed by each instance
     :RunData evaluation_probes: 
         proebs to use during evaluation experiments
     :RunData evaluation_times: 
         times to use during evaluation experiments
 
-    :param GrowthRule growth_class: growth rule of true model, from
+    :param ExplorationStrategy exploration_class: exploration strategy of true model, from
         which to extract key info, e.g. true parameter ranges and prior.
     :param str run_info_file:
         path to which to store system information
-    :param list all_growth_rules: 
-        list of instances of :class:`~qmla.growth_rules.GrowthRule`
-        which are the alternative growth rules, 
+    :param list all_exploration_strategys: 
+        list of instances of :class:`~qmla.exploration_strategies.ExplorationStrategy`
+        which are the alternative exploration strategies, 
         i.e. which are performed during each instance, 
         but which do not specify the true model (system). 
     :param str run_directory: 
@@ -67,7 +67,7 @@ def set_shared_parameters(
         to this unique QMLA run are stored
     :param int num_paritlces: 
         number of particles used during model learning
-    :param int probe_max_num_qubits_all_growth_rules: 
+    :param int probe_max_num_qubits_all_exploration_strategys: 
         largest system size for which to generate plot probes
     :param bool generate_evaluation_experiments:
         whether to construct an evaluation dataset which
@@ -78,14 +78,14 @@ def set_shared_parameters(
         can be compared fairly on this data set. 
 
     """
-    if growth_class.growth_generation_rule not in all_growth_rules:
-        all_growth_rules.append(growth_class.growth_generation_rule)
+    if exploration_class.exploration_rules not in all_exploration_strategys:
+        all_exploration_strategys.append(exploration_class.exploration_rules)
 
     # Generate true parameters from an instance of the GR
-    true_params_info = growth_class.generate_true_parameters()
+    true_params_info = exploration_class.generate_true_parameters()
     # Add stuff to run info
-    true_params_info['all_growth_rules'] = all_growth_rules
-    true_params_info['growth_generator'] = growth_class.growth_generation_rule
+    true_params_info['all_exploration_strategys'] = all_exploration_strategys
+    true_params_info['exploration_rule'] = exploration_class.exploration_rules
 
     if run_info_file is not None:
         import pickle
@@ -97,8 +97,8 @@ def set_shared_parameters(
         return true_params_info
 
     # Generate evaluation data set
-    evaluation_data = growth_class.generate_evaluation_data(
-        probe_maximum_number_qubits=probe_max_num_qubits_all_growth_rules,
+    evaluation_data = exploration_class.generate_evaluation_data(
+        probe_maximum_number_qubits=probe_max_num_qubits_all_exploration_strategys,
         num_times = int(250), 
         run_directory = run_directory,
     )
@@ -126,7 +126,7 @@ def set_shared_parameters(
         qmla.utilities.plot_evaluation_dataset(
             evaluation_data = evaluation_data, 
             true_hamiltonian = true_ham,
-            expectation_value_function = growth_class.expectation_value,
+            expectation_value_function = exploration_class.expectation_value,
             save_to_file=os.path.join(
                 run_directory, 
                 'evaluation', 

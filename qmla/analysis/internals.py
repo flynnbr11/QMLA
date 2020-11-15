@@ -8,7 +8,7 @@ from matplotlib.gridspec import GridSpec
 from matplotlib import cm
 import seaborn as sns
 
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 
 __all__ = [
     'generational_analysis',
@@ -165,8 +165,8 @@ def generational_analysis(combined_results, save_directory=None):
 
 def r_sqaured_average(
     results_path,
-    growth_class,
-    growth_classes_by_name,
+    exploration_class,
+    all_exploration_classes,
     top_number_models=2,
     save_to_file=None
 ):
@@ -223,10 +223,10 @@ def r_sqaured_average(
             [np.std(r_squared_lists[t]) for t in times]
         )
 
-        gr_class = growth_classes_by_name[name]
-        # TODO need growth rule of given name to get proper latex term
+        gr_class = all_exploration_classes[name]
+        # TODO need exploration strategy of given name to get proper latex term
         term = gr_class.latex_name(name)
-        # term = growth_class.latex_name(name) # TODO need growth rule of given
+        # term = exploration_class.latex_name(name) # TODO need exploration strategy of given
         # name to get proper latex term
         r_sq_by_model[term] = means
         plot_label = str(term + ' (' + str(num_wins) + ')')
@@ -259,8 +259,8 @@ def r_sqaured_average(
 
 def average_quadratic_losses(
     results_path,
-    growth_classes,
-    growth_generator,
+    exploration_classes,
+    exploration_rule,
     top_number_models=2,
     fill_alpha=0.3,  # to shade area of 1 std deviation
     save_to_file=None
@@ -324,7 +324,7 @@ def average_quadratic_losses(
         for i in range(num_experiments):
             avg_q_losses[i] = np.average(list_this_models_q_losses[:, i])
 
-        latex_name = growth_classes[growth_generator].latex_name(name=mod)
+        latex_name = exploration_classes[exploration_rule].latex_name(name=mod)
         epochs = range(1, num_experiments + 1)
 
         ax.semilogy(
@@ -438,7 +438,7 @@ def all_times_learned_histogram(
 
 def volume_average(
     results_path,
-    growth_class,
+    exploration_class,
     top_number_models=2,
     save_to_file=None
 ):
@@ -494,7 +494,7 @@ def volume_average(
             [np.std(volume_lists[t]) for t in times]
         )
 
-        term = growth_class.latex_name(name)
+        term = exploration_class.latex_name(name)
         plot_label = str(term + ' (' + str(num_wins) + ')')
         colour = colours[i]
         ax.plot(
@@ -526,18 +526,18 @@ def volume_average(
 def plot_bayes_factors_v_true_model(
     results_csv_path,
     correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz",
-    growth_generator=None,
+    exploration_rule=None,
     save_to_file=None
 ):
 
     from matplotlib import cm
     # TODO saved fig is cut off on edges and don't have axes titles.
 
-    growth_class = qmla.get_growth_rule.get_growth_generator_class(
-        growth_generation_rule=growth_generator
+    exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+        exploration_rules=exploration_rule
     )
 
-    correct_mod = growth_class.latex_name(
+    correct_mod = exploration_class.latex_name(
         name=correct_mod
     )
     results_csv = os.path.abspath(results_csv_path)

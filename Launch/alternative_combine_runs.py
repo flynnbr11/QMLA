@@ -8,7 +8,7 @@ import sys
 sys.path.append(
     os.path.join("..", "Libraries", "QML_lib")
 )
-import GrowthRules
+import ExplorationStrategies
 
 results_directory = str(
     os.getcwd() + '/Results/'
@@ -94,9 +94,9 @@ for d in directories:
         true_expec_vals[t] for t in exp_val_times
     ]
 
-    growth_gen = true_model_terms_params['growth_generator']
-    growth_class = GrowthRules.get_growth_generator_class(
-        growth_generation_rule=growth_gen
+    exploration_rules = true_model_terms_params['exploration_rule']
+    exploration_class = ExplorationStrategies.get_exploration_class(
+        exploration_rules=exploration_rules
     )
 
     directory_info = {
@@ -105,8 +105,8 @@ for d in directories:
         'ResultsDirectory': d,
         'TrueModel': true_model_terms_params['true_model'],
         'TrueParams': true_model_terms_params['params_dict'],
-        'GrowthGenerator': growth_gen,
-        'TrueModelLatex': growth_class.latex_name(
+        'ExplorationRule': exploration_rules,
+        'TrueModelLatex': exploration_class.latex_name(
             true_model_terms_params['true_model']
         ),
         'TrueExpectationValues': raw_expec_vals,

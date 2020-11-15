@@ -1,7 +1,7 @@
 r"""
 Functions to generate sets of probe states to be used for training models.
 
-These functions are set to growth rule attributes, which are then called in wrapper functions. 
+These functions are set to exploration strategy attributes, which are then called in wrapper functions. 
 - probe_generation_function: 
     used for training, assumed to be the probes used on the system
     i.e. probes implemented during experiments. 
@@ -9,7 +9,7 @@ These functions are set to growth rule attributes, which are then called in wrap
     used for training, for the simulator. 
     Should be the same as used for system, 
     but in practice this is not always the case. 
-    Note growth_rule.shared_probes controls whether
+    Note exploration_strategy.shared_probes controls whether
     to default to the same probe set. 
 - plot_probe_generation_function: 
     State to use for plotting purposes only (not training). 
@@ -624,7 +624,7 @@ def zero_state_probes(max_num_qubits=9, **kwargs):
     return probes
 
 ###################################
-# Growth rule specific probes
+# Exploration Strategy specific probes
 ###################################
 
 # Fermi Hubbard model -- requires encoding via Jordan-Wigner transformation.

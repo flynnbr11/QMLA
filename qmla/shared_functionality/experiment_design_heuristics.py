@@ -342,7 +342,7 @@ class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
 
         self.num_epochs_for_first_phase = self._num_experiments / 2
         # generate a list of times of length Ne/2
-        # evenly spaced between 0, max_time (from growth_rule)
+        # evenly spaced between 0, max_time (from exploration_strategy)
         # then every t in that list is learned upon once. 
         # Higher Ne means finer granularity 
         # times are leared in a random order (from random.shuffle below)

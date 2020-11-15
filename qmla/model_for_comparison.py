@@ -11,7 +11,7 @@ import pickle
 
 import qmla.redis_settings
 import qmla.logging
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 import qmla.construct_models
 
 pickle.HIGHEST_PROTOCOL = 4
@@ -138,7 +138,7 @@ class ModelInstanceForComparison():
         self.model_name = learned_model_info['name']
         self.times_learned_over = learned_model_info['times_learned_over']
         self.final_learned_params = learned_model_info['final_learned_params']
-        self.growth_rule_of_this_model = learned_model_info['growth_rule_of_this_model']
+        self.exploration_strategy_of_this_model = learned_model_info['exploration_strategy_of_this_model']
         self.posterior_marginal = learned_model_info['posterior_marginal']
         self.model_normalization_record = learned_model_info['model_normalization_record']
         self.log_total_likelihood = learned_model_info['log_total_likelihood']
@@ -161,16 +161,16 @@ class ModelInstanceForComparison():
         op = qmla.construct_models.Operator(self.model_name)
         self.model_terms_matrices = op.constituents_operators
         self.model_terms_parameters_final = np.array(self.final_learned_params)
-        self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
-            growth_generation_rule=self.growth_rule_of_this_model,
+        self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+            exploration_rules=self.exploration_strategy_of_this_model,
             log_file=self.log_file,
             qmla_id = self.qmla_id,
         )
-        self.model_name_latex = self.growth_class.latex_name(self.model_name)
+        self.model_name_latex = self.exploration_class.latex_name(self.model_name)
 
         # New instances of model and updater used by QInfer
         self.log_print(["Getting QInfer model"])
-        self.qinfer_model = self.growth_class.qinfer_model(
+        self.qinfer_model = self.exploration_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters_final,
             oplist=self.model_terms_matrices,
@@ -181,7 +181,7 @@ class ModelInstanceForComparison():
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
-            growth_generation_rule=self.growth_rule_of_this_model,
+            exploration_rules=self.exploration_strategy_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             qmla_id=self.qmla_id, 
@@ -207,16 +207,16 @@ class ModelInstanceForComparison():
 
             num_particles_for_bf = max(
                 5,
-                int(self.growth_class.fraction_particles_for_bf * self.num_particles)
-            )  # this allows the growth rule to use less particles for the comparison stage
+                int(self.exploration_class.fraction_particles_for_bf * self.num_particles)
+            )  # this allows the exploration strategy to use less particles for the comparison stage
 
             self.qinfer_updater = qi.SMCUpdater(
                 model=self.qinfer_model,
                 n_particles=num_particles_for_bf,
                 prior=posterior_distribution,
-                resample_thresh=self.growth_class.qinfer_resampler_threshold,
+                resample_thresh=self.exploration_class.qinfer_resampler_threshold,
                 resampler=qi.LiuWestResampler(
-                    a=self.growth_class.qinfer_resampler_a
+                    a=self.exploration_class.qinfer_resampler_a
                 ),
             )
             self.qinfer_updater._normalization_record = self.model_normalization_record
@@ -228,7 +228,7 @@ class ModelInstanceForComparison():
             )
 
         # Fresh experiment design heuristic
-        self.experiment_design_heuristic = self.growth_class.heuristic(
+        self.experiment_design_heuristic = self.exploration_class.heuristic(
             model_id=self.model_id,
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
@@ -237,7 +237,7 @@ class ModelInstanceForComparison():
             log_file=self.log_file,
             inv_field=[item[0]
                        for item in self.qinfer_model.expparams_dtype[1:]],
-            max_time_to_enforce=self.growth_class.max_time_to_consider,
+            max_time_to_enforce=self.exploration_class.max_time_to_consider,
         )
 
         # Delete extra data now that everything useful is extracted
@@ -263,7 +263,7 @@ class ModelInstanceForComparison():
         # Reduced normalization record using only experiments to consider
         experiment_id_to_keep = int(
             len(self.qinfer_updater.normalization_record)
-            - (self.growth_class.fraction_own_experiments_for_bf * len(self.qinfer_updater.normalization_record) ) 
+            - (self.exploration_class.fraction_own_experiments_for_bf * len(self.qinfer_updater.normalization_record) ) 
         )
         self.qinfer_updater._normalization_record = self.qinfer_updater._normalization_record[experiment_id_to_keep:]
         self.bf_times = self.times_learned_over[experiment_id_to_keep:]
@@ -271,7 +271,7 @@ class ModelInstanceForComparison():
         # List of opponent's times, possibly shortened
         experiment_id_to_keep = int(
             len(new_times)
-            - (self.growth_class.fraction_opponents_experiments_for_bf * len(new_times) ) 
+            - (self.exploration_class.fraction_opponents_experiments_for_bf * len(new_times) ) 
         )
 
         epoch_id = len(self.times_learned_over)
@@ -332,7 +332,7 @@ class ModelInstanceForComparison():
         plot_probe = self.plot_probes[n_qubits]
 
         for t in times_not_yet_computed:
-            self.expectation_values[t] = self.growth_class.expectation_value(
+            self.expectation_values[t] = self.exploration_class.expectation_value(
                 ham = self.learned_hamiltonian, #TODO, 
                 t = t, 
                 state = plot_probe # TODO

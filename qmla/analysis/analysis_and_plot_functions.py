@@ -33,7 +33,7 @@ import seaborn as sns
 
 import lfig 
 
-import qmla.get_growth_rule as get_growth_rule
+import qmla.get_exploration_strategy as get_exploration_strategy
 import qmla.shared_functionality.experimental_data_processing
 import qmla.shared_functionality.expectation_values
 import qmla.construct_models as construct_models
@@ -268,7 +268,7 @@ def plot_parameter_estimates(
         i += 1
         try:
             y_true = qmd.true_param_dict[term]
-            true_term_latex = qmd.growth_class.latex_name(
+            true_term_latex = qmd.exploration_class.latex_name(
                 name=term
             )
             true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
@@ -284,7 +284,7 @@ def plot_parameter_estimates(
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
         x = range(1, 1 + len(param_estimate_by_term[term]))
-        latex_term = mod.growth_class.latex_name(term)
+        latex_term = mod.exploration_class.latex_name(term)
         latex_term = latex_term[:-1] + r'^{\prime}' + '$'
         # print("[pQMD] latex_term:", latex_term)
         ax.scatter(
@@ -397,7 +397,7 @@ def plot_learned_models_dynamics(
         reduced.compute_expectation_values(
             times=qmd.times_to_plot
         )
-#         growth_generator = reduced.growth_rule_of_true_model
+#         exploration_rule = reduced.exploration_strategy_of_true_model
         desc = str(
             "ID:{}\n".format(mod_id) +
             reduced.model_name_latex
@@ -607,7 +607,7 @@ def plot_learned_models_dynamics(
                 i += 1
                 try:
                     y_true = qmd.true_param_dict[term]
-                    true_term_latex = qmd.growth_class.latex_name(
+                    true_term_latex = qmd.exploration_class.latex_name(
                         name=term
                     )
 
@@ -623,7 +623,7 @@ def plot_learned_models_dynamics(
                 y = np.array(param_estimate_by_term[term])
                 s = np.array(std_devs[term])
                 x = range(1, 1 + len(param_estimate_by_term[term]))
-                latex_term = qmd.growth_class.latex_name(
+                latex_term = qmd.exploration_class.latex_name(
                     name=term
                 )
                 if latex_term not in individual_terms_already_in_legend:
@@ -930,7 +930,7 @@ def r_squared_from_epoch_list(
             ham = np.tensordot(mod.track_param_means[epoch], mod.model_terms_matrices, axes=1)
             sum_of_residuals = 0
             for t in exp_times:
-                sim = qmd.growth_class.expectation - value(
+                sim = qmd.exploration_class.expectation - value(
                     ham=ham,
                     t=t,
                     state=probe
@@ -978,7 +978,7 @@ def plot_quadratic_loss(
         mod = qmd.get_model_storage_instance_by_id(i)
         if len(mod.quadratic_losses_record) > 0:
             epochs = range(1, len(mod.quadratic_losses_record) + 1)
-            model_name = mod.growth_class.latex_name(
+            model_name = mod.exploration_class.latex_name(
                 name=qmd.model_name_id_map[i]
             )
             ax.plot(epochs, mod.quadratic_losses_record, label=str(model_name))

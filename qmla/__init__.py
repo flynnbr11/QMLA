@@ -4,12 +4,12 @@ from __future__ import absolute_import
 from qmla.quantum_model_learning_agent import *
 
 # Logistics
-from qmla.get_growth_rule import *
+from qmla.get_exploration_strategy import *
 from qmla.construct_models import *  # TODO fix __all__
 from qmla.controls_qmla import *
 from qmla.logging import *
 from qmla.redis_settings import *
-from qmla.growth_rule_tree import *
+from qmla.exploration_tree import *
 from qmla.parameter_definition import *
 from qmla.process_string_to_matrix import *
 

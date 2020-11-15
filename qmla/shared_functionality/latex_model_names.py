@@ -68,7 +68,7 @@ def pauli_set_latex_name(
     return latex_term
 
 ##########
-# Section: Specific to a growth rule
+# Section: Specific to a exploration strategy
 ##########
 
 def nv_centre_SAT(

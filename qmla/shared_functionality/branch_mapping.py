@@ -1,7 +1,7 @@
 """
 Functions which find which branch to display models on. 
 
-Called by growth rules name_branch_map wrapper function. 
+Called by exploration strategies name_branch_map wrapper function. 
 Branch IDs returned are displayed vertically downwards:
     models on branch 0 appear at the top of the DAG; 
     models on branch 1,...,N appear beneath. 

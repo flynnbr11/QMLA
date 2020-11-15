@@ -11,7 +11,7 @@ import pickle
 import qmla.redis_settings
 import qmla.memory_tests
 import qmla.logging
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 import qmla.shared_functionality.experimental_data_processing
 import qmla.construct_models
 import qmla.analysis
@@ -216,23 +216,23 @@ class ModelInstanceForStorage():
         for i in range(len(self.raw_volume_list)):
             self.volume_by_epoch[i] = self.raw_volume_list[i]
 
-        # Instantiate growth rule instance (passive - not used to generate
+        # Instantiate exploration strategy instance (passive - not used to generate
         # models)
-        self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
-            growth_generation_rule=self.growth_rule_of_this_model,
+        self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+            exploration_rules=self.exploration_strategy_of_this_model,
             log_file=self.log_file,
             qmla_id=self.qmla_id, 
         )
 
         # Compile some attributes
-        self.model_name_latex = self.growth_class.latex_name(
+        self.model_name_latex = self.exploration_class.latex_name(
             name=self.model_name
         )
         model_constituent_terms = qmla.construct_models.get_constituent_names_from_name(
             self.model_name
         )
         self.constituents_terms_latex = [
-            self.growth_class.latex_name(term)
+            self.exploration_class.latex_name(term)
             for term in model_constituent_terms
         ]
         self.track_parameter_estimates = self.track_param_estimate_v_epoch
@@ -274,7 +274,7 @@ class ModelInstanceForStorage():
 
         # Compute and store results.
         for t in required_times:
-            self.expectation_values[t] = self.growth_class.expectation_value(
+            self.expectation_values[t] = self.exploration_class.expectation_value(
                 ham=self.learned_hamiltonian,
                 t=t,
                 state=probe,
@@ -343,7 +343,7 @@ class ModelInstanceForStorage():
             if t in available_expectation_values:
                 sim = self.expectation_values[t]
             else:
-                sim = self.growth_class.expectation_value(
+                sim = self.exploration_class.expectation_value(
                     ham=self.learned_hamiltonian,
                     t=t,
                     state=probe
@@ -453,7 +453,7 @@ class ModelInstanceForStorage():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                sim = self.growth_class.expectation_value(
+                sim = self.exploration_class.expectation_value(
                     ham=self.learned_hamiltonian,
                     t=t,
                     state=probe

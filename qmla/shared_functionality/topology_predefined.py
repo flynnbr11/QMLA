@@ -1,5 +1,5 @@
 r"""
-A number of GridTopology instances predefined for convenience in growth rules. 
+A number of GridTopology instances predefined for convenience in exploration strategies. 
 
 """
 from qmla.shared_functionality.topology import GridTopology

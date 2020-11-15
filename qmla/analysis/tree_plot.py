@@ -14,7 +14,7 @@ from matplotlib.patches import FancyArrowPatch, Circle, ArrowStyle
 import matplotlib.text as mpl_text
 import networkx as nx
 
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 
 __all__ = [
     'plot_tree_multiple_instances', 
@@ -27,7 +27,7 @@ def plot_tree_multiple_instances(
     all_bayes_csv,
     latex_mapping_file,
     avg_type='medians',
-    growth_generator=None,
+    exploration_rule=None,
     entropy=None,
     inf_gain=None,
     save_to_file=None
@@ -51,11 +51,11 @@ def plot_tree_multiple_instances(
     for mod in mods:
         winning_count[mod] = mods.count(mod)
 
-    cumulative_GrowthRuleTree_plot(
+    cumulative_ExplorationTree_plot(
         cumulative_csv=all_bayes_csv,
         wins_per_mod=winning_count,
         latex_mapping_file=latex_mapping_file,
-        growth_generator=growth_generator,
+        exploration_rule=exploration_rule,
         only_adjacent_branches=True,
         avg=avg_type,
         entropy=entropy,
@@ -66,7 +66,7 @@ def plot_tree_multiple_instances(
 
 def get_averages_from_combined_results(
     all_bayes_csv,
-    growth_generator=None
+    exploration_rule=None
 ):
     import csv
     import pandas
@@ -105,13 +105,13 @@ def get_averages_from_combined_results(
     return means_dict, medians_dict, count_bayes
 
 
-def cumulative_GrowthRuleTree_plot(
+def cumulative_ExplorationTree_plot(
     cumulative_csv,
     wins_per_mod,
     latex_mapping_file,
     avg='means',
     only_adjacent_branches=True,
-    growth_generator=None,
+    exploration_rule=None,
     directed=True,
     entropy=None,
     inf_gain=None,
@@ -122,27 +122,27 @@ def cumulative_GrowthRuleTree_plot(
     import csv
     means, medians, counts = get_averages_from_combined_results(
         cumulative_csv,
-        growth_generator=growth_generator
+        exploration_rule=exploration_rule
     )
     if avg == 'means':
-        # print("[cumulative_GrowthRuleTree_plot] USING MEANS")
+        # print("[cumulative_ExplorationTree_plot] USING MEANS")
         # print(means)
         bayes_factors = means  # medians
     elif avg == 'medians':
-        # print("[cumulative_GrowthRuleTree_plot] USING MEDIANS")
+        # print("[cumulative_ExplorationTree_plot] USING MEDIANS")
         # print(medians)
         bayes_factors = medians
 
-    print("[cumulative_GrowthRuleTree_plot] COUNTS", counts)
+    print("[cumulative_ExplorationTree_plot] COUNTS", counts)
 
     max_bayes_factor = max([max(bayes_factors[k].values())
                             for k in bayes_factors.keys()])
-    growth_class = qmla.get_growth_rule.get_growth_generator_class(
-        growth_generation_rule=growth_generator
+    exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+        exploration_rules=exploration_rule
     )
-    true_model = growth_class.true_model_latex()
+    true_model = exploration_class.true_model_latex()
 
-    term_branches = growth_class.name_branch_map(
+    term_branches = exploration_class.name_branch_map(
         latex_mapping_file=latex_mapping_file,
     )
 
@@ -177,7 +177,7 @@ def cumulative_GrowthRuleTree_plot(
         colour_dicts_from_win_count(
             wins_per_mod,
             latex_mapping_file=latex_mapping_file,
-            growth_generator=growth_generator,
+            exploration_rule=exploration_rule,
             min_colour_value=0.4
         )
     )
@@ -204,7 +204,7 @@ def cumulative_GrowthRuleTree_plot(
             G.nodes[m]['status'] = min_colour
             G.nodes[m]['info'] = 0
 
-    print("[cumulative_GrowthRuleTree_plot] nodes added.")
+    print("[cumulative_ExplorationTree_plot] nodes added.")
     max_num_mods_any_branch = max(list(branch_mod_count.values()))
     # get the cordinates to display this model's node at
 
@@ -224,7 +224,7 @@ def cumulative_GrowthRuleTree_plot(
         positions[m] = (x_pos, y_pos)
         G.node[m]['pos'] = (x_pos, y_pos)
 
-    print("[cumulative_GrowthRuleTree_plot] node positions added.")
+    print("[cumulative_ExplorationTree_plot] node positions added.")
     sorted_positions = sorted(positions.values(), key=lambda x: (x[1], x[0]))
     mod_id = 0
     model_ids_names = {}
@@ -250,8 +250,8 @@ def cumulative_GrowthRuleTree_plot(
         high = max_frequency
 
     # frequency_markers = list(np.linspace(0, max_frequency, 4, dtype=int))
-    print("[cumulative_GrowthRuleTree_plot] setting edges.")
-    print("[cumulative_GrowthRuleTree_plot] modelist:", modlist)
+    print("[cumulative_ExplorationTree_plot] setting edges.")
+    print("[cumulative_ExplorationTree_plot] modelist:", modlist)
     # only_adjacent_branches = False
 
     even_arrow_width = True
@@ -333,7 +333,7 @@ def cumulative_GrowthRuleTree_plot(
                             )
                         except BaseException:
                             print(
-                                "[plotQMD - cumulative_GrowthRuleTree_plot] failed to add edge", pairing
+                                "[plotQMD - cumulative_ExplorationTree_plot] failed to add edge", pairing
                             )
                             raise
 
@@ -342,7 +342,7 @@ def cumulative_GrowthRuleTree_plot(
             else:
                 print("not adding edge {}/{}".format(a, b))
 
-    print("[cumulative_GrowthRuleTree_plot] edges added.")
+    print("[cumulative_ExplorationTree_plot] edges added.")
     print("edge freqs:", edge_frequencies)
     max_freq = max(edge_frequencies)
     # print("freq markers:", frequency_markers)
@@ -363,7 +363,7 @@ def cumulative_GrowthRuleTree_plot(
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
     # new_cmap = cmap
 
-    plot_GrowthRuleTree(
+    plot_ExplorationTree(
         G,
         n_cmap=plt.cm.pink_r,
         e_cmap=new_cmap,
@@ -385,7 +385,7 @@ def cumulative_GrowthRuleTree_plot(
         plt.savefig(save_to_file, bbox_inches='tight')
     return G, edges, edge_f
 
-def plot_GrowthRuleTree(
+def plot_ExplorationTree(
     G,
     n_cmap,
     e_cmap,
@@ -693,11 +693,11 @@ class textObjectHandler(object):
 def colour_dicts_from_win_count(
     winning_count,
     latex_mapping_file,
-    growth_generator=None,
+    exploration_rule=None,
     min_colour_value=0.1
 ):
-    growth_class = qmla.get_growth_rule.get_growth_generator_class(
-        growth_generation_rule=growth_generator
+    exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+        exploration_rules=exploration_rule
     )
 
     max_wins = max(list(winning_count.values()))
@@ -713,7 +713,7 @@ def colour_dicts_from_win_count(
     colour_by_win_count = {}
     colour_by_node_name = {}
 
-    all_models = growth_class.name_branch_map(
+    all_models = exploration_class.name_branch_map(
         latex_mapping_file=latex_mapping_file,
     ).keys()
 

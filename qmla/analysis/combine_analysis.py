@@ -1,5 +1,5 @@
 import os
-import qmla.get_growth_rule as get_growth_rule
+import qmla.get_exploration_strategy as get_exploration_strategy
 
 def combine_analysis_plots(
     results_directory,

@@ -35,14 +35,14 @@ parser.add_argument(
     default=100
 )
 parser.add_argument(
-    '-ggr', '--growth_generation_rule',
-    help="Growth rule of new models",
+    '-ggr', '--exploration_rules',
+    help="Exploration Strategy of new models",
     type=str,
     default=0
 )
 parser.add_argument(
-    '-agr', '--alternative_growth_rules',
-    help='Growth rules to form other trees.',
+    '-agr', '--alternative_exploration_strategys',
+    help='Exploration Strategies to form other trees.',
     action='append',
     default=[],
 )
@@ -81,75 +81,75 @@ parser.add_argument(
 arguments = parser.parse_args()
 
 num_particles = arguments.particle_number
-growth_generation_rule = arguments.growth_generation_rule
+exploration_rules = arguments.exploration_rules
 log_file = arguments.log_file
 probes_plot_file = arguments.probes_plot_file
 run_directory = arguments.run_directory
 
 # Generate GR instances
-growth_class_attributes = {
+exploration_class_attributes = {
     'true_params_path' : arguments.run_info_file,
     'plot_probes_path' : probes_plot_file,
     'log_file': log_file
 }
 
-all_growth_rules = [growth_generation_rule]
-alternative_growth_rules = arguments.alternative_growth_rules
-all_growth_rules.extend(alternative_growth_rules)
-all_growth_rules = list(set(all_growth_rules))
+all_exploration_strategys = [exploration_rules]
+alternative_exploration_strategys = arguments.alternative_exploration_strategys
+all_exploration_strategys.extend(alternative_exploration_strategys)
+all_exploration_strategys = list(set(all_exploration_strategys))
 
-unique_growth_classes = {
-    gr : qmla.get_growth_generator_class(
-            growth_generation_rule=gr,
-            **growth_class_attributes
-    ) for gr in all_growth_rules
+unique_exploration_classes = {
+    gr : qmla.get_exploration_class(
+            exploration_rules=gr,
+            **exploration_class_attributes
+    ) for gr in all_exploration_strategys
 }
 
-growth_class = unique_growth_classes[growth_generation_rule]
-probe_max_num_qubits_all_growth_rules = max([
-    gr.max_num_probe_qubits for gr in unique_growth_classes.values()
+exploration_class = unique_exploration_classes[exploration_rules]
+probe_max_num_qubits_all_exploration_strategys = max([
+    gr.max_num_probe_qubits for gr in unique_exploration_classes.values()
 ])
 
 # Use setup so far to generate parameters 
-true_model = growth_class.true_model
+true_model = exploration_class.true_model
 
 qmla.set_shared_parameters(
-    growth_class = growth_class,
+    exploration_class = exploration_class,
     run_info_file = arguments.run_info_file,
-    all_growth_rules = all_growth_rules,
+    all_exploration_strategys = all_exploration_strategys,
     run_directory = run_directory,
     num_particles = num_particles,
     generate_evaluation_experiments = True, 
-    probe_max_num_qubits_all_growth_rules = probe_max_num_qubits_all_growth_rules, 
+    probe_max_num_qubits_all_exploration_strategys = probe_max_num_qubits_all_exploration_strategys, 
 )
 
 
 # Probes used for plotting by all instances in this run, for consistency.
-plot_probe_dict = growth_class.plot_probe_generator(
-    probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
+plot_probe_dict = exploration_class.plot_probe_generator(
+    probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategys, 
 )
 pickle.dump(
     plot_probe_dict,
     open(probes_plot_file, 'wb')
 )
 
-# Store growth rule config to share with all instances in this run
+# Store exploration strategy config to share with all instances in this run
 path_to_store_configs = os.path.join(
     run_directory, 
-    'configs_growth_rules.p'
+    'configs_exploration_strategys.p'
 )
-growth_rule_configurations = {
-    gr : unique_growth_classes[gr].store_growth_rule_configuration()
-    for gr in unique_growth_classes
+exploration_strategy_configurations = {
+    gr : unique_exploration_classes[gr].store_exploration_strategy_configuration()
+    for gr in unique_exploration_classes
 }
 pickle.dump(
-    growth_rule_configurations,
+    exploration_strategy_configurations,
     open(path_to_store_configs, 'wb')
 )
 
 # Get system measurements
 # i.e. compute them only once and share with all instances
-true_system_measurements = growth_class.get_measurements_by_time()
+true_system_measurements = exploration_class.get_measurements_by_time()
 pickle.dump(
     true_system_measurements,
     open(
@@ -158,8 +158,8 @@ pickle.dump(
 )
 
 # Store an example of the probes used
-growth_class.generate_probes(
-    probe_maximum_number_qubits = probe_max_num_qubits_all_growth_rules, 
+exploration_class.generate_probes(
+    probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategys, 
     noise_level=0, # TODO get directly in GR
     minimum_tolerable_noise=0.0,
 )
@@ -175,7 +175,7 @@ try:
         "system_probes.p"
     )
     pickle.dump(
-        growth_class.probes_system,
+        exploration_class.probes_system,
         open(system_probes_path, 'wb')
     )
     simulator_probes_path = os.path.join(
@@ -183,7 +183,7 @@ try:
         "simulator_probes.p"
     )
     pickle.dump(
-        growth_class.probes_simulator,
+        exploration_class.probes_simulator,
         open(simulator_probes_path, 'wb')
     )
 except:

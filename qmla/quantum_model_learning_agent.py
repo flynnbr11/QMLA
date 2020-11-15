@@ -22,12 +22,12 @@ import seaborn as sns
 # QMLA functionality
 import qmla.analysis
 import qmla.construct_models as construct_models
-import qmla.get_growth_rule as get_growth_rule
+import qmla.get_exploration_strategy as get_exploration_strategy
 import qmla.redis_settings as rds
 import qmla.model_for_storage
 from qmla.remote_bayes_factor import remote_bayes_factor_calculation
 from qmla.remote_model_learning import remote_learn_model_parameters
-import qmla.growth_rule_tree
+import qmla.exploration_tree
 import qmla.utilities
 
 pickle.HIGHEST_PROTOCOL = 4
@@ -43,8 +43,8 @@ class QuantumModelLearningAgent():
     QMLA manager class.
 
     Controls the infrastructure which determines which models are learned and compared.
-    By interpreting user defined :class:`~qmla.growth_rules.GrowthRule`,
-    grows :class:`~qmla.GrowthRuleTree` objects which hold numerous models
+    By interpreting user defined :class:`~qmla.exploration_strategies.ExplorationStrategy`,
+    grows :class:`~qmla.ExplorationTree` objects which hold numerous models
     on :class:`~qmla.BranchQMLA` objects.
     All models on branches are learned and then compared.
     The comparisons on a branch inform the next set of models generated on that tree.
@@ -87,7 +87,7 @@ class QuantumModelLearningAgent():
             )
         else:
             self.qmla_controls = qmla_controls
-        self.growth_class = self.qmla_controls.growth_class
+        self.exploration_class = self.qmla_controls.exploration_class
         
 
         # Basic settings, path definitions etc
@@ -114,8 +114,8 @@ class QuantumModelLearningAgent():
         # QMLA core info stored on redis server
         self._compile_and_store_qmla_info_summary()
 
-        # Set up infrastructure related to growth rules and tree management
-        self._setup_tree_and_growth_rules()
+        # Set up infrastructure related to exploration strategies and tree management
+        self._setup_tree_and_exploration_strategys()
 
     ##########
     # Section: Initialisation and setup
@@ -129,7 +129,7 @@ class QuantumModelLearningAgent():
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
-        self.log_print(["\nwithin QMLA, GR's qmla id is {}. True model={}".format(self.growth_class.qmla_id, self.growth_class.true_model)])
+        self.log_print(["\nwithin QMLA, GR's qmla id is {}. True model={}".format(self.exploration_class.qmla_id, self.exploration_class.true_model)])
         self.qhl_mode = self.qmla_controls.qhl_mode
         self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
@@ -168,25 +168,25 @@ class QuantumModelLearningAgent():
             self.true_model_name)
         self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
         self.true_model_constituent_terms_latex = [
-            self.growth_class.latex_name(term)
+            self.exploration_class.latex_name(term)
             for term in
             qmla.construct_models.get_constituent_names_from_name(
                 self.true_model_name)
         ]
         self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
-        self.true_param_list = self.growth_class.true_params_list
-        self.true_param_dict = self.growth_class.true_params_dict
+        self.true_param_list = self.exploration_class.true_params_list
+        self.true_param_dict = self.exploration_class.true_params_dict
         self.true_model_branch = -1  # overwrite if true model is added to database
         self.true_model_considered = False
         self.true_model_found = False
         self.true_model_id = -1
         self.true_model_on_branhces = []
-        self.true_model_hamiltonian = self.growth_class.true_hamiltonian
+        self.true_model_hamiltonian = self.exploration_class.true_hamiltonian
         self.log_print([
             "True model:", self.true_model_name
         ])
 
-    def _setup_tree_and_growth_rules(
+    def _setup_tree_and_exploration_strategys(
         self,
     ):
         r""" Set up infrastructure."""
@@ -207,16 +207,16 @@ class QuantumModelLearningAgent():
         self.model_lists = {
             # assumes maxmium 13 qubit-models considered
             # to be checked when checking model_lists
-            # TODO generalise to max dim of Growth Rule
+            # TODO generalise to max dim of Exploration Strategy
             j: []
             for j in range(1, 13)
         }
         self.all_bayes_factors = {}
         self.bayes_factor_pair_computed = []
 
-        # Growth rule setup
-        self.growth_rule_of_true_model = self.qmla_controls.growth_generation_rule
-        self.unique_growth_rule_instances = self.qmla_controls.unique_growth_rule_instances
+        # Exploration Strategy setup
+        self.exploration_strategy_of_true_model = self.qmla_controls.exploration_rules
+        self.unique_exploration_strategy_instances = self.qmla_controls.unique_exploration_strategy_instances
 
         # Keep track of models/branches
         self.model_count = 0
@@ -226,12 +226,12 @@ class QuantumModelLearningAgent():
         self.model_name_id_map = {}
         self.ghost_branches = {}
 
-        # Tree object for each growth rule
+        # Tree object for each exploration strategy
         self.trees = {
-            gen: qmla.growth_rule_tree.GrowthRuleTree(
-                growth_class=self.unique_growth_rule_instances[gen]
+            gen: qmla.exploration_tree.ExplorationTree(
+                exploration_class=self.unique_exploration_strategy_instances[gen]
             )
-            for gen in self.unique_growth_rule_instances
+            for gen in self.unique_exploration_strategy_instances
         }
         self.branches = {}
         self.tree_count = len(self.trees)
@@ -252,7 +252,7 @@ class QuantumModelLearningAgent():
         # Learning parameters, used by QInfer updates
         self.num_particles = self.qmla_controls.num_particles
         self.num_experiments = self.qmla_controls.num_experiments
-        # self.fraction_experiments_for_bf = self.growth_class.fraction_experiments_for_bf
+        # self.fraction_experiments_for_bf = self.exploration_class.fraction_experiments_for_bf
         self.num_experiments_for_bayes_updates = self.num_experiments # TODO remove
 
 
@@ -267,17 +267,17 @@ class QuantumModelLearningAgent():
         self.bayes_factors_df = pd.DataFrame()
 
         # Get probes used for learning
-        self.growth_class.generate_probes(
-            noise_level=self.growth_class.probe_noise_level,
+        self.exploration_class.generate_probes(
+            noise_level=self.exploration_class.probe_noise_level,
             minimum_tolerable_noise=0.0,
             # tell it the max number of qubits required by any GR under consideration
             probe_maximum_number_qubits = max(
-                [gr.max_num_probe_qubits for gr in self.qmla_controls.unique_growth_rule_instances.values()]
+                [gr.max_num_probe_qubits for gr in self.qmla_controls.unique_exploration_strategy_instances.values()]
             )
         )
-        self.probes_system = self.growth_class.probes_system
-        self.probes_simulator = self.growth_class.probes_simulator
-        self.probe_number = self.growth_class.num_probes
+        self.probes_system = self.exploration_class.probes_system
+        self.probes_simulator = self.exploration_class.probes_simulator
+        self.probe_number = self.exploration_class.num_probes
         sim_probe_keys = list(self.probes_simulator.keys())
         self.log_print(["Simulator probe keys (len {}):{}".format(len(sim_probe_keys), sim_probe_keys) ])
 
@@ -372,10 +372,10 @@ class QuantumModelLearningAgent():
         """
 
         # Decide if reallocating resources based on true GR.
-        if self.growth_class.reallocate_resources:
+        if self.exploration_class.reallocate_resources:
             base_num_qubits = 3
             base_num_terms = 3
-            for op in self.growth_class.initial_models:
+            for op in self.exploration_class.initial_models:
                 if construct_models.get_num_qubits(op) < base_num_qubits:
                     base_num_qubits = construct_models.get_num_qubits(op)
                 num_terms = len(
@@ -423,7 +423,7 @@ class QuantumModelLearningAgent():
             # '}B_{' + str(self.num_experiments_for_bayes_updates) +
             '}H_{' + str(number_hamiltonians_to_exponentiate) +
             r'}|\psi>_{' + str(self.probe_number) +
-            '}PN_{' + str(self.growth_class.probe_noise_level) +
+            '}PN_{' + str(self.exploration_class.probe_noise_level) +
             '}$'
         )
 
@@ -444,10 +444,10 @@ class QuantumModelLearningAgent():
             'model_priors': self.model_priors,  # could be path to unpickle within model?
             'experimental_measurements': self.experimental_measurements,
             'base_resources': self.base_resources,
-            'store_particles_weights': False,  # TODO from growth rule or unneeded
-            'qhl_plots': False,  # TODO get from growth rule
+            'store_particles_weights': False,  # TODO from exploration strategy or unneeded
+            'qhl_plots': False,  # TODO get from exploration strategy
             'experimental_measurement_times': self.experimental_measurement_times,
-            'num_probes': self.probe_number,  # from growth rule or unneeded,
+            'num_probes': self.probe_number,  # from exploration strategy or unneeded,
             'run_info_file': self.qmla_controls.run_info_file,
         }
 
@@ -594,7 +594,7 @@ class QuantumModelLearningAgent():
                     remote_learn_model_parameters,
                     model_name,
                     model_id,
-                    growth_generator=self.branches[branch_id].growth_rule,
+                    exploration_rule=self.branches[branch_id].exploration_strategy,
                     branch_id=branch_id,
                     remote=True,
                     host_name=self.redis_host_name,
@@ -643,7 +643,7 @@ class QuantumModelLearningAgent():
                 remote_learn_model_parameters(
                     name=model_name,
                     model_id=model_id,
-                    growth_generator=self.branches[branch_id].growth_rule,
+                    exploration_rule=self.branches[branch_id].exploration_strategy,
                     branch_id=branch_id,
                     qmla_core_info_dict=self.qmla_settings,
                     remote=True,
@@ -1169,9 +1169,9 @@ class QuantumModelLearningAgent():
         self,
     ):
         r"""
-        Iteratively learn/compare/generate models on growth rule trees.
+        Iteratively learn/compare/generate models on exploration strategy trees.
 
-        Each :class:`~qmla.growth_rules.GrowthRule` has a unique :class:`~qmla.QMLATree``.
+        Each :class:`~qmla.exploration_strategies.ExplorationStrategy` has a unique :class:`~qmla.QMLATree``.
         Trees hold sets of models on :class:`~qmla.BranchTree` objects.
 
         Models on a each branch are learned through :meth:`learn_models_on_given_branch`.
@@ -1182,12 +1182,12 @@ class QuantumModelLearningAgent():
 
         When a branch has completed learning and comparisons of models,
         the corresponding tree is checked to see if it has finished proposing
-        models, through :meth:`~qmla.GrowthRuleTree.is_tree_complete`.
-        If the tree is not complete, the :meth:`~qmla.GrowthRuleTree.next_layer`
+        models, through :meth:`~qmla.ExplorationTree.is_tree_complete`.
+        If the tree is not complete, the :meth:`~qmla.ExplorationTree.next_layer`
         method is called to generate the next branch on that tree.
         The next branch can correspond to `spawn` or `prune` stages of the
-        tree's :class:`~qmla.growth_rules.GrowthRule`, but QMLA is ambivalent to the
-        inner workings of the tree/growth rule: a branch is
+        tree's :class:`~qmla.exploration_strategies.ExplorationStrategy`, but QMLA is ambivalent to the
+        inner workings of the tree/exploration strategy: a branch is
         simply a set of models to learn and compare.
 
         When all trees have completed learning, this method terminates.
@@ -1287,7 +1287,7 @@ class QuantumModelLearningAgent():
                         self.tree_count_completed += 1
                         self.log_print([
                             "Tree complete:",
-                            self.branches[branch_id].growth_rule,
+                            self.branches[branch_id].exploration_strategy,
                             "Number of trees now completed:",
                             self.tree_count_completed,
                         ])
@@ -1378,15 +1378,15 @@ class QuantumModelLearningAgent():
         Retrieve the next set of models and place on a new branch.
 
         By checking the :class:`~qmla.tree.QMLATree`` associated with the `branch_id` used
-        to call this method, call :meth:`GrowthRuleTree.next_layer`, which returns
+        to call this method, call :meth:`ExplorationTree.next_layer`, which returns
         a set of models to place on a new branch, as well as which models therein
         to compare. These are passed to :meth:`new_branch`, constructing a new branch
         in the QMLA environment. The generated new branch then has all its models
         learned by calling :meth:`~qmla.QuantumModelLearningAgent.learn_models_on_given_branch`.
-        :meth:`~qmla.GrowthRuleTree.next_layer` is in control of how to select the next set of models,
-        usually either by calling the :class:`~qmla.growth_rules.GrowthRule`'s
-        :meth:`~qmla.growth_rules.GrowthRule.generate_models` or
-        :meth:`~qmla.growth_rules.GrowthRule.tree_pruning` methods.
+        :meth:`~qmla.ExplorationTree.next_layer` is in control of how to select the next set of models,
+        usually either by calling the :class:`~qmla.exploration_strategies.ExplorationStrategy`'s
+        :meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_models` or
+        :meth:`~qmla.exploration_strategies.ExplorationStrategy.tree_pruning` methods.
         This allows the user to define how models are generated,
         given access to the comparisons of the previous branch,
         or how the tree is pruned, e.g. by performing preliminary
@@ -1413,7 +1413,7 @@ class QuantumModelLearningAgent():
 
         self.log_print([
             "After model generation for GR",
-            self.branches[branch_id].growth_rule,
+            self.branches[branch_id].exploration_strategy,
             "\nnew models:", new_models,
         ])
 
@@ -1421,7 +1421,7 @@ class QuantumModelLearningAgent():
         new_branch_id = self.new_branch(
             model_list=new_models,
             pairs_to_compare_by_names=models_to_compare,
-            growth_rule=self.branches[branch_id].growth_rule,
+            exploration_strategy=self.branches[branch_id].exploration_strategy,
             spawning_branch=branch_id,
         )
 
@@ -1436,14 +1436,14 @@ class QuantumModelLearningAgent():
         model_list,
         pairs_to_compare='all',
         pairs_to_compare_by_names=None,
-        growth_rule=None,
+        exploration_strategy=None,
         spawning_branch=0,
     ):
         r"""
         Add a set of models to a new QMLA branch.
 
         Branches have a unique id within QMLA, but belong to a single
-        tree, where each tree corresponds to a single growth rule.
+        tree, where each tree corresponds to a single exploration strategy.
 
         :param list model_list: strings corresponding to models to
             place in the branch
@@ -1451,8 +1451,8 @@ class QuantumModelLearningAgent():
             'all' (deafult) means  all models in `model_list` are set to compare.
             Otherwise a list of tuples of model IDs to compare
         :type pairs_to_compare: str or list
-        :param str growth_rule: growth rule identifer;
-            used to get the unique tree object corresponding to a growth rule,
+        :param str exploration_strategy: exploration strategy identifer;
+            used to get the unique tree object corresponding to a exploration strategy,
             which is then used to host the branch.
         :param int spawning_branch: branch id which is the parent of the new branch.
         :return: branch id which uniquely identifies the new branch
@@ -1463,9 +1463,9 @@ class QuantumModelLearningAgent():
         branch_id = int(self.branch_highest_id) + 1
         self.branch_highest_id = branch_id
 
-        if growth_rule is None:
-            growth_rule = self.growth_rule_of_true_model
-        growth_tree = self.trees[growth_rule]
+        if exploration_strategy is None:
+            exploration_strategy = self.exploration_strategy_of_true_model
+        exploration_tree = self.trees[exploration_strategy]
 
         this_branch_models = {}
         model_id_list = []
@@ -1476,7 +1476,7 @@ class QuantumModelLearningAgent():
             add_model_info = self.add_model_to_database(
                 model,
                 branch_id=branch_id,
-                growth_tree=growth_tree,
+                exploration_tree=exploration_tree,
             )
             already_computed = not(
                 add_model_info['is_new_model']
@@ -1499,7 +1499,7 @@ class QuantumModelLearningAgent():
             for m in list(this_branch_models.keys())
         }
 
-        # Start new branch on corresponding growth rule tree
+        # Start new branch on corresponding exploration strategy tree
 
         if pairs_to_compare_by_names is not None:
             if pairs_to_compare_by_names == 'all':
@@ -1518,7 +1518,7 @@ class QuantumModelLearningAgent():
                         ["Failed to unpack pairs_to_compare_by_names:\n", pairs_to_compare_by_names])
                     raise
 
-        self.branches[branch_id] = growth_tree.new_branch_on_tree(
+        self.branches[branch_id] = exploration_tree.new_branch_on_tree(
             branch_id=branch_id,
             models=this_branch_models,
             pairs_to_compare=pairs_to_compare,
@@ -1532,7 +1532,7 @@ class QuantumModelLearningAgent():
     def add_model_to_database(
         self,
         model,
-        growth_tree,
+        exploration_tree,
         branch_id=-1,
         force_create_model=False
     ):
@@ -1595,20 +1595,20 @@ class QuantumModelLearningAgent():
             f_score = np.round(self.compute_model_f_score(
                 model_id=model_id,
                 model_name=model_name,
-                growth_class=growth_tree.growth_class
+                exploration_class=exploration_tree.exploration_class
             ), 2)
             terms = qmla.construct_models.get_constituent_names_from_name(model_name)
 
             running_db_new_row = pd.Series({
                 'model_id': int(model_id),
                 'model_name': model_name,
-                'latex_name': growth_tree.growth_class.latex_name(model_name),
+                'latex_name': exploration_tree.exploration_class.latex_name(model_name),
                 'branch_id': int(branch_id),
                 'f_score': f_score,
                 'model_storage_instance': model_storage_instance,
                 'branches_present_on' : [int(branch_id)], 
                 'terms' : terms,
-                'latex_terms' : [growth_tree.growth_class.latex_name(t) for t in terms] # need to get latex name by the GR which spawned this model
+                'latex_terms' : [exploration_tree.exploration_class.latex_name(t) for t in terms] # need to get latex name by the GR which spawned this model
             })
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
@@ -1693,7 +1693,7 @@ class QuantumModelLearningAgent():
 
         self.bayes_factors_data()
         try:
-            self.growth_class.growth_rule_specific_plots(
+            self.exploration_class.exploration_strategy_specific_plots(
                 save_directory=self.qmla_controls.plots_directory,
                 qmla_id=self.qmla_controls.long_id,
                 true_model_id = self.true_model_id, 
@@ -1702,7 +1702,7 @@ class QuantumModelLearningAgent():
         except:
             # TODO log print the reason for failure
             pass
-        self.growth_class.growth_rule_finalise()
+        self.exploration_class.exploration_strategy_finalise()
         self.get_statistical_metrics()
 
         # Prepare model/name maps
@@ -1840,8 +1840,8 @@ class QuantumModelLearningAgent():
             'Time': time_taken,
             'Host': self.redis_host_name,
             'Port': self.redis_port_number,
-            'ResampleThreshold': self.growth_class.qinfer_resampler_threshold,
-            'ResamplerA': self.growth_class.qinfer_resampler_a,
+            'ResampleThreshold': self.exploration_class.qinfer_resampler_threshold,
+            'ResamplerA': self.exploration_class.qinfer_resampler_a,
             # Details about true model:
             'TrueModel': self.true_model_name,
             'TrueModelConsidered': self.true_model_considered,
@@ -1854,7 +1854,7 @@ class QuantumModelLearningAgent():
             'ChampLatex': mod.model_name_latex,
             'ConstituentTerms': mod.constituents_terms_latex,
             'LearnedHamiltonian': mod.learned_hamiltonian,
-            'GrowthGenerator': mod.growth_rule_of_this_model,
+            'ExplorationRule': mod.exploration_strategy_of_this_model,
             'NameAlphabetical': construct_models.alph(mod.model_name),
             'LearnedParameters': mod.qhl_final_param_estimates,
             'FinalSigmas': mod.qhl_final_param_uncertainties,
@@ -1890,7 +1890,7 @@ class QuantumModelLearningAgent():
         self.storage.qmla_id = self.qmla_id
         self.storage.bayes_factors_df = self.bayes_factors_df
         self.storage.model_f_scores = self.model_f_scores
-        self.storage.growth_rule_storage = self.growth_class.storage
+        self.storage.exploration_strategy_storage = self.exploration_class.storage
 
         # store expectation values of all models
 
@@ -1946,7 +1946,7 @@ class QuantumModelLearningAgent():
 
         Consider whether the champion model has some terms whose parameters
         were found to be negligible (either within one standard
-        deviation from 0, or very close to zero as determined by the growth rule's
+        deviation from 0, or very close to zero as determined by the exploration strategy's
         `learned_param_limit_for_negligibility` attribute).
         Construct a new model which is the same as the champion, less those negligible
         terms, named the reduced champion. The data of the champion model is inherited
@@ -1956,7 +1956,7 @@ class QuantumModelLearningAgent():
         the champion and the reduced champion.
         Compare the champion with the reduced champion; if the reduced champion
         is heavily favoured, directly select it as the global champion.
-        This method is triggered if the growth rule's `check_champion_reducibility`
+        This method is triggered if the exploration strategy's `check_champion_reducibility`
         attribute is set to True.
 
         """
@@ -1989,7 +1989,7 @@ class QuantumModelLearningAgent():
 
             if (
                 np.abs(champ_mod.qhl_final_param_estimates[p])
-                < self.growth_class.learned_param_limit_for_negligibility
+                < self.exploration_class.learned_param_limit_for_negligibility
             ):
                 to_remove.append(p)
                 removed_params[p] = np.round(
@@ -2103,7 +2103,7 @@ class QuantumModelLearningAgent():
 
             if (
                 bayes_factor
-                < (1.0 / self.growth_class.reduce_champ_bayes_factor_threshold)
+                < (1.0 / self.exploration_class.reduce_champ_bayes_factor_threshold)
             ):
                 # overwrite champ id etc
                 self.log_print([
@@ -2138,10 +2138,10 @@ class QuantumModelLearningAgent():
 
     def compare_nominated_champions(self):
         r"""
-        Compare the champions of all growth rule trees.
+        Compare the champions of all exploration strategy trees.
 
         Get the champions (usually one, but in general can be multiple)
-        from each tree, where each tree is unique to a growth rule.
+        from each tree, where each tree is unique to a exploration strategy.
         Place the champions on a branch together and perform all-versus-all
         comparisons. The champion of that branch is deemed the global champion.
 
@@ -2152,7 +2152,7 @@ class QuantumModelLearningAgent():
             # extend in case multiple models nominated by tree
             tree_champions.extend(tree.nominate_champions())
 
-        # Place tree champions on new QMLA branch, not tied to a growth rule
+        # Place tree champions on new QMLA branch, not tied to a exploration strategy
         global_champ_branch_id = self.new_branch(
             model_list=tree_champions
         )
@@ -2191,13 +2191,13 @@ class QuantumModelLearningAgent():
         r"""
         Run Quantum Hamiltonian Learning algorithm .
 
-        The `true_model` of the :class:`~qmla.growth_rules.GrowthRule` is used to generate
+        The `true_model` of the :class:`~qmla.exploration_strategies.ExplorationStrategy` is used to generate
         true data (in simulation) and have its parameters learned.
 
         """
 
         qhl_branch = self.new_branch(
-            growth_rule=self.growth_rule_of_true_model,
+            exploration_strategy=self.exploration_strategy_of_true_model,
             model_list=[self.true_model_name]
         )
 
@@ -2228,7 +2228,7 @@ class QuantumModelLearningAgent():
             )
         ])
         self._update_database_model_info()
-        self.growth_class.growth_rule_finalise()
+        self.exploration_class.exploration_strategy_finalise()
         self.get_statistical_metrics()
 
     def run_quantum_hamiltonian_learning_multiple_models(
@@ -2239,20 +2239,20 @@ class QuantumModelLearningAgent():
         Run Quantum Hamiltonian Learning algorithm with multiple simulated models.
 
         Numerous Hamiltonian models attempt to learn the dynamics of the true model.
-        The underlying model is set in the :class:`~qmla.growth_rules.GrowthRule`'s `true_model` attribute.
+        The underlying model is set in the :class:`~qmla.exploration_strategies.ExplorationStrategy`'s `true_model` attribute.
 
         :param list model_names:
             list of strings of model names to learn the parameterisations of.
-            None: taken from :class:`~qmla.growth_rules.GrowthRule` `qhl_models`.
+            None: taken from :class:`~qmla.exploration_strategies.ExplorationStrategy` `qhl_models`.
         """
 
         # Choose models to perform QHL on
         if model_names is None:
-            model_names = self.growth_class.qhl_models
+            model_names = self.exploration_class.qhl_models
 
         # Place models on a branch
         branch_id = self.new_branch(
-            growth_rule=self.growth_rule_of_true_model,
+            exploration_strategy=self.exploration_strategy_of_true_model,
             model_list=model_names
         )
         self.qhl_mode_multiple_models = True
@@ -2304,7 +2304,7 @@ class QuantumModelLearningAgent():
             mod = self.get_model_storage_instance_by_id(mod_id)
             mod.model_update_learned_values()
 
-        self.growth_class.growth_rule_finalise()
+        self.exploration_class.exploration_strategy_finalise()
         self.get_statistical_metrics()
         self.model_id_to_name_map = {}
         for k in self.model_name_id_map:
@@ -2321,14 +2321,14 @@ class QuantumModelLearningAgent():
         r"""
         Run complete Quantum Model Learning Agent algorithm.
 
-        Each :class:`~qmla.growth_rules.GrowthRule` is assigned a :class:`~qmla.tree.QMLATree`,
-        which manages the growth rule. When new models are spawned by a growth rule,
+        Each :class:`~qmla.exploration_strategies.ExplorationStrategy` is assigned a :class:`~qmla.tree.QMLATree`,
+        which manages the exploration strategy. When new models are spawned by a exploration strategy,
         they are placed on a :class:`~qmla.tree.BranchQMLA` of the corresponding tree.
         Models are learned/compared/spawned iteratively in
         :meth:`learn_models_until_trees_complete`, until all
-        trees declare that their growth rule has completed.
-        Growth rules are complete when they have nominated one or more champions,
-        which can follow spawning/pruning stages as required by the growth rule.
+        trees declare that their exploration strategy has completed.
+        Exploration Strategies are complete when they have nominated one or more champions,
+        which can follow spawning/pruning stages as required by the exploration strategy.
         Nominated champions are then compared with :meth:`compare_nominated_champions`,
         resulting in a single global champion selected.
         Some analysis then takes place, including possibly reducing the
@@ -2336,13 +2336,13 @@ class QuantumModelLearningAgent():
 
         """
 
-        # Set up one tree per growth rule
+        # Set up one tree per exploration strategy
         for tree in list(self.trees.values()):
             starting_models, models_to_compare = tree.get_initial_models()
             # TODO genetic alg giving some non-unique initial model sets
             self.log_print([
                 "First branch for {} has ( {}/{} unique ) starting models: {}".format(
-                    tree.growth_rule, 
+                    tree.exploration_strategy, 
                     len(set(starting_models)), 
                     len(starting_models),
                     starting_models
@@ -2351,14 +2351,14 @@ class QuantumModelLearningAgent():
             ])
             self.new_branch(
                 model_list=starting_models,
-                growth_rule=tree.growth_rule,
+                exploration_strategy=tree.exploration_strategy,
                 pairs_to_compare_by_names=models_to_compare
             )
 
         # Iteratively learn models, compute bayes factors, spawn new models
         self.learn_models_until_trees_complete()
         self.log_print([
-            "Growth rule trees completed."
+            "Exploration Strategy trees completed."
         ])
 
         # Choose champion by comparing nominated champions of all trees.
@@ -2393,7 +2393,7 @@ class QuantumModelLearningAgent():
         ])
 
         # Consider reducing champion if negligible parameters found
-        if self.growth_class.check_champion_reducibility:
+        if self.exploration_class.check_champion_reducibility:
             self.check_champion_reducibility()
 
         # Tidy up and finish QMLA.
@@ -2531,7 +2531,7 @@ class QuantumModelLearningAgent():
         self,
         model_id,
         model_name=None,
-        growth_class=None,
+        exploration_class=None,
         beta=1  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
         r"""
@@ -2545,13 +2545,13 @@ class QuantumModelLearningAgent():
 
         # TODO set precision, f-score etc as model instance attributes and
         # return those in champion_results
-        true_set = self.growth_class.true_model_terms
-        if growth_class is None:
-            growth_class = self.get_model_storage_instance_by_id(
-                model_id).growth_class
+        true_set = self.exploration_class.true_model_terms
+        if exploration_class is None:
+            exploration_class = self.get_model_storage_instance_by_id(
+                model_id).exploration_class
             model_name = self.model_name_id_map[model_id]
         terms = [
-            growth_class.latex_name(
+            exploration_class.latex_name(
                 term
             )
             for term in
@@ -2712,7 +2712,7 @@ class QuantumModelLearningAgent():
         s = sns.heatmap(
             bayes_factor_by_id,
             # cmap='RdYlGn',
-            cmap=self.growth_class.bf_cmap, 
+            cmap=self.exploration_class.bf_cmap, 
             mask=mask,
             annot=False
         )
@@ -2868,7 +2868,7 @@ class QuantumModelLearningAgent():
             include_params = True
         elif self.qhl_mode_multiple_models:
             model_ids = list(self.qhl_mode_multiple_models_model_ids)
-        elif self.growth_class.tree_completed_initially:
+        elif self.exploration_class.tree_completed_initially:
             model_ids = list(self.models_learned)
             include_bayes_factors = True
             include_params = True
@@ -2918,7 +2918,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_GrowthRuleTree(
+    def plot_ExplorationTree(
         self,
         modlist=None,
         only_adjacent_branches=True,
@@ -3048,7 +3048,7 @@ class QuantumModelLearningAgent():
         if colour_by == 'f_score':
             sns.heatmap(
                 piv_table,
-                cmap=self.growth_class.f_score_cmap, 
+                cmap=self.exploration_class.f_score_cmap, 
                 ax = ax,
                 cbar_kws={'label': 'F-score', }
             )

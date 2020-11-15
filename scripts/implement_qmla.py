@@ -29,7 +29,7 @@ import qmla.logging
 # Parse input variables to use in QMD; store in class qmla_controls.
 #########################
 qmla_controls = qmla.parse_cmd_line_args(sys.argv[1:])
-growth_class = qmla_controls.growth_class
+exploration_class = qmla_controls.exploration_class
 
 
 #########################
@@ -64,7 +64,7 @@ long_id = qmla_controls.long_id
 if qmla_controls.further_qhl == True:
     # TODO further QHL stage out of date and won't work with 
     # new code -- update
-    # make a growth rule accepting list of models and priors?
+    # make a exploration strategy accepting list of models and priors?
 
     qmd_results_model_scores_csv = str(
         qmla_controls.results_directory
@@ -105,7 +105,7 @@ elif (
 ):
 
     if qmla_controls.qhl_mode_multiple_models:
-        qhl_models = growth_class.qhl_models
+        qhl_models = exploration_class.qhl_models
         output_prefix = ''  # TODO make so that this can have an output prefix
     else:
         qhl_models = further_qhl_models
@@ -377,8 +377,8 @@ else:
         # TODO generalise so tree diagram can be used in all cases
         # currently only useful for Ising growth 2 qubits.
         try:
-            print("plot_GrowthRuleTree")
-            qmla_instance.plot_GrowthRuleTree(
+            print("plot_ExplorationTree")
+            qmla_instance.plot_ExplorationTree(
                 only_adjacent_branches=False,
                 save_to_file=str
                 (qmla_controls.plots_directory +
@@ -409,7 +409,7 @@ else:
             )
 
 
-    # qmla_instance.growth_class.growth_rule_specific_plots(
+    # qmla_instance.exploration_class.exploration_strategy_specific_plots(
     #     save_directory = qmla_controls.plots_directory,
     #     qmla_id = qmla_controls.long_id
     # )

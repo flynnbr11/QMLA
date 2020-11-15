@@ -34,7 +34,7 @@ def plot_qmla_branches(
 
     for tree in trees:
         # tree = trees[0] # TODO loop over trees
-        q.log_print(["Working on tree ", tree.growth_rule])
+        q.log_print(["Working on tree ", tree.exploration_strategy])
         graphs = {}
 
         branches = [
@@ -79,8 +79,8 @@ def plot_qmla_branches(
         )
 
         # colour maps
-        f_score_cmap = q.growth_class.f_score_cmap
-        bf_cmap = q.growth_class.bf_cmap
+        f_score_cmap = q.exploration_class.f_score_cmap
+        bf_cmap = q.exploration_class.bf_cmap
         min_bf = q.bayes_factors_df.log10_bayes_factor.min()
         max_bf = q.bayes_factors_df.log10_bayes_factor.max()
         norm = plt.Normalize(vmin = min_bf, vmax = max_bf)
@@ -225,7 +225,7 @@ def plot_qmla_branches(
             )
 
         # Save figure
-        save_file = 'graphs_of_branches_{}.png'.format(tree.growth_rule)
+        save_file = 'graphs_of_branches_{}.png'.format(tree.exploration_strategy)
         q.log_print(["Storing ", save_file])
         fig.savefig(
             os.path.join(q.qmla_controls.plots_directory, save_file)

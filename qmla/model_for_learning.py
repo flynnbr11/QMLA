@@ -21,7 +21,7 @@ except:
 
 import qmla.redis_settings
 import qmla.logging
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 import qmla.shared_functionality.prior_distributions
 import qmla.construct_models
 import qmla.analysis
@@ -44,7 +44,7 @@ class ModelInstanceForLearning():
     Each term is assigned a parameter probability distribution, or a prior distribution:
     this will be iteratively changed according to evidence from experiments, and its mean
     gives the estimate for that parameter. Prior distributions are used by the QInfer updater,
-    and can be specified by the :meth:`~qmla.growth_rules.GrowthRule.get_prior` method.
+    and can be specified by the :meth:`~qmla.exploration_strategies.ExplorationStrategy.get_prior` method.
     The individual terms are parsed into matrices for calculations. This is achieved by
     :func:`~qmla.process_basic_operator`: different string syntax enable different core oeprators.
 
@@ -58,7 +58,7 @@ class ModelInstanceForLearning():
     :param int model_id: ID of the model to study
     :param str model_name: name of the model to be learned
     :param qid: ID of the QMLA instance
-    :param str growth_generator: name of growth_rule
+    :param str exploration_rule: name of exploration_strategy
     :param dict qmla_core_info_database: essential details about the QMLA
         instance needed to learn/compare models.
         If None, this is retrieved instead from the redis database.
@@ -72,7 +72,7 @@ class ModelInstanceForLearning():
         model_id,
         model_name,
         qid,
-        growth_generator,
+        exploration_rule,
         log_file,
         qmla_core_info_database=None,
         host_name='localhost',
@@ -85,7 +85,7 @@ class ModelInstanceForLearning():
         self.log_file = log_file
         self.redis_host = host_name
         self.redis_port_number = port_number
-        self.growth_rule_of_this_model = growth_generator
+        self.exploration_strategy_of_this_model = exploration_rule
         self.log_print([
             "QHL for model (id:{}) {} ".format(
                 model_id, model_name,
@@ -112,13 +112,13 @@ class ModelInstanceForLearning():
         r"""
         Preliminary set up necessary before parameter learning.
 
-        Start instances of classes used throughout, generally by calling the growth rule's method,
-            * qinfer inferface: :meth:`~qmla.growth_rules.GrowthRule.qinfer_model`.
+        Start instances of classes used throughout, generally by calling the exploration strategy's method,
+            * qinfer inferface: :meth:`~qmla.exploration_strategies.ExplorationStrategy.qinfer_model`.
             * updater is default `QInfer.SMCUpdater <http://docs.qinfer.org/en/latest/guide/smc.html#using-smcupdater>`_.
-            * parameter distribution prior: :meth:`~qmla.growth_rules.GrowthRule.get_prior`.
+            * parameter distribution prior: :meth:`~qmla.exploration_strategies.ExplorationStrategy.get_prior`.
 
         :param str model_name: name of the model to be learned
-        :param str growth_generator: name of growth_rule
+        :param str exploration_rule: name of exploration_strategy
         :param dict qmla_core_info_database: essential details about the QMLA
             instance needed to learn/compare models.
             If None, this is retrieved instead from the redis database.
@@ -168,9 +168,9 @@ class ModelInstanceForLearning():
         self.debug_mode = qmla_core_info_dict['debug_mode']
         self.plot_level = qmla_core_info_dict['plot_level']
 
-        # Instantiate growth rule
-        self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
-            growth_generation_rule=self.growth_rule_of_this_model,
+        # Instantiate exploration strategy
+        self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+            exploration_rules=self.exploration_strategy_of_this_model,
             log_file=self.log_file,
             qmla_id = self.qmla_id, 
         )
@@ -178,7 +178,7 @@ class ModelInstanceForLearning():
         # Get initial configuration for this model
         op = qmla.construct_models.Operator(name=model_name)
         self.model_terms_names = op.constituents_names
-        self.model_name_latex = self.growth_class.latex_name(
+        self.model_name_latex = self.exploration_class.latex_name(
             name=self.model_name
         )
         self.model_terms_matrices = np.asarray(op.constituents_operators)
@@ -202,8 +202,8 @@ class ModelInstanceForLearning():
         Set up prior, model and updater (via QInfer) which are used to run Bayesian inference.
         """
 
-        # Prior parameter distribution via growth rule
-        self.model_prior = self.growth_class.get_prior(
+        # Prior parameter distribution via exploration strategy
+        self.model_prior = self.exploration_class.get_prior(
             model_name=self.model_name,
             log_file=self.log_file,
             log_identifier=str("QHL {}".format(self.model_id)),
@@ -212,7 +212,7 @@ class ModelInstanceForLearning():
         self._store_prior()
 
         # Initialise model to infereace with QInfer as specified in GR
-        self.qinfer_model = self.growth_class.qinfer_model(
+        self.qinfer_model = self.exploration_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
@@ -223,7 +223,7 @@ class ModelInstanceForLearning():
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
-            growth_generation_rule=self.growth_rule_of_this_model,
+            exploration_rules=self.exploration_strategy_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             qmla_id=self.qmla_id, 
@@ -234,14 +234,14 @@ class ModelInstanceForLearning():
         # Updater to perform Bayesian inference with
 
         if (
-            self.growth_class.hard_fix_resample_effective_sample_size is not None
-            and self.growth_class.hard_fix_resample_effective_sample_size < self.num_particles
+            self.exploration_class.hard_fix_resample_effective_sample_size is not None
+            and self.exploration_class.hard_fix_resample_effective_sample_size < self.num_particles
         ):
             # get resampler treshold
-            resampler_threshold = self.growth_class.hard_fix_resample_effective_sample_size / \
+            resampler_threshold = self.exploration_class.hard_fix_resample_effective_sample_size / \
                 self.num_particles
         else:
-            resampler_threshold = self.growth_class.qinfer_resampler_threshold
+            resampler_threshold = self.exploration_class.qinfer_resampler_threshold
 
         self.qinfer_updater = qi.SMCUpdater(
             self.qinfer_model,
@@ -249,11 +249,11 @@ class ModelInstanceForLearning():
             self.model_prior,
             resample_thresh=resampler_threshold,
             resampler=qi.LiuWestResampler(
-                a=self.growth_class.qinfer_resampler_a),
+                a=self.exploration_class.qinfer_resampler_a),
         )
 
         # Experiment design heuristic
-        self.model_heuristic = self.growth_class.heuristic(
+        self.model_heuristic = self.exploration_class.heuristic(
             model_id=self.model_id,
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
@@ -262,7 +262,7 @@ class ModelInstanceForLearning():
             log_file=self.log_file,
             inv_field=[item[0]
                        for item in self.qinfer_model.expparams_dtype[1:]],
-            max_time_to_enforce=self.growth_class.max_time_to_consider,
+            max_time_to_enforce=self.exploration_class.max_time_to_consider,
         )
         self.log_print(["Heuristic built"])
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
@@ -417,8 +417,8 @@ class ModelInstanceForLearning():
 
             # Terminate
             if (
-                self.growth_class.terminate_learning_at_volume_convergence
-                and volume_by_epoch[-1] < self.growth_class.volume_convergence_threshold
+                self.exploration_class.terminate_learning_at_volume_convergence
+                and volume_by_epoch[-1] < self.exploration_class.volume_convergence_threshold
 
             ):  # can be reinstated to stop learning when volume converges
                 self._finalise_learning()
@@ -461,7 +461,7 @@ class ModelInstanceForLearning():
             self.epochs_after_resampling.append(update_step)
 
         # Some optional tracking
-        if self.growth_class.track_cov_mtx:
+        if self.exploration_class.track_cov_mtx:
             self.track_covariance_matrices.append(
                 self.qinfer_updater.est_covariance_mtx()
             )
@@ -684,7 +684,7 @@ class ModelInstanceForLearning():
         learned_info['covariance_mtx_final'] = self.qinfer_updater.est_covariance_mtx()
         learned_info['estimated_mean_params'] = self.qinfer_updater.est_mean()
         learned_info['learned_hamiltonian'] = self.learned_hamiltonian
-        learned_info['growth_rule_of_this_model'] = self.growth_rule_of_this_model
+        learned_info['exploration_strategy_of_this_model'] = self.exploration_strategy_of_this_model
         learned_info['model_heuristic_class'] = self.model_heuristic_class
         learned_info['evaluation_log_likelihood'] = self.evaluation_log_likelihood
         learned_info['evaluation_normalization_record'] = self.evaluation_normalization_record
@@ -754,13 +754,13 @@ class ModelInstanceForLearning():
         self.num_evaluation_points = len(evaluation_experiments)
 
 
-        if not self.growth_class.force_evaluation and self.num_experiments < 20:
+        if not self.exploration_class.force_evaluation and self.num_experiments < 20:
             # TODO make optional robustly in GR or pass dev arg to QMLA
             # instance.
             self.log_print(
                 ["<20 experiments; presumed dev mode. Not evaluating all models"])
             evaluation_experiments = evaluation_experiments[::10]
-        if self.growth_class.exclude_evaluation: 
+        if self.exploration_class.exclude_evaluation: 
             evaluation_experiments = evaluation_experiments[::10]
 
 
@@ -779,7 +779,7 @@ class ModelInstanceForLearning():
         #     estimated_params,
         #     cov_mt
         # )
-        posterior_distribution = self.growth_class.get_evaluation_prior(
+        posterior_distribution = self.exploration_class.get_evaluation_prior(
             model_name = self.model_name, 
             estimated_params = estimated_params, 
             cov_mt = cov_mt, 
@@ -787,7 +787,7 @@ class ModelInstanceForLearning():
 
         # TODO using precise mean of posterior to evaluate model
         # want to sample from it -- add flag to qinfer model 
-        evaluation_qinfer_model = self.growth_class.qinfer_model(
+        evaluation_qinfer_model = self.exploration_class.qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
@@ -798,7 +798,7 @@ class ModelInstanceForLearning():
             num_probes=self.probe_number,
             probe_dict=evaluation_probe_dict,
             sim_probe_dict=evaluation_probe_dict,
-            growth_generation_rule=self.growth_rule_of_this_model,
+            exploration_rules=self.exploration_strategy_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
             log_file=self.log_file,
@@ -817,10 +817,10 @@ class ModelInstanceForLearning():
             # improved version
             resample_thresh=0.0,
             resampler=qi.LiuWestResampler(
-                a=self.growth_class.qinfer_resampler_a
+                a=self.exploration_class.qinfer_resampler_a
             ),
         )
-        evaluation_heuristic = self.growth_class.heuristic(
+        evaluation_heuristic = self.exploration_class.heuristic(
             model_id=self.model_id,
             updater=evaluation_updater,
             oplist=self.model_terms_matrices,
@@ -829,7 +829,7 @@ class ModelInstanceForLearning():
             log_file=self.log_file,
             inv_field=[item[0]
                        for item in self.qinfer_model.expparams_dtype[1:]],
-            max_time_to_enforce=self.growth_class.max_time_to_consider,
+            max_time_to_enforce=self.exploration_class.max_time_to_consider,
         )
 
         evaluation_updater._log_total_likelihood = 0.0
@@ -1050,7 +1050,7 @@ class ModelInstanceForLearning():
             # ax.semilogx()
             # ax.semilogy()
             # ax.minorticks_off()
-            latex_name = self.growth_class.latex_name(term)
+            latex_name = self.exploration_class.latex_name(term)
             self.log_print(["Latex name:", latex_name])
             ax.set_title(r"{}".format(latex_name))
 
@@ -1148,7 +1148,7 @@ class ModelInstanceForLearning():
                 ax.axhline(true_param, color='red', ls='--', label='True')
 
             try:
-                term_latex = self.growth_class.latex_name(term)
+                term_latex = self.exploration_class.latex_name(term)
                 ax.set_title(term_latex)
             except BaseException:
                 self.log_print(["Failed to get latex name"])
@@ -1362,12 +1362,12 @@ class ModelInstanceForLearning():
                 x_term = self.qinfer_model.modelparam_names[j]
                 if ax.is_first_col():
                     ax.set_ylabel(
-                        self.growth_class.latex_name(y_term),
+                        self.exploration_class.latex_name(y_term),
                         rotation=0
                     )
                 if ax.is_first_row():
                     ax.set_title(
-                        self.growth_class.latex_name(x_term)
+                        self.exploration_class.latex_name(x_term)
                     )
                 if (i, j) in pairs_of_params:
                     ax.contourf(
@@ -1423,7 +1423,7 @@ class ModelInstanceForLearning():
         plot_probe = self.plot_probes[self.model_num_qubits]
 
         self.expectation_values = {
-            t : self.growth_class.expectation_value(
+            t : self.exploration_class.expectation_value(
                 ham = self.learned_hamiltonian, 
                 t = t, 
                 state = plot_probe
@@ -1504,7 +1504,7 @@ class ModelInstanceForLearning():
     def _consider_reallocate_resources(self):
         r"""Model might get less resources if it is deemed less complex than others"""
 
-        if self.growth_class.reallocate_resources:
+        if self.exploration_class.reallocate_resources:
             base_resources = qmla_core_info_dict['base_resources']
             this_model_num_qubits = qmla.construct_models.get_num_qubits(
                 self.model_name)
@@ -1512,7 +1512,7 @@ class ModelInstanceForLearning():
                 qmla.construct_models.get_constituent_names_from_name(
                     self.model_name)
             )
-            max_num_params = self.growth_class.max_num_parameter_estimate
+            max_num_params = self.exploration_class.max_num_parameter_estimate
 
             new_resources = qmla.utilities.resource_allocation(
                 base_qubits=base_resources['num_qubits'],
@@ -1562,7 +1562,7 @@ class ModelInstanceForLearning():
         )
         latex_terms = []
         for term in individual_terms_in_name:
-            lt = self.growth_class.latex_name(
+            lt = self.exploration_class.latex_name(
                 name=term
             )
             latex_terms.append(lt)

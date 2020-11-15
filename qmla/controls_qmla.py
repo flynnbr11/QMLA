@@ -3,7 +3,7 @@ import os
 import sys
 import pickle
 
-import qmla.get_growth_rule
+import qmla.get_exploration_strategy
 import qmla.construct_models as construct_models
 import qmla.logging
 
@@ -30,13 +30,13 @@ class ControlsQMLA():
     The command line arguments are stored together in this class.
     The class is then given to the :class:`qmla.QuantumModelLearningAgent` instance,
     which uses those details into the implementation.
-    Some QMLA parameters are also set by the attributes of the Growth Rule.
-    In particular, the :class:`~qmla.growth_rules.GrowthRule` of the true model
-    is instantiated by calling :meth:`~qmla.get_growth_generator_class`.
+    Some QMLA parameters are also set by the attributes of the Exploration Strategy.
+    In particular, the :class:`~qmla.exploration_strategies.ExplorationStrategy` of the true model
+    is instantiated by calling :meth:`~qmla.get_exploration_class`.
     model is defined as the true model of that instance.
-    This growth rule instance is the master growth rule for the QMLA instance: the true
-    Likewise, instances are generated for all of the growth rules specified by the user:
-    these instances are associated with the growth rule :class:`~qmla.GrowthRuleTree` objects.
+    This exploration strategy instance is the master exploration strategy for the QMLA instance: the true
+    Likewise, instances are generated for all of the exploration strategies specified by the user:
+    these instances are associated with the exploration strategy :class:`~qmla.ExplorationTree` objects.
 
     :param dict arguments: command line arguments, parsed into a dict.
     """
@@ -55,11 +55,11 @@ class ControlsQMLA():
         self.qhl_mode = bool(arguments.qhl_mode)
         self.further_qhl = bool(arguments.further_qhl)
 
-        # Get growth rule instances for true and alternative growth rules
-        self.growth_generation_rule = arguments.growth_generation_rule
+        # Get exploration strategy instances for true and alternative exploration strategies
+        self.exploration_rules = arguments.exploration_rules
         try:
-            self.growth_class = qmla.get_growth_rule.get_growth_generator_class(
-                growth_generation_rule=self.growth_generation_rule,
+            self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+                exploration_rules=self.exploration_rules,
                 true_params_path=arguments.run_info_file,
                 plot_probes_path=arguments.probes_plot_file,
                 log_file=self.log_file,
@@ -67,28 +67,28 @@ class ControlsQMLA():
             )
         except BaseException:
             raise
-        self.growth_class.get_true_parameters() # either retrieve or assign true parameters
+        self.exploration_class.get_true_parameters() # either retrieve or assign true parameters
         self.log_print([
-            "GR set by controls has ID {} has true model {}".format(arguments.qmla_id, self.growth_class.true_model)
+            "GR set by controls has ID {} has true model {}".format(arguments.qmla_id, self.exploration_class.true_model)
         ])
 
-        self.alternative_growth_rules = arguments.alternative_growth_rules
-        self.unique_growth_rule_instances = {
-            gen: qmla.get_growth_rule.get_growth_generator_class(
-                growth_generation_rule=gen,
+        self.alternative_exploration_strategys = arguments.alternative_exploration_strategys
+        self.unique_exploration_strategy_instances = {
+            gen: qmla.get_exploration_strategy.get_exploration_class(
+                exploration_rules=gen,
                 log_file=self.log_file,
                 qmla_id = arguments.qmla_id,
             )
-            for gen in self.alternative_growth_rules
+            for gen in self.alternative_exploration_strategys
         }
-        self.unique_growth_rule_instances[self.growth_generation_rule] = self.growth_class
+        self.unique_exploration_strategy_instances[self.exploration_rules] = self.exploration_class
 
         # Get (or set) true parameters from parameter files shared among
         # instances within the same run.
         if arguments.run_info_file is None:
             try:
                 true_params_info = qmla.set_shared_parameters(
-                    growth_class=self.growth_class,
+                    exploration_class=self.exploration_class,
                 )
             except BaseException:
                 self.log_print(["Failed to set shared parameters"])
@@ -103,7 +103,7 @@ class ControlsQMLA():
 
         # Attributes about true model
         # self.true_model = true_params_info['true_model']
-        self.true_model = construct_models.alph(self.growth_class.true_model)
+        self.true_model = construct_models.alph(self.exploration_class.true_model)
         self.true_model_name = self.true_model # TODO remove redundancy
         self.true_model_class = construct_models.Operator(
             self.true_model_name
@@ -240,18 +240,18 @@ def parse_cmd_line_args(args):
         default=0
     )
 
-    # Growth rules to learn from
+    # Exploration Strategies to learn from
     parser.add_argument(
-        '-ggr', '--growth_generation_rule',
+        '-ggr', '--exploration_rules',
         help='Rule applied for generation of new models during QMD. \
         Corresponding functions must be built into model_generation',
         type=str,
-        default='GrowthRule'
+        default='ExplorationStrategy'
     )
 
     parser.add_argument(
-        '-agr', '--alternative_growth_rules',
-        help='Growth rules to form other trees.',
+        '-agr', '--alternative_exploration_strategys',
+        help='Exploration Strategies to form other trees.',
         # type=str,
         action='append',
         default=[],
