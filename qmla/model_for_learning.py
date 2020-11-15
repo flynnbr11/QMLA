@@ -14,6 +14,10 @@ from matplotlib.gridspec import GridSpec
 import seaborn as sns
 import redis
 import pickle
+try:
+    from lfig import LatexFigure
+except:
+    from qmla.shared_functionality.latex_figure import LatexFigure
 
 import qmla.redis_settings
 import qmla.logging
@@ -613,6 +617,7 @@ class ModelInstanceForLearning():
             try:
                 self._plot_learning_summary()
             except BaseException:
+                raise
                 self.log_print(["Failed to _plot_learning_summary"])
                 
             try:
@@ -625,7 +630,9 @@ class ModelInstanceForLearning():
             try:
                 self._plot_distributions()
             except BaseException:
+                raise
                 self.log_print(["Failed to plot posterior"])
+
             try:
                 self.model_heuristic.plot_heuristic_attributes(
                     save_to_file=os.path.join(
@@ -984,24 +991,11 @@ class ModelInstanceForLearning():
         ]
 
         num_terms = self.qinfer_model.n_modelparams
-        ncols = int(np.ceil(np.sqrt(num_terms)))
-        nrows = int(np.ceil(num_terms / ncols))
-        fig, axes = plt.subplots(
-            figsize=(18, 10),
-            nrows=nrows,
-            ncols=ncols,
-            constrained_layout=True,
-        )
+        lf = LatexFigure(auto_gridspec=num_terms)
 
-        gs = GridSpec(
-            nrows=nrows,
-            ncols=ncols,
-        )
-        row = 0
-        col = 0
         for param_idx in range(num_terms):
             term = self.model_terms_names[param_idx]
-            ax = fig.add_subplot(gs[row, col])
+            ax = lf.new_axis()
 
             # plot prior
             ax.plot(
@@ -1056,37 +1050,37 @@ class ModelInstanceForLearning():
             # ax.semilogx()
             # ax.semilogy()
             # ax.minorticks_off()
-            ax.set_title("{}".format(self.growth_class.latex_name(term)))
+            latex_name = self.growth_class.latex_name(term)
+            self.log_print(["Latex name:", latex_name])
+            ax.set_title(r"{}".format(latex_name))
 
-            if row == 0 and col == ncols - 1:
+            if ax.row == 0 and ax.col == lf.gridspec_layout[1] - 1:
                 ax.legend()
 
-            col += 1
-            if col == ncols:
-                col = 0
-                row += 1
-
-        fig.text(0.5, 0.04, 'Particle locations', ha='center')
-        fig.text(0.04, 0.5, 'Weights', va='center', rotation='vertical')
+        lf.fig.text(0.5, 0.04, 'Particle locations', ha='center')
+        lf.fig.text(0.04, 0.5, 'Weights', va='center', rotation='vertical')
 
         # save the plot
-        fig.savefig(
-            os.path.join(self.model_learning_plots_directory, "{}distributions_{}.png".format(
-                self.plot_prefix,
-                self.model_id
-        )))
+        lf.save(
+            os.path.join(
+                self.model_learning_plots_directory, "{}distributions_{}.png".format(
+                    self.plot_prefix,
+                    self.model_id
+                )
+            )
+        )
 
         # Plot covariance matrix heatmap
         plt.clf()
-        fig, ax = plt.subplots(
-            figsize=(10, 10),
-        )
+        lf = LatexFigure()
+        ax = lf.new_axis()
 
         sns.heatmap(self.qinfer_updater.est_covariance_mtx(), ax=ax)
-        fig.savefig(
+        lf.save(
             os.path.join(self.model_learning_plots_directory,
                          '{}cov_mtx_final_{}.png'.format(self.plot_prefix, self.model_id))
         )
+
 
     def _plot_learning_summary(self):
         r"""
@@ -1104,26 +1098,21 @@ class ModelInstanceForLearning():
 
         extra_plots = ['volume', 'quad_loss', 'pr0_diff', 'likelihoods']
         resample_colour = 'grey'
+
         ncols = int(np.ceil(np.sqrt(num_terms)))
         nrows_for_params = int(np.ceil(num_terms / ncols))
         nrows = nrows_for_params + len(extra_plots)
 
         plt.clf()
-        fig = plt.figure(
-            figsize=(
-                max(3 * ncols, 12), 3 * nrows)
+        lf = LatexFigure(
+            use_gridspec=True, 
+            gridspec_layout=(nrows, ncols)
         )
-        gs = GridSpec(
-            nrows=nrows,
-            ncols=ncols,
-        )
-
-        row = 0
-        col = 0
 
         # Parameter estimates
         for term in terms:
-            ax = fig.add_subplot(gs[row, col])
+            # ax = fig.add_subplot(gs[row, col])
+            ax = lf.new_axis()
             estimates = self.track_param_estimate_v_epoch[term]
             uncertainty = self.track_param_uncertainty_v_epoch[term]
             lower_bound = estimates - uncertainty
@@ -1167,18 +1156,12 @@ class ModelInstanceForLearning():
             ax.set_ylabel('Parameter')
             ax.set_xlabel('Epoch')
 
-            if row == 0 and col == ncols - 1:
+            if ax.row == 0 and ax.col == ncols - 1:
                 ax.legend()
-
-            col += 1
-            if col == ncols:
-                col = 0
-                row += 1
 
         # Volume and experimental times
         row = nrows_for_params
-        col = 0
-        ax = fig.add_subplot(gs[row, :])
+        ax = lf.fig.add_subplot(lf.gs[row, :])
 
         ax.plot(
             range(len(self.volume_by_epoch)),
@@ -1228,9 +1211,10 @@ class ModelInstanceForLearning():
 
         # Covariance mtx norm and quadratic loss
         row += 1
-        col = 0
 
-        ax = fig.add_subplot(gs[row, :])
+        ax = lf.fig.add_subplot(lf.gs[row, :])
+        # ax = lf.new_axis(force_position=(row, :))
+        
         ax.plot(
             range(len(self.track_norm_cov_matrices)),
             self.track_norm_cov_matrices,
@@ -1250,8 +1234,9 @@ class ModelInstanceForLearning():
 
         # Likelihoods of system and particles
         row += 1
-        col = 0
-        ax = fig.add_subplot(gs[row, :])
+        ax = lf.fig.add_subplot(lf.gs[row, :])
+        # ax = lf.new_axis(force_position=[row, :])
+
         particle_likelihoods = self.qinfer_model.summarise_likelihoods['particles_median']
         particle_likelihoods_std = self.qinfer_model.summarise_likelihoods['particles_std']
         system_likelihoods = self.qinfer_model.summarise_likelihoods['system']
@@ -1287,8 +1272,8 @@ class ModelInstanceForLearning():
 
         # Difference | system-pr0 - particles-pr0 |
         row += 1
-        col = 0
-        ax = fig.add_subplot(gs[row, :])
+        ax = lf.fig.add_subplot(lf.gs[row, :])
+
         self.qinfer_pr0_diff_from_true = np.array(
             self.qinfer_model.store_p0_diffs)
         medians = self.qinfer_pr0_diff_from_true[:, 0]
@@ -1317,8 +1302,7 @@ class ModelInstanceForLearning():
         ax.legend()
 
         # Save figure
-        fig.tight_layout()
-        fig.savefig(
+        lf.save(
             os.path.join(self.model_learning_plots_directory,
                          '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
         )

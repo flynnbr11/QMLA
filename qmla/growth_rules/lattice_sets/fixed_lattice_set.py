@@ -4,14 +4,13 @@ import sys
 import os
 import pandas as pd
 
-from qmla.growth_rules import connected_lattice, growth_rule
+from qmla.growth_rules import growth_rule
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 from qmla.shared_functionality import topology_predefined
 
 class LatticeSet(
-    # connected_lattice.ConnectedLattice
     growth_rule.GrowthRule
 ):
 

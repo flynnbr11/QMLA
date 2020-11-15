@@ -31,6 +31,8 @@ from inspect import currentframe, getframeinfo
 import sklearn
 import seaborn as sns
 
+import lfig 
+
 import qmla.get_growth_rule as get_growth_rule
 import qmla.shared_functionality.experimental_data_processing
 import qmla.shared_functionality.expectation_values

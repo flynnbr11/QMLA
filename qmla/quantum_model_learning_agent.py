@@ -2898,7 +2898,7 @@ class QuantumModelLearningAgent():
             )
         except BaseException:
             self.log_print(["Failed to plot dynamics"])
-            raise
+            # raise
 
     def plot_volume_after_qhl(self,
                               model_id=None,
@@ -2982,6 +2982,7 @@ class QuantumModelLearningAgent():
         )
 
     def _plot_model_terms(self, colour_by = 'binary'):
+        plt.rcParams.update({"text.usetex" : False})
         if self.plot_level < 1:
             return
         
@@ -3071,6 +3072,7 @@ class QuantumModelLearningAgent():
             labelsize=fontsize
         )
         ax.set_ylabel('Model ID', fontsize=2*fontsize)
+        ax.set_x_label('Term')
 
         fig.savefig(
             os.path.join(

@@ -1,5 +1,10 @@
 import numpy as np
 
+try:
+    from expm import expm
+except:
+    from scipy.linalg import epxm
+
 from scipy import linalg, sparse
 import qmla.logging
 
@@ -42,40 +47,8 @@ def probability_from_default_expectation_value(
     :return: probability of measuring the input state after Hamiltonian evolution
     """
 
-    if np.shape(ham)[0] >= 128 and t < 50: 
-        # use sparse for >=5 qubits
-        sparse_ham = sparse.csc_matrix(-1j*ham*t)
-        try:
-            u_psi = sparse.linalg.expm_multiply( 
-                sparse_ham, 
-                state
-            )
-        except:
-            n_q = np.log2(np.shape(ham)[0])
-            print("Failed: n_q={} state={}".format(n_q, repr(state)))
-            raise
-    else:
-        try:
-            unitary = linalg.expm(-1j * ham * t)
-            u_psi = np.dot(unitary, state)
-        except:
-            log_print(
-                [ "Failed to build unitary for ham:\n {}".format(ham) ],
-                log_file=log_file, log_identifier=log_identifier
-            )
-            raise
-
-    # try:
-    #     unitary = linalg.expm(-1j * ham * t)
-    #     u_psi = np.dot(unitary, state)
-    # except:
-    #     log_print(
-    #         [ "Failed to build unitary for ham:\n {}".format(ham) ],
-    #         log_file=log_file, log_identifier=log_identifier
-    #     )
-    #     raise
-
-
+    u = expm(-1j*ham*t)
+    u_psi = np.dot(u, state)
 
     probe_bra = state.conj().T
     expectation_value = np.dot(probe_bra, u_psi) # in general a complex number
@@ -85,8 +58,7 @@ def probability_from_default_expectation_value(
     ex_val_tol = 1e-9
     if (
         prob_of_measuring_input_state > (1 + ex_val_tol)
-        or
-        prob_of_measuring_input_state < (0 - ex_val_tol)
+        or prob_of_measuring_input_state < (0 - ex_val_tol)
     ):
         log_print(
             [

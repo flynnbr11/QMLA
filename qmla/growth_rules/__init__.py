@@ -17,3 +17,4 @@ from qmla.growth_rules.genetic_algorithms import *
 
 from qmla.growth_rules.analytical import * 
 from qmla.growth_rules.demo import * 
+from qmla.growth_rules.thesis_demos import * 
