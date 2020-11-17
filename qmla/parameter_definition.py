@@ -18,10 +18,10 @@ __all__ = [
 def set_shared_parameters(
     exploration_class,
     run_info_file=None,
-    all_exploration_strategys=[],
+    all_exploration_strategies=[],
     run_directory='',
     num_particles=100,
-    probe_max_num_qubits_all_exploration_strategys=12,
+    probe_max_num_qubits_all_exploration_strategies=12,
     generate_evaluation_experiments=True,
 ):
     r"""
@@ -43,9 +43,9 @@ def set_shared_parameters(
         list of parameters of the true model
     :RunData params_dict: 
         dict of parameters of the true model
-    :RunData exploration_rule: 
+    :RunDatan exploration_rule: 
         exploration strategy (name) of true model
-    :RunData all_exploration_strategys: 
+    :RunData all_exploration_strategies: 
         list of all exploration strategies (names) which are to 
         be performed by each instance
     :RunData evaluation_probes: 
@@ -57,7 +57,7 @@ def set_shared_parameters(
         which to extract key info, e.g. true parameter ranges and prior.
     :param str run_info_file:
         path to which to store system information
-    :param list all_exploration_strategys: 
+    :param list all_exploration_strategies: 
         list of instances of :class:`~qmla.exploration_strategies.ExplorationStrategy`
         which are the alternative exploration strategies, 
         i.e. which are performed during each instance, 
@@ -67,7 +67,7 @@ def set_shared_parameters(
         to this unique QMLA run are stored
     :param int num_paritlces: 
         number of particles used during model learning
-    :param int probe_max_num_qubits_all_exploration_strategys: 
+    :param int probe_max_num_qubits_all_exploration_strategies: 
         largest system size for which to generate plot probes
     :param bool generate_evaluation_experiments:
         whether to construct an evaluation dataset which
@@ -78,13 +78,13 @@ def set_shared_parameters(
         can be compared fairly on this data set. 
 
     """
-    if exploration_class.exploration_rules not in all_exploration_strategys:
-        all_exploration_strategys.append(exploration_class.exploration_rules)
+    if exploration_class.exploration_rules not in all_exploration_strategies:
+        all_exploration_strategies.append(exploration_class.exploration_rules)
 
     # Generate true parameters from an instance of the GR
     true_params_info = exploration_class.generate_true_parameters()
     # Add stuff to run info
-    true_params_info['all_exploration_strategys'] = all_exploration_strategys
+    true_params_info['all_exploration_strategies'] = all_exploration_strategies
     true_params_info['exploration_rule'] = exploration_class.exploration_rules
 
     if run_info_file is not None:
@@ -98,7 +98,7 @@ def set_shared_parameters(
 
     # Generate evaluation data set
     evaluation_data = exploration_class.generate_evaluation_data(
-        probe_maximum_number_qubits=probe_max_num_qubits_all_exploration_strategys,
+        probe_maximum_number_qubits=probe_max_num_qubits_all_exploration_strategies,
         num_times = int(250), 
         run_directory = run_directory,
     )
@@ -126,7 +126,7 @@ def set_shared_parameters(
         qmla.utilities.plot_evaluation_dataset(
             evaluation_data = evaluation_data, 
             true_hamiltonian = true_ham,
-            expectation_value_function = exploration_class.expectation_value,
+            measurement_probability_function = exploration_class.expectation_value,
             save_to_file=os.path.join(
                 run_directory, 
                 'evaluation', 

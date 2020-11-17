@@ -187,9 +187,10 @@ def process_likewise_pauli_sum(term):
             connected_sites.append(l.split('J'))
     all_terms = []
     for s in connected_sites:
+        ops = 'J'.join([operator]*len(s))
         conn = 'J'.join(list(s))
-        new_term = 'pauliSet_{o}J{o}_{conn}_d{N}'.format(
-            o=operator,
+        new_term = 'pauliSet_{ops}_{conn}_d{N}'.format(
+            ops=ops,
             conn=conn,
             N=dim
         )

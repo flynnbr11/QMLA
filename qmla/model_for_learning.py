@@ -202,7 +202,7 @@ class ModelInstanceForLearning():
         Set up prior, model and updater (via QInfer) which are used to run Bayesian inference.
         """
 
-        # Prior parameter distribution via exploration strategy
+        # Prior parameter distribution vian exploration strategy
         self.model_prior = self.exploration_class.get_prior(
             model_name=self.model_name,
             log_file=self.log_file,
@@ -947,7 +947,7 @@ class ModelInstanceForLearning():
         """
         self.model_learning_plots_directory = os.path.join(
             self.plots_directory,
-            'model_learning'
+            'model_training'
         )
         self.plot_prefix = ''
         if self.is_true_model:
@@ -1096,23 +1096,29 @@ class ModelInstanceForLearning():
         terms = self.track_param_estimate_v_epoch.keys()
         num_terms = len(terms)
 
-        extra_plots = ['volume', 'quad_loss', 'pr0_diff', 'likelihoods']
+        extra_plots = [
+            'volume', 
+            # 'quad_loss',  'residuals', 'likelihoods'
+        ]
         resample_colour = 'grey'
 
         ncols = int(np.ceil(np.sqrt(num_terms)))
         nrows_for_params = int(np.ceil(num_terms / ncols))
         nrows = nrows_for_params + len(extra_plots)
-
+        height_ratios = [1]*nrows_for_params
+        height_ratios.extend([ncols*0.7]*len(extra_plots))
         plt.clf()
         lf = LatexFigure(
             use_gridspec=True, 
-            gridspec_layout=(nrows, ncols)
+            gridspec_layout=(nrows, ncols),
+            gridspec_params={'height_ratios' : height_ratios}
         )
 
         # Parameter estimates
         for term in terms:
-            # ax = fig.add_subplot(gs[row, col])
-            ax = lf.new_axis()
+            ax = lf.new_axis(
+                label_position=(-.3, 1.1)
+            )
             estimates = self.track_param_estimate_v_epoch[term]
             uncertainty = self.track_param_uncertainty_v_epoch[term]
             lower_bound = estimates - uncertainty
@@ -1129,19 +1135,19 @@ class ModelInstanceForLearning():
                 label='Uncertainty'
             )
 
-            if len(self.epochs_after_resampling) > 0:
-                ax.axvline(
-                    self.epochs_after_resampling[0],
-                    ls='--',
-                    c=resample_colour, alpha=0.5, label='Resample'
-                )
+            # if len(self.epochs_after_resampling) > 0:
+            #     ax.axvline(
+            #         self.epochs_after_resampling[0],
+            #         ls='--',
+            #         c=resample_colour, alpha=0.5, label='Resample'
+            #     )
 
-                for e in self.epochs_after_resampling[1:]:
-                    ax.axvline(
-                        e,
-                        ls='--',
-                        c=resample_colour, alpha=0.5,
-                    )
+            #     for e in self.epochs_after_resampling[1:]:
+            #         ax.axvline(
+            #             e,
+            #             ls='--',
+            #             c=resample_colour, alpha=0.5,
+            #         )
 
             if term in self.true_param_dict:
                 true_param = self.true_param_dict[term]
@@ -1150,161 +1156,183 @@ class ModelInstanceForLearning():
             try:
                 term_latex = self.exploration_class.latex_name(term)
                 ax.set_title(term_latex)
+                # ax.set_ylabel(term_latex)
             except BaseException:
                 self.log_print(["Failed to get latex name"])
                 raise
-            ax.set_ylabel('Parameter')
+            # ax.set_ylabel('Parameter')
             ax.set_xlabel('Epoch')
 
-            if ax.row == 0 and ax.col == ncols - 1:
-                ax.legend()
-
-        # Volume and experimental times
-        row = nrows_for_params
-        ax = lf.fig.add_subplot(lf.gs[row, :])
-
-        ax.plot(
-            range(len(self.volume_by_epoch)),
-            self.volume_by_epoch,
-            label='Volume',
-            color='k'
-        )
-
-        if len(self.epochs_after_resampling) > 0:
-            ax.axvline(  # label first resample only
-                self.epochs_after_resampling[0],
-                ls='--',
-                c=resample_colour,
-                alpha=0.5,
-                label='Resample'
-            )
-
-            for e in self.epochs_after_resampling[1:]:
-                ax.axvline(
-                    e,
-                    ls='--',
-                    c=resample_colour,
-                    alpha=0.5,
+            if ax.row == 0 and ax.col == lf.gridspec_layout[1]-1:
+                ax.legend(
+                    bbox_to_anchor=(1.1, 1.1)
                 )
 
-        ax.set_title('Volume and Experimental Times')
-        ax.set_ylabel('Volume')
-        ax.set_xlabel('Epoch')
-        ax.set_yscale('log')
+        if 'volume' in extra_plots:
+            # Volume and experimental times
+            ax = lf.new_axis(
+                label_position=(-0.1, 1.05),
+                span=(1, 'all')
+            )
 
-        time_ax = ax.twinx()
-        times = qmla.utilities.flatten(self.track_experimental_times)
-        if self.num_experiments > 100:
-            s = 4  # size of time dots
-        else:
-            s = 7
-        time_ax.scatter(
-            range(len(self.track_experimental_times)),
-            self.track_experimental_times,
-            label=r"$t \sim k \frac{1}{V}$",
-            s=s,
-        )
-        time_ax.set_ylabel('Time')
-        time_ax.semilogy()
-        time_ax.legend(loc='upper right')
-        ax.legend(loc='upper center')
+            ax.plot(
+                range(len(self.volume_by_epoch)),
+                self.volume_by_epoch,
+                label=r"$V$",
+                color='k'
+            )
 
-        # Covariance mtx norm and quadratic loss
-        row += 1
+            # if len(self.epochs_after_resampling) > 0:
+            #     ax.axvline(  # label first resample only
+            #         self.epochs_after_resampling[0],
+            #         ls='--',
+            #         c=resample_colour,
+            #         alpha=0.5,
+            #         # label='Resample'
+            #     )
 
-        ax = lf.fig.add_subplot(lf.gs[row, :])
-        # ax = lf.new_axis(force_position=(row, :))
-        
-        ax.plot(
-            range(len(self.track_norm_cov_matrices)),
-            self.track_norm_cov_matrices,
-            label="Covariance norm",
-            color='green', ls=':'
-        )
-        ax.semilogy()
-        ax.set_ylabel('Q.L / Norm')
+            #     for e in self.epochs_after_resampling[1:]:
+            #         ax.axvline(
+            #             e,
+            #             ls='--',
+            #             c=resample_colour,
+            #             alpha=0.5,
+            #         )
 
-        ax.plot(
-            range(len(self.quadratic_losses_record)),
-            self.quadratic_losses_record,
-            label='Quadratic loss',
-            c='orange', ls='--'
-        )
-        ax.legend(loc='upper right')
+            # ax.set_title('Volume and Experimental Times')
+            ax.set_ylabel('Volume')
+            ax.set_xlabel('Epoch')
+            ax.set_yscale('log')
 
-        # Likelihoods of system and particles
-        row += 1
-        ax = lf.fig.add_subplot(lf.gs[row, :])
-        # ax = lf.new_axis(force_position=[row, :])
+            time_ax = ax.twinx()
+            times = qmla.utilities.flatten(self.track_experimental_times)
+            if self.num_experiments > 100:
+                s = 4  # size of time dots
+            else:
+                s = 7
+            time_ax.scatter(
+                range(len(self.track_experimental_times)),
+                self.track_experimental_times,
+                label=r"$t$",
+                s=s,
+            )
+            time_ax.set_ylabel('Time')
+            time_ax.semilogy()
+            # time_ax.legend(
+            #     bbox_to_anchor=(0.85, 1.25),
+            #     # loc='lower center'
+            # )
+            
+            handles, labels = ax.get_legend_handles_labels()
+            t_handles, t_labels = time_ax.get_legend_handles_labels()
+            handles.extend(t_handles)
+            labels.extend(t_labels)
 
-        particle_likelihoods = self.qinfer_model.summarise_likelihoods['particles_median']
-        particle_likelihoods_std = self.qinfer_model.summarise_likelihoods['particles_std']
-        system_likelihoods = self.qinfer_model.summarise_likelihoods['system']
+            ax.legend(
+                handles, labels, 
+                ncol=2, 
+                loc='upper center'
+                # bbox_to_anchor=(0.4, 1.25)
+            )
 
-        ax.plot(
-            range(len(system_likelihoods)),
-            system_likelihoods,
-            # s=3,
-            color='red',
-            ls='--',
-            label='System'
-        )
+        if 'quad_loss' in extra_plots:
+            # Covariance mtx norm and quadratic loss
+            ax = lf.new_axis(span=(1, 'all'))
 
-        ax.scatter(
-            range(len(particle_likelihoods)),
-            particle_likelihoods,
-            s=3,
-            color='Blue',
-            label='Particles'
-        )
-        ax.fill_between(
-            range(len(particle_likelihoods)),
-            self.qinfer_model.summarise_likelihoods['particles_upper_quartile'],
-            self.qinfer_model.summarise_likelihoods['particles_lower_quartile'],
-            alpha=0.3,
-            color='Blue',
-            label='Particles IQR'
-        )
-        ax.set_ylabel("$ Pr(0) $")
-        ax.set_xlabel("Epoch")
-        ax.semilogy()
-        ax.legend()
+            ax.plot(
+                range(len(self.track_norm_cov_matrices)),
+                self.track_norm_cov_matrices,
+                label="Covariance norm",
+                color='green', ls=':'
+            )
+            ax.semilogy()
+            ax.set_ylabel('Q.L / Norm')
 
-        # Difference | system-pr0 - particles-pr0 |
-        row += 1
-        ax = lf.fig.add_subplot(lf.gs[row, :])
+            ax.plot(
+                range(len(self.quadratic_losses_record)),
+                self.quadratic_losses_record,
+                label='Quadratic loss',
+                c='orange', ls='--'
+            )
+            ax.legend(
+                loc='lower left'
+                # bbox_to_anchor=(1.1, 1.1)
+            )
 
-        self.qinfer_pr0_diff_from_true = np.array(
-            self.qinfer_model.store_p0_diffs)
-        medians = self.qinfer_pr0_diff_from_true[:, 0]
-        std = self.qinfer_pr0_diff_from_true[:, 1]
-        ax.scatter(
-            range(len(medians)),
-            medians,
-            s=3,
-            color='Blue'
-        )
-        ax.fill_between(
-            range(len(medians)),
-            medians + std,
-            medians - std,
-            alpha=0.3,
-            color='Blue'
-        )
-        ax.set_ylabel(r"$ \|Pr(0)_{sys} - Pr(0)_{sim} \|  $")
-        ax.set_xlabel("Epoch")
-        ax.semilogy()
-        try:
-            ax.axhline(0.5, label='0.5', ls='--', alpha=0.3, c='grey')
-            ax.axhline(0.1, label='0.1', ls=':', alpha=0.3, c='grey',)
-        except BaseException:
-            pass
-        ax.legend()
+        if 'likelihoods' in extra_plots:
+            # Likelihoods of system and particles
+            row += 1
+            ax = lf.fig.add_subplot(lf.gs[row, :])
+
+            particle_likelihoods = self.qinfer_model.summarise_likelihoods['particles_median']
+            particle_likelihoods_std = self.qinfer_model.summarise_likelihoods['particles_std']
+            system_likelihoods = self.qinfer_model.summarise_likelihoods['system']
+
+            ax.plot(
+                range(len(system_likelihoods)),
+                system_likelihoods,
+                # s=3,
+                color='red',
+                ls='--',
+                label='System'
+            )
+
+            ax.scatter(
+                range(len(particle_likelihoods)),
+                particle_likelihoods,
+                s=3,
+                color='Blue',
+                label='Particles'
+            )
+            ax.fill_between(
+                range(len(particle_likelihoods)),
+                self.qinfer_model.summarise_likelihoods['particles_upper_quartile'],
+                self.qinfer_model.summarise_likelihoods['particles_lower_quartile'],
+                alpha=0.3,
+                color='Blue',
+                label='Particles IQR'
+            )
+            ax.set_ylabel("$ Pr(0) $")
+            ax.set_xlabel("Epoch")
+            ax.semilogy()
+            ax.legend()
+
+        if 'residuals' in extra_plots:
+            # Difference | system-pr0 - particles-pr0 |
+            row += 1
+            ax = lf.fig.add_subplot(lf.gs[row, :])
+
+            self.qinfer_pr0_diff_from_true = np.array(
+                self.qinfer_model.store_p0_diffs)
+            medians = self.qinfer_pr0_diff_from_true[:, 0]
+            std = self.qinfer_pr0_diff_from_true[:, 1]
+            ax.scatter(
+                range(len(medians)),
+                medians,
+                s=3,
+                color='Blue'
+            )
+            ax.fill_between(
+                range(len(medians)),
+                medians + std,
+                medians - std,
+                alpha=0.3,
+                color='Blue'
+            )
+            ax.set_ylabel(r"$ \|Pr(0)_{sys} - Pr(0)_{sim} \|  $")
+            ax.set_xlabel("Epoch")
+            ax.semilogy()
+            try:
+                ax.axhline(0.5, label='0.5', ls='--', alpha=0.3, c='grey')
+                ax.axhline(0.1, label='0.1', ls=':', alpha=0.3, c='grey',)
+            except BaseException:
+                pass
+            ax.legend()
 
         # Save figure
         lf.save(
             os.path.join(self.model_learning_plots_directory,
-                         '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
+                         '{}learning_summary_{}.pdf'.format(self.plot_prefix, self.model_id))
         )
 
     def _plot_posterior_mesh_pairwise(self):
@@ -1423,7 +1451,7 @@ class ModelInstanceForLearning():
         plot_probe = self.plot_probes[self.model_num_qubits]
 
         self.expectation_values = {
-            t : self.exploration_class.expectation_value(
+            t : self.exploration_class.get_measurement_probability(
                 ham = self.learned_hamiltonian, 
                 t = t, 
                 state = plot_probe

@@ -115,7 +115,7 @@ class QuantumModelLearningAgent():
         self._compile_and_store_qmla_info_summary()
 
         # Set up infrastructure related to exploration strategies and tree management
-        self._setup_tree_and_exploration_strategys()
+        self._setup_tree_and_exploration_strategies()
 
     ##########
     # Section: Initialisation and setup
@@ -186,7 +186,7 @@ class QuantumModelLearningAgent():
             "True model:", self.true_model_name
         ])
 
-    def _setup_tree_and_exploration_strategys(
+    def _setup_tree_and_exploration_strategies(
         self,
     ):
         r""" Set up infrastructure."""
@@ -1452,7 +1452,7 @@ class QuantumModelLearningAgent():
             Otherwise a list of tuples of model IDs to compare
         :type pairs_to_compare: str or list
         :param str exploration_strategy: exploration strategy identifer;
-            used to get the unique tree object corresponding to a exploration strategy,
+            used to get the unique tree object corresponding to an exploration strategy,
             which is then used to host the branch.
         :param int spawning_branch: branch id which is the parent of the new branch.
         :return: branch id which uniquely identifies the new branch
@@ -2141,7 +2141,7 @@ class QuantumModelLearningAgent():
         Compare the champions of all exploration strategy trees.
 
         Get the champions (usually one, but in general can be multiple)
-        from each tree, where each tree is unique to a exploration strategy.
+        from each tree, where each tree is unique to an exploration strategy.
         Place the champions on a branch together and perform all-versus-all
         comparisons. The champion of that branch is deemed the global champion.
 
@@ -2152,7 +2152,7 @@ class QuantumModelLearningAgent():
             # extend in case multiple models nominated by tree
             tree_champions.extend(tree.nominate_champions())
 
-        # Place tree champions on new QMLA branch, not tied to a exploration strategy
+        # Place tree champions on new QMLA branch, not tied to an exploration strategy
         global_champ_branch_id = self.new_branch(
             model_list=tree_champions
         )
@@ -2322,7 +2322,7 @@ class QuantumModelLearningAgent():
         Run complete Quantum Model Learning Agent algorithm.
 
         Each :class:`~qmla.exploration_strategies.ExplorationStrategy` is assigned a :class:`~qmla.tree.QMLATree`,
-        which manages the exploration strategy. When new models are spawned by a exploration strategy,
+        which manages the exploration strategy. When new models are spawned by an exploration strategy,
         they are placed on a :class:`~qmla.tree.BranchQMLA` of the corresponding tree.
         Models are learned/compared/spawned iteratively in
         :meth:`learn_models_until_trees_complete`, until all

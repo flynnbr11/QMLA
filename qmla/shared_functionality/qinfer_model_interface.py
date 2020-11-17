@@ -35,7 +35,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         employed within QMLA.
         Bayesian inference relies on comparisons likelihoods
         of the target and candidate system. 
-    This class, specified by a exploration strategy, defines how to 
+    This class, specified by an exploration strategy, defines how to 
         compute the likelihood for the user's system. 
         Most functionality is inherited from QInfer, but methods listed 
         here are edited for QMLA's needs. 
@@ -62,7 +62,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         for the simulator, indexed by (probe_id, num_qubits). Usually the same as 
         the system probes, but not always. 
     :param str exploration_rule: string corresponding to a unique exploration strategy,
-        used to generate a ExplorationStrategy_ instance.
+        used to generate an explorationStrategy_ instance.
     :param dict experimental_measurements: fixed measurements of the target system, 
         indexed by time.
     :param list experimental_measurement_times: times indexed in experimental_measurements.
@@ -779,7 +779,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     t = random.randint(1e6, 3e6)
                 try:
                     t_init = time.time()
-                    prob_meas_input_state = self.exploration_class.expectation_value(
+                    prob_meas_input_state = self.exploration_class.get_measurement_probability(
                         ham=ham,
                         t=t,
                         state=probe,

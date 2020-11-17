@@ -29,7 +29,7 @@ __all__ = [
 
 class ExplorationTree():
     r"""
-    Tree corresponding to a exploration strategy for management within QMLA.
+    Tree corresponding to an exploration strategy for management within QMLA.
 
     Each :class:`~qmla.exploration_strategies.ExplorationStrategy` in the  :class:`~qmla.QuantumModelLearningAgent`
     instance is associated with one tree (instance of this class).
@@ -333,7 +333,7 @@ class BranchQMLA():
         :class:`~qmla.QuantumModelLearningAgent` environment, with the same ID on both.
         Sets of models reside on each branch. Models can reside on multiple branches.
         Models are instances of :class:`~qmla.ModelInstanceForStorage`.
-        Branches are essentially a mechanism to group models within a exploration strategy.
+        Branches are essentially a mechanism to group models within an exploration strategy.
         By default, all models on a branch are compared with each other, but it is
         possible to compare only a subset, e.g. during the tree pruning stage.
         Models on branches are learned via

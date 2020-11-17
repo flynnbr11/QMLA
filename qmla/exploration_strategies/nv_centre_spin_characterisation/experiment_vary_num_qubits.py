@@ -9,7 +9,7 @@ from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centr
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
-import qmla.shared_functionality.expectation_values
+import qmla.shared_functionality.measurement_probabilities
 import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 
@@ -44,7 +44,7 @@ class ExperimentNVCentreNQubits(
         self.max_num_probe_qubits = self.max_num_qubits
 
         # experiment design and running
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
+        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilitiesn_qubit_hahn_evolution_double_time_reverse
         # self.experimental_dataset = 'NVB_rescale_dataset.p'
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic

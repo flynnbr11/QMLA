@@ -41,7 +41,7 @@ parser.add_argument(
     default=0
 )
 parser.add_argument(
-    '-agr', '--alternative_exploration_strategys',
+    '-agr', '--alternative_exploration_strategies',
     help='Exploration Strategies to form other trees.',
     action='append',
     default=[],
@@ -93,20 +93,20 @@ exploration_class_attributes = {
     'log_file': log_file
 }
 
-all_exploration_strategys = [exploration_rules]
-alternative_exploration_strategys = arguments.alternative_exploration_strategys
-all_exploration_strategys.extend(alternative_exploration_strategys)
-all_exploration_strategys = list(set(all_exploration_strategys))
+all_exploration_strategies = [exploration_rules]
+alternative_exploration_strategies = arguments.alternative_exploration_strategies
+all_exploration_strategies.extend(alternative_exploration_strategies)
+all_exploration_strategies = list(set(all_exploration_strategies))
 
 unique_exploration_classes = {
     gr : qmla.get_exploration_class(
             exploration_rules=gr,
             **exploration_class_attributes
-    ) for gr in all_exploration_strategys
+    ) for gr in all_exploration_strategies
 }
 
 exploration_class = unique_exploration_classes[exploration_rules]
-probe_max_num_qubits_all_exploration_strategys = max([
+probe_max_num_qubits_all_exploration_strategies = max([
     gr.max_num_probe_qubits for gr in unique_exploration_classes.values()
 ])
 
@@ -116,17 +116,17 @@ true_model = exploration_class.true_model
 qmla.set_shared_parameters(
     exploration_class = exploration_class,
     run_info_file = arguments.run_info_file,
-    all_exploration_strategys = all_exploration_strategys,
+    all_exploration_strategies = all_exploration_strategies,
     run_directory = run_directory,
     num_particles = num_particles,
     generate_evaluation_experiments = True, 
-    probe_max_num_qubits_all_exploration_strategys = probe_max_num_qubits_all_exploration_strategys, 
+    probe_max_num_qubits_all_exploration_strategies = probe_max_num_qubits_all_exploration_strategies, 
 )
 
 
 # Probes used for plotting by all instances in this run, for consistency.
 plot_probe_dict = exploration_class.plot_probe_generator(
-    probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategys, 
+    probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategies, 
 )
 pickle.dump(
     plot_probe_dict,
@@ -136,7 +136,7 @@ pickle.dump(
 # Store exploration strategy config to share with all instances in this run
 path_to_store_configs = os.path.join(
     run_directory, 
-    'configs_exploration_strategys.p'
+    'configs_exploration_strategies.p'
 )
 exploration_strategy_configurations = {
     gr : unique_exploration_classes[gr].store_exploration_strategy_configuration()
@@ -159,7 +159,7 @@ pickle.dump(
 
 # Store an example of the probes used
 exploration_class.generate_probes(
-    probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategys, 
+    probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategies, 
     noise_level=0, # TODO get directly in GR
     minimum_tolerable_noise=0.0,
 )

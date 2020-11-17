@@ -20,7 +20,7 @@ class NVCentreRevivalsSimulated(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
+        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilitiesn_qubit_hahn_evolution
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference

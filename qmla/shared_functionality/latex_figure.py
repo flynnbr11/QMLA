@@ -42,6 +42,15 @@ def get_latex_rc_params(
         "pgf.texsystem": "pdflatex",
         "text.usetex": True,
         "font.family": "serif",
+        "text.latex.preamble" : [
+            # import pacakages needed to ensure latex renders text properly
+            r"\usepackage{underscore}",  # to ensure underscores don't cause crashes
+            r"\usepackage{amsmath}"
+        ],
+        "font.serif" : ["Times", "Palatino", "New Century Schoolbook", "Bookman", "Computer Modern Roman"],
+        "font.sans-serif" : ["Helvetica", "Avant Garde", "Computer Modern Sans seri"],
+        "font.cursive" : "Zapf Chancery",
+        "font.monospace" : ["Courier", "Computer Modern Typewriter"],
         "font.weight" : "normal",
         'pgf.rcfonts': False,
 
@@ -118,20 +127,31 @@ class LatexFigure():
         self.font_scale = font_scale
         self.specific_rc_params = rc_params
         self.square_plot = square_plot
-        
+        self.ax_counter = 0
+
         # Setup gridspec 
-        self.use_gridspec = use_gridspec
-        if self.use_gridspec and auto_gridspec is not None :
+        if auto_gridspec is not None :
             # auto_gridspec is num subplots to draw
+            self.use_gridspec =  True
             ncols = int(np.ceil(np.sqrt(auto_gridspec)))
             nrows = int(np.ceil(auto_gridspec / ncols))
             self.gridspec_layout = (nrows, ncols)
-        else:
+        elif gridspec_layout is not None:
+            self.use_gridspec = True
             self.gridspec_layout = gridspec_layout
+        elif use_gridspec:
+            # set to true even though no grid functionality is used
+            self.use_gridspec = True
+            self.gridspec_layout = (0,0)
+        else: 
+            self.use_gridspec = False
+            self.gridspec_layout = (0,0)
+
         if 'width_ratios' in gridspec_params:
             self.width_ratios = gridspec_params['width_ratios']
         else:
             self.width_ratios = [1] * self.gridspec_layout[1]
+
         if 'height_ratios' in gridspec_params:
             self.height_ratios = gridspec_params['height_ratios']
         else:
@@ -215,19 +235,22 @@ class LatexFigure():
             self.width_to_height = 0.5*(1 + np.sqrt(5))
 
         # Ratio of subplots sizes
-        self.total_width = sum(self.width_ratios) * self.width_to_height
-        self.total_height = sum(self.height_ratios) 
-        self.geometry_ratio = self.total_width/self.total_height       
+        self.n_x = sum(self.width_ratios)
+        self.n_y = sum(self.height_ratios) 
 
-        # Figure width/height in inches
-        # We know the total width in inches, so must get the height in inches
-        # -> height_inches/width_inches = total_height/total_width
-        fig_width_in = fig_width_pt * inches_per_pt
-        fig_height_in = (fig_width_in/self.total_width) * self.total_height
+        total_width_inches = fig_width_pt * inches_per_pt # dictated by size of page
+        total_height_inches = (total_width_inches / self.width_to_height) * (self.n_y / self.n_x)
 
-        return (fig_width_in, fig_height_in)
+        self.total_size_inches = (total_width_inches, total_height_inches)
+        return self.total_size_inches
 
-    def new_axis(self, force_position=None, ax_params={}):
+    def new_axis(
+        self, 
+        force_position=None, 
+        ax_label=None, 
+        auto_label=True, 
+        ax_params={}
+    ):
         r""" 
         Get an ax object to plot on. 
         If using grid spec, finds the next available ax. 
@@ -255,10 +278,36 @@ class LatexFigure():
                 **ax_params
             )
             self.gridspec_axes[grid_position] = self.ax
+        else:
+            grid_position = (0,0)
 
+        # add data so the ax can be questioned
+        self.ax.grid_position = grid_position
+        self.ax.row = grid_position[0]
+        self.ax.col = grid_position[1]
         
         # set background to white # TODO make this optional
         self.ax.set_facecolor('white')
+
+        # counter/label
+        self.ax_counter += 1
+        self.ax.label = None
+        if ax_label is not None:
+            self.ax.label = ax_label
+        elif auto_label:
+            self.ax.label = chr(ord('`')+ (self.ax_counter) )
+        
+        if self.ax.label:
+            self.ax.text(
+                x = -0.25, y = 1.05, 
+                s = r'({})'.format(self.ax.label),
+                transform = self.ax.transAxes,
+                fontdict={
+                    'fontsize' : self.rc_params["font.size"],
+                    "weight" : "bold"
+                }
+            )
+
         return self.ax 
     
     def show(self):
@@ -267,6 +316,7 @@ class LatexFigure():
         """
         from IPython.display import display
         # self.set_fonts()
+        self.fig.tight_layout()
         display(self.fig)
         
     def save(
@@ -282,6 +332,7 @@ class LatexFigure():
             If a filetype is not included in the suffix, 
             default format used from self.rc_params.
         """
+        self.fig.tight_layout()
         self.fig.savefig(
             save_to_file, 
             # format=file_format, 

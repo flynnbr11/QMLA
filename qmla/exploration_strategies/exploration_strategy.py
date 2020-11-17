@@ -13,7 +13,7 @@ import qinfer as qi
 import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
-import qmla.shared_functionality.expectation_values
+import qmla.shared_functionality.measurement_probabilities
 import qmla.utilities
 import qmla.construct_models as construct_models
 import qmla.exploration_strategies.rating_system
@@ -110,7 +110,7 @@ class ExplorationStrategy():
         and replacing the methods in the user exploration strategy's ``__init__`` method.
         The wrappers and corresponding class attributes are:
 
-        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.expectation_value` : ``expectation_value_function``
+        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.expectation_value` : ``measurement_probability_function``
         * :meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_probes` : ``probe_generation_function``
         * :meth:`~qmla.exploration_strategies.ExplorationStrategy.plot_probe_generator` : ``plot_probe_generation_function``
         * :meth:`~qmla.exploration_strategies.ExplorationStrategy.heuristic` : ``model_heuristic_function``
@@ -121,7 +121,7 @@ class ExplorationStrategy():
         """
 
         # Measurement
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
+        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilities.default_measurement_probability
 
         # Probes
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
@@ -695,7 +695,7 @@ class ExplorationStrategy():
         plot_times = sorted(plot_times)
 
         self.measurements = {
-            t : self.expectation_value(
+            t : self.get_measurement_probability(
                 ham = self.true_hamiltonian, 
                 t = t, 
                 state = probe
@@ -710,12 +710,12 @@ class ExplorationStrategy():
     ##########
 
     # Measurement
-    def expectation_value(
+    def get_measurement_probability(
         self,
         **kwargs
     ):
         r"""
-        Call the GR's ``expectation_value_function`` to compute quantum likelihood.
+        Call the GR's ``measurement_probability_function`` to compute quantum likelihood.
 
         Compute the probability of measuring in some basis, to be used as likelihood. 
         The default probability is that of the expectation value. 
@@ -745,7 +745,7 @@ class ExplorationStrategy():
 
         """ 
 
-        return self.expectation_value_function(
+        return self.measurement_probability_function(
             **kwargs
         )
 

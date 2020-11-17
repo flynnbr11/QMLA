@@ -4,7 +4,7 @@ import itertools
 
 from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.probe_set_generation
-import qmla.shared_functionality.expectation_values
+import qmla.shared_functionality.measurement_probabilities
 from qmla import construct_models
 
 
@@ -114,8 +114,8 @@ class SimulatedNVCentre(
         
         self.tree_completed_initially = True
         self.initial_models=None
-        self.expectation_value_function = \
-            qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution_double_time_reverse
+        self.measurement_probability_function = \
+            qmla.shared_functionality.measurement_probabilitiesn_qubit_hahn_evolution_double_time_reverse
         self.timing_insurance_factor = 2/3
         self.num_probes = 20
         time_basis = 1e-9 # nanoseconds
@@ -123,7 +123,7 @@ class SimulatedNVCentre(
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
         self.track_quadratic_loss = True
-        # self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
+        # self.measurement_probability_function = qmla.shared_functionality.measurement_probabilities.default_measurement_probability
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
@@ -267,7 +267,7 @@ class TestSimulatedNVCentre(
         self.iqle_mode = False
         self.hard_fix_resample_effective_sample_size = 1000
 
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.probability_from_default_expectation_value
+        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilities.default_measurement_probability
         
         # Choose heuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic

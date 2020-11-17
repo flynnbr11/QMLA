@@ -188,17 +188,17 @@ for file in os.listdir(directory_to_analyse):
     ):
         pickled_files.append(file)
 
-exploration_strategys = {}
+exploration_strategies = {}
 for f in pickled_files:
     fname = directory_to_analyse + '/' + str(f)
     result = pickle.load(open(fname, 'rb'))
     alph = result['NameAlphabetical']
     if alph not in list(exploration_strategies.keys()):
-        exploration_strategys[alph] = result['ExplorationRule']
+        exploration_strategies[alph] = result['ExplorationRule']
 
 unique_exploration_classes = {}
-unique_exploration_strategys = true_params_info['all_exploration_strategys']
-for g in unique_exploration_strategys:
+unique_exploration_strategies = true_params_info['all_exploration_strategies']
+for g in unique_exploration_strategies:
     try:
         unique_exploration_classes[g] = qmla.get_exploration_class(
             exploration_rules=g
@@ -213,7 +213,7 @@ model_score_results = qmla.analysis.get_model_scores(
     collective_analysis_pickle_file=results_collection_file,
 )
 model_scores = model_score_results['scores']
-exploration_strategys = model_score_results['exploration_strategys']
+exploration_strategies = model_score_results['exploration_strategies']
 exploration_classes = model_score_results['exploration_classes']
 unique_exploration_classes = model_score_results['unique_exploration_classes']
 median_coeff_determination = model_score_results['avg_coeff_determination']
@@ -431,7 +431,7 @@ try:
         scores=model_scores,
         exploration_classes=exploration_classes,
         unique_exploration_classes=unique_exploration_classes,
-        exploration_strategys=exploration_strategys,
+        exploration_strategies=exploration_strategies,
         plot_r_squared=False,
         coefficients_of_determination=median_coeff_determination,
         coefficient_determination_latex_name=latex_coeff_det,

@@ -208,7 +208,7 @@ def get_model_scores(
     os.chdir(directory_name)
 
     scores = {}
-    exploration_strategys = {}
+    exploration_strategies = {}
 
     pickled_files = []
     for file in os.listdir(directory_name):
@@ -245,7 +245,7 @@ def get_model_scores(
             volumes[alph] = [vol_list]
 
         if alph not in list(exploration_strategies.keys()):
-            exploration_strategys[alph] = result['ExplorationRule']
+            exploration_strategies[alph] = result['ExplorationRule']
 
     for alph in list(scores.keys()):
         avg_coeff_determination[alph] = np.median(
@@ -257,14 +257,14 @@ def get_model_scores(
             # because true_exp_val=1 for all times, so no variance
             avg_coeff_determination[alph] = 0
 
-    unique_exploration_strategys = list(
+    unique_exploration_strategies = list(
         set(list(exploration_strategies.values()))
     )
 
     exploration_classes = {}
     for g in list(exploration_strategies.keys()):
         try:
-            exploration_classes[g] = unique_exploration_classes[exploration_strategys[g]]
+            exploration_classes[g] = unique_exploration_classes[exploration_strategies[g]]
         except BaseException:
             exploration_classes[g] = None
 
@@ -272,7 +272,7 @@ def get_model_scores(
     latex_coeff_det = {}
     wins = {}
     for mod in list(scores.keys()):
-        latex_name = unique_exploration_classes[exploration_strategys[mod]].latex_name(mod)
+        latex_name = unique_exploration_classes[exploration_strategies[mod]].latex_name(mod)
         latex_model_wins[latex_name] = scores[mod]
         latex_f_scores[latex_name] = f_scores[mod]
         latex_coeff_det[latex_name] = avg_coeff_determination[mod]
@@ -293,7 +293,7 @@ def get_model_scores(
     results = {
         'scores': scores,
         'latex_model_wins' : latex_model_wins, 
-        'exploration_strategys': exploration_strategys,
+        'exploration_strategies': exploration_strategies,
         'exploration_classes': exploration_classes,
         'unique_exploration_classes': unique_exploration_classes,
         'avg_coeff_determination': avg_coeff_determination,
@@ -492,7 +492,7 @@ def summarise_qmla_text_file(
         True model won {true_mod_found} instance(s); considered in {true_mod_considered} instance(s). \n\
         {n_exp} experiments; {n_prt} particles. \n\
         Average time taken: {avg_time} seconds. \n\
-        True exploration strategies: {exploration_strategys}. \n\
+        True exploration strategies: {exploration_strategies}. \n\
         Min/median/max number of models per instance: {min_num_mods}/{median_num_mods}/{max_num_mods}. \n\
         ".format(
             num_instances = len(all_results), 
@@ -501,7 +501,7 @@ def summarise_qmla_text_file(
             true_mod_considered = all_results['TrueModelConsidered'].sum(), 
             true_mod_found = all_results['TrueModelFound'].sum(),
             avg_time = np.round(all_results['Time'].median(), 2),
-            exploration_strategys = list(all_results.ExplorationRule.unique()),
+            exploration_strategies = list(all_results.ExplorationRule.unique()),
             min_num_mods = int(all_results['NumModels'].min()),
             median_num_mods = int(all_results['NumModels'].median()),
             max_num_mods = int(all_results['NumModels'].max())
@@ -519,7 +519,7 @@ def plot_scores(
     scores,
     exploration_classes,
     unique_exploration_classes,
-    exploration_strategys,
+    exploration_strategies,
     coefficients_of_determination=None,
     coefficient_determination_latex_name=None,
     f_scores=None,

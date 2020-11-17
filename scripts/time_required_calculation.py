@@ -27,13 +27,13 @@ parser.add_argument(
     default='two_qubit_ising_rotation_hyperfine'
 )
 parser.add_argument(
-    '-use_agr', '--use_alternative_exploration_strategys',
+    '-use_agr', '--use_alternative_exploration_strategies',
     help='Whether to use the alternative exploration strategies provided.',
     type=int,
     default=1
 )
 parser.add_argument(
-    '-agr', '--alternative_exploration_strategys',
+    '-agr', '--alternative_exploration_strategies',
     help='Exploration Strategies to form other trees.',
     # type=str,
     action='append',
@@ -149,7 +149,7 @@ hamiltonian_exponentiation_times = {
 
 def time_required(
     exploration_rule,  # ie true growth generator for QHL
-    exploration_strategys,
+    exploration_strategies,
     num_particles,
     num_experiments,
     num_processes=1,
@@ -168,10 +168,10 @@ def time_required(
 
     parallelisability = {}
 
-    print("exploration strategies:", exploration_strategys)
+    print("exploration strategies:", exploration_strategies)
 #  print("num models by shape:", generator_max_num_models_by_shape)
     total_time_required = 0
-    for gen in exploration_strategys:
+    for gen in exploration_strategies:
         try:
             exploration_class = qmla.get_exploration_class(
                 exploration_rules=gen
@@ -260,13 +260,13 @@ def time_required(
 
 arguments = parser.parse_args()
 exploration_rule = arguments.exploration_rules
-alternative_exploration_strategys = arguments.alternative_exploration_strategys
-all_exploration_strategys = [exploration_rule]
-use_alternative_exploration_strategys = bool(
-    arguments.use_alternative_exploration_strategys
+alternative_exploration_strategies = arguments.alternative_exploration_strategies
+all_exploration_strategies = [exploration_rule]
+use_alternative_exploration_strategies = bool(
+    arguments.use_alternative_exploration_strategies
 )
-if use_alternative_exploration_strategys == True:
-    all_exploration_strategys.extend(alternative_exploration_strategys)
+if use_alternative_exploration_strategies == True:
+    all_exploration_strategies.extend(alternative_exploration_strategies)
 num_particles = arguments.num_particles
 num_experiments = arguments.num_experiments
 num_bayes_times = arguments.num_bayes_times
@@ -280,11 +280,11 @@ num_processes_env_var = arguments.num_processes_env_var
 minimum_allowed_time = arguments.minimum_allowed_time
 time_insurance_factor = float(arguments.time_insurance_factor)
 
-# print("all exploration strategies:", all_exploration_strategys)
-# print("alternative_exploration_strategys:", alternative_exploration_strategys)
+# print("all exploration strategies:", all_exploration_strategies)
+# print("alternative_exploration_strategies:", alternative_exploration_strategies)
 time_reqd = time_required(
     exploration_rule=exploration_rule,  # true generator
-    exploration_strategys=all_exploration_strategys,
+    exploration_strategies=all_exploration_strategies,
     num_particles=num_particles,
     insurance_factor=time_insurance_factor,
     num_experiments=num_experiments,
@@ -298,7 +298,7 @@ time_reqd = time_required(
 # print(
 # 	"Timing heuristic function:",
 #   "\nInsurance factor:", time_insurance_factor,
-#   "\nuse_alt_exploration_strategys:", use_alternative_exploration_strategys,
+#   "\nuse_alt_exploration_strategies:", use_alternative_exploration_strategies,
 # 	"\nQMD:", time_reqd['qmd'],
 # 	"\nQHL:", time_reqd['qhl'],
 # 	"\nFurtherQHL:", time_reqd['fqhl'],

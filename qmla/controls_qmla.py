@@ -72,14 +72,14 @@ class ControlsQMLA():
             "GR set by controls has ID {} has true model {}".format(arguments.qmla_id, self.exploration_class.true_model)
         ])
 
-        self.alternative_exploration_strategys = arguments.alternative_exploration_strategys
+        self.alternative_exploration_strategies = arguments.alternative_exploration_strategies
         self.unique_exploration_strategy_instances = {
             gen: qmla.get_exploration_strategy.get_exploration_class(
                 exploration_rules=gen,
                 log_file=self.log_file,
                 qmla_id = arguments.qmla_id,
             )
-            for gen in self.alternative_exploration_strategys
+            for gen in self.alternative_exploration_strategies
         }
         self.unique_exploration_strategy_instances[self.exploration_rules] = self.exploration_class
 
@@ -250,7 +250,7 @@ def parse_cmd_line_args(args):
     )
 
     parser.add_argument(
-        '-agr', '--alternative_exploration_strategys',
+        '-agr', '--alternative_exploration_strategies',
         help='Exploration Strategies to form other trees.',
         # type=str,
         action='append',

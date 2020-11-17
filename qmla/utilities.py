@@ -223,7 +223,7 @@ def plot_subset_eval_probes(
     true_hamiltonian,
     probe_dict, 
     subset_probes, 
-    expectation_value_function, 
+    measurement_probability_function, 
     times, 
     fig, 
     dynamics_ax, 
@@ -249,7 +249,7 @@ def plot_subset_eval_probes(
         probe = probe_dict[pid]
 
         ev = [
-            expectation_value_function(
+            measurement_probability_function(
                 ham = true_hamiltonian, 
                 t = t, 
                 state = probe
@@ -284,7 +284,7 @@ def plot_subset_eval_probes(
 def plot_evaluation_dataset(
     evaluation_data, 
     true_hamiltonian,
-    expectation_value_function,
+    measurement_probability_function,
     num_probes_to_plot=6, 
     save_to_file=None
 ):
@@ -317,7 +317,7 @@ def plot_evaluation_dataset(
 
     plot_subset_eval_probes(
         true_hamiltonian = true_hamiltonian, 
-        expectation_value_function = expectation_value_function,
+        measurement_probability_function = measurement_probability_function,
         subset_probes = subset_probes,
         probe_dict = probe_dict, 
         times = times, 

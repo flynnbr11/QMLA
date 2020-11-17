@@ -1,11 +1,36 @@
+r"""
+These functions compute the likelihood used by quantum likelihood estimation (QLE). 
+QLE updates the Bayesian posterior distribution through particles' likelihood $\mathcal{L}(d | \hat{H}_p; e)$,
+    given a datum $d$, experiment $e$ and model $\hat{H}_p$.
+The expectation value is given by
+    $$ \bra{\psi} e^{-i \hat{H}_p t} \ket{\psi}, $$
+    such that the probability of measuring into the input probe state $\ket{\psi}$, via the Born rule, is
+    $$ \Pr(0) = | \bra{\psi} e^{-i \hat{H}_p t} \ket{\psi}  |^2 = \mathcal{L}(d=0 | \hat{H}_p; e), $$
+    i.e. the input basis is assigned the measurement label $d=0$, and this quantity is the probability 
+    of measuring $d=0$, i.e. measuring the same state as input. 
+    Importantly, QInfer requires the quantity $\Pr(0)$, so that is the output of these functions. 
+However, we assume a binary outcome model, 
+    i.e. that the system is measured either in $\ket{\psi}$ (labelled $d=0$), or it is not ($d=1$);
+    the likelihood for the latter case is
+    $$ \mathcal{L}(d=1 | \hat{H}_p; e) = | \bra{\psi_{\perp}} e^{-i \hat{H}_p t} \ket{\psi}  |^2 = 1 - \Pr(0) $$
+
+So, the role of these functions is to compute $\Pr(0)$, 
+    which is not always the same as computing the likelihood
+    (although these are equiavelent when we measure $d=0$).
+For clarity, then, these functions are labelled as, .e.g \texttt{get\_pr0()}
+    instead of \texttt{get\_likelihood()} or \texttt{get\_expectation\_value()}. 
+
+"""
+
+
 import numpy as np
 
 try:
     from expm import expm
 except:
-    from scipy.linalg import epxm
+    from scipy.linalg import expm
 
-from scipy import linalg, sparse
+from scipy import linalg
 import qmla.logging
 
 
@@ -23,20 +48,20 @@ def log_print(
 
 # Default expectation value calculations
 
-def probability_from_default_expectation_value(
+def default_measurement_probability(
     ham,
     t,
     state,
-    log_file='QMDLog.log',
+    log_file='qmla_log.log',
     log_identifier='Expecation Value'
 ):
     """
     Default probability calculation: | <state.transpose | e^{-iHt} | state> |**2
 
     Returns the expectation value computed by evolving the input state with
-    the provided Hamiltonian operator. NB: In this case, the assumption is that the 
-    value measured is 1 and the expectation value corresponds to the probability of
-    obtaining 1.
+        the provided Hamiltonian operator. 
+    NB: In this case, the assumption is that the value measured (datum) is 1 
+    and the expectation value corresponds to the probability of obtaining 1.
 
     :param np.array ham: Hamiltonian needed for the time-evolution
     :param float t: Evolution time
@@ -47,12 +72,11 @@ def probability_from_default_expectation_value(
     :return: probability of measuring the input state after Hamiltonian evolution
     """
 
+    probe_bra = state.conj().T
     u = expm(-1j*ham*t)
     u_psi = np.dot(u, state)
-
-    probe_bra = state.conj().T
     expectation_value = np.dot(probe_bra, u_psi) # in general a complex number
-    prob_of_measuring_input_state = np.abs(expectation_value)
+    prob_of_measuring_input_state = np.abs(expectation_value)**2
 
     # check that probability is reasonable (0 <= P <= 1)
     ex_val_tol = 1e-9
@@ -71,10 +95,7 @@ def probability_from_default_expectation_value(
     return prob_of_measuring_input_state
 
 
-
-
-# Expecactation value function using Hahn inversion gate:
-
+# Expectation value function using Hahn inversion gate:
 def hahn_evolution(
     ham,
     t,
@@ -135,26 +156,10 @@ def hahn_evolution(
             )
         )
     else:
-        # TODO revisit custom exponentiation function and match with Qutip.
-        # first_unitary_time_evolution = h.exp_ham(
-        #     ham,
-        #     t,
-        #     precision=precision
-        # )
-        # second_unitary_time_evolution = h.exp_ham(
-        #     ham,
-        #     2*t,
-        #     precision=precision
-        # )
-
-        first_unitary_time_evolution = linalg.expm(-1j * ham * t)
+        first_unitary_time_evolution = expm(-1j * ham * t)
         second_unitary_time_evolution = np.linalg.matrix_power(
             first_unitary_time_evolution, 2
         )
-        # first_unitary_time_evolution = qutip.Qobj(-1j*ham*t).expm().full()
-        # second_unitary_time_evolution = qutip.Qobj(-1j*ham*2*t).expm().full()
-        # first_unitary_time_evolution = h.exp_ham(ham, t)
-        # second_unitary_time_evolution = h.exp_ham(ham, 2*t)
 
         total_evolution = np.dot(
             second_unitary_time_evolution,
@@ -216,7 +221,7 @@ def make_inversion_gate_rotate_y(num_qubits):
         np.eye(2**(num_qubits - 1))
     )
     # inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
-    inversion_gate = linalg.expm(-1j * hahn_gate)
+    inversion_gate = expm(-1j * hahn_gate)
 
     return inversion_gate
 
@@ -237,7 +242,7 @@ def make_inversion_gate(num_qubits):
         np.eye(2**(num_qubits - 1))
     )
     # inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
-    inversion_gate = linalg.expm(-1j * hahn_gate)
+    inversion_gate = expm(-1j * hahn_gate)
 
     return inversion_gate
 
@@ -263,7 +268,7 @@ def n_qubit_hahn_evolution(
     log_identifier=None
 ):
     r"""
-    n qubits time evolution for hahn-echo measurement returning expectation value
+    n qubits time evolution for Hahn-echo measurement returning measurement probability for input state
 
     :param ham: Hamiltonian needed for the time-evolution
     :type ham: np.array()
@@ -278,9 +283,7 @@ def n_qubit_hahn_evolution(
     :param log_identifier: (optional) identifier for the log
     :type log_identifier: str()    
 
-    :output: expectation value of the evolved state
-
-
+    :output: probability of measuring input state after time t
     """
 
     import numpy as np
@@ -288,28 +291,15 @@ def n_qubit_hahn_evolution(
     from scipy import linalg
     num_qubits = int(np.log2(np.shape(ham)[0]))
 
-    # try:
-    #     from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_z_inversion_gates
-    #     inversion_gate = precomputed_hahn_z_inversion_gates[num_qubits]
-    # except BaseException:
-    #     inversion_gate = make_inversion_gate(num_qubits)
-
-    # try:
-    #     from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
-    #     inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
-    # except BaseException:
-    #     inversion_gate = make_inversion_gate(num_qubits)
-
     from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
     inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
-
     # inversion_gate = make_inversion_gate_rotate_y(num_qubits)
 
     # want to evolve for t, then apply Hahn inversion gate, 
     # then again evolution for (S * t)
     # where S = 2 in standard Hahn evolution, 
     # S = 1 for long time dynamics study
-    first_unitary_time_evolution = linalg.expm(-1j * ham * t)
+    first_unitary_time_evolution = expm(-1j * ham * t)
     second_unitary_time_evolution = np.linalg.matrix_power(
         first_unitary_time_evolution,
         second_time_evolution_factor 
@@ -391,10 +381,6 @@ def n_qubit_hahn_evolution(
 
     return likelihood
     # return expect_value
-
-
-
-
 
 
 def partial_trace(

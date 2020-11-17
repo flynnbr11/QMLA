@@ -332,7 +332,7 @@ class ModelInstanceForComparison():
         plot_probe = self.plot_probes[n_qubits]
 
         for t in times_not_yet_computed:
-            self.expectation_values[t] = self.exploration_class.expectation_value(
+            self.expectation_values[t] = self.exploration_class.get_measurement_probability(
                 ham = self.learned_hamiltonian, #TODO, 
                 t = t, 
                 state = plot_probe # TODO

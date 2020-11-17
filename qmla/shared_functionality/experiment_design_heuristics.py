@@ -9,6 +9,10 @@ import itertools
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 from inspect import currentframe, getframeinfo
+try:
+    from lfig import LatexFigure
+except:
+    from qmla.shared_functionality.latex_figure import LatexFigure
 
 import qmla.logging
 
@@ -162,40 +166,28 @@ class BaseHeuristicQMLA(qi.Heuristic):
         
         plt.clf()
         nrows = len(plots_to_include)
-        fig = plt.figure( 
-            figsize=(15, 3*nrows)
+        lf = LatexFigure(
+            gridspec_layout=(nrows, 1)
         )
-        gs = GridSpec(
-            nrows = nrows,
-            ncols = 1,
-        )
-
-        row = -1 # add 1 for every ax included
-        col = 0
 
         if 'volume' in plots_to_include:
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
+            ax = lf.new_axis()
             self._plot_volumes(ax = ax)
             ax.legend()
 
         if 'times_used' in plots_to_include:
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
+            ax = lf.new_axis()
             self._plot_suggested_times(ax = ax)
             ax.legend()
 
         if 'effective_sample_size' in plots_to_include:
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
+            ax = lf.new_axis()
             self._plot_effective_sample_size(ax = ax)
             ax.legend()
 
         # Save figure
-        fig.tight_layout()
-        fig.savefig(
-            save_to_file
-        )
+        self.log_print(["LatexFigure has size:", lf.size])
+        lf.save(save_to_file)
 
 
     def _plot_suggested_times(self, ax, **kwargs):
@@ -738,28 +730,19 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
         
         plt.clf()
         nrows = len(plots_to_include)
-        fig = plt.figure( 
-            figsize=(15, 3*nrows)
+        lf = LatexFigure(
+            gridspec_layout=(nrows, 1)
         )
-        gs = GridSpec(
-            nrows = nrows,
-            ncols = 1,
-        )
-
-        row = -1 # add 1 for every ax included
-        col = 0
 
         # Volume
         if 'volume' in plots_to_include:
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
+            ax = lf.new_axis()
             self._plot_volumes(ax = ax)
             self.add_time_factor_change_points_to_ax(ax = ax)
             ax.legend()
 
         if 'times_used' in plots_to_include:
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
+            ax = lf.new_axis()
 
             self._plot_suggested_times(ax = ax)
             self.add_time_factor_change_points_to_ax(ax = ax)
@@ -767,8 +750,7 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
 
         if 'derivatives' in plots_to_include:
             # Volume Derivatives
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
+            ax = lf.new_axis()
             ## first derivatives
             derivs = self.derivatives[1]
             epochs = sorted(derivs.keys())
@@ -819,9 +801,8 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
 
         if 'metric_distances' in plots_to_include:
             # Times by distance metrics
-            row += 1
-            ax = fig.add_subplot(gs[row, 0])
-            
+            ax = lf.new_axis()
+
             linestyles = itertools.cycle( 
                 ['--', ':', '-.']
             )
@@ -853,11 +834,8 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
             ax.semilogy()
 
         # Save figure
-        fig.tight_layout()
-        fig.savefig(
-            save_to_file
-        )
-
+        self.log_print(["LatexFigure has size:", lf.size])
+        lf.save(save_to_file)
 
     def add_time_factor_change_points_to_ax(self, ax):
 

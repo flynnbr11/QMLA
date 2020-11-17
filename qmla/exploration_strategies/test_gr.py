@@ -29,7 +29,7 @@ class GRTest(
             **kwargs
         )
         self.log_print(["Initialising test GR"])
-        self.expectation_value_function = test_evolution_fnc
+        self.measurement_probability_function = test_evolution_fnc
         self.initial_models = ['pauliSet_xJx_1J2_d2']
         self.tree_completed_initially = False
         self.true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2'

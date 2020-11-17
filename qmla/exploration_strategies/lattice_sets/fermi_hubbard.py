@@ -162,7 +162,7 @@ class FermiHubbardLatticeSet(
     #     """
 
     #     try:
-    #         ex_val = self.expectation_value_function(**kwargs)
+    #         ex_val = self.measurement_probability_function(**kwargs)
     #         method = 'default'
     #     except:
     #         # transform - e.g. probe was from a different starting basis
@@ -172,7 +172,7 @@ class FermiHubbardLatticeSet(
             
     #         method = 'transform'
 
-    #         ex_val = self.expectation_value_function(**kwargs)
+    #         ex_val = self.measurement_probability_function(**kwargs)
 
     #     return ex_val
 

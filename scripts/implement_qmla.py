@@ -64,7 +64,7 @@ long_id = qmla_controls.long_id
 if qmla_controls.further_qhl == True:
     # TODO further QHL stage out of date and won't work with 
     # new code -- update
-    # make a exploration strategy accepting list of models and priors?
+    # make an exploration strategy accepting list of models and priors?
 
     qmd_results_model_scores_csv = str(
         qmla_controls.results_directory

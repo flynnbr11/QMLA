@@ -177,7 +177,7 @@ def average_parameter_estimates(
     num_experiments_by_name = {}
 
     latex_terms = {}
-    exploration_strategys = {}
+    exploration_strategies = {}
 
     for f in pickled_files:
         fname = directory_name + '/' + str(f)
@@ -197,15 +197,15 @@ def average_parameter_estimates(
 
         if alph not in list(exploration_strategies.keys()):
             try:
-                exploration_strategys[alph] = result['ExplorationRule']
+                exploration_strategies[alph] = result['ExplorationRule']
             except BaseException:
-                exploration_strategys[alph] = exploration_rule
+                exploration_strategies[alph] = exploration_rule
 
-    unique_exploration_strategys = list(set(list(exploration_strategies.values())))
+    unique_exploration_strategies = list(set(list(exploration_strategies.values())))
     exploration_classes = {}
     for g in list(exploration_strategies.keys()):
         try:
-            exploration_classes[g] = unique_exploration_classes[exploration_strategys[g]]
+            exploration_classes[g] = unique_exploration_classes[exploration_strategies[g]]
         except BaseException:
             exploration_classes[g] = None
 
@@ -747,7 +747,7 @@ def replot_expectation_values(
 
         sim_exp_vals = {}
         for t in sim_times:
-            sim_exp_vals[t] = exploration_class.expectation_value(
+            sim_exp_vals[t] = exploration_class.get_measurement_probability(
                 ham=sim_ham,
                 state=probe,
                 t=t

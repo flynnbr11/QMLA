@@ -1,5 +1,5 @@
 from qmla.shared_functionality.branch_mapping import *
-from qmla.shared_functionality.expectation_values import *
+from qmla.shared_functionality.measurement_probabilities import *
 from qmla.shared_functionality.model_pairing_strategies import * 
 from qmla.shared_functionality.probe_transformer import *
 # from qmla.shared_functionality.experiment_design_heuristics import *

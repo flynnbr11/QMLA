@@ -3,7 +3,7 @@ import os
 
 from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centre_full_access
 import qmla.shared_functionality.probe_set_generation
-import qmla.shared_functionality.expectation_values
+import qmla.shared_functionality.measurement_probabilities
 import qmla.shared_functionality.latex_model_names
 from qmla import construct_models
 
@@ -26,7 +26,7 @@ class NVLargeSpinBath(
             **kwargs
         )
 
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
+        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilitiesn_qubit_hahn_evolution
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_spin_interaction
 
         # self.true_model = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'

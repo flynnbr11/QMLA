@@ -111,7 +111,7 @@ def plot_dynamics_multiple_models(
         ):
             pickled_files.append(file)
     num_results_files = len(pickled_files)
-    exploration_strategys = {}
+    exploration_strategies = {}
     for f in pickled_files:
         fname = directory_name + '/' + str(f)
         result = pickle.load(open(fname, 'rb'))
@@ -124,12 +124,12 @@ def plot_dynamics_multiple_models(
             expectation_values_by_name[alph] = [expec_values]
 
         if alph not in list(exploration_strategies.keys()):
-            exploration_strategys[alph] = result['ExplorationRule']
+            exploration_strategies[alph] = result['ExplorationRule']
 
     exploration_classes = {}
     for g in list(exploration_strategies.keys()):
         try:
-            exploration_classes[g] = unique_exploration_classes[exploration_strategys[g]]
+            exploration_classes[g] = unique_exploration_classes[exploration_strategies[g]]
         except BaseException:
             exploration_classes[g] = None
 

@@ -14,7 +14,7 @@ import qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strate
 from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy import Genetic
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
-import qmla.shared_functionality.expectation_values
+import qmla.shared_functionality.measurement_probabilities
 import qmla.construct_models
 
 
@@ -65,7 +65,7 @@ class NVCentreSimulatedLongDynamicsGenticAlgorithm(
         self.simulator_probe_generation_function = self.probe_generation_function
         self.shared_probes = True
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-        self.expectation_value_function = qmla.shared_functionality.expectation_values.n_qubit_hahn_evolution
+        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilitiesn_qubit_hahn_evolution
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic

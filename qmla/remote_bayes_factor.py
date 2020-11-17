@@ -473,7 +473,7 @@ def plot_models_dynamics(
         plot_probe = plot_probes[dim]
 
         mod_exp_vals = [
-            mod.exploration_class.expectation_value(
+            mod.exploration_class.get_measurement_probability(
                 ham=final_ham,
                 t=t,
                 state=plot_probe,

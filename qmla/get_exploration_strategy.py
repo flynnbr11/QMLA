@@ -16,7 +16,7 @@ def get_exploration_class(
     **kwargs
 ):
     r"""
-    Get an instance of the class specified by the user which implements a Exploration Strategy.
+    Get an instance of the class specified by the user which implements an exploration Strategy.
 
     Instance of a :class:`~qmla.ExplorationStrategy` (or subclass).
     This is used to specify how QMLA proceeds, in particular by designing the next batch
@@ -26,7 +26,7 @@ def get_exploration_class(
     exploration_classes dictionary. New exploration strategies must be added here so that QMLA can find them.
 
 
-    :param str exploration_rules: string corresponding to a exploration strategy
+    :param str exploration_rules: string corresponding to an exploration strategy
     :params **kwargs: arguments required by the exploration strategy, passed directly
         to the desired exploration strategy's constructor.
     :return ExplorationStrategy gr: exploration strategy class instance

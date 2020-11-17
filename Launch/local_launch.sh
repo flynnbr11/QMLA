@@ -10,8 +10,8 @@ run_qhl=1 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=20 # number of experiments
-prt=100 # number of particles
+exp=500 # number of experiments
+prt=3000 # number of particles
 
 ###############
 # QMLA settings
@@ -25,9 +25,9 @@ plot_level=6
 debug_mode=0
 
 ###############
-# Choose a exploration strategy 
+# Choose an exploration strategy 
 # This will determine how QMLA proceeds. 
-# use_alt_exploration_strategys=1 # note this is redundant locally, currently
+# use_alt_exploration_strategies=1 # note this is redundant locally, currently
 ###############
 
 # exploration_strategy='AnalyticalLikelihood'
@@ -40,7 +40,7 @@ debug_mode=0
 # exploration_strategy='NVPrelearnedTest'
 # exploration_strategy='HeisenbergLatticeSet'
 # exploration_strategy='FermiHubbardLatticeSet'
-exploration_strategy='ThesisLatticeDemo'
+exploration_strategy='DemoIsing'
 # exploration_strategy='IsingLatticeSet'
 # exploration_strategy='Demonstration'
 
@@ -69,17 +69,17 @@ exploration_strategy='ThesisLatticeDemo'
 # exploration_strategy='Genetic'
 # exploration_strategy='NVExperimentalData'
 
-alt_exploration_strategys=(
+alt_exploration_strategies=(
     # 'IsingLatticeSet'
     # 'HeisenbergLatticeSet'
     # 'FermiHubbardLatticeSet'
     # 'GeneticTest'
 )
 
-exploration_strategys_command=""
-for item in ${alt_exploration_strategys[*]}
+exploration_strategies_command=""
+for item in ${alt_exploration_strategies[*]}
 do
-    exploration_strategys_command+=" -agr $item" 
+    exploration_strategies_command+=" -agr $item" 
 done
 
 if (( "$run_qhl" == 1 )) 
@@ -123,7 +123,7 @@ python3 ../scripts/set_qmla_params.py \
     -sysmeas=$system_measurements_file \
     -plotprobes=$plot_probe_file \
     -log=$log_for_entire_run \
-    $exploration_strategys_command 
+    $exploration_strategies_command 
 
 echo "Generated configuration."
 
@@ -193,7 +193,7 @@ do
         -plotprobes=$plot_probe_file \
         -latex=$latex_mapping_file \
         -ggr=$exploration_strategy \
-        $exploration_strategys_command \
+        $exploration_strategies_command \
         > $this_run_directory/output.txt
 done
 
@@ -243,7 +243,7 @@ then
             -plotprobes=$plot_probe_file \
             -latex=$latex_mapping_file \
             -ggr=$exploration_strategy \
-            $exploration_strategys_command 
+            $exploration_strategies_command 
     done
     echo "
     cd $this_run_directory
