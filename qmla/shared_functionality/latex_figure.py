@@ -86,6 +86,7 @@ class LatexFigure():
         gridspec_layout=(1,1),
         gridspec_params={},
         font_scale=1,
+        pad=1.08, # for tight_layout
         rc_params={},
         plot_style='default',
         legend_axis=None
@@ -118,9 +119,15 @@ class LatexFigure():
         plt.style.use(plot_style)
         
         if width == 'thesis':
+            # 6.9 inches; assumes latex is using geometry wider than this
+            self.width_pt = 500
+        elif width == 'default_a4': 
             self.width_pt = 448
         elif width == 'beamer':
             self.width_pt = 307.28987
+        elif width == 'test' : 
+            # precisely 1 inch
+            self.width_pt = 72.27
         else:
             self.width_pt = width
         self.fraction = fraction
@@ -158,12 +165,13 @@ class LatexFigure():
             self.height_ratios = [1] * self.gridspec_layout[0]
         
         # Setup figure
+        self.set_fonts()
+        self.delta = pad * self.rc_params["font.size"]
         self.size = self.set_size(
             width_pt = self.width_pt, 
             fraction = self.fraction,
             subplots = self.gridspec_layout
         )
-        self.set_fonts()
         
         # Produce figure object
         if self.use_gridspec: 
@@ -203,7 +211,7 @@ class LatexFigure():
         # Update font etc via matplotlib
         plt.rcParams.update(self.rc_params)        
         
-    def set_size(self, width_pt, fraction=1, subplots=(1, 1)):
+    def _set_size(self, width_pt, fraction=1, subplots=(1, 1)):
         """
         Set figure dimensions to avoid scaling in LaTeX.
 
@@ -221,7 +229,7 @@ class LatexFigure():
         # TODO account for the width ratios of the gridspec layout -- don't use full ratio in s[0]/s[1] in fig_height_in if some are shorter
 
         # Width of figure (in pts)
-        fig_width_pt = width_pt * fraction
+        self.fig_width_pt = width_pt * fraction
         # Convert from pt to inches
         inches_per_pt = 1 / 72.27
 
@@ -238,18 +246,63 @@ class LatexFigure():
         self.n_x = sum(self.width_ratios)
         self.n_y = sum(self.height_ratios) 
 
-        total_width_inches = fig_width_pt * inches_per_pt # dictated by size of page
-        total_height_inches = (total_width_inches / self.width_to_height) * (self.n_y / self.n_x)
+        total_width_inches = self.fig_width_pt * inches_per_pt # dictated by size of page
+        total_height_inches = (total_width_inches / golden_ratio) * (self.n_y / self.n_x)
 
+        # total_height_inches = total_width_inches * golden_ratio * (self.n_y / self.n_x)
+    
         self.total_size_inches = (total_width_inches, total_height_inches)
+        return self.total_size_inches
+
+    def set_size(self, width_pt, fraction=1, subplots=(1, 1)):
+        
+        golden_ratio = (5**.5 - 1) / 2
+        fig_width_pt = width_pt * fraction
+        inches_per_pt = 1 / 72.27
+
+        # Ratio of subplots sizes
+        self.n_x = sum(self.width_ratios)
+        self.n_y = sum(self.height_ratios) 
+
+        total_width = fig_width_pt
+        if self.n_x > 1:
+            width_given_to_padding = (self.n_x + 1) * self.delta
+        else:
+            width_given_to_padding = 0 
+        subplot_width_used = fig_width_pt - width_given_to_padding # remove the padding    
+        width_per_subplot = subplot_width_used / self.n_x # in points
+        # print(
+        #     "total width: {}; subplot combined width: {}; width_per_subplot: {}".format(
+        #         total_width, subplot_width_used, width_per_subplot)
+        # )
+
+        height_per_subplot = width_per_subplot * golden_ratio
+        height_used_by_subplots = height_per_subplot * self.n_y
+        if self.n_y > 1:
+            height_given_to_padding = ((self.n_y + 1)*self.delta )
+        else:
+            height_given_to_padding = 0
+        
+        total_height = height_used_by_subplots + height_given_to_padding # in points
+
+        # print(
+        #     "total height: {}; subplot combined height: {}; height_per_subplot: {}".format(
+        #         total_height, height_used_by_subplots, height_per_subplot)
+        # )
+
+
+        self.total_size_inches = (total_width*inches_per_pt, total_height*inches_per_pt)
+
         return self.total_size_inches
 
     def new_axis(
         self, 
         force_position=None, 
-        ax_label=None, 
+        label=None, 
+        label_position=(0, 1.05), 
         auto_label=True, 
-        ax_params={}
+        ax_params={},
+        span=(1,1),
     ):
         r""" 
         Get an ax object to plot on. 
@@ -272,12 +325,40 @@ class LatexFigure():
                         self.col = 0
                         self.row += 1
                 grid_position = (self.row, self.col)
+            
+            grid_x_start = grid_position[0]
+            if type(span[0]) == int: 
+                grid_x_finish = grid_x_start + span[0]
+            elif span[0] == 'all':
+                grid_x_finish = self.gridspec_layout[0]
+            else:
+                raise AttributeError("span[0] must either be number or 'all's")
+            if grid_x_finish > self.gridspec_layout[0]:
+                # TODO replace with proper warning
+                print("Note: span of ax greater than available number of rows; squashing ax.")
+
+            grid_y_start = grid_position[1]
+            if type(span[1]) == int: 
+                grid_y_finish = grid_y_start + span[1]
+            elif span[1] == 'all':
+                grid_y_finish = self.gridspec_layout[1]
+            else:
+                raise AttributeError("span[1] must either be number or 'all's")
+            if grid_y_finish > self.gridspec_layout[1]:
+                print("Note: span of ax greater than available number of cols; squashing ax.")               
 
             self.ax = self.fig.add_subplot(
-                self.gs[grid_position],
+                self.gs[
+                    grid_x_start:grid_x_finish, 
+                    grid_y_start:grid_y_finish
+                ],
                 **ax_params
             )
-            self.gridspec_axes[grid_position] = self.ax
+            self.ax.span = span
+
+            for x in range(grid_x_start, grid_x_finish):
+                for y in range(grid_y_start, grid_y_finish):
+                    self.gridspec_axes[(x, y)] = self.ax
         else:
             grid_position = (0,0)
 
@@ -292,14 +373,15 @@ class LatexFigure():
         # counter/label
         self.ax_counter += 1
         self.ax.label = None
-        if ax_label is not None:
-            self.ax.label = ax_label
+        if label is not None:
+            self.ax.label = label
         elif auto_label:
             self.ax.label = chr(ord('`')+ (self.ax_counter) )
-        
+                
         if self.ax.label:
             self.ax.text(
-                x = -0.25, y = 1.05, 
+                x = label_position[0], 
+                y = label_position[1], 
                 s = r'({})'.format(self.ax.label),
                 transform = self.ax.transAxes,
                 fontdict={
@@ -316,7 +398,7 @@ class LatexFigure():
         """
         from IPython.display import display
         # self.set_fonts()
-        self.fig.tight_layout()
+        self.fig.tight_layout(pad = self.delta)
         display(self.fig)
         
     def save(
@@ -332,13 +414,8 @@ class LatexFigure():
             If a filetype is not included in the suffix, 
             default format used from self.rc_params.
         """
-        self.fig.tight_layout()
+        self.fig.tight_layout(pad = self.delta)
         self.fig.savefig(
             save_to_file, 
-            # format=file_format, 
             bbox_inches='tight'
         )
-        
-
-def test_load():
-    print("Hello world")
