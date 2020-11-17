@@ -15,9 +15,9 @@ from matplotlib.gridspec import GridSpec
 import seaborn as sns
 
 try:
-    import lfig # most up to date system version
+    from lfig import LatexFigure
 except:
-    import qmla.shared_functionality.latex_figure as lfig
+    from qmla.shared_functionality.latex_figure import LatexFigure
 from qmla.exploration_strategies import exploration_strategy
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
@@ -868,7 +868,7 @@ class Genetic(
         generations = [int(g) for g in ratings.generation.unique()]
         num_generations = len(generations)
 
-        lf = lfig.LatexFigure(
+        lf = LatexFigure(
             use_gridspec=True, 
             gridspec_layout=(num_generations, 1)
         )
@@ -1007,7 +1007,7 @@ class Genetic(
     def plot_selection_probabilities(self, save_to_file): 
         generations = sorted(self.genetic_algorithm.gene_pool.generation.unique())
         self.log_print(["[plot_selection_probabilities] generations:", generations])
-        lf = lfig.LatexFigure(auto_gridspec=len(generations))
+        lf = LatexFigure(auto_gridspec=len(generations))
 
         for g in generations:
             ax = lf.new_axis()

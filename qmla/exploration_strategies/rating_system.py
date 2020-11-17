@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import matplotlib
 try:
-    import lfig # most up to date system version
+    from lfig import LatexFigure
 except:
-    import qmla.shared_functionality.latex_figure as lfig
+    from qmla.shared_functionality.latex_figure import LatexFigure
 
 import qmla.utilities
 
@@ -212,7 +212,7 @@ class RatingSystem():
             legend_axis = (0,1)
         else:
             legend_axis = None
-        lf = lfig.LatexFigure(
+        lf = LatexFigure(
             # via https://github.com/flynnbr11/lfig-py
             use_gridspec=True, 
             gridspec_layout=(1,len(widths)),

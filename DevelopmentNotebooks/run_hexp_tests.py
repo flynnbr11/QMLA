@@ -16,7 +16,11 @@ import qinfer
 import scipy
 import time
 
-import lfig
+try:
+    from lfig import LatexFigure
+except:
+    from qmla.shared_functionality.latex_figure import LatexFigure
+
 sys.path.append("/home/bf16951/QMD")
 import qmla
 

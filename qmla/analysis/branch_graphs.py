@@ -17,9 +17,9 @@ import matplotlib
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import GridSpec
 try:
-    import lfig # most up to date system version
+    from lfig import LatexFigure
 except:
-    import qmla.shared_functionality.latex_figure as lfig
+    from qmla.shared_functionality.latex_figure import LatexFigure
 
 import qmla
 
@@ -57,7 +57,7 @@ def plot_qmla_branches(
         
         # Generate plot
         plt.clf()
-        lf = lfig.LatexFigure()
+        lf = LatexFigure()
         fig = plt.figure( 
             figsize=lf.size,
             constrained_layout=True

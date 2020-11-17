@@ -31,7 +31,11 @@ from inspect import currentframe, getframeinfo
 import sklearn
 import seaborn as sns
 
-import lfig 
+try:
+    from lfig import LatexFigure
+except:
+    from qmla.shared_functionality.latex_figure import LatexFigure
+ 
 
 import qmla.get_exploration_strategy as get_exploration_strategy
 import qmla.shared_functionality.experimental_data_processing
