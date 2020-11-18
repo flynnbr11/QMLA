@@ -75,8 +75,8 @@ class LatticeSet(
             lattice_idx = self.qmla_id % len(self.available_lattices)  
             # Rerunning subset with more resources
             # lattice_idx = self.qmla_id % len(self.rerun_lattices)  
-        self.true_lattice_name = self.lattice_names[ lattice_idx ]
-        # self.true_lattice_name = self.rerun_lattices[ lattice_idx ]
+        # self.true_lattice_name = self.lattice_names[ lattice_idx ]
+        self.true_lattice_name = '_4_site_lattice_fully_connected'
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)
 
