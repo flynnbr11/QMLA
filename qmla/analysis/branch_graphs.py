@@ -17,9 +17,9 @@ import matplotlib
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import GridSpec
 try:
-    from lfig import LatexFigure
+    from lfig import LatexFigure, get_latex_rc_params
 except:
-    from qmla.shared_functionality.latex_figure import LatexFigure
+    from qmla.shared_functionality.latex_figure import LatexFigure, get_latex_rc_params
 
 import qmla
 
@@ -30,7 +30,7 @@ def plot_qmla_branches(
 ):
     trees = list(q.trees.values())
     q.log_print(["Plotting QMLA branch graphs. Trees:", trees])
-    plt.rcParams.update(lfig.get_latex_rc_params(font_scale=1.5,))
+    plt.rcParams.update(get_latex_rc_params(font_scale=1.5,))
 
     for tree in trees:
         # tree = trees[0] # TODO loop over trees

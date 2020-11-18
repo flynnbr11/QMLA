@@ -27,7 +27,7 @@ class DemoLattice(
             **kwargs
         )
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.lattice_pauli_likewise_concise
-        self.true_lattice_name = '_4_site_lattice_fully_connected'
+        self.true_lattice_name = '_3_site_chain_fully_connected'
         self.true_lattice = topologies.__getattribute__(self.true_lattice_name)
         self.true_model = self.model_from_lattice(self.true_lattice)
 
@@ -114,21 +114,25 @@ class DemoIsing(DemoLattice):
 
         self.base_terms = ['z']
         self.transverse_field = 'x'
-        self.true_model = "pauliLikewise_lx_1_2_3_4_d4+pauliLikewise_lz_1J2_1J3_1J4_2J3_2J4_3J4_d4"
+        self.true_model = "pauliLikewise_lx_1_2_3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3"
         super().__init__(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.true_model = "pauliSet_zJz_1J2_d4+pauliSet_zJz_1J3_d4+pauliSet_zJz_1J4_d4+pauliSet_zJz_2J3_d4+pauliSet_zJz_2J4_d4+pauliSet_zJz_3J4_d4+pauliSet_x_1_d4"
+        self.true_model = "pauliLikewise_lx_1_2_3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3"
         self.qhl_models = [
-            "pauliSet_zJz_1J2_d4+pauliSet_zJz_1J3_d4+pauliSet_zJz_1J4_d4+pauliSet_zJz_2J3_d4+pauliSet_zJz_2J4_d4+pauliSet_zJz_3J4_d4+pauliSet_x_1_d4+pauliSet_x_2_d4+pauliSet_x_3_d4+pauliSet_x_4_d4",
-            "pauliLikewise_lx_1_2_3_4_d4+pauliLikewise_lz_1J2_1J3_1J4_2J3_2J4_3J4_d4"            
+            "pauliSet_zJz_1J2_d3+pauliSet_zJz_1J3_d3+pauliSet_zJz_2J3_d3+pauliSet_x_1_d3+pauliSet_x_2_d3+pauliSet_x_3_d3",
+            "pauliLikewise_lx_1_2_3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3"
         ]
         self.qhl_models = [qmla.construct_models.alph(m) for m in self.qhl_models]
+        self.initial_models = self.qhl_models
         self.true_model_terms_params = {
-            "pauliLikewise_lx_1_2_3_4_d4" : 0.2,
-            "pauliLikewise_lz_1J2_1J3_1J4_2J3_2J4_3J4_d4" : 0.8
+            "pauliLikewise_lx_1_2_3_d3" : 0.2,
+            "pauliLikewise_lz_1J2_1J3_2J3_d3" : 0.8
         }
+        self.tree_completed_initially = True
+
+    
 
     def latex_name(
         self,
