@@ -617,7 +617,6 @@ class ModelInstanceForLearning():
             try:
                 self._plot_learning_summary()
             except BaseException:
-                raise
                 self.log_print(["Failed to _plot_learning_summary"])
                 
             try:
@@ -1332,7 +1331,7 @@ class ModelInstanceForLearning():
         # Save figure
         lf.save(
             os.path.join(self.model_learning_plots_directory,
-                         '{}learning_summary_{}.pdf'.format(self.plot_prefix, self.model_id))
+                         '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
         )
 
     def _plot_posterior_mesh_pairwise(self):
