@@ -24,6 +24,7 @@ class IsingLatticeSet(
             exploration_rules=exploration_rules,
             **kwargs
         )
+        self._shared_true_parameters = True
 
         # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.timing_insurance_factor = 0.2
