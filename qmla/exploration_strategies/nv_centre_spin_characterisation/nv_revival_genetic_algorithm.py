@@ -14,7 +14,7 @@ import qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strate
 from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy import Genetic
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
-import qmla.shared_functionality.measurement_probabilities
+import qmla.shared_functionality.expectation_value_functions
 import qmla.construct_models
 
 

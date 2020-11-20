@@ -13,7 +13,7 @@ import qinfer as qi
 import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
-import qmla.shared_functionality.measurement_probabilities
+import qmla.shared_functionality.expectation_value_functions
 import qmla.utilities
 import qmla.construct_models as construct_models
 import qmla.exploration_strategies.rating_system
@@ -121,7 +121,7 @@ class ExplorationStrategy():
         """
 
         # Measurement
-        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilities.default_measurement_probability
+        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_values
 
         # Probes
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict

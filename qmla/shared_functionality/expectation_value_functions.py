@@ -25,10 +25,13 @@ For clarity, then, these functions are labelled as, .e.g \texttt{get\_pr0()}
 
 import numpy as np
 
-try:
-    from expm import expm
-except:
-    from scipy.linalg import expm
+# try:
+#     from expm import expm
+# except:
+#     from scipy.linalg import expm
+
+import hexp
+from scipy.linalg import expm
 
 # from scipy.linalg import expm
 from scipy import linalg
@@ -49,7 +52,7 @@ def log_print(
 
 # Default expectation value calculations
 
-def default_measurement_probability(
+def default_expectation_values(
     ham,
     t,
     state,
@@ -74,7 +77,14 @@ def default_measurement_probability(
     """
 
     probe_bra = state.conj().T
-    u = expm(-1j*ham*t)
+    # u = expm(-1j*ham*t)
+    
+    h = hexp.UnitaryEvolvingMatrix(
+        ham, 
+        evolution_time = t,
+    )
+    u = h.expm()
+
     u_psi = np.dot(u, state)
     expectation_value = np.dot(probe_bra, u_psi) # in general a complex number
     prob_of_measuring_input_state = np.abs(expectation_value)**2

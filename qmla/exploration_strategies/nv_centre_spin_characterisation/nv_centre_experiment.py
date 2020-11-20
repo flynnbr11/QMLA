@@ -8,7 +8,7 @@ from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centr
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
-import qmla.shared_functionality.measurement_probabilities
+import qmla.shared_functionality.expectation_value_functions
 from qmla import construct_models
 
 
@@ -36,7 +36,7 @@ class ExperimentNVCentre(
             **kwargs
         )
 
-        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilitiesn_qubit_hahn_evolution
+        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
 
@@ -122,7 +122,7 @@ class NVCentreExperimentalData(
         # self.true_model = 'iTi'
         # self.max_spawn_depth = 3
         self.true_model = qmla.construct_models.alph(self.true_model) 
-        self.measurement_probability_function = qmla.shared_functionality.measurement_probabilitieshahn_evolution
+        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionshahn_evolution
         self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probe_generation_function = self.probe_generation_function
