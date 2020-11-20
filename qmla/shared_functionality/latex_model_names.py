@@ -338,7 +338,7 @@ def lattice_pauli_likewise_concise(name, **kwargs):
 
         # limits for sum
         lower_limit = str(
-            "i \in "
+            "k \in "
             +",".join(this_term_connections)
         )
         if n_sites == 1: 
@@ -348,7 +348,7 @@ def lattice_pauli_likewise_concise(name, **kwargs):
                 - set(range(1, dim+1))
             )
             if len(sites_not_present) == 0:
-                lower_limit = "i=1"
+                lower_limit = "k=1"
         elif n_sites == 2:
             operator_string = str("\sigma_{ \langle k, l \\rangle }^{" + str(operator) + "}")
             nns = [(str(n), str(n+1) ) for n in range(1, dim)]
