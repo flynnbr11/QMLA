@@ -97,12 +97,14 @@ def default_expectation_values(
     ):
         log_print(
             [
-                "prob_of_measuring_input_state value greater than 1 or less than 0: \t",
-                prob_of_measuring_input_state
+                "prob_of_measuring_input_state > 1 or < 0 (={}) at t={}".format(
+                    prob_of_measuring_input_state, t
+                )
             ],
             log_file=log_file,
             log_identifier=log_identifier
         )
+        raise NameError("Unphysical expectation value")
     return prob_of_measuring_input_state
 
 
