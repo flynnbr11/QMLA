@@ -77,13 +77,13 @@ def default_expectation_values(
     """
 
     probe_bra = state.conj().T
-    # u = expm(-1j*ham*t)
+    u = expm(-1j*ham*t)
     
-    h = hexp.UnitaryEvolvingMatrix(
-        ham, 
-        evolution_time = t,
-    )
-    u = h.expm()
+    # h = hexp.UnitaryEvolvingMatrix(
+    #     ham, 
+    #     evolution_time = t,
+    # )
+    # u = h.expm()
 
     u_psi = np.dot(u, state)
     expectation_value = np.dot(probe_bra, u_psi) # in general a complex number
