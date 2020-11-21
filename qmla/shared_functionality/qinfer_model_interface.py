@@ -504,7 +504,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 self.timings[timing_marker]['get_pr0'] += time.time() - t_init
         except:
             self.log_print([
-                "Failed to compute pr0. Params:\n", params[:5]
+                "Failed to compute pr0. probe id used: {}".format(self.probe_counter)
             ])
             # self.log_print(["H_ for IQLE:", self.ham_from_expparams[0]])
             raise # TODO raise specific error

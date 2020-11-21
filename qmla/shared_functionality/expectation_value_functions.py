@@ -97,8 +97,8 @@ def default_expectation_values(
     ):
         log_print(
             [
-                "prob_of_measuring_input_state > 1 or < 0 (={}) at t={}".format(
-                    prob_of_measuring_input_state, t
+                "prob_of_measuring_input_state > 1 or < 0 (={}) at t={}\n Probe={}".format(
+                    prob_of_measuring_input_state, t, repr(state)
                 )
             ],
             log_file=log_file,
