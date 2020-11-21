@@ -11,5 +11,5 @@ API Reference
     qmla_logistics
     models
     implementation
-    growth_rules
+    exploration_strategies
     shared_functionality

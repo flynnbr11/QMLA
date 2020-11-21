@@ -363,7 +363,7 @@ def cumulative_ExplorationTree_plot(
     new_cmap = truncate_colormap(cmap, 0.35, 1.0)
     # new_cmap = cmap
 
-    plot_ExplorationTree(
+    plot_exploration_tree(
         G,
         n_cmap=plt.cm.pink_r,
         e_cmap=new_cmap,
@@ -385,7 +385,7 @@ def cumulative_ExplorationTree_plot(
         plt.savefig(save_to_file, bbox_inches='tight')
     return G, edges, edge_f
 
-def plot_ExplorationTree(
+def plot_exploration_tree(
     G,
     n_cmap,
     e_cmap,

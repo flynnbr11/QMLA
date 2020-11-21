@@ -14,10 +14,10 @@ User Guide
     :maxdepth: 2
 
     qmla
-    growth_rule
+    exploration_strategy
     quantum_hamiltonian_learning
     bayes_factors
-    growth_rule_tree
+    exploration_strategy_tree
     modular_functions
     probes
     experiment_design

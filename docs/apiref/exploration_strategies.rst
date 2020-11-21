@@ -8,17 +8,18 @@
 .. currentmodule:: qmla
 
 
-Growth Rules
+Exploration Strategies
 ===============
 
 
 
-.. currentmodule:: qmla.growth_rules
+.. currentmodule:: qmla.exploration_strategies
 Classes
 ~~~~~~~~~~~~~~~
-:class:`~qmla.growth_rules.GrowthRule` Growth rules do this thing. 
+:class:`~qmla.exploration_strategies.ExplorationStrategy` Exploration Strategies do this thing. 
+    TODO.
 
-.. autoclass:: GrowthRule
+.. autoclass:: ExplorationStrategy
     :members:
     :private-members: _initialise_model_for_learning
 
@@ -26,4 +27,4 @@ Classes
 .. currentmodule:: qmla
 Functions
 ~~~~~~~~~~~~~~~~~~~
-.. autofunction:: get_growth_generator_class
+.. autofunction:: get_exploration_class

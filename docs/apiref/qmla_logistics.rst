@@ -51,12 +51,12 @@ Functions
 .. autofunction:: process_basic_operator
 
 
-Initialising growth rule
+Initialising Exploration Strategy
 ------------------------
 
 Functions 
 ~~~~~~~~~~~~~~~~~~~
-.. autofunction:: get_growth_rule
+.. autofunction:: get_exploration_strategy
 
 
 Trees and branches

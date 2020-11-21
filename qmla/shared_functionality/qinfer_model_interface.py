@@ -794,17 +794,15 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 except NameError:
                     self.log_print([
                         "Error raised; unphysical expecation value.",
-                        "\nHam:\n", ham,
+                        "\nParticle:\n", particles[evoId],
                         "\nt=", t,
-                        "\nState=", probe,
                     ])
                     sys.exit()
                 except timeouts.JobTimeoutException:
                     self.log_print([
-                        "RQ Time exception. \nprobe=",
-                        probe,
-                        "\nt=", t, "\nHam=",
-                        ham
+                        "RQ Time exception.",
+                        "\nParticle:\n", particles[evoId],
+                        "\nt=", t,
                     ])
                     sys.exit()
 

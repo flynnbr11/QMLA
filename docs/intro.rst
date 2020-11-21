@@ -25,9 +25,9 @@ model approximation.
 
 QMLA can operate on simulated or experimental data, or be incorporated with an online experiment. 
 This document provides details on QMLA's mechanics, and provides examples of usage. 
-Particular attention is given to the concept and design of `Growth Rules`, 
+Particular attention is given to the concept and design of `Exploration Strategies`, 
 the primary mechanism by which users ought to interact with the software. 
-Custom growth rules can be developed and plugged into the QMLA framework, to 
+Custom Exploration Strategies can be developed and plugged into the QMLA framework, to 
 target systems, run experiments and generate models according to the user's requirements. 
 Several aspects of the framework are modular, allowing users to select the combination
 which suits their requirements, or easily add functionality as needed. 

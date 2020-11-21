@@ -2918,7 +2918,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_ExplorationTree(
+    def plot_exploration_tree(
         self,
         modlist=None,
         only_adjacent_branches=True,

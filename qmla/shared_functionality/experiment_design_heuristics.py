@@ -945,7 +945,7 @@ class FixedTimeTest(BaseHeuristicQMLA):
         epoch_id=0,
         **kwargs
     ):
-        new_time = 3e10
+        new_time = 5
         # new_time  = self._max_time
 
         eps = self._get_exp_params_array(epoch_id = epoch_id)

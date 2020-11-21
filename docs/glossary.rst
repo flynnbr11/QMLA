@@ -47,10 +47,10 @@ Glossary
     Quantum Likelihood Estimation
         .. seealso:: :term:`QLE`
 
-    Growth Rule
-        .. seealso:: :term:`GR`
-    GR 
-        Growth Rule. 
+    Exploration Strategy
+        .. seealso:: :term:`ES`
+    ES
+        Exploration Strategy. 
         The mechanism by which a tree grows, specifying new
         models to consider, when to stop considering new models, 
         how to remove models, etc. 

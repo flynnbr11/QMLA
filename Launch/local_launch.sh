@@ -10,8 +10,8 @@ run_qhl=1 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-exp=500 # number of experiments
-prt=2000 # number of particles
+exp=5 # number of experiments
+prt=20 # number of particles
 
 ###############
 # QMLA settings
@@ -39,9 +39,9 @@ debug_mode=0
 # exploration_strategy='NVCentreGenticAlgorithmPrelearnedParameters'
 # exploration_strategy='NVPrelearnedTest'
 # exploration_strategy='HeisenbergLatticeSet'
-# exploration_strategy='FermiHubbardLatticeSet'
+exploration_strategy='FermiHubbardLatticeSet'
 # exploration_strategy='DemoIsing'
-exploration_strategy='IsingLatticeSet'
+# exploration_strategy='IsingLatticeSet'
 # exploration_strategy='Demonstration'
 
 # exploration_strategy='HeisenbergGenetic'
