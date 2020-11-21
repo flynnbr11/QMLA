@@ -25,12 +25,12 @@ For clarity, then, these functions are labelled as, .e.g \texttt{get\_pr0()}
 
 import numpy as np
 
-try:
-    from expm import expm
-except:
-    from scipy.linalg import expm
+# try:
+#     from expm import expm
+# except:
+#     from scipy.linalg import expm
 
-# from scipy.linalg import expm
+from scipy.linalg import expm
 # import hexp
 # from scipy.linalg import expm
 
