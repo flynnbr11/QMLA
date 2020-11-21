@@ -60,7 +60,7 @@ class FermiHubbardLatticeSet(
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
         # self.true_lattice_name = self.rerun_lattices[ lattice_idx ]
         self.true_lattice_name = '_4_site_square'
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedTimeTest # TODO remove - for test
+        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedTimeTest # TODO remove - for test
 
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)
