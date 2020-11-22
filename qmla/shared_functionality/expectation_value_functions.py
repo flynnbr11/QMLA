@@ -31,7 +31,7 @@ import numpy as np
 #     from scipy.linalg import expm
 
 from scipy.linalg import expm
-# import hexp
+import hexp
 # from scipy.linalg import expm
 
 # from scipy.linalg import expm
@@ -78,7 +78,12 @@ def default_expectation_values(
     """
 
     probe_bra = state.conj().T
-    u = expm(-1j*ham*t)
+    # u = expm(-1j*ham*t)
+    h = hexp.LinalgUnitaryEvolvingMatrix(
+        ham, 
+        evolution_time = t,
+    )
+    u = h.expm()
     
     # h = hexp.UnitaryEvolvingMatrix(
     #     ham, 
