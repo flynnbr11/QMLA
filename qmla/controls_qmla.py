@@ -56,7 +56,7 @@ class ControlsQMLA():
         self.further_qhl = bool(arguments.further_qhl)
 
         # Get exploration strategy instances for true and alternative exploration strategies
-        self.exploration_rules = arguments.exploration_rules
+        self.exploration_rules = arguments.exploration_strategy
         try:
             self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
                 exploration_rules=self.exploration_rules,
@@ -242,17 +242,15 @@ def parse_cmd_line_args(args):
 
     # Exploration Strategies to learn from
     parser.add_argument(
-        '-ggr', '--exploration_rules',
-        help='Rule applied for generation of new models during QMD. \
-        Corresponding functions must be built into model_generation',
+        '-es', '--exploration_strategy',
+        help='Exploration strategy used to generate models to test during QMLA',
         type=str,
         default='ExplorationStrategy'
     )
 
     parser.add_argument(
-        '-agr', '--alternative_exploration_strategies',
-        help='Exploration Strategies to form other trees.',
-        # type=str,
+        '-aes', '--alternative_exploration_strategies',
+        help='Exploration Strategies to form other exploration trees.',
         action='append',
         default=[],
     )

@@ -79,7 +79,7 @@ alt_exploration_strategies=(
 exploration_strategies_command=""
 for item in ${alt_exploration_strategies[*]}
 do
-    exploration_strategies_command+=" -agr $item" 
+    exploration_strategies_command+=" -aes $item" 
 done
 
 if (( "$run_qhl" == 1 )) 
@@ -117,7 +117,7 @@ git_commit=$(git rev-parse HEAD)
 
 python3 ../scripts/set_qmla_params.py \
     -dir=$this_run_directory \
-    -ggr=$exploration_strategy \
+    -es=$exploration_strategy \
     -prt=$prt \
     -runinfo=$run_info_file \
     -sysmeas=$system_measurements_file \
@@ -143,7 +143,7 @@ python3 ../../../../scripts/analyse_qmla.py \
     -fqhl=0 \
     -runinfo=$run_info_file \
     -sysmeas=$system_measurements_file \
-    -ggr=$exploration_strategy \
+    -es=$exploration_strategy \
     -plotprobes=$plot_probe_file \
     -latex=$latex_mapping_file \
     -gs=1
@@ -154,7 +154,7 @@ python3 ../../../../scripts/generate_results_pdf.py \
     -p=$prt \
     -e=$exp \
     -log=$log_for_entire_run \
-    -ggr=$exploration_strategy \
+    -es=$exploration_strategy \
     -run_desc=\"localdevelopemt\" \
     -git_commit=$git_commit \
     -qhl=$run_qhl \
@@ -192,7 +192,7 @@ do
         -sysmeas=$system_measurements_file \
         -plotprobes=$plot_probe_file \
         -latex=$latex_mapping_file \
-        -ggr=$exploration_strategy \
+        -es=$exploration_strategy \
         $exploration_strategies_command \
         > $this_run_directory/output.txt
 done
@@ -242,7 +242,7 @@ then
             -system_measurements_file=$system_measurements_file \
             -plotprobes=$plot_probe_file \
             -latex=$latex_mapping_file \
-            -ggr=$exploration_strategy \
+            -es=$exploration_strategy \
             $exploration_strategies_command 
     done
     echo "
@@ -255,7 +255,7 @@ then
         -qhl=0 \
         -fqhl=1 \
         -true_expec=$system_measurements_file \
-        -ggr=$exploration_strategy \
+        -es=$exploration_strategy \
         -plot_probes=$plot_probe_file \
         -params=$run_info_file \
         -latex=$latex_mapping_file

@@ -35,7 +35,7 @@ parser.add_argument(
     default=100
 )
 parser.add_argument(
-    '-ggr', '--exploration_rules',
+    '-es', '--exploration_rules',
     help="Exploration Strategy of new models",
     type=str,
     default=0

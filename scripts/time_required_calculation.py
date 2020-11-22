@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser(
 # Add parser arguments, ie command line arguments for QMD
 # QMLA parameters -- fundamentals such as number of particles etc
 parser.add_argument(
-    '-ggr', '--exploration_rules',
+    '-es', '--exploration_rules',
     help='Rule applied for generation of new models during QMD. \
     Corresponding functions must be built into model_generation',
     type=str,

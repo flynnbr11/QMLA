@@ -70,7 +70,7 @@ parser.add_argument(
     default=None
 )
 parser.add_argument(
-    '-ggr', '--exploration_rules',
+    '-es', '--exploration_rules',
     help='Rule applied for generation of new models during QMD. \
     Corresponding functions must be built into model_generation',
     type=str,
