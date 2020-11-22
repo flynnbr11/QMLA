@@ -26,8 +26,8 @@ time_request_insurance_factor=1
 min_time_to_request=16000 # 1300 by default
 
 # QHL parameters.
-e=50 # experiments
-p=4000 # particles
+e=100 # experiments
+p=2000 # particles
 
 ### ---------------------------------------------------###
 # Choose growth rule 
@@ -56,8 +56,8 @@ p=4000 # particles
 # growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='SimulatedNVCentre'
 
-growth_rule='FermiHubbardLatticeSet'
-# growth_rule='IsingLatticeSet'
+# growth_rule='FermiHubbardLatticeSet'
+growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
@@ -94,7 +94,7 @@ top_number_models=4
 running_dir="$(pwd)"
 day_time=$(date +%b_%d/%H_%M)
 this_run_directory=$(pwd)/Results/$day_time/
-qmla_dir="${running_dir%/Launch}" # directory where qmla source can be found
+qmla_dir="${running_dir%/launch}" # directory where qmla source can be found
 lib_dir="$qmla_dir/qmla"
 script_dir="$qmla_dir/scripts"
 output_dir="$this_run_directory/output_and_error_logs/"
