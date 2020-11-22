@@ -93,8 +93,8 @@ def plot_dynamics_multiple_models(
     colours = [cm.viridis(x) for x in cm_subsection]
     # colours = [ cm.Spectral(x) for x in cm_subsection ]
 
-    # Relies on Results folder structure -- not safe?!
-    # ie ExperimentalSimulations/Results/Sep_10/14_32/results_001.p, etc
+    # Relies on results folder structure -- not safe?!
+    # ie ExperimentalSimulations/results/Sep_10/14_32/results_001.p, etc
     experimental_measurements = pickle.load(
         open(str(true_expectation_value_path), 'rb')
     )

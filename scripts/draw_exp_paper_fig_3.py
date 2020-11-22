@@ -19,11 +19,11 @@ import qmla.analysis
 
 test = False
 if test:
-    run_path = '/home/bf16951/QMD/Launch/Results/Aug_05/15_23'
+    run_path = '/home/bf16951/QMD/Launch/results/Aug_05/15_23'
     focus_on_instance = '001'
     branches_to_draw = [1]
 else:
-    # run_path = '/panfs/panasas01/phys/bf16951/QMD/Launch/Results/Aug_05/15_59/'
+    # run_path = '/panfs/panasas01/phys/bf16951/QMD/Launch/results/Aug_05/15_59/'
     run_path = '/home/bf16951/bc_results/Aug_05/15_59'
     focus_on_instance = '013'
     branches_to_draw = [1, 15, 30, 45]
