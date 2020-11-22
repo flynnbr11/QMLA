@@ -1,9 +1,13 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-# test_description='NV__revival-data__qhl__sim-data__sampled-uncertainty-heuristic'
-test_description='NV_bath-GR__2-qubit-taget__all-models-in-stage-at-once__qhl'
-# test_description='NV-GA__1000-3000__experimental-data__16-gen__simulations'
-# test_description='ga__qle__1000-5000-qhl__f-spread__4-generation__reduced-comparison'
+# test_description='NV-GA__prelearned-models__6-qubit-space__4-qubit-true'
+# test_description='theory-paper__selection-from-lattices__heis-rerun'
+# test_description='multiple-GR-at-once__true-ising__DEBUG'
+# test_description='ga__4-qubit-HeisXYZ__IQLE__Elo__28-models-32-gen__reassigning-fitness-at-rebirth'
+# test_description='time-tests__fh-4-sites'
+# test_description='lattices_fh__4-site-square__qhl'
+test_description='test-hexp-install__fh-qhl'
+
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -15,13 +19,15 @@ num_instances=5
 run_qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
 run_qhl_multi_model=0
 multiple_growth_rules=0
-do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMD. 
-time_request_insurance_factor=3
-
+do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMLA. 
+plot_level=2
+debug_mode=0
+time_request_insurance_factor=1
+min_time_to_request=16000 # 1300 by default
 
 # QHL parameters.
-e=10 # experiments
-p=30 # particles
+e=50 # experiments
+p=4000 # particles
 
 ### ---------------------------------------------------###
 # Choose growth rule 
@@ -29,30 +35,36 @@ p=30 # particles
 # and value of experimental_data.
 ### ---------------------------------------------------###
 
-# growth_rule='TestSimulatedNVCentre'
+# growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
+# growth_rule='NVCentreSimulatedLongDynamicsGenticAlgorithm'
+# growth_rule='FermiHubbardLatticeSet'
+# growth_rule='NVCentreNQubitBath'
+# growth_rule='HeisenbergGeneticXXZ'
 # growth_rule='IsingGeneticTest'
+# growth_rule='TestSimulatedNVCentre'
 # growth_rule='IsingGeneticSingleLayer'
+# growth_rule='ObjFncBFP'
+# growth_rule='IsingGenetic'
+# growth_rule='HeisenbergGeneticXXZ'
 
 # growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
 # growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
 # gowth_rule='NVCentreRevivals'
 # growth_rule='NVCentreRevivalsSimulated'
-growth_rule='NVCentreNQubitBath'
+# growth_rule='NVCentreRevivalSimulation'
 # growth_rule='IsingGenetic'
 # growth_rule='ExperimentNVCentreNQubits'
 # growth_rule='SimulatedNVCentre'
 
-# growth_rule='FermiHubbardLatticeSet'
+growth_rule='FermiHubbardLatticeSet'
 # growth_rule='IsingLatticeSet'
 # growth_rule='HeisenbergLatticeSet'
-# growth_rule='IsingSharedField'
-# growth_rule='Genetic'
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
 alt_growth_rules=(  
-#	'IsingPredetermined' 
-#	'HeisenbergXYZPredetermined'
-	'FermiHubbardLatticeSet'
+	'IsingLatticeSet'
+# 	'FermiHubbardLatticeSet'
+	'HeisenbergLatticeSet'
 )
 growth_rules_command=""
 for item in ${alt_growth_rules[*]}
@@ -92,7 +104,7 @@ mkdir -p $output_dir
 # results_dir=$day_time
 
 # File paths used
-bayes_csv="$this_run_directory/cumulative.csv"
+bayes_csv="$this_run_directory/all_models_bayes_factors.csv"
 system_measurements_file="$this_run_directory/system_measurements.p"
 run_info_file="$this_run_directory/true_params.p"
 plot_probe_file="$this_run_directory/plot_probes.p"
@@ -147,7 +159,7 @@ python3 ../scripts/time_required_calculation.py \
 	-qhltenv="QHL_TIME" \
 	-fqhltenv="FQHL_TIME" \
 	-num_proc_env="NUM_PROCESSES" \
-	-mintime=1300
+	-mintime=$min_time_to_request
 
 source $time_required_script
 qmla_time=$QMLA_TIME
@@ -159,9 +171,13 @@ num_processes=$NUM_PROCESSES # TODO RESTORE!!!!!!! testing without RQ
 if (( "$run_qhl" == 1 )) 
 then	
 	num_proc=2
+	plot_level=6 # do all plots for QHL test
 elif (( "run_qhl_multi_model"  == 1 ))
 then 
-	num_proc=4
+	num_proc=5
+elif (( "$multiple_growth_rules" == 1))
+then 
+	num_proc=16
 else
 	num_proc=$num_processes
 fi
@@ -180,6 +196,7 @@ time="walltime=00:00:$seconds_reqd"
 ### ---------------------------------------------------###
 # Submit instances as jobs to job scheduler.
 ### ---------------------------------------------------###
+printf "$day_time: e=$e; p=$p \t $growth_rule \t $test_description \n" >> paths_to_results.log
 
 min_id=0
 let max_id="$min_id + $num_instances - 1 "
@@ -191,9 +208,9 @@ do
 	let num_jobs_launched="$num_jobs_launched+1"
 	this_qmla_name="$test_description""_$qmla_id"
 	this_error_file="$output_dir/error_$qmla_id.txt"
-	this_output_file="$output_dir/ouput_$qmla_id.txt"
+	this_output_file="$output_dir/output_$qmla_id.txt"
 
-	qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmla_dir,QMLA_ID=$qmla_id,RUN_QHL=$run_qhl,RUN_QHL_MULTI_MODEL=$run_qhl_multi_model,FURTHER_QHL=0,GLOBAL_SERVER=$global_server,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXPERIMENTS=$e,PLOTS=$do_plots,PICKLE_INSTANCE=$pickle_class,BAYES_CSV=$bayes_csv,GROWTH_RULE=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,RUN_INFO_FILE=$run_info_file,SYS_MEAS_FILE=$system_measurements_file,PLOT_PROBES_FILE=$plot_probe_file -N $this_qmla_name -l $node_req,$time -o $this_output_file -e $this_error_file run_single_qmla_instance.sh
+	qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmla_dir,QMLA_ID=$qmla_id,RUN_QHL=$run_qhl,RUN_QHL_MULTI_MODEL=$run_qhl_multi_model,FURTHER_QHL=0,GLOBAL_SERVER=$global_server,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXPERIMENTS=$e,PLOTS=$do_plots,PICKLE_INSTANCE=$pickle_class,BAYES_CSV=$bayes_csv,GROWTH_RULE=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,RUN_INFO_FILE=$run_info_file,SYS_MEAS_FILE=$system_measurements_file,PLOT_PROBES_FILE=$plot_probe_file,PLOT_LEVEL=$plot_level,DEBUG=$debug_mode -N $this_qmla_name -l $node_req,$time -o $this_output_file -e $this_error_file run_single_qmla_instance.sh
 
 done
 
@@ -233,24 +250,12 @@ python3 generate_results_pdf.py \
 
 " > $finalise_qmla_script
 
-#	-nprobes=$num_probes \
-#	-pnoise=$probe_noise_level \
-#	-ra=$ra \
-#	-rt=$rt \
-#	-pgh=$rp \
-#	-special_probe=$special_probe \
-#	-bt=$bt \
-#	-exp=$experimental_data
 
-
-### Further QHL on best performing models. Add section to analysis script, which launches futher_qhl stage.
-
-
+# Further QHL on best performing models. Add section to analysis script, which launches futher_qhl stage.
 let p="$further_qhl_resource_factor*$p"
 let e="$further_qhl_resource_factor*$e"
 let bt="$e-1"
 pgh=1.0 # further QHL on different times than initially trained on. 
-#	rp=2.0
 pbs_config=walltime=00:00:$fqhl_time,nodes=1:ppn=$top_number_models
 
 # Prepare script to run further QHL if desired
