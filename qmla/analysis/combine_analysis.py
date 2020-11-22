@@ -19,7 +19,6 @@ def combine_analysis_plots(
 
         def header(self):
             # Logo
-            #         self.image('logo_pb.png', 10, 8, 33)
             # Arial bold 15
             self.set_font('Arial', 'B', 15)
             # Move to the right
@@ -47,7 +46,7 @@ def combine_analysis_plots(
 
     # Instantiation of inherited class
     pdf = PDF()
-
+    print("combining analysis on directory {}".format(results_directory))
     run_dir = re.search(
         # 'results/(.*)/',
         'results/(.*)',
