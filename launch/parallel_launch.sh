@@ -1,13 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-# test_description='NV-GA__prelearned-models__6-qubit-space__4-qubit-true'
-# test_description='theory-paper__selection-from-lattices__heis-rerun'
-# test_description='multiple-GR-at-once__true-ising__DEBUG'
-# test_description='ga__4-qubit-HeisXYZ__IQLE__Elo__28-models-32-gen__reassigning-fitness-at-rebirth'
-# test_description='time-tests__fh-4-sites'
-# test_description='lattices_fh__4-site-square__qhl'
 test_description='test-hexp-install__fh-qhl'
-
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -15,10 +8,10 @@ test_description='test-hexp-install__fh-qhl'
 ### ---------------------------------------------------###
 
 ## Number and type of QMLA instances to perform in this run.
-num_instances=5
-run_qhl=1 # do a test on QHL only -> 1; for full QMD -> 0
+num_instances=1
+run_qhl=1 # do a test on QHL only -> 1; for full QMLA -> 0
 run_qhl_multi_model=0
-multiple_growth_rules=0
+multiple_exploration_strategies=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMLA. 
 plot_level=2
 debug_mode=0
@@ -35,41 +28,19 @@ p=2000 # particles
 # and value of experimental_data.
 ### ---------------------------------------------------###
 
-# growth_rule='NVCentreGenticAlgorithmPrelearnedParameters'
-# growth_rule='NVCentreSimulatedLongDynamicsGenticAlgorithm'
-# growth_rule='FermiHubbardLatticeSet'
-# growth_rule='NVCentreNQubitBath'
-# growth_rule='HeisenbergGeneticXXZ'
-# growth_rule='IsingGeneticTest'
-# growth_rule='TestSimulatedNVCentre'
-# growth_rule='IsingGeneticSingleLayer'
-# growth_rule='ObjFncBFP'
-# growth_rule='IsingGenetic'
-# growth_rule='HeisenbergGeneticXXZ'
+exploration_strategy='IsingLatticeSet'
+# exploration_strategy='HeisenbergLatticeSet'
 
-# growth_rule='NVCentreSimulatedShortDynamicsGenticAlgorithm'
-# growth_rule='NVCentreExperimentalShortDynamicsGenticAlgorithm'
-# gowth_rule='NVCentreRevivals'
-# growth_rule='NVCentreRevivalsSimulated'
-# growth_rule='NVCentreRevivalSimulation'
-# growth_rule='IsingGenetic'
-# growth_rule='ExperimentNVCentreNQubits'
-# growth_rule='SimulatedNVCentre'
-
-# growth_rule='FermiHubbardLatticeSet'
-growth_rule='IsingLatticeSet'
-# growth_rule='HeisenbergLatticeSet'
-
-# Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_growth_rules set to 1 above
-alt_growth_rules=(  
-	'IsingLatticeSet'
-# 	'FermiHubbardLatticeSet'
+# Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_exploration_strategies set to 1 above
+alt_exploration_strategies=(  
+# 	'IsingLatticeSet'
+ 	'FermiHubbardLatticeSet'
 	'HeisenbergLatticeSet'
 )
-growth_rules_command=""
-for item in ${alt_growth_rules[*]}
+exploration_strategies_command=""
+for item in ${alt_exploration_strategies[*]}
 do
-    growth_rules_command+=" -agr $item" 
+    exploration_strategies_command+=" -aes $item" 
 done
 
 
@@ -93,15 +64,13 @@ top_number_models=4
 # Create output files/directories
 running_dir="$(pwd)"
 day_time=$(date +%b_%d/%H_%M)
-this_run_directory=$(pwd)/Results/$day_time/
+this_run_directory=$(pwd)/results/$day_time/
 qmla_dir="${running_dir%/launch}" # directory where qmla source can be found
 lib_dir="$qmla_dir/qmla"
 script_dir="$qmla_dir/scripts"
 output_dir="$this_run_directory/output_and_error_logs/"
 mkdir -p $this_run_directory
 mkdir -p $output_dir
-
-# results_dir=$day_time
 
 # File paths used
 bayes_csv="$this_run_directory/all_models_bayes_factors.csv"
@@ -110,10 +79,7 @@ run_info_file="$this_run_directory/true_params.p"
 plot_probe_file="$this_run_directory/plot_probes.p"
 latex_mapping_file="$this_run_directory/LatexMapping.txt"
 
-
-
 cp $(pwd)/parallel_launch.sh "$this_run_directory/launched_script.txt"
-global_server=$(hostname) # TODO can be removed ?
 echo "" > $this_run_directory/job_ids_started.txt
 echo "" > $this_run_directory/job_ids_completed.txt
 
@@ -136,20 +102,20 @@ git_commit="$(git rev-parse HEAD)"
 # python3 ../qmla/SetQHLParams.py \
 python3 ../scripts/set_qmla_params.py \
 	-dir=$this_run_directory \
-	-ggr=$growth_rule \
+	-es=$exploration_strategy \
 	-prt=$p \
 	-runinfo=$run_info_file \
 	-sysmeas=$system_measurements_file \
 	-plotprobes=$plot_probe_file \
 	-log=$log_for_entire_run \
-	$growth_rules_command
+	$exploration_strategies_command
 
 ### Call script to determine how much time is needed based on above params. Store in qmla_TIME, QHL_TIME, etc. 
 let temp_bayes_times="2*$e" # TODO fix time calculator
 python3 ../scripts/time_required_calculation.py \
-	-ggr=$growth_rule \
-	-use_agr=$multiple_growth_rules \
-	$growth_rules_command \
+	-es=$exploration_strategy \
+	-use_aes=$multiple_exploration_strategies \
+	$exploration_strategies_command \
 	-e=$e \
 	-p=$p \
 	-proc=1 \
@@ -165,7 +131,7 @@ source $time_required_script
 qmla_time=$QMLA_TIME
 qhl_time=$QHL_TIME
 fqhl_time=$FQHL_TIME
-num_processes=$NUM_PROCESSES # TODO RESTORE!!!!!!! testing without RQ
+num_processes=$NUM_PROCESSESNUM_PROCESSES
 
 # Change requested time. e.g. if running QHL , don't need as many nodes. 
 if (( "$run_qhl" == 1 )) 
@@ -175,7 +141,7 @@ then
 elif (( "run_qhl_multi_model"  == 1 ))
 then 
 	num_proc=5
-elif (( "$multiple_growth_rules" == 1))
+elif (( "$multiple_exploration_strategies" == 1))
 then 
 	num_proc=16
 else
@@ -196,7 +162,8 @@ time="walltime=00:00:$seconds_reqd"
 ### ---------------------------------------------------###
 # Submit instances as jobs to job scheduler.
 ### ---------------------------------------------------###
-printf "$day_time: e=$e; p=$p \t $growth_rule \t $test_description \n" >> paths_to_results.log
+printf "$day_time: e=$e; p=$p \t $exploration_strategy \t $test_description \n" >> paths_to_results.log
+
 
 min_id=0
 let max_id="$min_id + $num_instances - 1 "
@@ -210,11 +177,12 @@ do
 	this_error_file="$output_dir/error_$qmla_id.txt"
 	this_output_file="$output_dir/output_$qmla_id.txt"
 
-	qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmla_dir,QMLA_ID=$qmla_id,RUN_QHL=$run_qhl,RUN_QHL_MULTI_MODEL=$run_qhl_multi_model,FURTHER_QHL=0,GLOBAL_SERVER=$global_server,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXPERIMENTS=$e,PLOTS=$do_plots,PICKLE_INSTANCE=$pickle_class,BAYES_CSV=$bayes_csv,GROWTH_RULE=$growth_rule,MULTIPLE_GROWTH_RULES=$multiple_growth_rules,ALT_GROWTH="$growth_rules_command",LATEX_MAP_FILE=$latex_mapping_file,RUN_INFO_FILE=$run_info_file,SYS_MEAS_FILE=$system_measurements_file,PLOT_PROBES_FILE=$plot_probe_file,PLOT_LEVEL=$plot_level,DEBUG=$debug_mode -N $this_qmla_name -l $node_req,$time -o $this_output_file -e $this_error_file run_single_qmla_instance.sh
+	qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmla_dir,QMLA_ID=$qmla_id,RUN_QHL=$run_qhl,RUN_QHL_MULTI_MODEL=$run_qhl_multi_model,FURTHER_QHL=0,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXPERIMENTS=$e,PLOTS=$do_plots,PICKLE_INSTANCE=$pickle_class,BAYES_CSV=$bayes_csv,EXPLORATION_STRATEGY=$exploration_strategy,MULTIPLE_EXPLORATION_STRATEGIES=$multiple_exploration_strategies,ALT_ES="$exploration_strategies_command",LATEX_MAP_FILE=$latex_mapping_file,RUN_INFO_FILE=$run_info_file,SYS_MEAS_FILE=$system_measurements_file,PLOT_PROBES_FILE=$plot_probe_file,PLOT_LEVEL=$plot_level,DEBUG=$debug_mode -N $this_qmla_name -l $node_req,$time -o $this_output_file -e $this_error_file run_single_qmla_instance.sh
 
 done
+echo "Launched $num_instances instances."
 
-finalise_qmla_script=$this_run_directory/analyse_$test_description.sh
+finalise_qmla_script=$this_run_directory/analyse.sh
 monitor_script=$this_run_directory/monitor.sh
 finalise_further_qhl_stage_script=$this_run_directory/further_analyse.sh
 
@@ -234,14 +202,14 @@ python3 analyse_qmla.py \
 	-sysmeas=$system_measurements_file \
 	-latex=$latex_mapping_file \
 	-gs=1 \
-	-ggr=$growth_rule
+	-es=$exploration_strategy
 
 python3 generate_results_pdf.py \
 	-dir=$this_run_directory \
 	-p=$p \
 	-e=$e \
 	-t=$num_instances \
-	-ggr=$growth_rule \
+	-es=$exploration_strategy \
 	-run_desc=$test_description \
 	-git_commit=$git_commit \
 	-qhl=$run_qhl \
@@ -271,7 +239,7 @@ then
 	do
 		let qmla_id="1+\$qmla_id"
 		finalise_script="finalise_$test_description_\$qmla_id"
-		qsub -v qmla_ID=\$qmla_id,QHL=0,FURTHER_QHL=1,EXP_DATA=$experimental_data,RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,GLOBAL_SERVER=$global_server,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_qmla=$pickle_class,BAYES_CSV=$bayes_csv,CUSTOM_PRIOR=$custom_prior,DATA_MAX_TIME=$data_max_time,GROWTH=$growth_rule,LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$run_info_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$system_measurements_file,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma -N \$finalise_script -l $pbs_config -o $output_dir/finalise_output.txt -e $output_dir/finalise_error.txt run_qmla_instance.sh 
+		qsub -v qmla_ID=\$qmla_id,QHL=0,FURTHER_QHL=1,EXP_DATA=$experimental_data,RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXP=$e,NUM_BAYES=$bt,RESAMPLE_A=$ra,RESAMPLE_T=$rt,RESAMPLE_PGH=$rp,PLOTS=$do_plots,PICKLE_qmla=$pickle_class,BAYES_CSV=$bayes_csv,CUSTOM_PRIOR=$custom_prior,DATA_MAX_TIME=$data_max_time,EXPLORATION_STRATEGY=$exploration_strategy,LATEX_MAP_FILE=$latex_mapping_file,TRUE_PARAMS_FILE=$run_info_file,PRIOR_FILE=$prior_pickle_file,TRUE_EXPEC_PATH=$system_measurements_file,PLOT_PROBES=$plot_probe_file,RESOURCE_REALLOCATION=$resource_reallocation,UPDATER_FROM_PRIOR=$updater_from_prior,GAUSSIAN=$gaussian,PARAM_MIN=$param_min,PARAM_MAX=$param_max,PARAM_MEAN=$param_mean,PARAM_SIGMA=$param_sigma -N \$finalise_script -l $pbs_config -o $output_dir/finalise_output.txt -e $output_dir/finalise_error.txt run_qmla_instance.sh 
 	done 
 fi
 " >> $finalise_qmla_script
@@ -289,7 +257,7 @@ echo "
 		-latex==$latex_mapping_file \
 		-runinfo=$run_info_file \
 		-sysmeas=$system_measurements_file \
-		-ggr=$growth_rule \
+		-es=$exploration_strategy \
 		-plotprobes=$plot_probe_file
 
 	python3 generate_results_pdf.py \
@@ -298,7 +266,7 @@ echo "
 		-nprobes=$num_probes \
 		-pnoise=$probe_noise_level \
 		-special_probe=$special_probe \
-		-ggr=$growth_rule \
+		-es=$exploration_strategy \
 		-run_desc=$test_description \
 		-git_commit=$git_commit \
 		-ra=$ra \
