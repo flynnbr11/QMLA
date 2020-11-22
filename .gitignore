@@ -28,40 +28,20 @@ docs/_build
 ParallelDevelopment/*
 ExperimentalSimulations/*
 # DevelopmentNotebooks/*
-Launch/*
+launch/*
 
-!Launch/Results/
-Launch/Results/*
-!Launch/Results/Selected_Runs/
-!Launch/Results/Selected_Runs/*/*/*
-!Launch/Results/Selected_Runs/*/*/*/*
-
-!Launch/SharedResults/
-Launch/SharedResults/*
-!Launch/SharedResults/*/
-!Launch/SharedResults/*/*
-!Launch/SharedResults/*/*/*
-
-
-!Launch/local_launch.sh
-!Launch/parallel_launch.sh
-!Launch/run_qmd_instance.sh
-
-
-!ParallelDevelopment/Results/
-ParallelDevelopment/Results/*
-!ParallelDevelopment/Results/Selected_Runs/
-!ParallelDevelopment/Results/Selected_Runs/*/*/*
-!ParallelDevelopment/Results/Selected_Runs/*/*/*/*
-!ParallelDevelopment/launch_qmd.sh
-!ParallelDevelopment/run_qmd_instance.sh
-
+!launch/results/
+launch/results/*
+!launch/results/Selected_Runs/
+!launch/results/Selected_Runs/*/*/*
+!launch/results/Selected_Runs/*/*/*/*
+!launch/local_launch.sh
+!launch/parallel_launch.sh
+!launch/run_qmd_instance.sh
 
 # But want redis configuration:
 !qmla/RedisConfig.conf
 !qmla/RedisDatabaseConfig.conf
-
-
 
 # Output files from cluster
 *.e*
