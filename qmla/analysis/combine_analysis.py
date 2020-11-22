@@ -49,8 +49,8 @@ def combine_analysis_plots(
     pdf = PDF()
 
     run_dir = re.search(
-        # 'Results/(.*)/',
-        'Results/(.*)',
+        # 'results/(.*)/',
+        'results/(.*)',
         results_directory
     ).group(1)
 

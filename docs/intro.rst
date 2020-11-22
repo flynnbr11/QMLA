@@ -129,7 +129,7 @@ QMLA automatically performs a series of analyses and produces associated plots.
 Analyses are available on three levels: 
 
 Run: 
-    Results across a number of instances.
+    results across a number of instances.
 
     Example: the number of isntance wins for champion models. 
     

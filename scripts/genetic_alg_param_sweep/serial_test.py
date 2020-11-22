@@ -53,5 +53,5 @@ path_to_store_result = os.path.join(
     'results_{}.csv'.format(time)
 )
 ga_results_df.to_csv( path_to_store_result )
-print("[MASTER] Results stored at:", path_to_store_result, flush=True)
+print("[MASTER] results stored at:", path_to_store_result, flush=True)
 # FINISHED 
