@@ -18,6 +18,7 @@ class FermiHubbardLatticeSet(
         exploration_rules,
         **kwargs
     ):
+    
         self.onsite_terms_present = True
         super().__init__(
             exploration_rules=exploration_rules,

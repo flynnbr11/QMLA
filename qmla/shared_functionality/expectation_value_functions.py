@@ -25,13 +25,13 @@ For clarity, then, these functions are labelled as, .e.g \texttt{get\_pr0()}
 
 import numpy as np
 
-# try:
-#     from expm import expm
-# except:
-#     from scipy.linalg import expm
+try:
+    from expm import expm
+except:
+    from scipy.linalg import expm
 
-from scipy.linalg import expm
-import hexp
+# from scipy.linalg import expm
+# import hexp
 # from scipy.linalg import expm
 
 # from scipy.linalg import expm
@@ -65,8 +65,6 @@ def default_expectation_values(
 
     Returns the expectation value computed by evolving the input state with
         the provided Hamiltonian operator. 
-    NB: In this case, the assumption is that the value measured (datum) is 1 
-    and the expectation value corresponds to the probability of obtaining 1.
 
     :param np.array ham: Hamiltonian needed for the time-evolution
     :param float t: Evolution time
@@ -78,12 +76,12 @@ def default_expectation_values(
     """
 
     probe_bra = state.conj().T
-    # u = expm(-1j*ham*t)
-    h = hexp.LinalgUnitaryEvolvingMatrix(
-        ham, 
-        evolution_time = t,
-    )
-    u = h.expm()
+    u = expm(-1j*ham*t)
+    # h = hexp.LinalgUnitaryEvolvingMatrix(
+    #     ham, 
+    #     evolution_time = t,
+    # )
+    # u = h.expm()
     
     # h = hexp.UnitaryEvolvingMatrix(
     #     ham, 
