@@ -55,9 +55,9 @@ For example, 1-qubit models can be constructed using the Pauli operators
 :math:`\hat{H}_{xy} = \alpha_x \hat{\sigma}_x + \alpha_y \hat{\sigma}_y`. 
 Then, :math:`\hat{H}_{xy}` is completely described by the vector 
 :math:`\vec{\alpha} =(\alpha_x, \alpha_y)`, when we know the corresponding operators
-:math:`\vec{\hat{O}} = ( \hat{\sigma}_x, \hat{\sigma_y} )`. 
+:math:`\vec{\hat{T}} = ( \hat{\sigma}_x, \hat{\sigma_y} )`. 
 In general then, models are given by 
-:math:`\hat{H}(\vec{\alpha}) = \vec{\alpha} \vec{\hat{O}}`. 
+:math:`\hat{H}(\vec{\alpha}) = \vec{\alpha} \vec{\hat{T}}`. 
 
 In the Hamiltonian (closed) formalism, terms included in the model correspond 
 to interactions between particles in the system. 
@@ -77,15 +77,18 @@ e.g. whether the system is better described by a partially connected
 Ising lattice :math:`\hat{H}_1` 
 or a nearest-neighbour connected Ising chain :math:`\hat{H}_2`:
 
-:math:`\hat{H}_1 =  
-\alpha_1 \hat{\sigma}_1^z \hat{\sigma}_{2}^z
-+ \alpha_2  \hat{\sigma}_1^z \hat{\sigma}_{3}^z
-+ \alpha_3  \hat{\sigma}_1^z \hat{\sigma}_{4}^z`
+.. math::
 
-:math:`\hat{H}_2 =  
-\beta_1  \hat{\sigma}_1^z \hat{\sigma}_{2}^z
-+ \beta_2  \hat{\sigma}_2^z \hat{\sigma}_{3}^z
-+ \beta_3  \hat{\sigma}_3^z \hat{\sigma}_{4}^z`
+    \hat{H}_1 =  
+    \alpha_1 \hat{\sigma}_1^z \hat{\sigma}_{2}^z
+    + \alpha_2  \hat{\sigma}_1^z \hat{\sigma}_{3}^z
+    + \alpha_3  \hat{\sigma}_1^z \hat{\sigma}_{4}^z
+
+.. math::
+    \hat{H}_2 =  
+    \beta_1  \hat{\sigma}_1^z \hat{\sigma}_{2}^z
+    + \beta_2  \hat{\sigma}_2^z \hat{\sigma}_{3}^z
+    + \beta_3  \hat{\sigma}_3^z \hat{\sigma}_{4}^z`
 
 
 Then, models exist in a `model space`, i.e. the space of all available terms.
@@ -95,26 +98,23 @@ the set of terms which produce data that best matches that of the system.
 
 
 
-Model Learning
+Model Training
 ==============
-Model learning is the process of optimising the parameters of a given model against the system's data. 
+Model traning is the process of optimising the parameters of a given model against the system's data. 
 The model which is being learned does not need to be the `true` model; any model can attempt
 to describe any data.
 A core hypothesis of QMLA is that models which better reflect the true model
 will produce data more consistent with the system data, when compared against less 
 similar models. 
 
-In practice, :term:`Quantum Hamiltonian Learning` is applied
-to perform Bayesian inference and hence find the best parameterisation
-for each model. 
-In principle, however, any parameter learning technique can fulfil this part of the protocol, 
-such as Hamiltonian tomography. 
-
+In principle, any parameter-learning algorithm can fulfil the role of training models in the QMLA framework,
+but in practice, :term:`Quantum Hamiltonian Learning` is applied
+to perform Bayesian inference and hence find the best parameterisation for each model. 
 
 Model Comparison
 ================
-Two candidate models :math:`\hat{H}_1, \hat{H}_2`, having undergone parameter learning,
-can be compared to determine which one better describes the system data. 
+Two candidate models :math:`\hat{H}_1, \hat{H}_2`, having undergone model training,
+can be compared against each other to determine which one better describes the system data. 
 Bayes factors provide a quantitative measure of the relative strength 
 of the models at producing the data. 
 We take the Bayes factor :math:`B(\hat{H}_1, \hat{H}_2)` between two candidate models 
@@ -125,7 +125,7 @@ a number of competitors such that the strongest model from a pool can be determi
 Outputs
 =======
 QMLA automatically performs a series of analyses and produces associated plots. 
-
+These are stored in a unique folder generated for the run upon launch. 
 Analyses are available on three levels: 
 
 Run: 
@@ -145,5 +145,10 @@ Model:
     
     Example: pairwise comparison between models.
 
-
-
+Within the launch script, there is a `plot_level` variable which informs QMLA of how many plots to produce by default. 
+This gives users a level of control over how much analysis is performed. 
+For instance, while testing an Exploration Strategy, a higher degree of testing may be required, 
+so plots relating to every individual model are desired. 
+For large runs, however, where a large number of models are generated/compared, 
+plotting each model's training performance is overly cumbersome and is unneccessary. 
+These are detailed in :ref:`section_analysis`.

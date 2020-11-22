@@ -123,13 +123,6 @@ class ControlsQMLA():
         self.pickle_qmla_instance = bool(arguments.pickle_qmla_instance)
         self.rq_timeout = arguments.rq_timeout
         self.plot_level = arguments.plot_level
-        # if plot_level == 'run':
-        #     self.plot_level = 1
-        # elif plot_level == 'instance':
-        #     self.plot_level = 2
-        # elif plot_level == 'model' : 
-        #     self.plot_level = 3
-
 
         # Redis
         self.host_name = arguments.host_name
