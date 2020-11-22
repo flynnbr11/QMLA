@@ -27,7 +27,7 @@ parser.add_argument(
     default='two_qubit_ising_rotation_hyperfine'
 )
 parser.add_argument(
-    '-use_agr', '--use_alternative_exploration_strategies',
+    '-use_aes', '--use_alternative_exploration_strategies',
     help='Whether to use the alternative exploration strategies provided.',
     type=int,
     default=1
