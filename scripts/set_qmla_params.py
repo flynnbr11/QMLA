@@ -41,7 +41,7 @@ parser.add_argument(
     default=0
 )
 parser.add_argument(
-    '-agr', '--alternative_exploration_strategies',
+    '-aes', '--alternative_exploration_strategies',
     help='Exploration Strategies to form other trees.',
     action='append',
     default=[],
