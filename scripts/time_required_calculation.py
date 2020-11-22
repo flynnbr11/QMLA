@@ -33,7 +33,7 @@ parser.add_argument(
     default=1
 )
 parser.add_argument(
-    '-agr', '--alternative_exploration_strategies',
+    '-aes', '--alternative_exploration_strategies',
     help='Exploration Strategies to form other trees.',
     # type=str,
     action='append',
