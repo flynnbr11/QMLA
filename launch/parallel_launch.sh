@@ -214,9 +214,9 @@ do
 
 done
 
-finalise_qmla_script=$this_run_directory/FINALISE_$test_description.sh
+finalise_qmla_script=$this_run_directory/analyse_$test_description.sh
 monitor_script=$this_run_directory/monitor.sh
-finalise_further_qhl_stage_script=$this_run_directory/FURTHER_finalise.sh
+finalise_further_qhl_stage_script=$this_run_directory/further_analyse.sh
 
 # Generate script to analyse results of QMD runs. 
 echo "
