@@ -2,10 +2,8 @@ r"""
 These functions compute the likelihood used by quantum likelihood estimation (QLE). 
 QLE updates the Bayesian posterior distribution through particles' likelihood $\mathcal{L}(d | \hat{H}_p; e)$,
     given a datum $d$, experiment $e$ and model $\hat{H}_p$.
-The expectation value is given by
-    $$ \bra{\psi} e^{-i \hat{H}_p t} \ket{\psi}, $$
-    such that the probability of measuring into the input probe state $\ket{\psi}$, via the Born rule, is
-    $$ \Pr(0) = | \bra{\psi} e^{-i \hat{H}_p t} \ket{\psi}  |^2 = \mathcal{L}(d=0 | \hat{H}_p; e), $$
+The expectation value for a the unitary operator is given by
+    $$ \Pr(0) =  |\bra{\psi} e^{-i \hat{H}_p t} \ket{\psi}|^2  = \mathcal{L}(d=0 | \hat{H}_p; e), $$
     i.e. the input basis is assigned the measurement label $d=0$, and this quantity is the probability 
     of measuring $d=0$, i.e. measuring the same state as input. 
     Importantly, QInfer requires the quantity $\Pr(0)$, so that is the output of these functions. 
@@ -15,11 +13,10 @@ However, we assume a binary outcome model,
     $$ \mathcal{L}(d=1 | \hat{H}_p; e) = | \bra{\psi_{\perp}} e^{-i \hat{H}_p t} \ket{\psi}  |^2 = 1 - \Pr(0) $$
 
 So, the role of these functions is to compute $\Pr(0)$, 
-    which is not always the same as computing the likelihood
-    (although these are equiavelent when we measure $d=0$).
-For clarity, then, these functions are labelled as, .e.g \texttt{get\_pr0()}
-    instead of \texttt{get\_likelihood()} or \texttt{get\_expectation\_value()}. 
-
+    which is not always the same as computing the likelihood,
+    although these are equiavelent when we measure $d=0$.
+Generically, without referring to the likelihood, these functions are to compute the expectation value
+    of the unitary operator corresponding to the model of the system.
 """
 
 
