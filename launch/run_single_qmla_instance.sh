@@ -2,12 +2,13 @@
 #PBS -l nodes=1:ppn=5,walltime=00:06:00
 
 rm dump.rdb 
+echo "inside run single instance script".
 
 let NUM_WORKERS="$PBS_NUM_NODES * $PBS_NUM_PPN"
 
-if (( "$MULTIPLE_GROWTH_RULES" == 0))
+if (( "$MULTIPLE_EXPLORATION_STRATEGIES" == 0))
 then
-	ALT_GROWTH=""
+	ALT_ES=""
 fi
 
 # Assumed to be running on backend -> load redis as module
@@ -83,8 +84,8 @@ mpirun --display-map --tag-output \
 	-latex=$LATEX_MAP_FILE \
 	-pl=$PLOT_LEVEL \
 	-debug=$DEBUG \
-	-ggr=$GROWTH_RULE \
-	$ALT_GROWTH \
+	-es=$EXPLORATION_STRATEGY \
+	$ALT_ES \
 	> $RESULTS_DIR/output_and_error_logs/profile_$QMLA_ID.txt \
 	: \
 	-np $NUM_RQ_WORKERS \
