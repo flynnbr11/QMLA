@@ -9,6 +9,17 @@
     
 .. only:: not latex
 
-    Biblography
-    ===========
+Biblography
+===========
 
+.. [WGFC13a]
+    Wiebe N., Granade C. E., Ferrie C. & Cory D. G. Hamiltonian Learning and Certification Using Quantum Resources. :arxiv:`1309.0876`
+
+.. [WGFC13b]
+    Wiebe N., Granade C. E., Ferrie C. & Cory D. G. Quantum Hamiltonian Learning Using Imperfect Quantum Resources. :arxiv:`1311.5269`
+
+.. [GFWC12]
+    Granade C. E., Ferrie C., Wiebe N. & Cory D. G.  Robust online Hamiltonian learning. New Journal of Physics **14** 103013 (2012). :doi:`10.1088/1367-2630/14/10/103013`. :arxiv:`1207.1655`.
+
+.. [QInfer]
+    Granade, Christopher, et al. "QInfer: Statistical inference software for quantum applications." Quantum 1 (2017): 5. https://github.com/QInfer/python-qinfer

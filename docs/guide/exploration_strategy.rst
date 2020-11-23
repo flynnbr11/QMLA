@@ -1,6 +1,7 @@
 .. _section_exploration_strategies:
-Exploration Strategies
-------------
+
+Exploration Strategy
+--------------------
 
 
 Exploration Strategies are the engine of QMLA. 

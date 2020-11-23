@@ -71,7 +71,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
         self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
         # self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
-        # self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_values
+        # self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_value
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic

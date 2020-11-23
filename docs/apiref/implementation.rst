@@ -29,5 +29,5 @@ Function References
 
 .. autofunction:: remote_bayes_factor_calculation
 
-.. autofunction:: plot_dynamics_from_models
+.. .. autofunction:: plot_dynamics_from_models
 

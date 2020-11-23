@@ -7,25 +7,50 @@ Glossary
 
     Instance 
         A single implementation of QMLA. 
+        
+        .. seealso:: Defined in :ref:`section_structure`.
     
     Run
-        A collection of :term:`Instance`s. Note that for a run, 
-        all instances must target the same :term:`System`. 
+        A collection of :term:`instance` s. Note that for a run, 
+        all instances must target the same :term:`system` . 
+
+        .. seealso:: Defined in :ref:`section_structure`.
 
     QMLA
-        Quantum Model Learning Agent. 
+        .. seealso:: :term:`Quantum Model Learning Agent`
 
     QHL
-        Quantum Hamiltonian Learning. Given a parameterisation 
-        of a model for a quantum system, 
-        and a target system from which to extract data, 
-        QHL learns the parameters which best match the data, through
-        :term:`QLE`. 
+        .. seealso:: :term:`Quantum Hamiltonian Learning`
 
     QLE 
-        Quantum Likelihood Estimation. The algorithm which is used to 
-        perform Bayesian inference during parameter learning for a given
-        candidate model. 
+        .. seealso:: :term:`Quantum Likelihood Estimation`
+
+    Quantum Hamiltonian Learning
+        Algorithm for learning the parameters of a given model. 
+
+    Quantum Model Learning Agent
+        Algorithm/framework for finding model of quantum system.
+
+    Quantum Likelihood Estimation
+        Algorithm used to perform Bayesian inference during :term:`QHL`
+
+    Exploration Strategy
+        The mechanism by which a tree grows, specifying new
+        models to consider, when to stop considering new models, 
+        how to remove models, etc. 
+        
+        .. seealso:: Defined in :ref:`section_exploration_strategies`.
+        
+    ES
+        .. seealso:: :term:`Exploration Strategy`
+   
+    Exploration Tree
+        Unique tree associated with an individual :term:`Exploration Strategy`. 
+        
+        .. seealso:: Defined in :ref:`section_structure`.
+
+    ET 
+        .. seealso:: :term:`Exploration Tree`
 
     System
         The target system, i.e. underlying model. 
@@ -36,21 +61,16 @@ Glossary
         estimation instead. 
 
     True Model
-        .. seealso:: :term:`System`
+        .. seealso:: :term:`system`
 
-    Quantum Hamiltonian Learning
-        .. seealso:: :term:`QHL`
 
-    Quantum Model Learning Agent
-        .. seealso:: :term:`QMLA`
+    Bayes factor
+        Statistical measure of performance between two models at explaining the same dataset
 
-    Quantum Likelihood Estimation
-        .. seealso:: :term:`QLE`
+    BF 
+        .. seealso:: :term:`Bayes factor`
 
-    Exploration Strategy
-        .. seealso:: :term:`ES`
-    ES
-        Exploration Strategy. 
-        The mechanism by which a tree grows, specifying new
-        models to consider, when to stop considering new models, 
-        how to remove models, etc. 
+    global champion
+        Single model favoured by :term:`Quantum Model Learning Agent` as the strongest candidate
+        to represent the :term:`system`.
+    

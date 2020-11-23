@@ -50,7 +50,7 @@ def log_print(
 
 # Default expectation value calculations
 
-def default_expectation_values(
+def default_expectation_value(
     ham,
     t,
     state,

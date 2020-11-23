@@ -4,7 +4,7 @@ Quantum Model Learning Agent
 The class which controls everything is :class:`~qmla.QuantumModelLearningAgent`. 
 
 
-An :term:`Instance` of this class is used to run one of the available algorithms; many 
+An :term:`instance` of this class is used to run one of the available algorithms; many 
 independent instances can operate simultaneously and be analysed together (e.g. 
 to see the *average* reproduction of dynamics following model learning). 
 This is referred to as a :term:`Run`

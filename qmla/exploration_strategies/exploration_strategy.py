@@ -40,7 +40,7 @@ class ExplorationStrategy():
     
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_modular_functions`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_true_model`
-    * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_model_learning`    
+    * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_model_learning`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_tree_infrastructure`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_logistics`
 
@@ -121,7 +121,7 @@ class ExplorationStrategy():
         """
 
         # Measurement
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_values
+        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_value
 
         # Probes
         self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
@@ -214,8 +214,7 @@ class ExplorationStrategy():
         max_time_to_consider
             Upper limit on time. 
                 1. used for all plots of dynamics
-                2. given to the experiment design heuristic which may use it upper-bound
-                experimental times chosen. 
+                2. given to the experiment design heuristic which may use it upper-bound experimental times chosen. 
         terminate_learning_at_volume_convergence
             Whether to stop learning when a model reaches a given threshold in volume
         volume_convergence_threshold
@@ -1253,6 +1252,10 @@ class ExplorationStrategy():
         spawn_step,
         **kwargs
     ):
+        r"""
+        QMLA asks the exploration tree whether it has finished growing; 
+        the exploration tree queries the exploration strategy through this method
+        """
         if self.tree_completed_initially:
             return True
         elif spawn_step >= self.max_spawn_depth:

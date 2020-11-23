@@ -8,6 +8,12 @@ from qmla import construct_models
 
 import qmla.logging
 
+__all__ = [
+    "process_n_qubit_NV_centre_spin", 
+    "process_multipauli_term",
+    "process_likewise_pauli_sum", 
+    "process_fermi_hubbard_term", 
+]
 
 def log_print(
     to_print_list,

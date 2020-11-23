@@ -12,8 +12,8 @@ Quantum Model Learning Agent
 
 .. toctree::
     glossary
-    intro
-    guide/index
+    overview
+    full_guide
     apiref/index
     bib
     :maxdepth: 2

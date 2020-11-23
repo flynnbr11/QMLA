@@ -39,7 +39,6 @@ Functions
 .. autofunction:: get_num_qubits
 .. autofunction:: get_constituent_names_from_name
 .. autofunction:: alph
-.. autofunction:: consider_new_model
 
 
 Model Generation
@@ -62,7 +61,7 @@ Trees and branches
 ------------------
 Classes
 ~~~~~~~~~~~~~~~~
-.. autoclass:: TreeQMLA
+.. autoclass:: ExplorationTree
     :members:
 .. autoclass:: BranchQMLA
     :members:

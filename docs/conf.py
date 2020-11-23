@@ -106,7 +106,7 @@ preamble = r"""
 extensions = [
 ]
 extensions.append('sphinx.ext.autodoc')
-extensions.append('sphinx.ext.pngmath')
+extensions.append('sphinx.ext.imgmath') 
 extensions.append('sphinx.ext.autosectionlabel')
 autosectionlabel_prefix_document = True
 

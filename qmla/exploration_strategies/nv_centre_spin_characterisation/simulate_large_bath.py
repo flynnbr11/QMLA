@@ -123,7 +123,7 @@ class SimulatedNVCentre(
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
         self.track_quadratic_loss = True
-        # self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_values
+        # self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_value
         self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
@@ -267,7 +267,7 @@ class TestSimulatedNVCentre(
         self.iqle_mode = False
         self.hard_fix_resample_effective_sample_size = 1000
 
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_values
+        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_value
         
         # Choose heuristic
         # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic

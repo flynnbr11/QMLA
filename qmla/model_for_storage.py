@@ -393,8 +393,9 @@ class ModelInstanceForStorage():
     ):
         r"""
         Compute and store r squared up to all times.
+        
         TODO incorporate as flag in r_squared() to store by epoch
-            instead of separate fnc.
+        instead of separate fnc.
         """
 
         self.log_print([

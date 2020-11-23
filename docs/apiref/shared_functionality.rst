@@ -5,18 +5,23 @@
     letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View,
     California, 94041, USA.
     
-.. _models:
+.. _shared_functionality:
+
+.. currentmodule:: qmla
 
 Shared functionality
 ====================
+Some stuff is shared across exploration strategies.
 
 Experiment Design Hueristics
 ----------------------------
-
+.. currentmodule:: qmla.shared_functionality.experiment_design_heuristics
+.. autoclass:: ExperimentDesignHueristic
+    :members: 
 
 Expectation Values
 -------------------------------
-.. currentmodule:: qmla.shared_functionality.expectation_values
+.. currentmodule:: qmla.shared_functionality.expectation_value_functions
 .. autofunction:: default_expectation_value
 
 Prior probability distributions

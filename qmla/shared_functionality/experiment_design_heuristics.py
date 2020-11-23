@@ -20,7 +20,7 @@ import qmla.logging
 frameinfo = getframeinfo(currentframe())
 
 __all__ = [
-    'BaseHeuristicQMLA', 
+    'ExperimentDesignHueristic', 
     'MultiParticleGuessHeuristic',
     'MixedMultiParticleLinspaceHeuristic',
     'VolumeAdaptiveParticleGuessHeuristic'
@@ -28,7 +28,36 @@ __all__ = [
 
 def identity(arg): return arg
 
-class BaseHeuristicQMLA(qi.Heuristic):
+class ExperimentDesignHueristic(qi.Heuristic):
+    """
+    Experiment Design Heuristic base class, to be inherited by specific implementations. 
+    This object has access to the QInfer Updater and Model objects, so it can, e.g., 
+    sample from the particle distribution, to use these values in the design of a new experiment. 
+
+    :param updater: QInfer updater for SMC 
+    :type updater: QInfer Updater object
+    :param model_id: ID of model under study, defaults to 1
+    :type model_id: int
+    :param oplist: list of matrices representing the operators constituting this model, defaults to None
+    :type oplist: list, optional
+    :param norm: type of norm to use, defaults to 'Frobenius'
+    :type norm: str, optional
+    :param inv_field: inversion field to use (legacy - should not matter) defaults to 'x_'
+    :type inv_field: str, optional
+    :param t_field: name of field corresponding to $t$, defaults to 't'
+    :type t_field: str, optional
+    :param maxiters: manimum number of iterations to attempt to find distinct particles from the distribution, defaults to 10
+    :type maxiters: int, optional
+    :param other_fields: optional further fields, defaults to None
+    :type other_fields: list, optional
+    :param inv_func: inverse function, used by QInfer, (legacy - should not matter) defaults to identity
+    :type inv_func: function, optional
+    :param t_func: function for computing $t$, defaults to identity
+    :type t_func: function, optional
+    :param log_file: path to log file, defaults to 'qmla_log.log'
+    :type log_file: str, optional
+    """    
+
     def __init__(
         self,
         updater,
@@ -44,31 +73,6 @@ class BaseHeuristicQMLA(qi.Heuristic):
         log_file='qmla_log.log',    
         **kwargs
     ):
-        """Experiment Design Heuristic base class, to be inherited by specific implementations. 
-
-        :param updater: [description]
-        :type updater: [type]
-        :param model_id: [description], defaults to 1
-        :type model_id: int, optional
-        :param oplist: [description], defaults to None
-        :type oplist: [type], optional
-        :param norm: [description], defaults to 'Frobenius'
-        :type norm: str, optional
-        :param inv_field: [description], defaults to 'x_'
-        :type inv_field: str, optional
-        :param t_field: [description], defaults to 't'
-        :type t_field: str, optional
-        :param maxiters: [description], defaults to 10
-        :type maxiters: int, optional
-        :param other_fields: [description], defaults to None
-        :type other_fields: [type], optional
-        :param inv_func: [description], defaults to identity
-        :type inv_func: [type], optional
-        :param t_func: [description], defaults to identity
-        :type t_func: [type], optional
-        :param log_file: [description], defaults to 'qmla_log.log'
-        :type log_file: str, optional
-        """    
         super().__init__(updater)
         # Most importantly - access to updater and underlying model
         self._model_id = model_id
@@ -137,6 +141,11 @@ class BaseHeuristicQMLA(qi.Heuristic):
         )
 
     def __call__(self, **kwargs):
+        """By calling the heuristic, it produces an experiment to be performed to learn upon.
+
+        :return: all necessary data to perform an experiment, e.g. evolution time and probe ID.  
+        :rtype: named tuple
+        """        
         # Process some data from the model first
         try:
             current_volume = kwargs['current_volume']
@@ -167,11 +176,18 @@ class BaseHeuristicQMLA(qi.Heuristic):
         return new_experiment
 
     def design_experiment(self, **kwargs):
+        r""" 
+        Design an experiment. 
+        Children classes can overwrite this function to implement custom logic 
+            for the deisggn of experiments. 
+
+        """
         raise RuntimeError(
             "experiment design method not written for this heuristic."
         )
     
     def finalise_heuristic(self, **kwargs):
+        r""" Any functionality the user wishes to happen at the final call to the heuristic."""
         self.log_print([
             "{} Resample epochs: {}".format(
                 len(self._resample_epochs), 
@@ -180,12 +196,24 @@ class BaseHeuristicQMLA(qi.Heuristic):
             # "\nTimes suggested:", self._times_suggested
         ])
 
-
-    def :meth:`~qmla.ModelInstanceForLearning._plot_distributions`(
+    def plot_heuristic_attributes(
         self, 
         save_to_file, 
         **kwargs
     ):
+        """  
+        Summarise the heuristic used for the model training through several plots. 
+
+            volume of distribution at each experiment
+            
+            time designed by heuristic for each experiment
+
+            effecitve sample size at each experiment, used to determine when to resample 
+
+        :param save_to_file: path to which the summary figure is stored
+        :type save_to_file: path
+        """        
+
         plots_to_include = [
             'volume', 'times_used', 'effective_sample_size'
         ]
@@ -296,7 +324,7 @@ class BaseHeuristicQMLA(qi.Heuristic):
                 )
 
 
-class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
+class MultiParticleGuessHeuristic(ExperimentDesignHueristic):
     def __init__(
         self,
         **kwargs
@@ -342,7 +370,7 @@ class MultiParticleGuessHeuristic(BaseHeuristicQMLA):
 
         return eps
 
-class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
+class MixedMultiParticleLinspaceHeuristic(ExperimentDesignHueristic):
     r"""
     First half of experiments are standard MPGH, then force times evenly spaced 
     between 0 and max_time.
@@ -419,7 +447,7 @@ class MixedMultiParticleLinspaceHeuristic(BaseHeuristicQMLA):
         return eps
 
 
-class SampleOrderMagnitude(BaseHeuristicQMLA):
+class SampleOrderMagnitude(ExperimentDesignHueristic):
     
     def __init__(
         self,
@@ -505,7 +533,7 @@ class SampleOrderMagnitude(BaseHeuristicQMLA):
         ])
 
 
-class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
+class SampledUncertaintyWithConvergenceThreshold(ExperimentDesignHueristic):
     
     def __init__(
         self,
@@ -651,7 +679,7 @@ class SampledUncertaintyWithConvergenceThreshold(BaseHeuristicQMLA):
         
         return experiment
 
-class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
+class VolumeAdaptiveParticleGuessHeuristic(ExperimentDesignHueristic):
     def __init__(
         self,
         updater,
@@ -907,7 +935,7 @@ class VolumeAdaptiveParticleGuessHeuristic(BaseHeuristicQMLA):
                 )
 
 
-class FixedNineEighthsToPowerK(BaseHeuristicQMLA):
+class FixedNineEighthsToPowerK(ExperimentDesignHueristic):
     def __init__(
         self,
         **kwargs
@@ -940,7 +968,7 @@ class FixedNineEighthsToPowerK(BaseHeuristicQMLA):
         return eps
 
 
-class RandomTimeUpperBounded(BaseHeuristicQMLA):
+class RandomTimeUpperBounded(ExperimentDesignHueristic):
     def __init__(
         self,
         **kwargs
@@ -971,7 +999,7 @@ class RandomTimeUpperBounded(BaseHeuristicQMLA):
         return eps
 
 
-class FixedTimeTest(BaseHeuristicQMLA):
+class FixedTimeTest(ExperimentDesignHueristic):
     def __init__(
         self,
         **kwargs
@@ -1004,7 +1032,7 @@ class FixedTimeTest(BaseHeuristicQMLA):
 
 
 
-class TimeList(BaseHeuristicQMLA):
+class TimeList(ExperimentDesignHueristic):
     def __init__(
         self,
         **kwargs

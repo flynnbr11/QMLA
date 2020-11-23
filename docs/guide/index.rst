@@ -13,12 +13,14 @@ User Guide
 .. toctree::
     :maxdepth: 2
 
-    qmla
-    exploration_strategy
-    quantum_hamiltonian_learning
-    bayes_factors
-    exploration_strategy_tree
-    modular_functions
-    probes
-    experiment_design
-    analysis
+    full_guide
+    .. qmla
+    .. exploration_strategy
+    .. quantum_hamiltonian_learning
+    .. bayes_factors
+    .. exploration_tree
+    .. modular_functions
+    .. probes
+    .. experiment_design
+    .. analysis
+    .. launch
