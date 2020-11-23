@@ -18,11 +18,10 @@ User controls
 
 Classes
 ~~~~~~~~~~~~~~~
-:class:`ControlsQMLA` Controls (user and otherwise) to specify QMLA instance.
+:class:`~qmla.ControlsQMLA` Controls (user and otherwise) to specify QMLA instance.
 
 .. autoclass:: ControlsQMLA
     :members:
-
 
 
 Database framework

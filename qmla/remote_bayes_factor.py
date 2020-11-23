@@ -20,7 +20,8 @@ plt.switch_backend('agg')
 
 
 __all__ = [
-    'remote_bayes_factor_calculation'
+    'remote_bayes_factor_calculation',
+    'plot_dynamics_from_models'
 ]
 
 
@@ -369,6 +370,19 @@ def plot_dynamics_from_models(
     bayes_factor, 
     save_directory
 ):
+    """Plot the dynamics of the pair of models considered in a Bayes factor comparison. 
+
+    :param models: list of 2 models which were compared during this calculation, [model_a, model_b].
+    :type models: :class:`~qmla.ModelInstanceForLearning`
+    :param exp_msmts: times and expectation values for the system. 
+    :type exp_msmts: dict
+    :param bf_times: Times used for the BF calculation
+    :type bf_times: list
+    :param bayes_factor: Bayes factor between the two input models, to be read as BF(model_a, model_b)
+    :type bayes_factor: float
+    :param save_directory: path where the generated figure is to be saved
+    :type save_directory: path
+    """
 
     times = list(sorted(exp_msmts.keys()))
     fig, ax1 = plt.subplots(
@@ -427,8 +441,6 @@ def plot_dynamics_from_models(
         )
     )
     plt.savefig(plot_path)
-
-
 
 
 def plot_models_dynamics(

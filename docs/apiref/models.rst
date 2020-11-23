@@ -11,14 +11,14 @@
 Models 
 ======
 
-
 Model for learning
 ------------------
 
 Classes
 ~~~~~~~~~~~~~~~
-Model to perform parameter learning upon, usually Quantum Hamiltonian Learning. 
+Model to perform parameter learning upon, usually quantum Hamiltonian learning. 
 
+.. currentmodule:: qmla.model_for_learning
 .. autoclass:: ModelInstanceForLearning
     :members:
     :private-members: _initialise_model_for_learning
@@ -38,7 +38,7 @@ Model for storage
 
 Classes
 ~~~~~~~~~~~~~~~~
-Reduced model to store in :class:`qmla.QuantumModelLearningAgent`
+Reduced model to store in :class:`~qmla.QuantumModelLearningAgent`
 
 .. autoclass:: ModelInstanceForStorage
     :members:

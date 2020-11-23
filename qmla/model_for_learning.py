@@ -608,6 +608,10 @@ class ModelInstanceForLearning():
 
 
     def _model_plots(self):
+        r"""
+        Generate plots specific to this model.
+        Which plots are drawn depends on the ``plot_level`` set in the launch script.
+        """
 
         if self.plot_level >= 4:
             # Plots for this model, if plot level wants to include them
@@ -1459,6 +1463,9 @@ class ModelInstanceForLearning():
         }
 
     def _plot_dynamics(self):
+        """
+        Plots the dynamics reproduced by this model against system data.
+        """        
         
         # Plot dynamics of model vs system
         plt.clf()

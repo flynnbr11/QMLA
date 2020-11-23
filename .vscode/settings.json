@@ -1,4 +1,5 @@
 {
     "python.linting.enabled": true,
-    "restructuredtext.confPath": "${workspaceFolder}/docs"
+    "restructuredtext.confPath": "${workspaceFolder}/docs",
+    "restructuredtext.linter.disabled": true
 }

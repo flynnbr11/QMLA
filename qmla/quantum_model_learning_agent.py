@@ -2982,6 +2982,12 @@ class QuantumModelLearningAgent():
         )
 
     def _plot_model_terms(self, colour_by = 'binary'):
+        """
+        Plot the terms of each model by model ID. 
+
+        :param colour_by: defaults to 'binary' for black/white; alternatively colour by f_score of model
+        :type colour_by: str, optional
+        """        
         plt.rcParams.update({"text.usetex" : False})
         if self.plot_level < 1:
             return
@@ -3081,7 +3087,11 @@ class QuantumModelLearningAgent():
         )
 
     def _plot_dynamics_all_models_on_branches(self, branches=None):
+        """Plot the dynamics of all models on given branches.
 
+        :param branches: list of branches to draw dynamics for, defaults to None, in which case all branches are drawn. 
+        :type branches: list, optional
+        """        
         self.branch_results_dir = os.path.join(
             self.qmla_controls.plots_directory, 
             'branches'
@@ -3192,6 +3202,8 @@ class QuantumModelLearningAgent():
 
 
     def _plot_evaluation_normalisation_records(self):
+        """Plot the normalisation record of all models grouped by the branch they are on.
+        """        
         if self.plot_level < 3 : 
             return
 

@@ -12,7 +12,7 @@
 Quantum Model Learning Agent
 ============================
 
-:class:`QuantumModelLearningAgent` - manager class for the implementation of QMLA
+:class:`~qmla.QuantumModelLearningAgent` - manager class for the implementation of QMLA
 -------------------------------------------------------------------------------
 
 Class Reference 

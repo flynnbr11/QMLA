@@ -10,6 +10,10 @@
 Shared functionality
 ====================
 
+Experiment Design Hueristics
+----------------------------
+
+
 Expectation Values
 -------------------------------
 .. currentmodule:: qmla.shared_functionality.expectation_values
