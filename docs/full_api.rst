@@ -15,7 +15,7 @@ The overall :term:`QMLA` protocol is managed by this class.
 
 .. autoclass:: QuantumModelLearningAgent
     :members: 
-    :private-members: _consider_new_model
+    :private-members: 
 
 
 Logistics
@@ -55,7 +55,7 @@ These functions map strings to matrices which can be used in the construction of
 
 Initialising Exploration Strategy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: get_exploration_strategy
+.. autofunction:: get_exploration_class
 
 
 Trees and branches
@@ -154,8 +154,6 @@ In order to initialise an :term:`ES`, :term:`QMLA` calls this function,
 which searches within the namespace of ``qmla/exploration_strategies``. 
 
 .. autofunction:: get_exploration_class
-
-
 
 Modular functionality
 ---------------------

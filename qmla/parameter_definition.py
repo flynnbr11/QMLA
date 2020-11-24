@@ -34,23 +34,23 @@ def set_shared_parameters(
 
     This function does not return anything, but stores data 
     required for the run to the ``run_info_file`` path.
-    The data pickled are:
+    The data pickled as ``run_info`` are:
 
-    :RunData true_model: 
+    :true_model: 
         name of true model, i.e. the model we call the system, 
         against which candidate models are tested
-    :RunData params_list: 
+    :params_list: 
         list of parameters of the true model
-    :RunData params_dict: 
+    :params_dict: 
         dict of parameters of the true model
-    :RunDatan exploration_rule: 
+    :exploration_rule: 
         exploration strategy (name) of true model
-    :RunData all_exploration_strategies: 
+    :all_exploration_strategies: 
         list of all exploration strategies (names) which are to 
         be performed by each instance
-    :RunData evaluation_probes: 
+    :evaluation_probes: 
         proebs to use during evaluation experiments
-    :RunData evaluation_times: 
+    :evaluation_times: 
         times to use during evaluation experiments
 
     :param ExplorationStrategy exploration_class: exploration strategy of true model, from

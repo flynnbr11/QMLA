@@ -322,24 +322,23 @@ It retrieves the succinct summaries of the training/comparisons pertainng to a s
 which are stored on the redis database, allowing for later anlaysis as required by :term:`QMLA`.
 The retrieval of trained model data is performed in :meth:`~qmla.ModelInstanceForStorage.model_update_learned_values`. 
 
-
 .. _section_modular_functionality: 
 
 Modular functionality
 ---------------------
 A large amount of the design of an :term:`ES` involves implementation of subroutines: 
-there are a number of methods of :class:`~qmla.ExplorationStrategy` which can be overwritten 
+there are a number of methods of :class:`~qmla.exploration_strategies.ExplorationStrategy` which can be overwritten 
 in order to achieve functionality specific to the target :term:`system`. 
 In this section we describe these subroutines. 
 Many of the subroutines have a number of sensible implementations: we make :term:`QMLA` \emph{modular} 
 by providing a set of pre-built subroutines, and allow them to be easily swapped
 so that a new :term:`ES` can benefit from arbitrary combiniations of subroutines. 
-The subroutines are called by wrapper methods in :class:`~qmla.ExplorationStrategy`;
+The subroutines are called by wrapper methods in :class:`~qmla.exploration_strategies.ExplorationStrategy`;
 to set which function is called, change the attribute in the definition of the custom :term:`ES`. 
 Alternatively, directly overwrite the wrapper. 
 The pre-built functions are in ``qmla/shared_functionality``. 
 
-Within :class:`~qmla.ExplorationStrategy`, these modular functions are set in
+Within :class:`~qmla.exploration_strategies.ExplorationStrategy`, these modular functions are set in
 :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_modular_subroutines`. 
 
 An example of setting each of these subroutines is 
@@ -408,7 +407,7 @@ since any evolution in this basis will be reflected by the measurement.
 The default set of probes is to use a random set. 
 Alternative sets include :math:`|+\rangle^{\otimes N}` or :math:`|0\rangle^{\otimes N}`.
 Probes are generated in a dictionary, of which the keys are ``(probe_id, num_qubits)``; 
-``probe_id`` runs from 1 to the ``num_probes`` attribute of the :class:`~qmla.ExplorationStrategy` controls; 
+``probe_id`` runs from 1 to the ``num_probes`` attribute of the :class:`~qmla.exploration_strategies.ExplorationStrategy` controls; 
 the ``num_qubits`` runs from 1 to ``max_num_qubits``. 
 
 There are a number of sets of probes required, all similarly set by specifying the subroutine:
@@ -475,7 +474,7 @@ Importantly, the range of each :term:`term`'s parameter can be different,
 e.g. near-neighbour couplings having much higher frequency than distant neighbours. 
 Terms' prior mean and width can be specified in ``gaussian_prior_means_and_widths``.
 Terms which do not have specific means/widths in ``gaussian_prior_means_and_widths`` are assigned based on the 
-:class:`~qmla.ExplorationStrategy` attributes ``min_param``, ``max_param``:
+:class:`~qmla.exploration_strategies.ExplorationStrategy` attributes ``min_param``, ``max_param``:
 the defaults are 
 
     ``mean = (max_param + min_param)/2``;
@@ -521,6 +520,7 @@ Further examples, specific to models of bespoke :term:`ES` are
 
 Output and Analysis
 -------------------
+.. currentmodule:: qmla
 
 When a run is launched (either locally or remotely), a results directory 
 is built for that run. 
@@ -604,7 +604,7 @@ Both of are available through ``bash`` scripts in ``qmla/launch``.
 When launched in parallel, the model training/comparison subroutines are run 
 on remote processes, e.g. in a compute cluster. 
 In either case, the user has a set of top-level controls, 
-bearing in mind that the majority of user requirements are implemented in the :class:`~qmla.ExplorationStrategy`.
+bearing in mind that the majority of user requirements are implemented in the :class:`~qmla.exploration_strategies.ExplorationStrategy`.
 Following the setting of these controls, the remainder of the launch script call a number of ``bash`` and ``Python``
 scripts for the actual implementation, which most users should not need to alter. 
 

@@ -112,7 +112,8 @@ extensions = [
   'sphinx.ext.todo',
   'sphinx.ext.viewcode', 
   'sphinx.ext.extlinks',
-  'matplotlib.sphinxext.plot_directive'
+  # 'sphinxcontrib.bibtex', # must install from pip first # also needs python3.6 :(
+  # 'matplotlib.sphinxext.plot_directive'
 ]
 
 autosectionlabel_prefix_document = True
