@@ -29,3 +29,17 @@ Prior probability distributions
 .. currentmodule:: qmla.shared_functionality.prior_distributions
 .. autofunction:: gaussian_prior
 
+QInfer Interface
+----------------
+.. currentmodule:: qmla.shared_functionality.qinfer_model_interface
+.. autoclass:: QInferModelQMLA
+    :members:
+
+Latex name mapping 
+~~~~~~~~~~~~~~~~~~
+Some examples of working latex name maps are provided. 
+
+.. currentmodule:: qmla.shared_functionality.latex_model_names
+.. autofunction:: pauli_set_latex_name
+.. autofunction:: grouped_pauli_terms
+.. autofunction:: fermi_hubbard_latex

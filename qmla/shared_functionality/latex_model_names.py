@@ -15,6 +15,18 @@ def pauli_set_latex_name(
     name,
     **kwargs
 ):
+    r"""
+    Get latex string for model of Hubbard type. 
+
+    Individual terms must be of the form, to implement operator ``t`` on qubit ``i`` of an ``N``-qubit system:
+
+        ``pauliSet_i_t_dN``
+
+    >>> model_name = 'pauliSet_1_x_d2+pauliSet_2_y_d2'
+    >>> pauli_set_latex_name(model_name)
+
+    :param str name: name of model or term to map
+    """
     core_operators = list(sorted(qmla.construct_models.core_operator_dict.keys()))
     num_sites = qmla.construct_models.get_num_qubits(name)
     separate_terms = name.split('+')
@@ -410,6 +422,11 @@ def fermi_hubbard_latex(
     name,
     **kwargs
 ):
+    r"""
+    Get latex string for model of Hubbard type. 
+
+    :param str name: name of model or term to map
+    """
     # TODO put in qmla.shared_functionality.latex_model_names
     # TODO gather terms in list, sort alphabetically and combine for latex
     # str

@@ -13,4 +13,3 @@ API Reference
     implementation
     exploration_strategies
     shared_functionality
-    string_processing

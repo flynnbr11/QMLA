@@ -219,14 +219,12 @@ For example, the launch script (e.g. at ``qmla/launch/local_launch.sh``) should 
 
 Users should ensure they understand the options for launching :term:`QMLA` as outlined in :ref:`section_launch`. 
 
-Exploration trees
-~~~~~~~~~~~~~~~~~
 Each :term:`ES` is assigned a unique :term:`Exploration Tree (ET) <ET>`, 
 although most users need not alter the infrastructure of the :term:`ET` or :term:`QMLA`. 
 
 
 Models
-----------------------------
+------
 
 Construction
 ~~~~~~~~~~~~~
@@ -272,6 +270,8 @@ In brief, these classes are
     training and comparisons.
 
 We next detail each of these roles of the model concept.
+
+.. _section_training: 
 
 Training
 ~~~~~~~~~
@@ -340,7 +340,7 @@ Alternatively, directly overwrite the wrapper.
 The pre-built functions are in ``qmla/shared_functionality``. 
 
 Within :class:`~qmla.ExplorationStrategy`, these modular functions are set in
-:meth:`~qmla.exploration_strategies.ExplorationStrategy.setup_modular_subroutines`. 
+:meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_modular_subroutines`. 
 
 An example of setting each of these subroutines is 
 
@@ -348,6 +348,11 @@ An example of setting each of these subroutines is
 
     from qmla.shared_functionality import experiment_design_heuristics as edh
     from qmla.shared_functionality import expectation_value_functions as ev
+    from qmla.shared_functionality import \
+        qmla.shared_functionality.probe_set_generation as probes
+    from qmla.shared_functionality import qinfer_model_interface as qii
+    from qmla.shared_functionality import prior_distributions
+    from qmla.shared_functionality import latex_model_names as lm
 
     class UserExplorationStrategy(qmla.ExplorationStrategy):
         def __init__(
@@ -365,46 +370,152 @@ An example of setting each of these subroutines is
             self.true_model = 'pauliSet_1_x_d1+pauliSet_1_y_d1'
 
             # Overwrite expectation value subroutine
-            self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.default_expectation_value
+            self.expectation_value_subroutine = ev.default_expectation_value
 
-            # Probes
-            self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-            self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
-            self.shared_probes = True  # i.e. system and simulator get same probes for learning
-            self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.zero_state_probes
-            self.evaluation_probe_generation_subroutine = None
-            self.probe_noise_level = 0 # 1e-5
+            # Overwrite probe generation subroutines
+            self.system_probes_generation_subroutine = probes.plus_probes_dict
+            self.plot_probes_generation_subroutine = probes.zero_state_probes
 
-            # Experiment design
-            self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+            # Overwrite exeperiment design heuristic
+            self.model_heuristic_subroutine = edh.VolumeAdaptiveParticleGuessHeuristic
                     
-            # QInfer interface
-            self.qinfer_model_subroutine = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
+            # Overwrite QInfer interface
+            self.qinfer_model_subroutine = qii.QInferModelQMLA
 
-            # Prior distribution
-            self.prior_distribution_subroutine = qmla.shared_functionality.prior_distributions.gaussian_prior
+            # Overwrite prior distribution subroutine
+            self.prior_distribution_subroutine = priors.gaussian_prior
 
-            # Map model name strings to latex representation
-            self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
-
-
-
+            # Overwrite latex mapping subroutine
+            self.latex_string_map_subroutine = lm.lattice_set_grouped_pauli
 
 .. _section_probes:
-Probes
-------------
 
-The `probe` is the input state used during the learning procedure. 
+Probes
+~~~~~~
+
+The :term:`probe` is the input state used during the learning procedure. 
 Different probes permit different biases on the information available to the
 algorithm; it is essential to consider which probes are appropriate for learning
 different classes of models. 
+In general the training procedure loops over the available probes, to minimise the chance of 
+favouring some models due to bias inherent in the probe. 
+For example, if the probe is (close to) an eigenstate of one candidate model, that model
+will never learn effectively since there will be little variation in measurements correspdonding 
+to evolving the probe according to that model. 
+Intuitively, the most informative probe for a given model is a superposition of its eigenstates, 
+since any evolution in this basis will be reflected by the measurement. 
 
-Experiment design
-----------------------------
+The default set of probes is to use a random set. 
+Alternative sets include :math:`|+\rangle^{\otimes N}` or :math:`|0\rangle^{\otimes N}`.
+Probes are generated in a dictionary, of which the keys are ``(probe_id, num_qubits)``; 
+``probe_id`` runs from 1 to the ``num_probes`` attribute of the :class:`~qmla.ExplorationStrategy` controls; 
+the ``num_qubits`` runs from 1 to ``max_num_qubits``. 
 
-A crucial aspect of the QHL subroutine is the design of experiments 
-which provide informative data which allows meaningful 
-updates of the prior distribution. 
+There are a number of sets of probes required, all similarly set by specifying the subroutine:
+
+    ``system_probes_generation_subroutine``
+        Probes used for evolution on the target :term:`system`
+
+    ``simulator_probes_generation_subroutine``
+        Probes correspdonding exactly to those used on the system. 
+        These should be the same so that the likelihood function is meaningful, but in realistic cases
+        there may be slight differences in probe preparation, e.g. due to expected noise in an experimental system. 
+        Therefore it is possible to specify a different set. 
+        Note to enable this functionality, ``shared_probes`` must also be set to ``False``. 
+    
+    ``plot_probes_generation_subroutine``
+        Probes used for plots throughout the protocol. 
+        Plots should be in the same basis for consistency; 
+        we generate them once per :term:`run` to save time, since the plot probes are the same everywhere. 
+        The standard plotting probes are :math:`|+\rangle^{\otimes N}`.
+    
+    ``evaluation_probe_generation_subroutine``
+        Some :term:`ES` use evaluation datasets within model selection; 
+        to specify a different generator than ``system_probes_generation_subroutine``, set this attribute. 
+        Defaults to ``None``. 
+
+.. _section_edh: 
+
+Experiment design heuristic
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order for the model :ref:`section_training` to perform well, 
+it is essential that the parameter learning subroutine is fed useful, meaningful data. 
+We use an :term:`experiment design heuristic (EDH) <EDH>` to generate informative experiments. 
+The :term:`EDH` can encompass custom logic for particular use cases, 
+although the most common (particle guess heuristic [WGFC13a]_) attempts to select an evolution time :math:`t`
+which can distinguish between strong and weak parameterisations (particles) based on the current 
+distribution. 
+
+Primarily the :term:`EDH` must choose an evolution time :math:`t` and :term:`probe`,
+since these two together specify an entire experiment in most use cases. 
+:term:`QMLA` can consider more complex experiment designs, in which case the :term:`EDH` must also 
+choose informative values for all inputs. 
+
+QInfer interface
+~~~~~~~~~~~~~~~~
+As mentioned, the workhorse of model :ref:`section_training` is [QInfer]_. 
+The default behaviour of :class:`~qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA` is to call 
+:meth:`~qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA.likelihood` for both the calculation of the datum from the :term:`system`,
+and the likelihoods of all the particles through the simulator. 
+This too can be replaced, for example if calls to the :term:`system` need to interface with a real experiment, 
+or the particles should be computed through a quantum simulator. 
+
+Prior distribution 
+~~~~~~~~~~~~~~~~~~
+QInfer works by taking an initial :term:`prior` distribution, which it iteratively narrows based on 
+quantum likelihood estimation. 
+This process of narrowing the distribution is what we call \emph{learning}: after :math:`N_E` experiments
+worth of data, the mean of the remaining distribution is considered as the optimised parameterisation.
+
+The :term:`prior` can be altered to incorporate the user's prior knowledge about the system. 
+The default generator for the prior is to construct an :math:`n` dimensional Gaussian through
+:func:`~qmla.shared_functionality.prior_distributions.gaussian_prior`. 
+Importantly, the range of each :term:`term`'s parameter can be different, 
+e.g. near-neighbour couplings having much higher frequency than distant neighbours. 
+Terms' prior mean and width can be specified in ``gaussian_prior_means_and_widths``.
+Terms which do not have specific means/widths in ``gaussian_prior_means_and_widths`` are assigned based on the 
+:class:`~qmla.ExplorationStrategy` attributes ``min_param``, ``max_param``:
+the defaults are 
+
+    ``mean = (max_param + min_param)/2``;
+
+    ``width= (max_param - min_param)/4``. 
+
+To overwrite this, e.g. to change the default width of each parameter's distribution, 
+users can implement a new :term:`prior` generation function to replace ``prior_distribution_subroutine``. 
+
+
+.. code-block:: python
+
+    self.gaussian_prior_means_and_widths = {
+        'pauliSet_1_x_d1' : (5, 1), 
+        'pauliSet_1_y_d1' : (150, 25), 
+        'pauliSet_1_z_d1' : (1e6, 1e2)
+    }
+    self.min_param = 0
+    self.max_param = 10
+
+    self.prior_distribution_subroutine = alternatve_prior_generation
+
+
+.. _section_latex_map:
+
+Latex name mapping 
+~~~~~~~~~~~~~~~~~~
+Each model string format requires a method which can map the string to a Latex string. 
+This is because much of the analysis automatically generated by :term:`QMLA` refers to individual 
+models or terms, so it is useful that these can be rendered into a readable format, rather than 
+the raw string used to generate the matrices used by the algorithm. 
+The mapping function should be able to operate either on single terms or entire models strings. 
+If using terms like ``pauliSet_i_t_dN``, the default :func:`~qmla.shared_functionality.latex_model_names.pauli_set_latex_name`
+should work. 
+Further examples, specific to models of bespoke :term:`ES` are 
+:func:`~qmla.shared_functionality.latex_model_names.grouped_pauli_terms`,
+:func:`~qmla.shared_functionality.latex_model_names.fermi_hubbard_latex`.
+
+>>> from qmla.shared_functionality.latex_model_names import grouped_pauli_terms
+>>> self.latex_string_map_subroutine = grouped_pauli_terms
 
 .. _section_analysis:
 

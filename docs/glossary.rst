@@ -73,4 +73,16 @@ Glossary
     global champion
         Single model favoured by :term:`Quantum Model Learning Agent` as the strongest candidate
         to represent the :term:`system`.
+
+    Experiment Design Heuristic
+        Mechanism to design informative experiments to perform upon the :term:`system` from
+        which the model training can learn. 
+        Defined in :ref:`section_edh`. 
+
+    EDH
+        .. seealso :term`Experiment Design Heuristic`
+
+    Probe
+        Input state evolved by both the candidate model and system to draw comparisons between them. 
+        Defined in :ref:`section_probes`. 
     

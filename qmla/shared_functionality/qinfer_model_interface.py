@@ -30,19 +30,19 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     Interface between QMLA and QInfer.
 
     QInfer is a library for performing Bayesian inference
-        on quantum data for parameter estimation.
-        It underlies the Quantum Hamiltonian Learning subroutine
-        employed within QMLA.
-        Bayesian inference relies on comparisons likelihoods
-        of the target and candidate system. 
+    on quantum data for parameter estimation.
+    It underlies the Quantum Hamiltonian Learning subroutine
+    employed within QMLA.
+    Bayesian inference relies on comparisons likelihoods
+    of the target and candidate system. 
     This class, specified by an exploration strategy, defines how to 
-        compute the likelihood for the user's system. 
-        Most functionality is inherited from QInfer, but methods listed 
-        here are edited for QMLA's needs. 
+    compute the likelihood for the user's system. 
+    Most functionality is inherited from QInfer, but methods listed 
+    here are edited for QMLA's needs. 
     The likelihood function given here should suffice for most QMLA 
-        implementations, though users may want to overwrite 
-        get_system_pr0_array and get_simulator_pr0_array, 
-        for instance to specify which experimental data points to use. 
+    implementations, though users may want to overwrite 
+    get_system_pr0_array and get_simulator_pr0_array, 
+    for instance to specify which experimental data points to use. 
     
     :param str model_name: Unique string representing a model.
     :param np.ndarray modelparams: list of parameters to multiply by operators, 
@@ -370,44 +370,43 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         Function to calculate likelihoods for all the particles
         
         Inherited from Qinfer:
-            Calculates the probability of each given outcome, conditioned on each
-            given model parameter vector and each given experimental control setting.
+        Calculates the probability of each given outcome, conditioned on each
+        given model parameter vector and each given experimental control setting.
 
         QMLA modifications: 
-            Given a list of experiments to perform, expparams, 
-            extract the time list. Typically we use a single experiment
-            (therefore single time) per update.
-            QInfer passes particles as modelparams.
-            QMLA updates its knowledge in two steps:
-                * "simulate" an experiment 
-                    (which can include outsourcing from here to perform a real experiment), 
-                * update parameter distribution 
-                    by comparing Np particles to the experimental result
-            It is important that the comparison is fair, meaning:
-                * The evolution time must be the same
-                * The probe state to evolve must be the same.
+        Given a list of experiments to perform, expparams, 
+        extract the time list. Typically we use a single experiment
+        (therefore single time) per update.
+        QInfer passes particles as modelparams.
+        QMLA updates its knowledge in two steps:
+            * "simulate" an experiment (which can include outsourcing from here to perform a real experiment), 
+            * update parameter distribution by comparing Np particles to the experimental result
+        
+        It is important that the comparison is fair, meaning:
+            * The evolution time must be the same
+            * The probe state to evolve must be the same.
 
-            To simulate the experiment, we call QInfer's simulate_experiment,
-                which calls likelihood(), passing a single particle. 
-            The update function calls simulate_experiment with Np particles. 
-            Therefore we know, when a single particle is passed to likelihood, 
-                that we want to call the true system (we know the true parameters 
-                and operators by the constructor of this class). 
-            So, when a single particle is detected, we circumvent QInfer by triggering
-                get_system_pr0_array. Users can overwrite this function as desired; 
-                by default it computes true_hamiltonian, 
-                and computes the likelhood for the given time. 
-            When >1 particles are detected, pr0 is computed by constructing Np 
-                candidate Hamiltonians, each corresponding to a single particle, 
-                where particles are chosen by Qinfer and given as modelparams.
-                This is done through get_simulator_pr0_array.
-            We know calls to likelihood are coupled: 
-                one call for the system, and one for the update, 
-                which must use the same probes. Therefore probes are indexed
-                by a probe_id as well as their dimension. 
-                We track calls to likelihood() in _a and increment the probe_id
-                to pull every second call, to ensure the same probe_id is used for 
-                system and simulator.
+        To simulate the experiment, we call QInfer's simulate_experiment,
+        which calls likelihood(), passing a single particle. 
+        The update function calls simulate_experiment with Np particles. 
+        Therefore we know, when a single particle is passed to likelihood, 
+        that we want to call the true system (we know the true parameters 
+        and operators by the constructor of this class). 
+        So, when a single particle is detected, we circumvent QInfer by triggering
+        get_system_pr0_array. Users can overwrite this function as desired; 
+        by default it computes true_hamiltonian, 
+        and computes the likelhood for the given time. 
+        When >1 particles are detected, pr0 is computed by constructing Np 
+        candidate Hamiltonians, each corresponding to a single particle, 
+        where particles are chosen by Qinfer and given as modelparams.
+        This is done through get_simulator_pr0_array.
+        We know calls to likelihood are coupled: 
+        one call for the system, and one for the update, 
+        which must use the same probes. Therefore probes are indexed
+        by a probe_id as well as their dimension. 
+        We track calls to likelihood() in _a and increment the probe_id
+        to pull every second call, to ensure the same probe_id is used for 
+        system and simulator.
 
         :param np.ndarray outcomes: outcomes of the experiments
         :param np.ndarray modelparams: 

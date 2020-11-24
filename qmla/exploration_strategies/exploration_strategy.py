@@ -38,7 +38,7 @@ class ExplorationStrategy():
     in their custom exploration strategy. 
     The ``setup`` methods are:
     
-    * :meth:`~qmla.exploration_strategies.ExplorationStrategy.setup_modular_subroutines`
+    * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_modular_subroutines`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_true_model`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_model_learning`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_tree_infrastructure`
@@ -80,7 +80,7 @@ class ExplorationStrategy():
             self.plot_probes_path = None
 
         # Set up default parameters (don't call any functions here)
-        self.setup_modular_subroutines()
+        self._setup_modular_subroutines()
         self._setup_true_model()
         self._setup_model_learning()
         self._setup_tree_infrastructure()
@@ -98,7 +98,7 @@ class ExplorationStrategy():
     def overwrite_default_parameters(self):
         pass
 
-    def setup_modular_subroutines(self):
+    def _setup_modular_subroutines(self):
         r"""
         Assign modular subroutines for the realisation of this exploration strategy.
 
@@ -806,7 +806,6 @@ class ExplorationStrategy():
         # Generate a set of probes
         new_probes = self.system_probes_generation_subroutine(
             max_num_qubits=probe_maximum_number_qubits,
-            # num_probes=self.num_probes,
             **kwargs
         )
 
@@ -822,7 +821,6 @@ class ExplorationStrategy():
                 self.log_print(["Not using system probes as simulator probes"])
                 self.probes_simulator = self.simulator_probes_generation_subroutine(
                     max_num_qubits=probe_maximum_number_qubits,
-                    # num_probes=self.num_probes,
                     **kwargs
                 )
         else:

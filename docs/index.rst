@@ -14,9 +14,9 @@ Quantum Model Learning Agent
     glossary
     overview
     full_guide
-    apiref/index
+    full_api
     bib
-    :maxdepth: 2
+    :maxdepth: 3
 
 
 .. only:: not latex
