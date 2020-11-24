@@ -56,7 +56,7 @@ class Genetic(
         self.genes = genes
         self.true_model = true_model
         self.log_print([
-            "Starting genetic GR"
+            "Starting genetic ES"
             # "Genes:", genes
         ])
 

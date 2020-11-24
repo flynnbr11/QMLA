@@ -10,4 +10,4 @@ def test_heisenberg_xyz():
     assert \
         exploration_strategy.lattice_dimension \
         == 1, \
-        "Testing GR lattice dimension" 
+        "Testing ES lattice dimension" 

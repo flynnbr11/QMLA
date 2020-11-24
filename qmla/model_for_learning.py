@@ -211,7 +211,7 @@ class ModelInstanceForLearning():
         self.model_terms_parameters = self.model_prior.sample()
         self._store_prior()
 
-        # Initialise model to infereace with QInfer as specified in GR
+        # Initialise model to infereace with QInfer as specified in ES
         self.qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
@@ -758,7 +758,7 @@ class ModelInstanceForLearning():
 
 
         if not self.exploration_class.force_evaluation and self.num_experiments < 20:
-            # TODO make optional robustly in GR or pass dev arg to QMLA
+            # TODO make optional robustly in ES or pass dev arg to QMLA
             # instance.
             self.log_print(
                 ["<20 experiments; presumed dev mode. Not evaluating all models"])

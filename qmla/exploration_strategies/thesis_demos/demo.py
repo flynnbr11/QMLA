@@ -90,7 +90,7 @@ class DemoLattice(
             'true_lattice.png'
         )
         self.log_print([
-            "GR plots for fixed lattice. Save file:", save_file
+            "ES plots for fixed lattice. Save file:", save_file
         ])
         self.true_lattice.draw_topology(
             save_to_file = save_file

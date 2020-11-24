@@ -320,7 +320,7 @@ class ConnectedLattice(
     ):
         # possibility that some models not valid; 
         # not needed by default but checked in general
-        # so that GR requiring check has it built in. 
+        # so that ES requiring check has it built in. 
         return True
 
     def combine_terms(

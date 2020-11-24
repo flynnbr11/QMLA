@@ -104,10 +104,17 @@ preamble = r"""
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+  'sphinx.ext.autodoc',
+  'sphinx.ext.doctest',
+  'sphinx.ext.imgmath',
+  'sphinx.ext.autosectionlabel',
+  'sphinx.ext.intersphinx',
+  'sphinx.ext.todo',
+  'sphinx.ext.viewcode', 
+  'sphinx.ext.extlinks',
+  'matplotlib.sphinxext.plot_directive'
 ]
-extensions.append('sphinx.ext.autodoc')
-extensions.append('sphinx.ext.imgmath') 
-extensions.append('sphinx.ext.autosectionlabel')
+
 autosectionlabel_prefix_document = True
 
 # Add any paths that contain templates here, relative to this directory.
@@ -226,7 +233,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'QuantumModelLearningAgent', 'Quantum Model Learning Agent Documentation',
-     author, 'QuantumModelLearningAgent', 'One line description of project.',
+     author, 'QuantumModelLearningAgent', 'Machine learning for identifying models of quantum systems.',
      'Miscellaneous'),
 ]
 
@@ -236,6 +243,5 @@ texinfo_documents = [
 extlinks = {
     'arxiv': ('http://arxiv.org/abs/%s', 'arXiv:'),
     'doi': ('https://dx.doi.org/%s', 'doi:'),
-    'example_nb': ('https://nbviewer.jupyter.org/github/qinfer/qinfer-examples/blob/master/%s.ipynb', ''),
     'hdl': ('https://hdl.handle.net/%s', 'hdl:')
 }

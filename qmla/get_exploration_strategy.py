@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import inspect
 
-import qmla.exploration_strategies as GR
+import qmla.exploration_strategies as ES
 
 __all__ = [
     'exploration_classes',
@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 # Get a dict of all the available exploration strategies
-exploration_classes = dict(inspect.getmembers(GR, inspect.isclass))
+exploration_classes = dict(inspect.getmembers(ES, inspect.isclass))
 
 def get_exploration_class(
     exploration_rules,

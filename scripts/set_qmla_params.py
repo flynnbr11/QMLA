@@ -86,7 +86,7 @@ log_file = arguments.log_file
 probes_plot_file = arguments.probes_plot_file
 run_directory = arguments.run_directory
 
-# Generate GR instances
+# Generate ES instances
 exploration_class_attributes = {
     'true_params_path' : arguments.run_info_file,
     'plot_probes_path' : probes_plot_file,
@@ -160,7 +160,7 @@ pickle.dump(
 # Store an example of the probes used
 exploration_class.generate_probes(
     probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategies, 
-    noise_level=0, # TODO get directly in GR
+    noise_level=0, # TODO get directly in ES
     minimum_tolerable_noise=0.0,
 )
 

@@ -85,4 +85,9 @@ Glossary
     Probe
         Input state evolved by both the candidate model and system to draw comparisons between them. 
         Defined in :ref:`section_probes`. 
+
+    Run Results Directory
+        Directory to which results are stored for an individual :term:`run`. 
+        Consists of results files for all the :term:`instance` s in the run, 
+        as well as analyses on the model, :term:`instance` and :term:`run` levels.
     

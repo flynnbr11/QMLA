@@ -41,7 +41,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         )
         self.true_model = qmla.construct_models.alph(self.true_model)
 
-        # Add genetic algorithm parameters to kwargs, which the Genetic GR passes to GA class
+        # Add genetic algorithm parameters to kwargs, which the Genetic ES passes to GA class
         kwargs['selection_truncation_rate'] = 1 / self.true_n_qubits
         kwargs['unchanged_elite_num_generations_cutoff'] = 3*self.true_n_qubits
         kwargs['num_protected_elite_models'] = 2

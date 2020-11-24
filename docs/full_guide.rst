@@ -532,27 +532,27 @@ in the sub-directories of the run's results directory.
 
 Analyses are available on various levels: 
 
-Run: 
-    results across a number of instances.
+    :Run: 
+        results across a number of instances.
 
-    Example: the number of instance wins for champion models. 
-    
-    Example: average dynamics reproduced by champion models. 
-Instance: 
-    Performance of a single insance. 
-    
-    Example: models generated and the branches on which they reside
-Model: 
-    Individual model performance within an instance. 
-    
-    Example: parameter estimation through QHL. 
-    
-    Example: pairwise comparison between models.
+        Example: the number of instance wins for champion models. 
+        
+        Example: average dynamics reproduced by champion models. 
+    :Instance: 
+        Performance of a single insance. 
+        
+        Example: models generated and the branches on which they reside
+    :Model: 
+        Individual model performance within an instance. 
+        
+        Example: parameter estimation through QHL. 
+        
+        Example: pairwise comparison between models.
 
-Comparisons:
-    Pairwise comparison of models' performance. 
+    :Comparisons:
+        Pairwise comparison of models' performance. 
 
-    Example: dynamics of both candidates (with respect to a single basis).
+        Example: dynamics of both candidates (with respect to a single basis).
 
 Within the :ref:`section_launch` scripts, there is a ``plot_level`` variable which informs :term:`QMLA` of how many plots to produce by default. 
 This gives users a level of control over how much analysis is performed. 
@@ -563,43 +563,119 @@ plotting each model's training performance is overly cumbersome and is unneccess
 
 The plots generated at each plot level are:
 
-``plot_level=1``
+    ``plot_level=1``
 
-    :meth:`~qmla.QuantumModelLearningAgent._plot_model_terms`
+        :meth:`~qmla.QuantumModelLearningAgent._plot_model_terms`
 
-``plot_level=2``
+    ``plot_level=2``
 
-``plot_level=3``
+    ``plot_level=3``
 
-    :meth:`~qmla.QuantumModelLearningAgent._plot_dynamics_all_models_on_branches`
+        :meth:`~qmla.QuantumModelLearningAgent._plot_dynamics_all_models_on_branches`
 
-    :meth:`~qmla.QuantumModelLearningAgent._plot_evaluation_normalisation_records`
+        :meth:`~qmla.QuantumModelLearningAgent._plot_evaluation_normalisation_records`
 
-``plot_level=4``
-    
-    :meth:`~qmla.ModelInstanceForLearning._plot_learning_summary`
+    ``plot_level=4``
+        
+        :meth:`~qmla.ModelInstanceForLearning._plot_learning_summary`
 
-    :meth:`~qmla.ModelInstanceForLearning._plot_dynamics`
+        :meth:`~qmla.ModelInstanceForLearning._plot_dynamics`
 
-    :meth:`~qmla.ModelInstanceForLearning._plot_preliminary_preparation`
+        :meth:`~qmla.ModelInstanceForLearning._plot_preliminary_preparation`
 
-    :func:`~qmla.remote_bayes_factor.plot_dynamics_from_models`
+        :func:`~qmla.remote_bayes_factor.plot_dynamics_from_models`
 
-``plot_level=5``
+    ``plot_level=5``
 
-    :meth:`~qmla.ModelInstanceForLearning._plot_distributions`
-    
-    :meth:`~qmla.shared_functionality.experiment_design_heuristics.ExperimentDesignHueristic.plot_heuristic_attributes`
-    
+        :meth:`~qmla.ModelInstanceForLearning._plot_distributions`
+        
+        :meth:`~qmla.shared_functionality.experiment_design_heuristics.ExperimentDesignHueristic.plot_heuristic_attributes`
+        
 
-``plot_level=6``
+    ``plot_level=6``
 
 
 .. _section_launch:
 
 Launch
 ------
+There are two mechanisms for launching :term:`QMLA`: locally and in parallel. 
+Both of are available through ``bash`` scripts in ``qmla/launch``. 
+When launched in parallel, the model training/comparison subroutines are run 
+on remote processes, e.g. in a compute cluster. 
+In either case, the user has a set of top-level controls, 
+bearing in mind that the majority of user requirements are implemented in the :class:`~qmla.ExplorationStrategy`.
+Following the setting of these controls, the remainder of the launch script call a number of ``bash`` and ``Python``
+scripts for the actual implementation, which most users should not need to alter. 
 
-How to launch :term:`QMLA`. 
+The available controls to the user are
 
->>> # this is a code example
+    :num_instances: number of instance in the run
+
+    :run_qhl: if 1, only implements :term:`QHL` on the ``true_model`` attribute of the :term:`ES`, 
+        i.e. :meth:`~qmla.QuantumModelLearningAgent.run_quantum_hamiltonian_learning`. 
+
+    :run_qhl_mulit_model: if 1, only implements :term:`QHL` on the ``qhl_models`` attribute (list) of the :term:`ES`, 
+        i.e. :meth:`~qmla.QuantumModelLearningAgent.run_quantum_hamiltonian_learning_multiple_models`. 
+        if *both* this and :run_qhl: are 0, then the full :term:`QMLA` protocol is run
+        (:meth:`~qmla.QuantumModelLearningAgent.run_complete_qmla`). 
+    
+    :exp: Number of experiments used during model training
+    
+    :prt: Number of particles used during model training
+
+    :plot_level:  specifies the granularity of plots generated. See :ref:`section_analysis`
+    
+    :debug_mode: (bool) whether to run :term:`QMLA` in degug mode. Should not be required by most users; 
+        this mode merely logs further data in the instances' log files, which can be found in the :term:`run results directory`. 
+
+    :exploration_strategy: specify the name of the :term:`ES` class to use. 
+
+    :alt_exploration_strategies: list of alternative :term:`ES` for the case where multiple :term:`ET` s are considered.  
+        This list should be in brackets with elements separated by spaces (i.e no commas). 
+        Note that in ``parallel_launch.sh``, this must be enabled through setting 
+        ``multiple_exploration_strategies=1``, while in ``local_launch.sh`` it is sufficient that the list is not empty. 
+
+
+An example of the top few lines of ``local_launch.sh`` is then given by
+
+.. code-block:: bash
+
+    #!/bin/bash
+
+    ###############
+    # QMLA run configuration
+    ###############
+    num_instances=100
+    run_qhl=0 # perform QHL on known (true) model
+    run_qhl_mulit_model=0 # perform QHL for defined list of models.
+    exp=500 # number of experiments
+    prt=2000 # number of particles
+
+    ###############
+    # QMLA settings - user
+    ###############
+    plot_level=4
+    debug_mode=0
+
+    ###############
+    # QMLA settings - default
+    ###############
+    do_further_qhl=0 
+    q_id=0 
+    use_rq=0
+    further_qhl_factor=1
+    further_qhl_num_runs=$num_instances
+    plots=0
+    number_best_models_further_qhl=5
+
+    ###############
+    # Choose exploration strategy/strategies
+    ###############
+
+    exploration_strategy='UserExplorationStrategy'
+
+    alt_exploration_strategies=(
+        'IsingLatticeSet'
+        'Genetic'
+    )

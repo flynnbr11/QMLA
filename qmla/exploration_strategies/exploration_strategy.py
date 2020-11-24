@@ -86,7 +86,7 @@ class ExplorationStrategy():
         self._setup_tree_infrastructure()
         self._setup_logistics()
 
-        # Allow user GR parameters to take over before any functionality is called
+        # Allow user ES parameters to take over before any functionality is called
         self.overwrite_default_parameters()
 
         # Set or retrieve system data shared over instances
@@ -297,7 +297,7 @@ class ExplorationStrategy():
 
     def _setup_tree_infrastructure(self):
         r"""
-        Determining how the GR tree grows, when it should stop etc. 
+        Determining how the ES tree grows, when it should stop etc. 
 
         *Tree development*
 
@@ -311,10 +311,10 @@ class ExplorationStrategy():
             # TODO review how pruning attributes are called/checked
             # TODO improve docs about pruning
         max_spawn_depth
-            Number of branches to spawn for this GR
+            Number of branches to spawn for this ES
         max_num_qubits
             Maximum number of qubits expected in any model entertained by 
-            this GR. Used to generate probes up to this dimension. 
+            this ES. Used to generate probes up to this dimension. 
         max_num_probe_qubits
             TODO remove: serves same purpose as max_num_qubtis
         num_top_models_to_build_on
@@ -358,28 +358,28 @@ class ExplorationStrategy():
             must defeat the nominated champion, in order to be declared 
             champion in its place. 
 
-        *Infrastructure* (shouldn't need to be replaced by custom GR).
+        *Infrastructure* (shouldn't need to be replaced by custom ES).
 
         storage
             Generic storage unit which is exported to the QMLA instance and stored. 
-            This allows for access to GR-specific data after QMLA has finished, 
+            This allows for access to ES-specific data after QMLA has finished, 
             for analysis and plotting on a cross-instance basis.         
         spawn_stage
-            list which is used by GR to determine what is the current stage of development.
+            list which is used by ES to determine what is the current stage of development.
             This can be checked against in :meth:`~qmla.exploration_strategies.ExplorationStrategy.check_tree_completed`.
             e.g. calls to :meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_models` can append the list with 
             an indicator 'stage_1_complete'. 
             Subsequent calls can check ``if self.spawn_stage[-1] == 'stage_1_complete ... ``
             to design models according to the current stage. 
-            By default, GR terminates model generation stage `` if self.spawn_stage[-1] == 'Complete'
+            By default, ES terminates model generation stage `` if self.spawn_stage[-1] == 'Complete'
         spawn_step
             Number of times spawn method (:meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_models`)
             has been called. 
-            By default, GR terminates model generation stage `` if self.spawn_step == self.max_spawn_depth``. 
+            By default, ES terminates model generation stage `` if self.spawn_step == self.max_spawn_depth``. 
         prune_step
             Number of times prune method (:meth:`~qmla.exploration_strategies.ExplorationStrategy.tree_pruning`)
             has been called.
-            By default, when spawning and pruning are both completed, GR nominates a champion, 
+            By default, when spawning and pruning are both completed, ES nominates a champion, 
             and is then terminated. 
 
         * Miscellaneous * 
@@ -509,7 +509,7 @@ class ExplorationStrategy():
 
         This method retrieves those shared true parameters and stores them for use by the 
         :class:`~qmla.QuantumModelLearningAgent` instance and its subsidiary models and methods. 
-        It then uses the true parameters to construct ``true_hamiltonian`` for the GR.   
+        It then uses the true parameters to construct ``true_hamiltonian`` for the ES.   
 
         """      
 
@@ -588,7 +588,7 @@ class ExplorationStrategy():
         true_prior = self.get_prior(
             model_name = self.true_model,
             log_file = self.log_file, 
-            log_identifier = "[GR true param setup]"
+            log_identifier = "[ES true param setup]"
         )
         widen_prior_factor = self.true_param_cov_mtx_widen_factor
         old_cov_mtx = true_prior.cov
@@ -714,7 +714,7 @@ class ExplorationStrategy():
         **kwargs
     ):
         r"""
-        Call the GR's ``measurement_probability_function`` to compute quantum likelihood.
+        Call the ES's ``measurement_probability_function`` to compute quantum likelihood.
 
         Compute the probability of measuring in some basis, to be used as likelihood. 
         The default probability is that of the expectation value. 
@@ -756,7 +756,7 @@ class ExplorationStrategy():
         **kwargs
     ):
         r""" 
-        Call the GR's probe generation methods to set the system and simulator probes. 
+        Call the ES's probe generation methods to set the system and simulator probes. 
 
         In general it is possible for the system and simulator to 
         have different probe states (e.g. due to noise).
@@ -783,11 +783,11 @@ class ExplorationStrategy():
 
         :param int probe_maximum_number_qubits: 
             how many qubits to compose probes up to. 
-            Can be left None, in which case assigned based on GR's 
+            Can be left None, in which case assigned based on ES's 
             ``max_num_qubits``, or forced to a different value by passing 
             to function call. 
         :param bool store_probes: whether to assign the generated probes 
-            to the GR instance. 
+            to the ES instance. 
             If False, probe dict is just returned .
         :returns dict new_probes: (if not storing)
             dictionary of probes returned from probe generation
@@ -832,7 +832,7 @@ class ExplorationStrategy():
         **kwargs
     ):
         r"""
-        Call the GR's ``plot_probes_generation_subroutine``. 
+        Call the ES's ``plot_probes_generation_subroutine``. 
 
         Generates a set of probes against which to compute measurements for plotting purposes. 
         The same probe dict is used by all QMLA instances within a run for consistency. 
@@ -842,7 +842,7 @@ class ExplorationStrategy():
         
         :param int probe_maximum_number_qubits: 
             how many qubits to compose probes up to. 
-            Can be left None, in which case assigned based on GR's 
+            Can be left None, in which case assigned based on ES's 
             ``max_num_qubits``, or forced to a different value by passing 
             to function call. 
         :return dict plot_probe_dict: 
@@ -876,7 +876,7 @@ class ExplorationStrategy():
         **kwargs
     ):
         r"""
-        Call the GR's ``model_heuristic_function`` to build an experiment design heuristic class. 
+        Call the ES's ``model_heuristic_function`` to build an experiment design heuristic class. 
 
         The heuristic class is called upon to design experiments to perform on 
         the system during model learning. 
@@ -915,7 +915,7 @@ class ExplorationStrategy():
         **kwargs
     ):
         r"""
-        Call the GR's ``prior_distribution_subroutine`` function. 
+        Call the ES's ``prior_distribution_subroutine`` function. 
 
         :param str model_name: 
             model for which to construct a prior distribution
@@ -1051,7 +1051,7 @@ class ExplorationStrategy():
         **kwargs
     ):
         r"""
-        Call the GR's ``latex_string_map_subroutine``. 
+        Call the ES's ``latex_string_map_subroutine``. 
 
         Map a model name (string) to its LaTeX representation. 
 
@@ -1061,7 +1061,7 @@ class ExplorationStrategy():
         latex_name = self.latex_string_map_subroutine(name, **kwargs)
         return latex_name
 
-    # Assign branch to model for visual representation of GR as tree
+    # Assign branch to model for visual representation of ES as tree
     def name_branch_map(
         self,
         latex_mapping_file,
@@ -1069,7 +1069,7 @@ class ExplorationStrategy():
     ):
         
         r"""
-        Assign branch to model for visual representation of GR as tree.
+        Assign branch to model for visual representation of ES as tree.
 
         Only used for attempt to plot the QMLA instance as a single tree, 
         which is often not suitable, so this is not essential. 
@@ -1101,13 +1101,13 @@ class ExplorationStrategy():
         of QMLA, until :meth:`~qmla.exploration_strategies.ExplorationStrategy.check_tree_completed`
         returns ``True``, for instance after a fixed depth of spawning. 
         In particular it is called by :meth:`~qmla.ExplorationTree.next_layer`, 
-        which either spawns on the GR tree, or prunes it. 
+        which either spawns on the ES tree, or prunes it. 
 
         Custom ESs must use this method to determine a set of models for 
         QMLA to consider on the next layer (or :class:`~qmla.BranchQMLA`)
         of QMLA.
         Such a set of models can be constructed based on the results of the
-        previous layers, or according to any logic required by the GR. 
+        previous layers, or according to any logic required by the ES. 
 
         Custom methods to replace this have access to the following 
         parameters, and must return the same format of outputs. 
@@ -1186,7 +1186,7 @@ class ExplorationStrategy():
             pruned_branch = self.tree.branches[previous_prune_branch]
             # check bayes factor compairsons on those from previous prune branch, 
             # which corresponds to parent/child collapse
-            prune_collapse_threshold = 1e2 # TODO set as GR attribute
+            prune_collapse_threshold = 1e2 # TODO set as ES attribute
             prev_branch_models = []
             for l in list(zip(*pruned_branch.pairs_to_compare)):
                 prev_branch_models.extend(list(l))
@@ -1277,7 +1277,7 @@ class ExplorationStrategy():
     ##########
 
     def finalise_model_learning(self, **kwargs):
-        self.log_print([" GR {} finished.".format(self.exploration_rules)])
+        self.log_print([" ES {} finished.".format(self.exploration_rules)])
 
 
     def exploration_strategy_finalise(self):

@@ -25,12 +25,14 @@ Here we list some of the functionality used as the logistics to implement :term:
 User controls 
 ~~~~~~~~~~~~~
 :class:`~qmla.ControlsQMLA` Controls (user and otherwise) to specify QMLA instance.
+
 .. autoclass:: ControlsQMLA
     :members:
 
 Database framework
 ~~~~~~~~~~~~~~~~~~
 :class:`Operator` Object for mathematical properties of a single model.
+
 .. autoclass:: Operator
     :members:
 
@@ -149,7 +151,7 @@ Exploration Strategies
 Functions
 ^^^^^^^^^
 In order to initialise an :term:`ES`, :term:`QMLA` calls this function, 
-which searches within the namespace of `qmla/exploration_strategies`. 
+which searches within the namespace of ``qmla/exploration_strategies``. 
 
 .. autofunction:: get_exploration_class
 

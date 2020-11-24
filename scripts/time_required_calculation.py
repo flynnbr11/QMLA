@@ -196,7 +196,7 @@ def time_required(
                     q
                 ))
                 num_models_this_dimension = generator_max_num_models_by_shape['other']
-            print("GR:", gen, "max num models for ", q, "qubits:",
+            print("ES:", gen, "max num models for ", q, "qubits:",
                   num_models_this_dimension
                   )
             time_this_dimension = (

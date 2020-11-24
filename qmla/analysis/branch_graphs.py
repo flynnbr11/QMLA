@@ -231,6 +231,6 @@ def plot_qmla_branches(
             os.path.join(q.qmla_controls.plots_directory, save_file)
         )
 
-        # TODO return dict of graphs organised by GR, if ever used
+        # TODO return dict of graphs organised by ES, if ever used
         # if return_graphs:
         #     return graphs

@@ -44,10 +44,10 @@ class ExplorationTree():
         self,
         exploration_class,
     ):
-        # Give tree access to the GR instance
+        # Give tree access to the ES instance
         self.exploration_class = exploration_class
 
-        # Give the GR access to this tree.
+        # Give the ES access to this tree.
         self.exploration_class.tree = self
         self.exploration_strategy = self.exploration_class.exploration_rules
 
@@ -74,13 +74,13 @@ class ExplorationTree():
         Models for the first layer of this exploration strategy.
 
         :return list initial_models: list of model names to place on the first
-            layer corresponding to this GR
+            layer corresponding to this ES
         :return list pairs_to_compare: list of model name pairs to compare
         """
 
         # Get models to learn
         if self.exploration_class.initial_models is None:
-            # call generate_models if not explicitly set by GR
+            # call generate_models if not explicitly set by ES
             self.log_print([
                 "Initial models not set; retrieving from generate_models"
             ])
@@ -221,7 +221,7 @@ class ExplorationTree():
         The nominated champions of all ESs enter an all-vs-all contest
         in :meth:`~qmla.QuantumModelLearningAgent.compare_nominated_champions`,
         with the winner deemed the global champion.
-        This tree object interfaces with the GR, so here it is just a wrapper for
+        This tree object interfaces with the ES, so here it is just a wrapper for
         :meth:`~qmla.exploration_strategies.ExplorationStrategy.nominate_champions`.
         """
         return self.exploration_class.nominate_champions()
@@ -474,7 +474,7 @@ class BranchQMLA():
             for pair in pair_list
         }
 
-        # Update the GR ratings system
+        # Update the ES ratings system
         self.exploration_class.ratings_class.batch_update(
             model_pairs_bayes_factors=bayes_factors,
             spawn_step=self.tree.spawn_step,

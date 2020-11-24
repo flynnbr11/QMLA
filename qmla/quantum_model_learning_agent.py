@@ -129,7 +129,7 @@ class QuantumModelLearningAgent():
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
-        self.log_print(["\nwithin QMLA, GR's qmla id is {}. True model={}".format(self.exploration_class.qmla_id, self.exploration_class.true_model)])
+        self.log_print(["\nwithin QMLA, ES's qmla id is {}. True model={}".format(self.exploration_class.qmla_id, self.exploration_class.true_model)])
         self.qhl_mode = self.qmla_controls.qhl_mode
         self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
@@ -257,7 +257,7 @@ class QuantumModelLearningAgent():
 
 
         self.bayes_threshold_lower = 1
-        self.bayes_threshold_upper = 100 # TODO get from GR
+        self.bayes_threshold_upper = 100 # TODO get from ES
 
 
         # Analysis infrastructure
@@ -270,7 +270,7 @@ class QuantumModelLearningAgent():
         self.exploration_class.generate_probes(
             noise_level=self.exploration_class.probe_noise_level,
             minimum_tolerable_noise=0.0,
-            # tell it the max number of qubits required by any GR under consideration
+            # tell it the max number of qubits required by any ES under consideration
             probe_maximum_number_qubits = max(
                 [gr.max_num_probe_qubits for gr in self.qmla_controls.unique_exploration_strategy_instances.values()]
             )
@@ -371,7 +371,7 @@ class QuantumModelLearningAgent():
         2 parameters.
         """
 
-        # Decide if reallocating resources based on true GR.
+        # Decide if reallocating resources based on true ES.
         if self.exploration_class.reallocate_resources:
             base_num_qubits = 3
             base_num_terms = 3
@@ -1136,7 +1136,7 @@ class QuantumModelLearningAgent():
             models_points=models_points
         )
 
-        # If the given results are not sufficient for the GR to determine a branch champion,
+        # If the given results are not sufficient for the ES to determine a branch champion,
         # reconsider a subset of models
         while not branch.is_branch_champion_set:
             reduced_model_set = branch.joint_branch_champions
@@ -1408,11 +1408,11 @@ class QuantumModelLearningAgent():
             called_by_branch=branch_id,
             branch_model_points=self.branches[branch_id].bayes_points,
             evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
-            model_dict=self.model_lists,  # is this used by any GR? TODO remove
+            model_dict=self.model_lists,  # is this used by any ES? TODO remove
         )
 
         self.log_print([
-            "After model generation for GR",
+            "After model generation for ES",
             self.branches[branch_id].exploration_strategy,
             "\nnew models:", new_models,
         ])
@@ -1608,7 +1608,7 @@ class QuantumModelLearningAgent():
                 'model_storage_instance': model_storage_instance,
                 'branches_present_on' : [int(branch_id)], 
                 'terms' : terms,
-                'latex_terms' : [exploration_tree.exploration_class.latex_name(t) for t in terms] # need to get latex name by the GR which spawned this model
+                'latex_terms' : [exploration_tree.exploration_class.latex_name(t) for t in terms] # need to get latex name by the ES which spawned this model
             })
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
@@ -3221,7 +3221,7 @@ class QuantumModelLearningAgent():
                     bins = np.arange(0, 1, 0.05), 
                     label = "{} ($LL={}$)".format(
                         mod.model_name_latex,
-                        # TODO use GR of branch to get latex name
+                        # TODO use ES of branch to get latex name
                         mod.evaluation_log_likelihood
                     ),
                     histtype='step'

@@ -69,7 +69,7 @@ class ControlsQMLA():
             raise
         self.exploration_class.get_true_parameters() # either retrieve or assign true parameters
         self.log_print([
-            "GR set by controls has ID {} has true model {}".format(arguments.qmla_id, self.exploration_class.true_model)
+            "ES set by controls has ID {} has true model {}".format(arguments.qmla_id, self.exploration_class.true_model)
         ])
 
         self.alternative_exploration_strategies = arguments.alternative_exploration_strategies

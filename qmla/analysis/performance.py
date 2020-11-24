@@ -59,7 +59,7 @@ def bayes_factor_f_score_heatmap(bayes_factors_df):
     sns.heatmap(
         bayes_factor_by_f_score,
         # cmap='RdYlGn',
-        cmap=matplotlib.cm.PRGn, # TODO get from GR?
+        cmap=matplotlib.cm.PRGn, # TODO get from ES?
         mask=mask,
         annot=True, 
         ax = ax1,

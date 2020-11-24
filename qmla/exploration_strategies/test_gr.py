@@ -28,7 +28,7 @@ class GRTest(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.log_print(["Initialising test GR"])
+        self.log_print(["Initialising test ES"])
         self.expectation_value_subroutine = test_evolution_fnc
         self.initial_models = ['pauliSet_xJx_1J2_d2']
         self.tree_completed_initially = False
