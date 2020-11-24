@@ -60,15 +60,15 @@ class NVCentreSimulatedLongDynamicsGenticAlgorithm(
         self._set_true_params() # again in case over written by parent __init__
 
         # Modular functions
-        # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.simulator_probe_generation_function = self.probe_generation_function
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = True
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.TimeList
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
         # Genetic algorithm options
         self.tree_completed_initially = False

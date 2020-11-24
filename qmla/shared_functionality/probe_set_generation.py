@@ -5,13 +5,13 @@ These functions are set to exploration strategy attributes, which are then calle
 - probe_generation_function: 
     used for training, assumed to be the probes used on the system
     i.e. probes implemented during experiments. 
-- simulator_probe_generation_function: 
+- simulator_probes_generation_subroutine: 
     used for training, for the simulator. 
     Should be the same as used for system, 
     but in practice this is not always the case. 
     Note exploration_strategy.shared_probes controls whether
     to default to the same probe set. 
-- plot_probe_generation_function: 
+- plot_probes_generation_subroutine: 
     State to use for plotting purposes only (not training). 
     Plots all use the same set of probes for consistency
 
@@ -24,6 +24,22 @@ import random
 
 import qmla.utilities
 import qmla.construct_models
+
+__all__ = [
+    "separable_probe_dict", 
+    "tomographic_basis",
+    "manual_set_probes",
+    "eigenbasis_of_first_qubit",
+    "NV_centre_ising_probes_plus",
+    "plus_plus_with_phase_difference",
+    "plus_probes_dict",
+    "zero_state_probes",
+    "separable_fermi_hubbard_half_filled",
+    "fermi_hubbard_occupation_basis_down_in_first_site",
+    "fermi_hubbard_occupation_basis_up_in_first_site",
+    "fermi_hubbard_occupation_basis_down_in_all_sites",
+    "pauli_eigenvector_based_probes"
+]
 
 ###################################
 # General useful functions

@@ -31,13 +31,13 @@ class FermiHubbardBase(
         self.initial_models = [
             self.true_model
         ]
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.fermi_hubbard_latex
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.fermi_hubbard_latex
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
         # unless specifically different set of probes required
-        self.simulator_probe_generation_function = self.probe_generation_function
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
-        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
-        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.FermiHubbard_single_spin_n_sites
+        self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
+        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.FermiHubbard_single_spin_n_sites
 
         # self.max_time_to_consider = 20
         self.num_sites_true = construct_models.get_num_qubits(self.true_model)

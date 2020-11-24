@@ -38,19 +38,19 @@ class ExperimentNVCentreNQubits(
         self.qhl_models = self.initial_models
 
         # probes
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.simulator_probe_generation_function = self.probe_generation_function
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
         self.max_num_probe_qubits = self.max_num_qubits
 
         # experiment design and running
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
         # self.experimental_dataset = 'NVB_rescale_dataset.p'
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
-        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
+        self.qinfer_model_subroutine =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.max_time_to_consider = 4.24
 
         # Tree

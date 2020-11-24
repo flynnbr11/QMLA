@@ -55,14 +55,14 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.max_param = 10
 
         # Modular functions
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
-        self.measurement_probability_function = qmla.shared_functionality.n_qubit_hahn_evolution_double_time_reverse
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.simulator_probe_generation_function = self.probe_generation_function
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
+        self.expectation_value_subroutine = qmla.shared_functionality.n_qubit_hahn_evolution_double_time_reverse
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
         # Genetic algorithm options
         self.tree_completed_initially = False
@@ -115,7 +115,7 @@ class NVCentreExperimentalShortDynamicsGenticAlgorithm(
             true_model = true_model,
             **kwargs
         )
-        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.qinfer_model_subroutine =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.max_time_to_consider = 4.24
 
     def get_true_parameters(

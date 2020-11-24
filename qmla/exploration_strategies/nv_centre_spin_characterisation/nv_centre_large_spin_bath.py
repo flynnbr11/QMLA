@@ -26,8 +26,8 @@ class NVLargeSpinBath(
             **kwargs
         )
 
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_spin_interaction
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_spin_interaction
 
         # self.true_model = 'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         # self.true_model = 'nv_spin_x_d3PPPnv_spin_y_d3PPPnv_spin_z_d3PPPnv_interaction_x_d3PPPnv_interaction_y_d3PPPnv_interaction_z_d3'
@@ -57,7 +57,7 @@ class NVLargeSpinBath(
         self.max_num_parameter_estimate = 6
         self.max_spawn_depth = 9
         self.max_num_qubits = 6
-        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
+        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.zero_state_probes
         self.min_param = 0
         self.max_param = 10
         # self.dataset = 'NV_revivals.p'

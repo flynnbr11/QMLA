@@ -30,7 +30,7 @@ class HeisenbergXYZProbabilistic(
         self.lattice_connectivity_linear_only = True
         self.lattice_full_connectivity = False
         self.max_num_sites = 4
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.pauli_eigenvector_based_probes
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.pauli_eigenvector_based_probes
 
         self.three_site_chain_xxz = 'pauliSet_1J2_xJx_d3+pauliSet_2J3_zJz_d3'
         self.four_site_xxz_chain = 'pauliSet_1J2_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4'
@@ -237,7 +237,7 @@ class HeisenbergSharedField(
             self.initial_models.append(self.true_model)
         self.qhl_models = self.initial_models
         self.tree_completed_initially = True
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.grouped_pauli_terms
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.grouped_pauli_terms
         self.num_processes_to_parallelise_over = len(self.initial_models)
         # self.setup_exploration_class()
 

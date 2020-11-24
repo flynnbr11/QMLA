@@ -36,8 +36,8 @@ class ExperimentNVCentre(
             **kwargs
         )
 
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
 
         self.initial_models = ['xTi', 'yTi', 'zTi']
@@ -56,14 +56,14 @@ class ExperimentNVCentre(
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis
 
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.simulator_probe_generation_function = self.probe_generation_function
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
         self.max_time_to_consider = 5
 
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         # params for testing p value calculation
         self.max_num_probe_qubits = 2
@@ -122,10 +122,10 @@ class NVCentreExperimentalData(
         # self.true_model = 'iTi'
         # self.max_spawn_depth = 3
         self.true_model = qmla.construct_models.alph(self.true_model) 
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionshahn_evolution
-        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.simulator_probe_generation_function = self.probe_generation_function
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionshahn_evolution
+        self.qinfer_model_subroutine =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
         self.max_time_to_consider = 4.24
 

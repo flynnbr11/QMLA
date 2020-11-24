@@ -43,10 +43,10 @@ class NVCentreRevivalSimulation(
         # self._setup_test_learn_ghz_params()
 
         # Modular functions
-        self.measurement_probability_function = qmla.shared_functionality.n_qubit_hahn_evolution
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.expectation_value_subroutine = qmla.shared_functionality.n_qubit_hahn_evolution
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
 
         # Genetic algorithm options
         self.tree_completed_initially = False

@@ -579,7 +579,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # TODO compute e^(-iH) once for true Hamiltonian and use that rather than computing every step. 
 
         For user specific data, or method to compute system data, replace this function 
-            in exploration_strategy.qinfer_model_class. 
+            in exploration_strategy.qinfer_model_subroutine. 
         Here we pass the true operator list and true parameters to 
             default_pr0_from_modelparams_times_.
 
@@ -631,7 +631,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         Compute pr0 array for the simulator. 
 
         For user specific data, or method to compute simulator data, replace this function 
-            in exploration_strategy.qinfer_model_class. 
+            in exploration_strategy.qinfer_model_subroutine. 
         Here we pass the candidate model's operators and particles
             to default_pr0_from_modelparams_times_.
 
@@ -779,7 +779,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                     t = random.randint(1e6, 3e6)
                 try:
                     t_init = time.time()
-                    prob_meas_input_state = self.exploration_class.get_measurement_probability(
+                    prob_meas_input_state = self.exploration_class.get_expectation_value(
                         ham=ham,
                         t=t,
                         state=probe,

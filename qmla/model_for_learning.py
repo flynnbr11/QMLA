@@ -212,7 +212,7 @@ class ModelInstanceForLearning():
         self._store_prior()
 
         # Initialise model to infereace with QInfer as specified in GR
-        self.qinfer_model = self.exploration_class.qinfer_model(
+        self.qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
@@ -253,7 +253,7 @@ class ModelInstanceForLearning():
         )
 
         # Experiment design heuristic
-        self.model_heuristic = self.exploration_class.heuristic(
+        self.model_heuristic = self.exploration_class.get_heuristic(
             model_id=self.model_id,
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
@@ -790,7 +790,7 @@ class ModelInstanceForLearning():
 
         # TODO using precise mean of posterior to evaluate model
         # want to sample from it -- add flag to qinfer model 
-        evaluation_qinfer_model = self.exploration_class.qinfer_model(
+        evaluation_qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters,
             oplist=self.model_terms_matrices,
@@ -823,7 +823,7 @@ class ModelInstanceForLearning():
                 a=self.exploration_class.qinfer_resampler_a
             ),
         )
-        evaluation_heuristic = self.exploration_class.heuristic(
+        evaluation_heuristic = self.exploration_class.get_heuristic(
             model_id=self.model_id,
             updater=evaluation_updater,
             oplist=self.model_terms_matrices,
@@ -1454,7 +1454,7 @@ class ModelInstanceForLearning():
         plot_probe = self.plot_probes[self.model_num_qubits]
 
         self.expectation_values = {
-            t : self.exploration_class.get_measurement_probability(
+            t : self.exploration_class.get_expectation_value(
                 ham = self.learned_hamiltonian, 
                 t = t, 
                 state = plot_probe

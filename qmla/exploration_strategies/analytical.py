@@ -24,7 +24,7 @@ class AnalyticalLikelihood(
             **kwargs
         )
 
-        self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferInterfaceAnalytical
+        self.qinfer_model_subroutine = qmla.shared_functionality.qinfer_model_interface.QInferInterfaceAnalytical
         self.true_model_terms_params = {'pauliSet_1_z_d1' : 7.75}
         self.min_param = 0
         self.max_param = 100

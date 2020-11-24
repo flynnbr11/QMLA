@@ -47,7 +47,7 @@ On a given tree, the associated :term:`ES` determines how to proceed,
 in particular by deciding which models to consider. 
 The first branch of the tree holds the initial models :math:`\mu^1 = \{ M_1^1, \dots M_n^1\}` 
 for that :term:`ES`. 
-After the initial models have been trained and compared on the first branch, 
+After the initial models have been trained and compared on :math:`\mu^1`, 
 the :term:`ES` uses the available information (e.g. the number of pairwise 
 wins each model has) to construct a new set of models, 
 :math:`\mu^2 = \{ M_1^2, \dots M_n^2\}`. 
@@ -72,8 +72,8 @@ which it places on its next branch, completely indifferent to how those models a
 or whether they have been learned already. 
 This allows for completely self-contained logic in the :term:`ES`: 
 QMLA will simply learn and compare
-the models it is presented - it is up to the :term:`ES` to decide how to interpret them. 
-As such the core :term:`QMLA` algorithm can be thought of as a simple loop: 
+the models it is presented - it is the responsibility of the :term:`ES` to interpret them. 
+As such, the core :term:`QMLA` algorithm can be thought of as a simple loop: 
 while the :term:`ES` continues to return models, place those models on a branch, learn them 
 and compare them. 
 When all :term:`ES` indicate they are finished, nominate champions from each :term:`ET`;
@@ -85,8 +85,8 @@ compare the champions of each tree against each other, and thus determine a :ter
 Exploration Strategy
 --------------------
 
-Exploration Strategies (ES) are the engine of :term:`QMLA`. 
-They specify how :term:`QMLA` should proceed at each stage, 
+:term:`Exploration Strategies (ES) <ES>` are the engine of :term:`QMLA`. 
+The :term:`ES` specifies how :term:`QMLA` should proceed at each stage, 
 most importantly by determining the next set of models for :term:`QMLA` to test.
 These are the primary mechanism by which most users should interface with the :term:`QMLA` framework: 
 by designing an :class:`~qmla.exploration_strategies.ExplorationStrategy` which implements the 
@@ -96,7 +96,6 @@ method to construct models given information about the previous models' training
 User :term:`ES` classes can be used to specify parameters required throughout the :term:`QMLA` protocol. 
 These are all detailed in the ``setup`` methods of the :class:`~qmla.exploration_strategies.ExplorationStrategy` class;
 users should familiarise themselves with these settings before proceeding. 
-
 
 At minimum, a functional :term:`ES` should look like: 
 
@@ -116,7 +115,7 @@ At minimum, a functional :term:`ES` should look like:
             )
             self.true_model = 'pauliSet_1_x_d1+pauliSet_1_y_d1'
         
-An example of :term:`ES` design including several parameter settings is 
+An example of :term:`ES` design, including a simple greedy-addition model generation method as well as seeting several parameter settings, is:
 
 .. code-block:: python
 
@@ -138,7 +137,7 @@ An example of :term:`ES` design including several parameter settings is
             self.true_model = 'pauliSet_1_x_d1+pauliSet_1_y_d1'
 
             # Overwrite modular functionality
-            self.model_heuristic_function = edh.VolumeAdaptiveParticleGuessHeuristic
+            self.model_heuristic_subroutine = edh.VolumeAdaptiveParticleGuessHeuristic
 
             # Overwrite parameters
             self.max_num_qubits = 2
@@ -194,23 +193,51 @@ An example of :term:`ES` design including several parameter settings is
             """
             return self.search_exhausted
 
+In order to implement a new :term:`ES`, :term:`QMLA` searches in the directory ``qmla/exploration_strategies``, 
+so the user's :term:`ES` must be ``import``ed to the ``qmla/exploration_strategies/__init__.py``.
+:term:`QMLA` retrieves the :term:`ES` through calls to the function :func:`~qmla.get_exploration_class`, 
+by searching for the :term:`ES` specified in the :ref:`section_launch` script. 
+For example, the launch script (e.g. at ``qmla/launch/local_launch.sh``) should be updated to call the user's :term:`ES`, e.g.
 
+.. code-block:: bash
+
+    #!/bin/bash
+
+    ###############
+    # QMLA run configuration
+    ###############
+    num_instances=1
+    run_qhl=0 # perform QHL on known (true) model
+    exp=500 # number of experiments
+    prt=2000 # number of particles
+
+    ###############
+    # Choose an exploration strategy 
+    ###############
+
+    exploration_strategy='UserExplorationStrategy'
+
+Users should ensure they understand the options for launching :term:`QMLA` as outlined in :ref:`section_launch`. 
+
+Exploration trees
+~~~~~~~~~~~~~~~~~
 Each :term:`ES` is assigned a unique :term:`Exploration Tree (ET) <ET>`, 
 although most users need not alter the infrastructure of the :term:`ET` or :term:`QMLA`. 
-We detail two :term:`ES` examples which are used in publications: 
-greedy term addition for the study of an electron spin in a nitrogen vacancy centre
-and genetic algorithm for generic target systems, with an example Hesienberg-XYZ :term:`system`.
 
 
 Models
-------
+----------------------------
+
+Construction
+~~~~~~~~~~~~~
+
 Models are specified by a string of terms separated by ``+``,
 e.g. ``pauliSet_1_x_d1+pauliSet_1_y_d1``. 
 Model names are unique and are assigned a ``model_id`` upon generation within :class:`~qmla.QuantumModelLearningAgent` : 
 :term:`QMLA` will recognise if a model string has already been proposed and therefore been
 assigned a ``model_id``, rather than retraining models which is computationally expensive.
 The uniqueness of models is ensured by the terms being sorted alphabetically internally within the string 
-(``pauliSet_1_x_d1+pauliSet_1_y_d1`` instead of ``pauliSet_1_y_d1+pauliSet_1_x_d1``), 
+(e.g. ``pauliSet_1_x_d1+pauliSet_1_y_d1`` instead of ``pauliSet_1_y_d1+pauliSet_1_x_d1``), 
 but note :term:`QMLA` ensures this internally so users do not need to enfore it in their 
 :meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_models`.
 
@@ -224,39 +251,143 @@ of :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_model_learning
 The terms are then processed into matrices. 
 A number of :ref:`section_string_processing` functions are available by default;
 new processing functions can be added by the user but must be incorporated in 
-:func:`~qmla.process_string_to_matrix` so that :term:`QMLA` will know where to find them.
+:func:`~qmla.process_basic_operator` so that :term:`QMLA` will know where to find them.
 
 
-Quantum Hamiltonian Learning
-----------------------------
+Classes
+~~~~~~~
+Models are central to the :term:`QMLA` framework so it sensible to identify their core functionality
+so we can design software to facilitate them. 
+In particular, there are three forms of classes which each depict models, but fulfil different roles. 
+In brief, these classes are 
 
-The algorithm for parameter learning when a model is known or presumed. 
+:class:`~qmla.ModelInstanceForLearning`
+    Class used for the training of individual models. 
+
+:class:`~qmla.ModelInstanceForComparison`
+    Class used for comparing models which have already been trained
+
+:class:`~qmla.ModelInstanceForStorage`
+    Class retained by :class:`~qmla.QuantumModelLearningAgent`, storing the results of the model's 
+    training and comparisons.
+
+We next detail each of these roles of the model concept.
+
+Training
+~~~~~~~~~
+:term:`QMLA` relies on a subroutine for training individual candidate models: 
+it is imperative that a given candidate is optimised against the :term:`system`, 
+as otherwise it might appear as a relatively weak candidate compared with its potential. 
+In principle, any parameter learning subroutine can fulfil this role in :term:`QMLA`, 
+such as Hamiltonian tomography or using neural networks for parameter estimation. 
+The in-built facility for this subroutine is :term:`quantum Hamiltonian Learning (QHL) <QHL>`. 
+We do not descibe the :term:`QHL` protocol here but readers can refer to [WGFC13a]_, [WGFC13b]_ for details. 
+
+:class:`~qmla.ModelInstanceForLearning` is a disposable class which instatiates indepdendently from :class:`~qmla.QuantumModelLearningAgent`.
+It trains a given model via :func:`qmla.remote_learn_model_parameters`, performs analysis on the trained model, 
+summarises the outcome of the training and sends a concise data packet to the database, before being deleted. 
+The model training refers to quantum Hamiltonian learning, performed in conjunction with [QInfer]_, 
+via :meth:`~qmla.ModelInstanceForLearning.update_model`.
+Importantly, :term:`QMLA` trains models simply by calling :func:`qmla.remote_learn_model_parameters`: 
+this function acts \emph{remotely} and is therefore independent, allowing for multiple instance 
+of the function and :class:`~qmla.ModelInstanceForLearning` to run simultaneously. 
+As such, this class mechanism allows for \emph{parallel processing} within :term:`QMLA`, 
+enabling speedup proportional to the number of processes available (for the model training stages). 
 
 
+Comparisons
+~~~~~~~~~~~
+Like the training subroutine, in principle :term:`QMLA` can operate with any model comparison subroutine, 
+but in practice we use :term:`Bayes factors (BF) <BF>`. 
+This is a quantity which is used to distinguish between models. 
 
-Bayes factors
-----------------------------
+:class:`~qmla.ModelInstanceForComparison` is a disposable class which reads the redis database to retrieve information about the 
+trainng of the given ``model_id``. 
+It then reconstructs the model, e.g. based on the final estimated mean of the parameter distribution. 
+Then, to compare models, :func:`~qmla.remote_bayes_factor_calculation` interfaces two instances of
+:class:`~qmla.ModelInstanceForComparison` such that each model is exposed to the opponent's experiments for further updates, 
+such that the two models under consideration have identical experiment records 
+(at least partially whereupon the BF is based), allowing for meaningful comparison among the two.  
+This is achieved through :meth:`~qmla.ModelInstanceForComparison.update_log_likelihood`.
 
-The quantity which is used to distinguish between models. 
+Similiar to the training stage, :func:`~qmla.remote_bayes_factor_calculation` can be run in parallel to provide a large speedup to the 
+overall :term:`QMLA` protocol. 
 
-Exploration Strategy tree
-----------------------------
-The object which manages a single Exploration Strategy. 
-Consists of a number of branches. 
-Branches are shared with the parent :term:`QMLA` instance: 
-the branch is indexed uniquely by :term:`QMLA`. i.e. it is possible for the 
-branch list of a :term:`ES` tree to be `[1, 4, 5, 7, 8, 9]` etc, since :term:`QMLA` 
-is in charge of this. 
+Storage
+~~~~~~~
+Finally, :class:`~qmla.ModelInstanceForStorage` is a much smaller onject than the previous forms of the model, 
+which retains only the useful information for storage/analysis within the bigger picture in 
+:class:`~qmla.QuantumModelLearningAgent`. 
+It retrieves the succinct summaries of the training/comparisons pertainng to a single model 
+which are stored on the redis database, allowing for later anlaysis as required by :term:`QMLA`.
+The retrieval of trained model data is performed in :meth:`~qmla.ModelInstanceForStorage.model_update_learned_values`. 
+
 
 .. _section_modular_functionality: 
 
 Modular functionality
 ---------------------
+A large amount of the design of an :term:`ES` involves implementation of subroutines: 
+there are a number of methods of :class:`~qmla.ExplorationStrategy` which can be overwritten 
+in order to achieve functionality specific to the target :term:`system`. 
+In this section we describe these subroutines. 
+Many of the subroutines have a number of sensible implementations: we make :term:`QMLA` \emph{modular} 
+by providing a set of pre-built subroutines, and allow them to be easily swapped
+so that a new :term:`ES` can benefit from arbitrary combiniations of subroutines. 
+The subroutines are called by wrapper methods in :class:`~qmla.ExplorationStrategy`;
+to set which function is called, change the attribute in the definition of the custom :term:`ES`. 
+Alternatively, directly overwrite the wrapper. 
+The pre-built functions are in ``qmla/shared_functionality``. 
 
-A number of functions are modular, so they can be set by a ES. 
-The function can either be overwritten in the :term:`ES` method, 
-or set using pointers to modular options. 
-    .. seealso:: :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_modular_functions`. 
+Within :class:`~qmla.ExplorationStrategy`, these modular functions are set in
+:meth:`~qmla.exploration_strategies.ExplorationStrategy.setup_modular_subroutines`. 
+
+An example of setting each of these subroutines is 
+
+.. code-block:: python
+
+    from qmla.shared_functionality import experiment_design_heuristics as edh
+    from qmla.shared_functionality import expectation_value_functions as ev
+
+    class UserExplorationStrategy(qmla.ExplorationStrategy):
+        def __init__(
+            self,
+            exploration_rules,
+            true_model=None,
+            **kwargs
+        ):
+            super().__init__(
+                exploration_rules=exploration_rules,
+                true_model=true_model,
+                **kwargs
+            )
+            # Overwrite true model
+            self.true_model = 'pauliSet_1_x_d1+pauliSet_1_y_d1'
+
+            # Overwrite expectation value subroutine
+            self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.default_expectation_value
+
+            # Probes
+            self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
+            self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
+            self.shared_probes = True  # i.e. system and simulator get same probes for learning
+            self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.zero_state_probes
+            self.evaluation_probe_generation_subroutine = None
+            self.probe_noise_level = 0 # 1e-5
+
+            # Experiment design
+            self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+                    
+            # QInfer interface
+            self.qinfer_model_subroutine = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
+
+            # Prior distribution
+            self.prior_distribution_subroutine = qmla.shared_functionality.prior_distributions.gaussian_prior
+
+            # Map model name strings to latex representation
+            self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+
+
 
 
 .. _section_probes:

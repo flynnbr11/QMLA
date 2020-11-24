@@ -60,7 +60,7 @@ class Genetic(
             # "Genes:", genes
         ])
 
-        self.ratings_class = qmla.exploration_strategies.rating_system.ModifiedEloRating(
+        self.ratings_class = qmla.shared_functionality.rating_system.ModifiedEloRating(
             initial_rating=1000,
             k_const=30
         ) # for use when ranking/rating models
@@ -1075,12 +1075,25 @@ class GeneticTest(
         exploration_rules,
         **kwargs
     ):
-        # print("[Exploration Strategies] init nv_spin_experiment_full_tree")
+        true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4'
+        self.true_model = qmla.construct_models.alph(true_model)
+        num_sites = qmla.construct_models.get_num_qubits(true_model)
+        terms = []
+        for i in range(1, 1 + num_sites):
+            for j in range(i + 1, 1 + num_sites):
+                for t in ['x', 'y', 'z']:
+                    new_term = 'pauliSet_{i}J{j}_{o}J{o}_d{N}'.format(
+                        i= i, j=j, o=t, N=num_sites, 
+                    )
+                    terms.append(new_term)
+        
         super().__init__(
-            exploration_rules=exploration_rules,
+            exploration_rules = exploration_rules,
+            genes = terms, 
+            true_model = self.true_model, 
             **kwargs
         )
-        self.max_spawn_depth = 4
+        self.max_spawn_depth = 2
         self.max_num_probe_qubits = self.num_sites
         self.initial_num_models = 6
         self.initial_models = self.genetic_algorithm.random_initial_models(

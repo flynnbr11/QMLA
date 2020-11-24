@@ -56,7 +56,7 @@ class ExpAlternativeNV_second(
         )
 
         self.true_model = 'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz'
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
         # unless specifically different set of probes required
-        self.simulator_probe_generation_function = self.probe_generation_function
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict

@@ -24,9 +24,9 @@ class PresentationPlotGeneration(
             **kwargs
         )
 
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         # unless specifically different set of probes required
-        self.simulator_probe_generation_function = self.probe_generation_function
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
 
         self.single_parameter = False

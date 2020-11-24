@@ -33,7 +33,7 @@ class LatticeSet(
         self.tree_completed_initially = True # fixed lattice set considered
         # self.base_terms = ['x', 'z']
         # self.transverse_field = None
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.lattice_set_grouped_pauli
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_grouped_pauli
         self.initial_models = None # so that QMLA will call generate_models first
         # self.true_model = self.model_from_lattice(self.available_lattices[0])
         self.max_time_to_consider = 45

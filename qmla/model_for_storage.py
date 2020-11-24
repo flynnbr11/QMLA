@@ -274,7 +274,7 @@ class ModelInstanceForStorage():
 
         # Compute and store results.
         for t in required_times:
-            self.expectation_values[t] = self.exploration_class.get_measurement_probability(
+            self.expectation_values[t] = self.exploration_class.get_expectation_value(
                 ham=self.learned_hamiltonian,
                 t=t,
                 state=probe,
@@ -343,7 +343,7 @@ class ModelInstanceForStorage():
             if t in available_expectation_values:
                 sim = self.expectation_values[t]
             else:
-                sim = self.exploration_class.get_measurement_probability(
+                sim = self.exploration_class.get_expectation_value(
                     ham=self.learned_hamiltonian,
                     t=t,
                     state=probe
@@ -454,7 +454,7 @@ class ModelInstanceForStorage():
                 list(self.expectation_values.keys())
             )
             for t in exp_times:
-                sim = self.exploration_class.get_measurement_probability(
+                sim = self.exploration_class.get_expectation_value(
                     ham=self.learned_hamiltonian,
                     t=t,
                     state=probe

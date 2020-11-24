@@ -170,7 +170,7 @@ class ModelInstanceForComparison():
 
         # New instances of model and updater used by QInfer
         self.log_print(["Getting QInfer model"])
-        self.qinfer_model = self.exploration_class.qinfer_model(
+        self.qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
             modelparams=self.model_terms_parameters_final,
             oplist=self.model_terms_matrices,
@@ -228,7 +228,7 @@ class ModelInstanceForComparison():
             )
 
         # Fresh experiment design heuristic
-        self.experiment_design_heuristic = self.exploration_class.heuristic(
+        self.experiment_design_heuristic = self.exploration_class.get_heuristic(
             model_id=self.model_id,
             updater=self.qinfer_updater,
             oplist=self.model_terms_matrices,
@@ -332,7 +332,7 @@ class ModelInstanceForComparison():
         plot_probe = self.plot_probes[n_qubits]
 
         for t in times_not_yet_computed:
-            self.expectation_values[t] = self.exploration_class.get_measurement_probability(
+            self.expectation_values[t] = self.exploration_class.get_expectation_value(
                 ham = self.learned_hamiltonian, #TODO, 
                 t = t, 
                 state = plot_probe # TODO

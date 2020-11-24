@@ -747,7 +747,7 @@ def replot_expectation_values(
 
         sim_exp_vals = {}
         for t in sim_times:
-            sim_exp_vals[t] = exploration_class.get_measurement_probability(
+            sim_exp_vals[t] = exploration_class.get_expectation_value(
                 ham=sim_ham,
                 state=probe,
                 t=t

@@ -35,8 +35,8 @@ class ExperimentFullAccessNV(
 
             # 'zTi'
         ]
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.nv_centre_SAT
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         # self.max_num_qubits = 3

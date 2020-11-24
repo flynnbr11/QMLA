@@ -26,7 +26,7 @@ class DemoLattice(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.lattice_pauli_likewise_concise
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_pauli_likewise_concise
         self.true_lattice_name = '_3_site_chain_fully_connected'
         self.true_lattice = topologies.__getattribute__(self.true_lattice_name)
         self.true_model = self.model_from_lattice(self.true_lattice)
@@ -160,7 +160,7 @@ class DemoIsingFullyParameterised(DemoIsing):
             **kwargs
         )
         self.transverse_field = None # neglecting transverse field here
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.true_model = self.model_from_lattice(self.true_lattice)
 
     def model_from_lattice(

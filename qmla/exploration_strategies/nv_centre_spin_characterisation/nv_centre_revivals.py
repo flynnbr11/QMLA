@@ -20,14 +20,14 @@ class NVCentreRevivalsSimulated(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
-        self.simulator_probe_generation_function = self.probe_generation_function
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.tomographic_basis
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.shared_probes = False
         self.probe_noise_level = 0 
         
@@ -102,8 +102,8 @@ class NVCentreRevivals(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.qinfer_model_class =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        self.qinfer_model_subroutine =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
 
     def get_true_parameters(
         self,

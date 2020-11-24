@@ -38,7 +38,7 @@ class IsingProbabilistic(
             # 'y',
             'z'
         ]
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.max_time_to_consider = 50
         # fitness calculation parameters. fitness calculation inherited.
         # 'all' # at each generation Badassness parameter
@@ -111,7 +111,7 @@ class IsingPredetermined(
             'pauliSet_zJz_2J3_d3': 0.3979280929069925,            
         }
         # test heuristic -- force all times to be considered
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic 
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic 
         # self.true_model = 'pauliSet_zJz_1J2_d2'
         self.true_model = 'pauliSet_zJz_1J2_d4PPPPpauliSet_zJz_2J3_d4PPPPpauliSet_zJz_3J4_d4'
         # self.true_model = 'pauliSet_zJz_1J2_d6PPPPPPpauliSet_zJz_2J3_d6PPPPPPpauliSet_zJz_3J4_d6PPPPPPpauliSet_zJz_4J5_d6PPPPPPpauliSet_zJz_5J6_d6'
@@ -164,8 +164,8 @@ class IsingSharedField(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.zero_state_probes
-        # self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.
+        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.zero_state_probes
+        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.
         # self.true_model = '1Dising_iz_d4PPPP1Dising_tx_d4'
         self.true_model = '1Dising_iz_d2PP1Dising_tx_d2'
         self.tree_completed_initially = True

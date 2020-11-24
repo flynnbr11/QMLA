@@ -32,13 +32,13 @@ class NVCentreNQubitBath(
         )
 
         # Choose functions 
-        # self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.tomographic_basis
-        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.TimeList
+        # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.tomographic_basis
+        self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.TimeList
 
 
         # QMLA and model learning configuration
@@ -97,7 +97,7 @@ class NVCentreNQubitBath(
         # self.true_model = 'pauliSet_1_y_d2'
         # self.num_probes = 1
         # self.hard_fix_resample_effective_sample_size = 0
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedTimeTest
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.FixedTimeTest
 
         # Logistics
         self.max_num_models_by_shape = {

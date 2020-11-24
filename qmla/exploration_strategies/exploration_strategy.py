@@ -16,7 +16,7 @@ import qmla.shared_functionality.probe_set_generation as probe_set_generation
 import qmla.shared_functionality.expectation_value_functions
 import qmla.utilities
 import qmla.construct_models as construct_models
-import qmla.exploration_strategies.rating_system
+import qmla.shared_functionality.rating_system
 import qmla.shared_functionality.qinfer_model_interface
 from qmla.exploration_strategies.exploration_strategy_decorator import ExplorationStrategyDecorator
 
@@ -38,7 +38,7 @@ class ExplorationStrategy():
     in their custom exploration strategy. 
     The ``setup`` methods are:
     
-    * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_modular_functions`
+    * :meth:`~qmla.exploration_strategies.ExplorationStrategy.setup_modular_subroutines`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_true_model`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_model_learning`
     * :meth:`~qmla.exploration_strategies.ExplorationStrategy._setup_tree_infrastructure`
@@ -80,7 +80,7 @@ class ExplorationStrategy():
             self.plot_probes_path = None
 
         # Set up default parameters (don't call any functions here)
-        self._setup_modular_functions()
+        self.setup_modular_subroutines()
         self._setup_true_model()
         self._setup_model_learning()
         self._setup_tree_infrastructure()
@@ -98,11 +98,11 @@ class ExplorationStrategy():
     def overwrite_default_parameters(self):
         pass
 
-    def _setup_modular_functions(self):
+    def setup_modular_subroutines(self):
         r"""
-        Assign modular functions for the realisation of this exploration strategy.
+        Assign modular subroutines for the realisation of this exploration strategy.
 
-        These are called by wrappers in the parent :class:`~qmla.ExplorationStrategy` class; 
+        These subroutines are called by wrappers in the parent :class:`~qmla.ExplorationStrategy` class; 
         the wrapper methods are called throughout a QMLA instance, e.g. to generate a set of probes
         according to the requirements of the user's exploration strategy. 
         Note also that these wrappers can be directly over written in a user exploration strategy, or more simply 
@@ -112,36 +112,36 @@ class ExplorationStrategy():
 
         * :meth:`~qmla.exploration_strategies.ExplorationStrategy.expectation_value` : ``measurement_probability_function``
         * :meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_probes` : ``probe_generation_function``
-        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.plot_probe_generator` : ``plot_probe_generation_function``
+        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.plot_probe_generator` : ``plot_probes_generation_subroutine``
         * :meth:`~qmla.exploration_strategies.ExplorationStrategy.heuristic` : ``model_heuristic_function``
         * :meth:`~qmla.exploration_strategies.ExplorationStrategy.qinfer_model` : ``qinfer_model_class``
-        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.get_prior` : ``prior_distribution_generator``
-        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.latex_name` : ``latex_model_naming_function``
+        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.get_prior` : ``prior_distribution_subroutine``
+        * :meth:`~qmla.exploration_strategies.ExplorationStrategy.latex_name` : ``latex_string_map_subroutine``
 
         """
 
         # Measurement
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_value
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.default_expectation_value
 
         # Probes
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        self.simulator_probe_generation_function = self.probe_generation_function
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = True  # i.e. system and simulator get same probes for learning
-        self.plot_probe_generation_function = qmla.shared_functionality.probe_set_generation.plus_probes_dict
-        self.evaluation_probe_generation_function = None
+        self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
+        self.evaluation_probe_generation_subroutine = None
         self.probe_noise_level = 0 # 1e-5
 
         # Experiment design
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
                 
         # QInfer interface
-        self.qinfer_model_class = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
+        self.qinfer_model_subroutine = qmla.shared_functionality.qinfer_model_interface.QInferModelQMLA
 
         # Prior distribution
-        self.prior_distribution_generator = qmla.shared_functionality.prior_distributions.gaussian_prior
+        self.prior_distribution_subroutine = qmla.shared_functionality.prior_distributions.gaussian_prior
 
         # Map model name strings to latex representation
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
 
 
     def _setup_true_model(self):
@@ -401,7 +401,7 @@ class ExplorationStrategy():
         self.num_top_models_to_build_on = 1
 
         # Rating models
-        self.ratings_class = qmla.exploration_strategies.rating_system.ModifiedEloRating(
+        self.ratings_class = qmla.shared_functionality.rating_system.ModifiedEloRating(
             initial_rating=1000,
             k_const=30
         ) 
@@ -694,7 +694,7 @@ class ExplorationStrategy():
         plot_times = sorted(plot_times)
 
         self.measurements = {
-            t : self.get_measurement_probability(
+            t : self.get_expectation_value(
                 ham = self.true_hamiltonian, 
                 t = t, 
                 state = probe
@@ -709,7 +709,7 @@ class ExplorationStrategy():
     ##########
 
     # Measurement
-    def get_measurement_probability(
+    def get_expectation_value(
         self,
         **kwargs
     ):
@@ -744,7 +744,7 @@ class ExplorationStrategy():
 
         """ 
 
-        return self.measurement_probability_function(
+        return self.expectation_value_subroutine(
             **kwargs
         )
 
@@ -763,7 +763,7 @@ class ExplorationStrategy():
         These can be generated from the same or different methods. 
         if ``shared_probes is True``, then ``probe_generation_function`` 
         is called once and the same probes are used for the system as simulator. 
-        else ``simulator_probe_generation_function`` is called for the simulator
+        else ``simulator_probes_generation_subroutine`` is called for the simulator
         probes. 
 
         Probe generation methods must take parameters
@@ -804,7 +804,7 @@ class ExplorationStrategy():
         if 'new_probes' not in kwargs:
             kwargs['num_probes'] = self.num_probes
         # Generate a set of probes
-        new_probes = self.probe_generation_function(
+        new_probes = self.system_probes_generation_subroutine(
             max_num_qubits=probe_maximum_number_qubits,
             # num_probes=self.num_probes,
             **kwargs
@@ -820,7 +820,7 @@ class ExplorationStrategy():
                 self.log_print(["Using system probes as simulator probes. len keys = {}".format(len(keys))])
             else:
                 self.log_print(["Not using system probes as simulator probes"])
-                self.probes_simulator = self.simulator_probe_generation_function(
+                self.probes_simulator = self.simulator_probes_generation_subroutine(
                     max_num_qubits=probe_maximum_number_qubits,
                     # num_probes=self.num_probes,
                     **kwargs
@@ -828,13 +828,13 @@ class ExplorationStrategy():
         else:
             return new_probes
 
-    def plot_probe_generator(
+    def generate_plot_probes(
         self,
         probe_maximum_number_qubits=None, 
         **kwargs
     ):
         r"""
-        Call the GR's ``plot_probe_generation_function``. 
+        Call the GR's ``plot_probes_generation_subroutine``. 
 
         Generates a set of probes against which to compute measurements for plotting purposes. 
         The same probe dict is used by all QMLA instances within a run for consistency. 
@@ -856,7 +856,7 @@ class ExplorationStrategy():
             probe_maximum_number_qubits = self.max_num_probe_qubits
 
         # Generate probes
-        plot_probe_dict =  self.plot_probe_generation_function(
+        plot_probe_dict =  self.plot_probes_generation_subroutine(
             max_num_qubits=probe_maximum_number_qubits,
             num_probes=1,
             **kwargs
@@ -873,7 +873,7 @@ class ExplorationStrategy():
 
 
     # Experiment design
-    def heuristic(
+    def get_heuristic(
         self,
         **kwargs
     ):
@@ -889,24 +889,24 @@ class ExplorationStrategy():
         # TODO clear up - the heuristic is a class, not a function
         """
 
-        return self.model_heuristic_function(
+        return self.model_heuristic_subroutine(
             **kwargs
         )
 
     # QInfer interface
-    def qinfer_model(
+    def get_qinfer_model(
         self, 
         **kwargs
     ):
         r"""
-        Call the GR's ``qinfer_model_class`` to build the interface with QInfer used for model learning. 
+        Call the ES's ``qinfer_model_class`` to build the interface with QInfer used for model learning. 
 
         The default QInfer model class, and details of what to include in custom 
         classes, can be found in :class:`~qmla.shared_functionality.QInferModelQMLA`. 
         
         """
 
-        return self.qinfer_model_class(
+        return self.qinfer_model_subroutine(
             **kwargs
         )
 
@@ -917,7 +917,7 @@ class ExplorationStrategy():
         **kwargs
     ):
         r"""
-        Call the GR's ``prior_distribution_generator`` function. 
+        Call the GR's ``prior_distribution_subroutine`` function. 
 
         :param str model_name: 
             model for which to construct a prior distribution
@@ -926,7 +926,7 @@ class ExplorationStrategy():
             distribution for learning model parameters. 
         """
 
-        self.prior = self.prior_distribution_generator(
+        self.prior = self.prior_distribution_subroutine(
             model_name=model_name,
             prior_specific_terms=self.gaussian_prior_means_and_widths,
             param_minimum=self.min_param,
@@ -949,13 +949,13 @@ class ExplorationStrategy():
         if num_probes is None: 
             num_probes = self.num_probes
         
-        if self.evaluation_probe_generation_function is not None: 
-            probes = self.evaluation_probe_generation_function(
+        if self.evaluation_probe_generation_subroutine is not None: 
+            probes = self.evaluation_probe_generation_subroutine(
                 num_probes = num_probes,
                 max_num_qubits=probe_maximum_number_qubits,
             )
         else:
-            probes = self.probe_generation_function(
+            probes = self.system_probes_generation_subroutine(
                 num_probes = num_probes,
                 max_num_qubits=probe_maximum_number_qubits,
             )
@@ -1053,14 +1053,14 @@ class ExplorationStrategy():
         **kwargs
     ):
         r"""
-        Call the GR's ``latex_model_naming_function``. 
+        Call the GR's ``latex_string_map_subroutine``. 
 
         Map a model name (string) to its LaTeX representation. 
 
         :param str name: name of model to map.
         :return str latex_name: representation of input model as LaTeX string. 
         """
-        latex_name = self.latex_model_naming_function(name, **kwargs)
+        latex_name = self.latex_string_map_subroutine(name, **kwargs)
         return latex_name
 
     # Assign branch to model for visual representation of GR as tree

@@ -114,21 +114,21 @@ class SimulatedNVCentre(
         
         self.tree_completed_initially = True
         self.initial_models=None
-        self.measurement_probability_function = \
+        self.expectation_value_subroutine = \
             qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
         self.timing_insurance_factor = 2/3
         self.num_probes = 20
         time_basis = 1e-9 # nanoseconds
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 0.5 * time_basis # 0.5 microseconds
         self.track_quadratic_loss = True
-        # self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_value
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
+        # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.default_expectation_value
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold
 
     def generate_models(self, model_list, **kwargs):
         if self.spawn_stage[-1]==None:
@@ -267,20 +267,20 @@ class TestSimulatedNVCentre(
         self.iqle_mode = False
         self.hard_fix_resample_effective_sample_size = 1000
 
-        self.measurement_probability_function = qmla.shared_functionality.expectation_value_functions.default_expectation_value
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.default_expectation_value
         
         # Choose heuristic
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
-        # self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.FixedNineEighthsToPowerK
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
+        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.RandomTimeUpperBounded
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.FixedNineEighthsToPowerK
 
 
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.manual_set_probes
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.manual_set_probes
         time_basis = 1/10**order_mag # nanoseconds
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.eigenbasis_of_first_qubit
         self.max_time_to_consider = 50 * time_basis # 50 microseconds 
         self.plot_time_increment = 5 * time_basis # 0.5 microseconds
         self.timing_insurance_factor = 0.25

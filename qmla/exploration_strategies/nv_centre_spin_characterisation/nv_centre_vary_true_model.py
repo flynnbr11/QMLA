@@ -25,8 +25,8 @@ class ExperimentNVCentreVaryTrueModel(
         )
         self.max_time_to_consider
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
-        # self.probe_generation_function = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
-        self.probe_generation_function = qmla.shared_functionality.probe_set_generation.separable_probe_dict
+        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict
         self.shared_probes = True
         self.true_model_terms_params = {}
 

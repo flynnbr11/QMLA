@@ -125,7 +125,7 @@ qmla.set_shared_parameters(
 
 
 # Probes used for plotting by all instances in this run, for consistency.
-plot_probe_dict = exploration_class.plot_probe_generator(
+plot_probe_dict = exploration_class.generate_plot_probes(
     probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategies, 
 )
 pickle.dump(

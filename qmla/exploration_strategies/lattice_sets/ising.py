@@ -26,7 +26,7 @@ class IsingLatticeSet(
         )
         self._shared_true_parameters = True
 
-        # self.latex_model_naming_function = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.true_model_terms_params = {
             'pauliLikewise_lx_1_2_3_4_d4': 0.2,
             'pauliLikewise_lz_1J2_1J3_1J4_2J3_2J4_3J4_d4': 0.7

@@ -11,14 +11,15 @@
 Models 
 ======
 
-Model for learning
+Model for training
 ------------------
 
-Model to perform parameter learning upon, usually quantum Hamiltonian learning. 
+Model to perform parameter learning upon, usually :term:`QHL`. 
+
 This is a disposable class which instatiates indepdendently from :class:`~qmla.QuantumModelLearningAgent`, 
 trains the model via :func:`qmla.remote_learn_model_parameters`, performs analysis on the trained model, 
-summaries the outcome of the training and sends a concise data packet to the database, before being deleted. 
-The model training refers to quantum Hamiltonian learning, performed in conjunction with [QInfer]_, 
+summarises the outcome of the training and sends a concise data packet to the database, before being deleted. 
+The model training refers to :term:`QHL`, performed in conjunction with [QInfer]_, 
 via :meth:`~qmla.ModelInstanceForLearning.update_model`.
 
 .. autoclass:: ModelInstanceForLearning
@@ -30,6 +31,7 @@ Model for comparisons
 ---------------------
 
 Model to use during Bayes factor comparisons.
+
 This is a disposable class which reads the redis database to retrieve information about the 
 trainng of the given model ID. 
 It then reconstructs the model, e.g. based on the final estimated mean of the parameter distribution. 
