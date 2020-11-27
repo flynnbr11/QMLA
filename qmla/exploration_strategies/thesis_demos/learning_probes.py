@@ -42,3 +42,32 @@ class DemoProbes(
 
         self.true_model = self.qhl_models[true_model_idx]
 
+class DemoProbesTomographic(
+    DemoProbes
+):
+    def __init__(
+        self,
+        exploration_rules,
+        **kwargs
+    ):
+
+        super().__init__(
+            exploration_rules=exploration_rules,
+            **kwargs
+        )
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.tomographic_basis
+
+class DemoProbesPlus(
+    DemoProbes
+):
+    def __init__(
+        self,
+        exploration_rules,
+        **kwargs
+    ):
+
+        super().__init__(
+            exploration_rules=exploration_rules,
+            **kwargs
+        )
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict        
