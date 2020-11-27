@@ -608,6 +608,7 @@ bearing in mind that the majority of user requirements are implemented in the :c
 Following the setting of these controls, the remainder of the launch script call a number of ``bash`` and ``Python``
 scripts for the actual implementation, which most users should not need to alter. 
 
+
 The available controls to the user are
 
     :num_instances: number of instance in the run
@@ -679,3 +680,13 @@ An example of the top few lines of ``local_launch.sh`` is then given by
         'IsingLatticeSet'
         'Genetic'
     )
+
+Redis server
+~~~~~~~~~~~~
+:term:`QMLA` uses a redis server as a database and job broker for the implementation of remote tasks. 
+This is launhed automatically when using ``parallel_launch.sh``, but using ``local_launch.sh``, 
+must be initiated in terminal as 
+
+.. code-blocks:: bash
+
+    redis-server

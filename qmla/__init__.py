@@ -21,3 +21,6 @@ from qmla.model_for_storage import *
 # Learning/comparisons
 from qmla.remote_bayes_factor import *
 from qmla.remote_model_learning import *
+
+# Results loader 
+from qmla.load_results import load_results
