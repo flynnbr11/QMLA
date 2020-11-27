@@ -93,7 +93,7 @@ class ExperimentDesignHueristic(qi.Heuristic):
 
         # probe ID
         self.probe_id = 0
-        self.probe_rotation_frequency = 25
+        self.probe_rotation_frequency = 5
         self.num_probes = kwargs['num_probes']
 
         # storage infrastructure
@@ -948,7 +948,9 @@ class FixedNineEighthsToPowerK(ExperimentDesignHueristic):
         epoch_id=0,
         **kwargs
     ):
-        if epoch_id %5 == 0:
+        if epoch_id % 10 == 0:
+            # don't want to increment at every single experiment when there are a lot to do. 
+            # b/c t becomes far too big
             self._k += 1
         new_time = (9/8)**self._k
 
@@ -974,14 +976,14 @@ class RandomTimeUpperBounded(ExperimentDesignHueristic):
         **kwargs
     ):
         super().__init__(**kwargs)
-        self._max_time = 1
+        self.max_time_to_enforce = kwargs['max_time_to_enforce']
 
     def design_experiment(
         self,
         epoch_id=0,
         **kwargs
     ):
-        new_time = random.uniform(0 , self._max_time)
+        new_time = random.uniform(0 , self.max_time_to_enforce)
         # new_time  = self._max_time
 
         eps = self._get_exp_params_array(epoch_id = epoch_id)

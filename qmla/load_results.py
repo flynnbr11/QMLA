@@ -15,7 +15,7 @@ def load_results(
     results_time,
     results_folder_elements=[qmla_root, "launch", "results"], 
     results_folder=None, 
-    run_id='001'
+    instance_id='001'
 ):
     r""" 
     Load results packet from a run of QMLA.
@@ -28,24 +28,26 @@ def load_results(
         results_folder=os.path.abspath(os.path.join(
             *results_folder_elements
         ))
-    print("Results folder = ", results_folder)
-    print("results time : ", results_time)
 
     results_dir = os.path.join(
         results_folder, 
         results_time
     )
+    instance_id = '{0:03d}'.format(instance_id)
 
     try:
-        results_file = os.path.join(results_dir, 'results_{}.p'.format(run_id))
+        results_file = os.path.join(results_dir, 'results_{}.p'.format(instance_id))
         res = pickle.load(open(results_file, 'rb'))
     except:
-        results_file = os.path.join(results_dir, 'results_m1_q{}.p'.format(run_id))
+        results_file = os.path.join(results_dir, 'results_m1_q{}.p'.format(instance_id))
         res = pickle.load(open(results_file, 'rb'))
 
+    try:
+        run_info = pickle.load(open(os.path.join(results_dir, 'run_info.p'), 'rb')) 
+    except:
+        run_info = pickle.load(open(os.path.join(results_dir, 'true_params.p'), 'rb'))  # old runs used this
 
-    true_params = pickle.load(open(os.path.join(results_dir, 'run_info.p'), 'rb')) 
-    qmla_class_file = os.path.join(results_dir, 'qmla_class_{}.p'.format(run_id))
+    qmla_class_file = os.path.join(results_dir, 'qmla_class_{}.p'.format(instance_id))
     plot_probes = pickle.load(open(os.path.join(results_dir, 'plot_probes.p'), 'rb'))
     true_measurements = pickle.load(open(os.path.join(results_dir, 'system_measurements.p'), 'rb'))
     q = pickle.load(open(qmla_class_file, 'rb'))
@@ -57,7 +59,7 @@ def load_results(
     try:
         combined_datasets = os.path.join(results_dir, 'combined_datasets')
         evaluation_data = pickle.load(open(os.path.join(results_dir, 'evaluation_data.p' ), 'rb'))
-        storage = pickle.load(open(os.path.join(results_dir, 'storage_{}.p'.format(run_id)), 'rb'))
+        storage = pickle.load(open(os.path.join(results_dir, 'storage_{}.p'.format(instance_id)), 'rb'))
         system_probes = pickle.load(open(
             os.path.join(results_dir, 'training_probes', 'system_probes.p'),
             'rb'
@@ -86,7 +88,7 @@ def load_results(
         'exploration_strategy' : es, 
         'results_dir' : results_dir,
         'true_measurements' : true_measurements, 
-        'true_params' : true_params
+        'run_info' : run_info
     }
     
     return results

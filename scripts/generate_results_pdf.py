@@ -160,7 +160,7 @@ variables = vars(arguments)
 # and some others arguments not explicitly set in launch script
 
 # variables['measurement_type'] = exploration_class.measurement_type
-variables['expectation_value_func'] = exploration_class.expectation_value_function.__name__
+variables['expectation_value_func'] = exploration_class.expectation_value_subroutine.__name__
 variables['heuristic'] = exploration_class.model_heuristic_subroutine.__name__
 variables['probe_generation_function'] = exploration_class.probe_generation_function.__name__
 variables['plot_probes_generation_subroutine'] = exploration_class.plot_probes_generation_subroutine.__name__
