@@ -1,3 +1,0 @@
-           f_value  win_per_resource  number_generations  starting_population_size  resources  median_f_score  mean_f_score  win_rate  mutation_probability  num_protected_elite_models mutation_method selection_method crossover_method
-config_id                                                                                                                                                                                                                                
-1.0        0.00046           0.00046                16.0                      16.0     2176.0             1.0           1.0       1.0                   0.1                         1.0    element_wise         roulette        one_point

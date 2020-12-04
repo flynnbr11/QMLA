@@ -1,0 +1,88 @@
+__main__ starting, on rank 0
+Getting reduced set of configurations to test.
+[MASTER] Configurations to cycle through: [{'crossover_method': 'one_point', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'number_sites': 8, 'unchanged_elite_num_generations_cutoff': 3, 'resources': 288.0, 'mutation_method': 'element_wise', 'starting_population_size': 8, 'selection_method': 'roulette', 'num_protected_elite_models': 1, 'number_generations': 8, 'mutation_probability': 0.1}]
+__main__ starting, on rank 3
+I am worker with rank 3
+Worker 3 waiting on message from master
+__main__ starting, on rank 2
+I am worker with rank 2
+Worker 2 waiting on message from master
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  2
+[MASTER] Sending work to  2
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  3
+[MASTER] Sending shutdown to  3
+Worker 2 received package to compute: {'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'mutation_probability': 0.1, 'number_sites': 8, 'starting_population_size': 8, 'num_protected_elite_models': 1, 'config_id': 1, 'resources': 288.0, 'crossover_method': 'one_point', 'number_generations': 8, 'selection_method': 'roulette', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log'}
+[MASTER] received message with tag: 4
+Worker 3 no longer accepting work.
+__main__ finished, on rank 3
+__main__ starting, on rank 1
+I am worker with rank 1
+Worker 1 waiting on message from master
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  1
+[MASTER] Sending shutdown to  1
+Worker 1 no longer accepting work.
+[MASTER] received message with tag: 4
+__main__ finished, on rank 1
+__main__ starting, on rank 7
+I am worker with rank 7
+Worker 7 waiting on message from master
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  7
+[MASTER] Sending shutdown to  7
+[MASTER] received message with tag: 4
+Worker 7 no longer accepting work.
+__main__ finished, on rank 7
+Running genetic algorithm with config  {'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'mutation_probability': 0.1, 'number_sites': 8, 'starting_population_size': 8, 'num_protected_elite_models': 1, 'config_id': 1, 'resources': 288.0, 'crossover_method': 'one_point', 'number_generations': 8, 'selection_method': 'roulette', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log'}
+Num sites:  8  has type  <class 'int'>
+LOG FILE FOR GENETIC ALGORITHM IS: /home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log
+Best model has chaged.
+Best model has chaged.
+__main__ starting, on rank 5
+I am worker with rank 5
+Worker 5 waiting on message from master
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  5
+[MASTER] Sending shutdown to  5
+[MASTER] received message with tag: 4
+Worker 5 no longer accepting work.
+__main__ finished, on rank 5
+Best model has chaged.
+__main__ starting, on rank 6
+I am worker with rank 6
+Worker 6 waiting on message from master
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  6
+[MASTER] Sending shutdown to  6
+Worker 6 no longer accepting work.
+__main__ finished, on rank 6
+[MASTER] received message with tag: 4
+Best model has chaged.
+__main__ starting, on rank 4
+I am worker with rank 4
+Worker 4 waiting on message from master
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  4
+[MASTER] Sending shutdown to  4
+[MASTER] received message with tag: 4
+Worker 4 no longer accepting work.
+__main__ finished, on rank 4
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Finished generations.
+Result: {'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'mutation_probability': 0.1, 'number_sites': 8, 'starting_population_size': 8, 'num_protected_elite_models': 1, 'number_possible_models': 268435456, 'config_id': 1, 'resources': 288.0, 'number_terms': 28, 'crossover_method': 'one_point', 'champion_f_score': 0.7826086956521738, 'number_generations': 8, 'selection_method': 'roulette', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log'}
+Worker 2 finished work package
+Worker 2 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  2
+[MASTER] Sending shutdown to  2
+Worker 2 no longer accepting work.
+__main__ finished, on rank 2
+[MASTER] received message with tag: 4
+Making  /home/bf16951/QMD/scripts/genetic_alg_param_sweep/results/Dec_04/12_53
+Directory made
+__main__ finished, on rank 0

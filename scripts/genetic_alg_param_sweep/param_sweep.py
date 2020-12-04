@@ -10,6 +10,8 @@ import sklearn
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
+import lfig
+
 p = os.path.abspath(os.path.realpath(__file__))
 elements = p.split('/')[:-3]
 qmla_root = os.path.abspath('/'.join(elements))
@@ -77,9 +79,9 @@ def get_all_configurations(
     if test_setup: 
         print("Getting reduced set of configurations to test.")
         number_of_iterations = 1
-        numbers_of_sites = [4] # 8 sites -> 28 terms
-        numbers_of_generations = [16,]
-        starting_populations = [16,]
+        numbers_of_sites = [8] # 8 sites -> 28 terms
+        numbers_of_generations = [8,]
+        starting_populations = [8,]
         elite_models_protected = [1,]
         mutation_probabilities = [0.1,]
         unchanged_gen_count_for_termination = [3]
@@ -153,7 +155,9 @@ def plot_configuration_sweep(results, save_to_file=None):
         'high' : matplotlib.colors.BASE_COLORS['r']
     }
 
-    fig, ax  = plt.subplots(figsize=(15, 10))
+    # fig, ax  = plt.subplots(figsize=(15, 10))
+    lf = lfig.LatexFigure()
+    ax = lf.new_axis()
 
     sns.swarmplot(
         x = 'config_id',
