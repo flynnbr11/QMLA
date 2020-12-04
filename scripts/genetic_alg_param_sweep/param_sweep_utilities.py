@@ -18,59 +18,6 @@ qmla_root = os.path.abspath('/'.join(elements))
 sys.path.append(qmla_root)
 import qmla
 
-
-def run_genetic_algorithm(configuration):
-    try:
-        print("Running genetic algorithm with config ", configuration)
-        print("Num sites: ", configuration['number_sites'], " has type ", type(configuration['number_sites']))
-        ga = qmla.exploration_strategies.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
-            num_sites = configuration['number_sites'],
-            base_terms = ['z'],
-            mutation_method = configuration['mutation_method'], 
-            selection_method = configuration['selection_method'],
-            crossover_method = configuration['crossover_method'],
-            mutation_probability = configuration['mutation_probability'], 
-            unchanged_elite_num_generations_cutoff = configuration['unchanged_elite_num_generations_cutoff'], 
-            log_file = configuration['log_file']
-        )
-        new_models = ga.random_initial_models(
-            num_models = configuration['starting_population_size']
-        )
-
-        # run genetic algorithm
-        for generation in range(configuration['number_generations']):
-            model_f_scores = {
-                mod : ga.model_f_score(mod) 
-                for mod in new_models
-            }
-            ga.consolidate_generation(
-                model_fitnesses = model_f_scores
-            )
-
-            new_models = ga.genetic_algorithm_step(
-                model_fitnesses = model_f_scores
-            )
-            if ga.best_model_unchanged:
-                print("Best model unchaged; terminating early.", flush=True)
-                break
-            else:
-                print("Best model has chaged.", flush=True)
-        print("Finished generations.", flush=True)
-
-        champion = ga.models_ranked_by_fitness[ max(ga.models_ranked_by_fitness)][0]
-        champ_f_score = ga.model_f_score(champion)
-
-        configuration['champion_f_score'] = champ_f_score
-        configuration['number_terms'] = ga.num_terms
-        configuration['number_possible_models'] = 2**ga.num_terms
-        print("Result:", configuration, flush=True)
-        return configuration
-    except Exception as e:
-        print("Job failed with exception \n{}\n".format(e), flush=True)
-        raise
-        return None
-
-
 def get_all_configurations(
     log_file=None,
 ):
@@ -78,12 +25,12 @@ def get_all_configurations(
     test_setup = True
     if test_setup: 
         print("Getting reduced set of configurations to test.")
-        number_of_iterations = 1
-        numbers_of_sites = [8] # 8 sites -> 28 terms
-        numbers_of_generations = [8,]
-        starting_populations = [8,]
-        elite_models_protected = [1,]
-        mutation_probabilities = [0.1,]
+        number_of_iterations = 5
+        numbers_of_sites = [5] # 8 sites -> 28 terms
+        numbers_of_generations = [2]
+        starting_populations = [32]
+        elite_models_protected = [2]
+        mutation_probabilities = [0.1]
         unchanged_gen_count_for_termination = [3]
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
@@ -143,6 +90,60 @@ def get_all_configurations(
     
     return all_configurations, configuration_df
     
+
+def run_genetic_algorithm(configuration):
+    try:
+        print("Running genetic algorithm with config ", configuration)
+        print("Num sites: ", configuration['number_sites'], " has type ", type(configuration['number_sites']))
+        ga = qmla.exploration_strategies.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
+            num_sites = configuration['number_sites'],
+            base_terms = ['z'],
+            mutation_method = configuration['mutation_method'], 
+            selection_method = configuration['selection_method'],
+            crossover_method = configuration['crossover_method'],
+            mutation_probability = configuration['mutation_probability'], 
+            unchanged_elite_num_generations_cutoff = configuration['unchanged_elite_num_generations_cutoff'], 
+            log_file = configuration['log_file']
+        )
+        new_models = ga.random_initial_models(
+            num_models = configuration['starting_population_size']
+        )
+
+        # run genetic algorithm
+        for generation in range(configuration['number_generations']):
+            model_f_scores = {
+                mod : ga.model_f_score(mod) 
+                for mod in new_models
+            }
+            ga.consolidate_generation(
+                model_fitnesses = model_f_scores
+            )
+
+            new_models = ga.genetic_algorithm_step(
+                model_fitnesses = model_f_scores
+            )
+            if ga.best_model_unchanged:
+                print("Best model unchaged; terminating early.", flush=True)
+                break
+            else:
+                print("Best model has chaged.", flush=True)
+        print("Finished generations.", flush=True)
+
+        champion = ga.models_ranked_by_fitness[ max(ga.models_ranked_by_fitness)][0]
+        champ_f_score = ga.model_f_score(champion)
+
+        configuration['champion_f_score'] = champ_f_score
+        configuration['number_terms'] = ga.num_terms
+        configuration['number_possible_models'] = 2**ga.num_terms
+        print("Result:", configuration, flush=True)
+        return configuration
+    except Exception as e:
+        print("Job failed with exception \n{}\n".format(e), flush=True)
+        raise
+        # return None
+
+
+
 
 
 def plot_configuration_sweep(results, save_to_file=None):

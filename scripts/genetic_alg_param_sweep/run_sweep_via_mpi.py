@@ -11,7 +11,7 @@ from mpi4py import MPI
 import ctypes
 ctypes.CDLL("libmpi.so", mode=ctypes.RTLD_GLOBAL)
 
-from param_sweep import get_all_configurations, run_genetic_algorithm, analyse_results
+from param_sweep_utilities import get_all_configurations, run_genetic_algorithm, analyse_results
 
 # globals  
 TAGS = {
@@ -44,7 +44,12 @@ def master():
         ),
     )
     iterable_configurations = iter(all_configurations)
-    print("[MASTER] Configurations to cycle through:", all_configurations, flush=True)
+    print("[MASTER] There are {} configurations to cycle through:\n".format(
+            len(all_configurations),
+            all_configurations, 
+        ),
+        flush=True
+    )
 
     # iteratively send configurations to workers, until none remain
     while num_workers_shutdown < num_workers: 

@@ -6,15 +6,15 @@
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=1 # perform QHL on known (true) model
+run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
-exp=25 # number of experiments
-prt=20 # number of particles
+exp=2 # number of experiments
+prt=5 # number of particles
 
 ###############
 # QMLA settings - user
 ###############
-plot_level=4
+plot_level=1
 debug_mode=0
 
 ###############
@@ -48,7 +48,7 @@ number_best_models_further_qhl=5
 # exploration_strategy='IsingLatticeSet'
 # exploration_strategy='Demonstration'
 
-exploration_strategy="DemoHeuristicPGH"
+exploration_strategy="ParamSweepGeneticAlgorithm"
 # exploration_strategy='HeisenbergGenetic'
 # exploration_strategy='HeisenbergGeneticXXZ'
 # exploration_strategy='IsingGenetic'

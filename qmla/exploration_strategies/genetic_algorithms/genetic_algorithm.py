@@ -37,7 +37,6 @@ class GeneticAlgorithmQMLA():
         self.get_base_chromosome()
        
         if true_model is None: 
-        
             r = random.randint(1, 2**self.num_terms-1)
             r = format(r, '0{}b'.format(self.num_terms))
             self.true_model = self.map_chromosome_to_model(r)
@@ -58,7 +57,7 @@ class GeneticAlgorithmQMLA():
         self.genetic_generation = 1
         self.log_file = log_file
         self.log_print([
-            "Genes: {} \n Base chromosome: {}".format(self.genes, self.basic_chromosome)
+            "Genes: {} \n Base chromosome: {} \n log file: {}".format(self.genes, self.basic_chromosome, self.log_file)
         ])
         self.f_score_change_by_generation = {}
         self.fitness_at_generation = {}
@@ -352,8 +351,7 @@ class GeneticAlgorithmQMLA():
     ):
         """
         This fnc assumes only 2 chromosomes to crossover
-        and does so in the most basic method of splitting
-        down the middle and swapping
+        and passes them to the method set as self.crossover_method which can be easily replaced. 
         """
         return self.crossover_method(**kwargs)
 
@@ -362,6 +360,12 @@ class GeneticAlgorithmQMLA():
         self, 
         **kwargs
     ):
+        r"""
+        Input two chromosomes, and a dict selection in kwargs. 
+        selection contains ``chromosome_1`` and ``chromosome_2``
+        and a dict ``other_data`` containing ``cut``, which is the position 
+        about which to crossover the two chromosomes. 
+        """
         selection = kwargs['selection']
         c1 = np.array(list(selection['chromosome_1']))
         c2 = np.array(list(selection['chromosome_2']))
@@ -536,6 +540,11 @@ class GeneticAlgorithmQMLA():
             "Considering truncation for {} models".format(num_models),
             "ranked models:", ranked_models
         ])
+        self.log_print([
+            "Models ordered by ranking with their fitness:"
+        ])
+        for m in ranked_models: 
+            self.log_print(["fitness = {} \t Model={} ".format(model_fitnesses[m], m )])
         
         # truncation_cutoff = max( int(num_models*truncation_rate), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = max( int(num_models*self.selection_truncation_rate), 4) # either consider top half, or top 4 if too small
@@ -548,6 +557,11 @@ class GeneticAlgorithmQMLA():
         }
         # keep the others with zero fitness, so the gene pool reflect them
         for m in ranked_models[truncation_cutoff:]:
+            self.log_print([
+                "Setting fitness to 0 for {} as it is {}th in rankings".format(
+                    m, ranked_models.index(m)
+                )
+            ])
             truncated_model_fitnesses[m] = 0 
 
         sum_fitnesses = np.sum(list(truncated_model_fitnesses.values()))
@@ -601,18 +615,28 @@ class GeneticAlgorithmQMLA():
         chromosome_combinations = list(
             itertools.combinations(list(chromosome_probabilities.keys()), 2)
         )
+        eg_combo = chromosome_combinations[0]
+        min_cut_pt = int(len(eg_combo[0])*0.25)
+        max_cut_pt = int(len(eg_combo[0])*0.75) + 1
+        self.log_print([
+            "example chrom combination : {}. \n min/max cut locations = {}/{}".format(
+                eg_combo, min_cut_pt, max_cut_pt
+            )
+        ])
+
         pair_data = []
+        count_good_pairs = 0 
         for c1,c2 in chromosome_combinations:
             pair_prob = chromosome_probabilities[c1] * chromosome_probabilities[c2] # TODO better way to get pair prob?
-            min_cut_pt = int(len(c1)*0.25)
-            max_cut_pt = int(len(c1)*0.75) + 1
             # for cut1 in range(1, len(c1)-2):
             if pair_prob > 0:
+                count_good_pairs += 1
+                self.log_print(["Nonzero prob pair: {} & {}, prob = {}".format(c1, c2, pair_prob)])
                 for cut1 in range(min_cut_pt, max_cut_pt):
                     this_pair_df = {
                         'c1' : c1, 
                         'c2' : c2, 
-                        'probability' : np.round(pair_prob, 2), 
+                        'probability' : pair_prob, # np.round(pair_prob, 2), 
                         'cut1' : cut1, 
                         'c1_prob' : chromosome_probabilities[c1], 
                         'c2_prob' : chromosome_probabilities[c2],
@@ -621,28 +645,47 @@ class GeneticAlgorithmQMLA():
                     pair_data.append(this_pair_df)
         self.chrom_pair_df = pd.DataFrame.from_dict(pair_data)                
         # normalise probabilities
+        self.log_print([
+            "Before normalising pairs' probabilities, sum of probs:",
+            self.chrom_pair_df.probability.sum()
+        ])
         try:
             self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
             self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         except:
             self.log_print(["Failing at final generation. chrom pair df:", self.chrom_pair_df])
         self.log_print([
-            "starting chromosome pair dataframe setup. {} combinations in total. took {} sec and has len {}".format(
+            "Before normalising pairs' probabilities, sum of probs:",
+            self.chrom_pair_df.probability.sum()
+        ])
+
+        self.log_print([
+            "starting chromosome pair dataframe setup. {} combinations in total from {} non-zero prob pairs. took {} sec and has len {}".format(
                 len(chromosome_combinations),
+                count_good_pairs, 
                 np.round(time.time() - t2, 3),
                 len(self.chrom_pair_df)
             )
+        ])
+        self.log_print([
+            "Probs after preparing df:", 
+            self.chrom_pair_df[
+                ["c1", "c2", "probability"]
+            ]
         ])
 
     def get_pair_selection_order(self):
         pair_idx = self.chrom_pair_df.index.values
         probabilities = self.chrom_pair_df.probability.values
-        
+        self.log_print([
+            "get_pair_selection_order initial probs\n", probabilities
+        ])        
         # only keep nonzero probs
         pair_idx = pair_idx[probabilities > 0]
         probabilities = probabilities[probabilities > 0] 
         self.log_print([
-            "probabilities: ", probabilities, 
+            "get_pair_selection_order probabilities: ", probabilities, 
+            "\n {} distinct".format(len(probabilities)), 
             "\n sum:", np.sum(probabilities)
         ])
         probabilities /= np.sum(probabilities)
@@ -712,6 +755,7 @@ class GeneticAlgorithmQMLA():
         # )
 
         # get the order to iterate through chromosome pairs
+        self.log_print(["Genetic algorithm step {}".format(self.genetic_generation)])
         pair_selection_order = self.get_pair_selection_order()
         init_num_chrom_pairs = len(pair_selection_order)
         pair_selection_order = iter(pair_selection_order)

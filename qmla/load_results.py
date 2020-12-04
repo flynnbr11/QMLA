@@ -33,7 +33,7 @@ def load_results(
         results_folder, 
         results_time
     )
-    instance_id = '{0:03d}'.format(instance_id)
+    instance_id = '{0:03d}'.format(int(instance_id))
 
     try:
         results_file = os.path.join(results_dir, 'results_{}.p'.format(instance_id))

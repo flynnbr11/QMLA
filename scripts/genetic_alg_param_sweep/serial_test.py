@@ -6,7 +6,7 @@ import time
 import pickle
 import datetime
 
-from param_sweep import get_all_configurations, run_genetic_algorithm
+from param_sweep_utilities import get_all_configurations, run_genetic_algorithm
 
 
 ga_results_df = pd.DataFrame() 

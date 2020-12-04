@@ -143,6 +143,8 @@ class LatticeSet(
         self,
         save_directory,
         qmla_id=0, 
+        plot_level=2, 
+        **kwargs
     ):
         save_file = os.path.join(
             save_directory, 

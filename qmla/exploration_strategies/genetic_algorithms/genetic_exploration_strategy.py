@@ -608,6 +608,8 @@ class Genetic(
         champion_model_id, 
         true_model_id,
         qmla_id=0, 
+        plot_level=2, 
+        **kwargs
     ):
         try:
             self.plot_correlation_fitness_with_f_score(

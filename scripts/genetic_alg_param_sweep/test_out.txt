@@ -1,69 +1,365 @@
+__main__ starting, on rank 5
+I am worker with rank 5
+Worker 5 waiting on message from master
+__main__ starting, on rank 4
+I am worker with rank 4
+Worker 4 waiting on message from master
+__main__ starting, on rank 1
+I am worker with rank 1
+Worker 1 waiting on message from master
 __main__ starting, on rank 0
 Getting reduced set of configurations to test.
-[MASTER] Configurations to cycle through: [{'crossover_method': 'one_point', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'number_sites': 8, 'unchanged_elite_num_generations_cutoff': 3, 'resources': 288.0, 'mutation_method': 'element_wise', 'starting_population_size': 8, 'selection_method': 'roulette', 'num_protected_elite_models': 1, 'number_generations': 8, 'mutation_probability': 0.1}]
-__main__ starting, on rank 3
-I am worker with rank 3
-Worker 3 waiting on message from master
+[MASTER] There are 20 configurations to cycle through:
+
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  1
+[MASTER] Sending work to  1
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  4
+[MASTER] Sending work to  4
+Worker 1 received package to compute: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 2176.0, 'number_generations': 16, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 16, 'config_id': 1}
+[MASTER] received message with tag: 0
+[MASTER] Sending message to  5
+[MASTER] Sending work to  5
+Worker 4 received package to compute: {'config_id': 2, 'resources': 8448.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 16, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Worker 5 received package to compute: {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 32, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 3, 'selection_method': 'roulette', 'resources': 4352.0, 'mutation_probability': 0.1, 'starting_population_size': 16}
 __main__ starting, on rank 2
 I am worker with rank 2
 Worker 2 waiting on message from master
 [MASTER] received message with tag: 0
 [MASTER] Sending message to  2
 [MASTER] Sending work to  2
+Worker 2 received package to compute: {'resources': 16896.0, 'starting_population_size': 32, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 4}
+__main__ starting, on rank 3
+I am worker with rank 3
+Worker 3 waiting on message from master
 [MASTER] received message with tag: 0
 [MASTER] Sending message to  3
+[MASTER] Sending work to  3
+Worker 3 received package to compute: {'selection_method': 'roulette', 'crossover_method': 'one_point', 'starting_population_size': 16, 'mutation_method': 'element_wise', 'resources': 2176.0, 'mutation_probability': 0.1, 'number_sites': 8, 'num_protected_elite_models': 2, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'unchanged_elite_num_generations_cutoff': 3, 'number_generations': 16}
+Running genetic algorithm with config  {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 2176.0, 'number_generations': 16, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 16, 'config_id': 1}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Running genetic algorithm with config  {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 32, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 3, 'selection_method': 'roulette', 'resources': 4352.0, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Running genetic algorithm with config  {'selection_method': 'roulette', 'crossover_method': 'one_point', 'starting_population_size': 16, 'mutation_method': 'element_wise', 'resources': 2176.0, 'mutation_probability': 0.1, 'number_sites': 8, 'num_protected_elite_models': 2, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'unchanged_elite_num_generations_cutoff': 3, 'number_generations': 16}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Running genetic algorithm with config  {'config_id': 2, 'resources': 8448.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 16, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Num sites:  8  has type  <class 'int'>
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 4 finished work package
+Job failed
+Worker 4 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  4
+[MASTER] Sending message to  4
+[MASTER] Sending work to  4
+Worker 4 received package to compute: {'config_id': 2, 'resources': 8448.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 16, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Best model has chaged.
+Running genetic algorithm with config  {'resources': 16896.0, 'starting_population_size': 32, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 4}
+Num sites:  8  has type  <class 'int'>
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 2 finished work package
+Job failed
+Worker 2 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  2
+[MASTER] Sending message to  2
+[MASTER] Sending work to  2
+Worker 2 received package to compute: {'resources': 4352.0, 'starting_population_size': 16, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 3}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'resources': 4352.0, 'starting_population_size': 16, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 3}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'config_id': 2, 'resources': 8448.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 16, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 4 finished work package
+Job failed
+Worker 4 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  4
+[MASTER] Sending message to  4
+[MASTER] Sending work to  4
+Worker 4 received package to compute: {'config_id': 4, 'resources': 16896.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 32, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'config_id': 4, 'resources': 16896.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 32, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 4 finished work package
+Job failed
+Worker 4 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  4
+[MASTER] Sending message to  4
+[MASTER] Sending work to  4
+Worker 4 received package to compute: {'config_id': 1, 'resources': 2176.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 16, 'num_protected_elite_models': 2, 'number_generations': 16, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Best model has chaged.
+Best model has chaged.
+Best model unchaged; terminating early.
+Finished generations.
+Result: {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 32, 'champion_f_score': 0.888888888888889, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 3, 'selection_method': 'roulette', 'number_terms': 28, 'resources': 4352.0, 'number_possible_models': 268435456, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Worker 5 finished work package
+Worker 5 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  5
+[MASTER] Sending work to  5
+Worker 5 received package to compute: {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 16, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 2, 'selection_method': 'roulette', 'resources': 8448.0, 'mutation_probability': 0.1, 'starting_population_size': 32}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'config_id': 1, 'resources': 2176.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 16, 'num_protected_elite_models': 2, 'number_generations': 16, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 16, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 2, 'selection_method': 'roulette', 'resources': 8448.0, 'mutation_probability': 0.1, 'starting_population_size': 32}
+Num sites:  8  has type  <class 'int'>
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 5 finished work package
+Job failed
+Worker 5 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  5
+[MASTER] Sending message to  5
+[MASTER] Sending work to  5
+Worker 5 received package to compute: {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 32, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 3, 'selection_method': 'roulette', 'resources': 4352.0, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 32, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 3, 'selection_method': 'roulette', 'resources': 4352.0, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model unchaged; terminating early.
+Finished generations.
+Result: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'champion_f_score': 0.8148148148148148, 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 2176.0, 'number_possible_models': 268435456, 'number_generations': 16, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 16, 'number_terms': 28, 'config_id': 1}
+Worker 1 finished work package
+Worker 1 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  1
+[MASTER] Sending work to  1
+Worker 1 received package to compute: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 16896.0, 'number_generations': 32, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 4}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model unchaged; terminating early.
+Finished generations.
+Result: {'selection_method': 'roulette', 'crossover_method': 'one_point', 'champion_f_score': 1.0, 'number_terms': 28, 'starting_population_size': 16, 'mutation_method': 'element_wise', 'resources': 2176.0, 'mutation_probability': 0.1, 'number_sites': 8, 'num_protected_elite_models': 2, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'number_possible_models': 268435456, 'unchanged_elite_num_generations_cutoff': 3, 'number_generations': 16}
+Worker 3 finished work package
+Worker 3 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  3
+[MASTER] Sending work to  3
+Worker 3 received package to compute: {'selection_method': 'roulette', 'crossover_method': 'one_point', 'starting_population_size': 16, 'mutation_method': 'element_wise', 'resources': 2176.0, 'mutation_probability': 0.1, 'number_sites': 8, 'num_protected_elite_models': 2, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'unchanged_elite_num_generations_cutoff': 3, 'number_generations': 16}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 16896.0, 'number_generations': 32, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 4}
+Num sites:  8  has type  <class 'int'>
+Job failed with exception 
+
+
+Worker 1 finished work package
+Job failed
+Worker 1 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  1
+[MASTER] Sending message to  1
+[MASTER] Sending work to  1
+Worker 1 received package to compute: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 8448.0, 'number_generations': 16, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 2}
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'selection_method': 'roulette', 'crossover_method': 'one_point', 'starting_population_size': 16, 'mutation_method': 'element_wise', 'resources': 2176.0, 'mutation_probability': 0.1, 'number_sites': 8, 'num_protected_elite_models': 2, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'unchanged_elite_num_generations_cutoff': 3, 'number_generations': 16}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model unchaged; terminating early.
+Finished generations.
+Result: {'number_terms': 28, 'resources': 4352.0, 'starting_population_size': 16, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'champion_f_score': 1.0, 'number_possible_models': 268435456, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 3}
+Worker 2 finished work package
+Worker 2 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  2
+[MASTER] Sending work to  2
+Worker 2 received package to compute: {'resources': 4352.0, 'starting_population_size': 16, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 3}
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 8448.0, 'number_generations': 16, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 2}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'resources': 4352.0, 'starting_population_size': 16, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 3}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 1 finished work package
+Job failed
+Worker 1 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  1
+[MASTER] Sending message to  1
+[MASTER] Sending work to  1
+Worker 1 received package to compute: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 16896.0, 'number_generations': 32, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 4}
+Best model has chaged.
+Best model unchaged; terminating early.
+Finished generations.
+Result: {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 32, 'champion_f_score': 0.8571428571428571, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 3, 'selection_method': 'roulette', 'number_terms': 28, 'resources': 4352.0, 'number_possible_models': 268435456, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Worker 5 finished work package
+Worker 5 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  5
+[MASTER] Sending work to  5
+Worker 5 received package to compute: {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 16, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 1, 'selection_method': 'roulette', 'resources': 2176.0, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 16896.0, 'number_generations': 32, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 4}
+Num sites:  8  has type  <class 'int'>
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 1 finished work package
+Job failed
+Worker 1 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  1
+[MASTER] Sending message to  1
+[MASTER] Sending work to  1
+Worker 1 received package to compute: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 8448.0, 'number_generations': 16, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 2}
+Best model has chaged.
+Running genetic algorithm with config  {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 16, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 1, 'selection_method': 'roulette', 'resources': 2176.0, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 8448.0, 'number_generations': 16, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 32, 'config_id': 2}
+Num sites:  8  has type  <class 'int'>
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 1 finished work package
+Job failed
+Worker 1 waiting on message from master
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  1
+[MASTER] Sending message to  1
+[MASTER] Sending work to  1
+Worker 1 received package to compute: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 4352.0, 'number_generations': 32, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 16, 'config_id': 3}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Finished generations.
+Result: {'config_id': 1, 'resources': 2176.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_possible_models': 268435456, 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 16, 'num_protected_elite_models': 2, 'number_terms': 28, 'number_generations': 16, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point', 'champion_f_score': 0.9655172413793104}
+Worker 4 finished work package
+Worker 4 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  4
+[MASTER] Sending work to  4
+Worker 4 received package to compute: {'config_id': 4, 'resources': 16896.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 32, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
+Running genetic algorithm with config  {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 4352.0, 'number_generations': 32, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 16, 'config_id': 3}
+Num sites:  8  has type  <class 'int'>
+Best model has chaged.
+Best model has chaged.
+Best model unchaged; terminating early.
+Finished generations.
+Result: {'selection_method': 'roulette', 'crossover_method': 'one_point', 'champion_f_score': 0.8148148148148148, 'number_terms': 28, 'starting_population_size': 16, 'mutation_method': 'element_wise', 'resources': 2176.0, 'mutation_probability': 0.1, 'number_sites': 8, 'num_protected_elite_models': 2, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'config_id': 1, 'number_possible_models': 268435456, 'unchanged_elite_num_generations_cutoff': 3, 'number_generations': 16}
+Worker 3 finished work package
+Worker 3 waiting on message from master
+[MASTER] received message with tag: 2
+Best model has chaged.
+[MASTER] Sending message to  3
 [MASTER] Sending shutdown to  3
-Worker 2 received package to compute: {'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'mutation_probability': 0.1, 'number_sites': 8, 'starting_population_size': 8, 'num_protected_elite_models': 1, 'config_id': 1, 'resources': 288.0, 'crossover_method': 'one_point', 'number_generations': 8, 'selection_method': 'roulette', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log'}
 [MASTER] received message with tag: 4
 Worker 3 no longer accepting work.
+Best model has chaged.
 __main__ finished, on rank 3
-__main__ starting, on rank 1
-I am worker with rank 1
-Worker 1 waiting on message from master
-[MASTER] received message with tag: 0
-[MASTER] Sending message to  1
-[MASTER] Sending shutdown to  1
-Worker 1 no longer accepting work.
-[MASTER] received message with tag: 4
-__main__ finished, on rank 1
-__main__ starting, on rank 7
-I am worker with rank 7
-Worker 7 waiting on message from master
-[MASTER] received message with tag: 0
-[MASTER] Sending message to  7
-[MASTER] Sending shutdown to  7
-[MASTER] received message with tag: 4
-Worker 7 no longer accepting work.
-__main__ finished, on rank 7
-Running genetic algorithm with config  {'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'mutation_probability': 0.1, 'number_sites': 8, 'starting_population_size': 8, 'num_protected_elite_models': 1, 'config_id': 1, 'resources': 288.0, 'crossover_method': 'one_point', 'number_generations': 8, 'selection_method': 'roulette', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log'}
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Running genetic algorithm with config  {'config_id': 4, 'resources': 16896.0, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_sites': 8, 'mutation_method': 'element_wise', 'unchanged_elite_num_generations_cutoff': 3, 'starting_population_size': 32, 'num_protected_elite_models': 2, 'number_generations': 32, 'mutation_probability': 0.1, 'selection_method': 'roulette', 'crossover_method': 'one_point'}
 Num sites:  8  has type  <class 'int'>
-LOG FILE FOR GENETIC ALGORITHM IS: /home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log
 Best model has chaged.
 Best model has chaged.
-__main__ starting, on rank 5
-I am worker with rank 5
-Worker 5 waiting on message from master
-[MASTER] received message with tag: 0
-[MASTER] Sending message to  5
-[MASTER] Sending shutdown to  5
-[MASTER] received message with tag: 4
-Worker 5 no longer accepting work.
-__main__ finished, on rank 5
 Best model has chaged.
-__main__ starting, on rank 6
-I am worker with rank 6
-Worker 6 waiting on message from master
-[MASTER] received message with tag: 0
-[MASTER] Sending message to  6
-[MASTER] Sending shutdown to  6
-Worker 6 no longer accepting work.
-__main__ finished, on rank 6
-[MASTER] received message with tag: 4
 Best model has chaged.
-__main__ starting, on rank 4
-I am worker with rank 4
+Job failed with exception 
+probabilities do not sum to 1
+
+Worker 4 finished work package
+Job failed
 Worker 4 waiting on message from master
-[MASTER] received message with tag: 0
+[MASTER] received message with tag: 3
+[MASTER] Job failure recorded from worker  4
 [MASTER] Sending message to  4
 [MASTER] Sending shutdown to  4
 [MASTER] received message with tag: 4
@@ -73,8 +369,14 @@ Best model has chaged.
 Best model has chaged.
 Best model has chaged.
 Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model unchaged; terminating early.
 Finished generations.
-Result: {'unchanged_elite_num_generations_cutoff': 3, 'mutation_method': 'element_wise', 'mutation_probability': 0.1, 'number_sites': 8, 'starting_population_size': 8, 'num_protected_elite_models': 1, 'number_possible_models': 268435456, 'config_id': 1, 'resources': 288.0, 'number_terms': 28, 'crossover_method': 'one_point', 'champion_f_score': 0.7826086956521738, 'number_generations': 8, 'selection_method': 'roulette', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log'}
+Result: {'number_terms': 28, 'resources': 4352.0, 'starting_population_size': 16, 'mutation_probability': 0.1, 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'num_protected_elite_models': 2, 'crossover_method': 'one_point', 'number_sites': 8, 'selection_method': 'roulette', 'unchanged_elite_num_generations_cutoff': 3, 'champion_f_score': 0.8799999999999999, 'number_possible_models': 268435456, 'mutation_method': 'element_wise', 'number_generations': 32, 'config_id': 3}
 Worker 2 finished work package
 Worker 2 waiting on message from master
 [MASTER] received message with tag: 2
@@ -83,6 +385,34 @@ Worker 2 waiting on message from master
 Worker 2 no longer accepting work.
 __main__ finished, on rank 2
 [MASTER] received message with tag: 4
-Making  /home/bf16951/QMD/scripts/genetic_alg_param_sweep/results/Dec_04/12_53
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model has chaged.
+Best model unchaged; terminating early.
+Finished generations.
+Result: {'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'champion_f_score': 0.8484848484848485, 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'mutation_method': 'element_wise', 'number_sites': 8, 'resources': 4352.0, 'number_possible_models': 268435456, 'number_generations': 32, 'crossover_method': 'one_point', 'selection_method': 'roulette', 'mutation_probability': 0.1, 'starting_population_size': 16, 'number_terms': 28, 'config_id': 3}
+Worker 1 finished work package
+Worker 1 waiting on message from master
+[MASTER] received message with tag: 2
+Best model has chaged.
+[MASTER] Sending message to  1
+[MASTER] Sending shutdown to  1
+[MASTER] received message with tag: 4
+Worker 1 no longer accepting work.
+__main__ finished, on rank 1
+Best model has chaged.
+Best model has chaged.
+Finished generations.
+Result: {'mutation_method': 'element_wise', 'log_file': '/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log', 'number_generations': 16, 'champion_f_score': 0.9500000000000001, 'crossover_method': 'one_point', 'unchanged_elite_num_generations_cutoff': 3, 'num_protected_elite_models': 2, 'number_sites': 8, 'config_id': 1, 'selection_method': 'roulette', 'number_terms': 28, 'resources': 2176.0, 'number_possible_models': 268435456, 'mutation_probability': 0.1, 'starting_population_size': 16}
+Worker 5 finished work package
+Worker 5 waiting on message from master
+[MASTER] received message with tag: 2
+[MASTER] Sending message to  5
+[MASTER] Sending shutdown to  5
+[MASTER] received message with tag: 4
+Worker 5 no longer accepting work.
+Making  /home/bf16951/QMD/scripts/genetic_alg_param_sweep/results/Dec_04/15_03
+__main__ finished, on rank 5
 Directory made
 __main__ finished, on rank 0
