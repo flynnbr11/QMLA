@@ -19,6 +19,8 @@ import qmla
 
 def run_genetic_algorithm(configuration):
     try:
+        print("Running genetic algorithm with config ", configuration)
+        print("Num sites: ", configuration['number_sites'], " has type ", type(configuration['number_sites']))
         ga = qmla.exploration_strategies.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
             num_sites = configuration['number_sites'],
             base_terms = ['z'],
@@ -39,6 +41,9 @@ def run_genetic_algorithm(configuration):
                 mod : ga.model_f_score(mod) 
                 for mod in new_models
             }
+            ga.consolidate_generation(
+                model_fitnesses = model_f_scores
+            )
 
             new_models = ga.genetic_algorithm_step(
                 model_fitnesses = model_f_scores
@@ -58,8 +63,9 @@ def run_genetic_algorithm(configuration):
         configuration['number_possible_models'] = 2**ga.num_terms
         print("Result:", configuration, flush=True)
         return configuration
-    except:
-        print("Job failed.", flush=True)
+    except Exception as e:
+        print("Job failed with exception \n{}\n".format(e), flush=True)
+        raise
         return None
 
 
@@ -70,13 +76,13 @@ def get_all_configurations(
     test_setup = True
     if test_setup: 
         print("Getting reduced set of configurations to test.")
-        number_of_iterations = 10
-        numbers_of_sites = [8] # 8 sites -> 28 terms
-        numbers_of_generations = [16, 32, 64 ]
-        starting_populations = [16, 32]
-        elite_models_protected = [1, ]
-        mutation_probabilities = [0.1, ]
-        unchanged_gen_count_for_termination = [3]        
+        number_of_iterations = 1
+        numbers_of_sites = [4] # 8 sites -> 28 terms
+        numbers_of_generations = [16,]
+        starting_populations = [16,]
+        elite_models_protected = [1,]
+        mutation_probabilities = [0.1,]
+        unchanged_gen_count_for_termination = [3]
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
         crossover_methods = ['one_point']
@@ -222,7 +228,7 @@ def analyse_results(
     # configuration_df['cost_per_win'] = configuration_df['win_rate'] / configuration_df['resources_reqd']
     # configuration_df['f_value'] = configuration_df['median_f_score'] / configuration_df['resources_reqd']
     configuration_df['cost_per_win'] = configuration_df['resources'] / configuration_df['win_rate']
-    configuration_df['win_per_resourrce'] = configuration_df['win_rate'] / configuration_df['resources']
+    configuration_df['win_per_resource'] = configuration_df['win_rate'] / configuration_df['resources']
     configuration_df['f_value'] = configuration_df['median_f_score'] / configuration_df['resources']
 
     path_to_store_configs = os.path.join(
@@ -232,12 +238,12 @@ def analyse_results(
     configuration_df.to_csv(path_to_store_configs)
 
 
-    ranked_configurations = configuration_df.sort_values(by='win_per_resourrce', ascending=False)
+    ranked_configurations = configuration_df.sort_values(by='win_per_resource', ascending=False)
     summary_file = os.path.join(result_directory, 'summary.txt')
     ranked_configurations.to_string(
         buf=open(summary_file, 'w'),
         columns = [
-        'f_value', 'win_per_resourrce',
+        'f_value', 'win_per_resource',
         'number_generations', 'starting_population_size', 
         'resources', 'median_f_score', 'mean_f_score', 'win_rate',
         'mutation_probability', 'num_protected_elite_models',
