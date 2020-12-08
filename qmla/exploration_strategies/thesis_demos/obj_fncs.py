@@ -68,5 +68,5 @@ class DemoObjectiveFunctions(
             self.num_sites : self.initial_num_models,
             'other': 0
         }
-        self.num_processes_to_parallelise_over = self.initial_num_models
+        self.num_processes_to_parallelise_over = int(self.initial_num_models)
  
