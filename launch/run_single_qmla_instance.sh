@@ -31,8 +31,8 @@ echo "$job_number" >> $RESULTS_DIR/job_ids_started.txt
 echo "running dir: $RUNNING_DIR"
 
 cd $RUNNING_DIR
-mkdir -p $RUNNING_DIR/logs # TODO remove?
-mkdir -p $PBS_O_WORKDIR/logs #TODO remove?
+mkdir -p $RUNNING_DIR/logs 
+mkdir -p $PBS_O_WORKDIR/logs
 
 # The redis server is started on the first node.
 REDIS_URL=redis://$SERVER_HOST:$REDIS_PORT

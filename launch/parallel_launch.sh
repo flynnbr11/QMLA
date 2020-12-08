@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description='test-hexp-install__fh-qhl'
+test_description='thesis-demo__obj-fnc-table'
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -8,19 +8,19 @@ test_description='test-hexp-install__fh-qhl'
 ### ---------------------------------------------------###
 
 ## Number and type of QMLA instances to perform in this run.
-num_instances=1
-run_qhl=1 # do a test on QHL only -> 1; for full QMLA -> 0
+num_instances=2
+run_qhl=0 # do a test on QHL only -> 1; for full QMLA -> 0
 run_qhl_multi_model=0
 multiple_exploration_strategies=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMLA. 
 plot_level=2
 debug_mode=0
 time_request_insurance_factor=1
-min_time_to_request=16000 # 1300 by default
+min_time_to_request=12000 # 1300 by default
 
 # QHL parameters.
-e=100 # experiments
-p=2000 # particles
+e=10 # experiments
+p=50 # particles
 
 ### ---------------------------------------------------###
 # Choose growth rule 
@@ -28,8 +28,7 @@ p=2000 # particles
 # and value of experimental_data.
 ### ---------------------------------------------------###
 
-exploration_strategy='IsingLatticeSet'
-# exploration_strategy='HeisenbergLatticeSet'
+exploration_strategy='DemoObjectiveFunctions'
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_exploration_strategies set to 1 above
 alt_exploration_strategies=(  
@@ -52,7 +51,7 @@ done
 # QMD settings - for learning (QHL) and comparison (BF)
 further_qhl_resource_factor=1
 do_plots=0
-pickle_class=0
+pickle_class=1
 top_number_models=4
 
 ### ---------------------------------------------------###
@@ -75,7 +74,7 @@ mkdir -p $output_dir
 # File paths used
 bayes_csv="$this_run_directory/all_models_bayes_factors.csv"
 system_measurements_file="$this_run_directory/system_measurements.p"
-run_info_file="$this_run_directory/true_params.p"
+run_info_file="$this_run_directory/run_info.p"
 plot_probe_file="$this_run_directory/plot_probes.p"
 latex_mapping_file="$this_run_directory/LatexMapping.txt"
 
@@ -131,7 +130,7 @@ source $time_required_script
 qmla_time=$QMLA_TIME
 qhl_time=$QHL_TIME
 fqhl_time=$FQHL_TIME
-num_processes=$NUM_PROCESSESNUM_PROCESSES
+num_processes=$NUM_PROCESSES
 
 # Change requested time. e.g. if running QHL , don't need as many nodes. 
 if (( "$run_qhl" == 1 )) 
@@ -157,7 +156,7 @@ else
 	let seconds_reqd="$qmla_time"
 fi
 time="walltime=00:00:$seconds_reqd"
-
+echo "After calling scipt(s), num processes=$num_proc, seconds_reqd=$seconds_reqd"
 
 ### ---------------------------------------------------###
 # Submit instances as jobs to job scheduler.
