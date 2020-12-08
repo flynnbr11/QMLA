@@ -65,7 +65,7 @@ class DemoObjectiveFunctions(
 
         self.tree_completed_initially = True
         self.max_num_models_by_shape = {
-            self.num_sites : (self.initial_num_models * self.max_spawn_depth)/10,
+            self.num_sites : self.initial_num_models,
             'other': 0
         }
         self.num_processes_to_parallelise_over = self.initial_num_models
