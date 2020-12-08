@@ -937,12 +937,12 @@ class ExplorationStrategy():
     # Generate evaluation data
     def generate_evaluation_data(
         self, 
-        num_probes = None, 
-        num_times = 100, 
-        probe_maximum_number_qubits = 10,
-        evaluation_times = None, 
+        num_probes=None, 
+        num_times=100, 
+        probe_maximum_number_qubits=10,
+        evaluation_times=None, 
         num_eval_points=None, 
-        run_directory = '', 
+        run_directory='', 
     ):
         if num_probes is None: 
             num_probes = self.num_probes

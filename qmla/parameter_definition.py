@@ -98,7 +98,7 @@ def set_shared_parameters(
 
     # Generate evaluation data set
     evaluation_data = exploration_class.generate_evaluation_data(
-        probe_maximum_number_qubits=probe_max_num_qubits_all_exploration_strategies,
+        probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategies,
         num_times = int(250), 
         run_directory = run_directory,
     )
