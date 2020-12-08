@@ -71,10 +71,10 @@ class DemoObjectiveFunctions(
         self.branch_comparison_strategy = 'all' # 'minimal'
         
         # speed things up
-        self.fraction_experiments_for_bf = 0.1
-        self.fraction_own_experiments_for_bf = 0.1
-        self.fraction_opponents_experiments_for_bf = 0.1
-        self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
+        self.fraction_experiments_for_bf = 0.5
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = 0.5
+        self.fraction_particles_for_bf = 0.2
 
         self.tree_completed_initially = True
         self.max_num_models_by_shape = {
