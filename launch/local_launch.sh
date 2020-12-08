@@ -48,7 +48,7 @@ number_best_models_further_qhl=5
 # exploration_strategy='IsingLatticeSet'
 # exploration_strategy='Demonstration'
 
-exploration_strategy="ParamSweepGeneticAlgorithm"
+exploration_strategy="DemoObjectiveFunctions"
 # exploration_strategy='HeisenbergGenetic'
 # exploration_strategy='HeisenbergGeneticXXZ'
 # exploration_strategy='IsingGenetic'

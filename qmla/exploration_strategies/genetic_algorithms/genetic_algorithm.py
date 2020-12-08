@@ -645,19 +645,11 @@ class GeneticAlgorithmQMLA():
                     pair_data.append(this_pair_df)
         self.chrom_pair_df = pd.DataFrame.from_dict(pair_data)                
         # normalise probabilities
-        self.log_print([
-            "Before normalising pairs' probabilities, sum of probs:",
-            self.chrom_pair_df.probability.sum()
-        ])
         try:
             self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
             self.chrom_pair_df.probability = self.chrom_pair_df.probability / self.chrom_pair_df.probability.sum()
         except:
             self.log_print(["Failing at final generation. chrom pair df:", self.chrom_pair_df])
-        self.log_print([
-            "Before normalising pairs' probabilities, sum of probs:",
-            self.chrom_pair_df.probability.sum()
-        ])
 
         self.log_print([
             "starting chromosome pair dataframe setup. {} combinations in total from {} non-zero prob pairs. took {} sec and has len {}".format(
@@ -677,9 +669,6 @@ class GeneticAlgorithmQMLA():
     def get_pair_selection_order(self):
         pair_idx = self.chrom_pair_df.index.values
         probabilities = self.chrom_pair_df.probability.values
-        self.log_print([
-            "get_pair_selection_order initial probs\n", probabilities
-        ])        
         # only keep nonzero probs
         pair_idx = pair_idx[probabilities > 0]
         probabilities = probabilities[probabilities > 0] 

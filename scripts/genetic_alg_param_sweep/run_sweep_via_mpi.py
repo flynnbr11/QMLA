@@ -37,10 +37,30 @@ def master():
     # set up results infrastructure
     ga_results_df = pd.DataFrame() 
 
+    now = datetime.datetime.now()
+    date = "{}_{}".format(
+        now.strftime("%b"),
+        now.strftime("%d"),
+    )
+    time = "{}_{}".format(
+        now.strftime("%H"),
+        now.strftime("%M"),
+    )
+
+    result_directory = os.path.join(os.getcwd(), 'results', date, time)
+    print("Making ", result_directory, flush=True)
+    if not os.path.exists(result_directory): 
+        try:
+            os.makedirs(result_directory)
+            print("Directory made", flush=True)
+        except:
+            print("Failed to make dir", flush=True)
+            raise
+
     # get configurations to cycle over
     all_configurations, configuration_df = get_all_configurations(
         log_file = os.path.join(
-            os.getcwd(), 'output.log'
+            result_directory, 'output.log'
         ),
     )
     iterable_configurations = iter(all_configurations)
@@ -52,6 +72,7 @@ def master():
     )
 
     # iteratively send configurations to workers, until none remain
+    num_configs = 0
     while num_workers_shutdown < num_workers: 
 
         # receive any message from any worker
@@ -83,7 +104,9 @@ def master():
             try:
                 # if some configs still to process, send the next one to the worker
                 configuration = next(iterable_configurations)
+                num_configs += 1
                 print("[MASTER] Sending work to ", sender, flush=True)
+                print("{} jobs launched.".format(num_configs), flush=True)
                 comm.send(
                     obj = configuration, 
                     dest = sender, 
@@ -98,28 +121,7 @@ def master():
                     tag = TAGS['shutdown'], 
                 )
 
-    # store the result
-
-    now = datetime.datetime.now()
-    date = "{}_{}".format(
-        now.strftime("%b"),
-        now.strftime("%d"),
-    )
-    time = "{}_{}".format(
-        now.strftime("%H"),
-        now.strftime("%M"),
-    )
-
-    result_directory = os.path.join(os.getcwd(), 'results', date, time)
-    print("Making ", result_directory, flush=True)
-    if not os.path.exists(result_directory): 
-        try:
-            os.makedirs(result_directory)
-            print("Directory made", flush=True)
-        except:
-            print("Failed to make dir", flush=True)
-            raise
-
+    # analyse the result
     analyse_results(
         ga_results_df, 
         configuration_df, 

@@ -21,17 +21,21 @@ import qmla
 def get_all_configurations(
     log_file=None,
 ):
+    r"""    
+    Generate dictionaries of configuartions which are used in parmaeter sweep for QMLA genetic algorithm. 
+    """
+
     # set up hyper parameters to sweep over
     test_setup = True
     if test_setup: 
         print("Getting reduced set of configurations to test.")
-        number_of_iterations = 5
-        numbers_of_sites = [5] # 8 sites -> 28 terms
-        numbers_of_generations = [2]
-        starting_populations = [32]
+        number_of_iterations = 20
+        numbers_of_sites = [4] # 4 sites, fully connected -> 3 * (4C2) = 18 terms
+        numbers_of_generations = [8, 16, 32, 64]
+        starting_populations = [8, 16, 32, 64]
         elite_models_protected = [2]
-        mutation_probabilities = [0.1]
-        unchanged_gen_count_for_termination = [3]
+        mutation_probabilities = [0.05, 0.1, 0.15, 0.2, 0.25]
+        unchanged_gen_count_for_termination = [3, 5, 8]
         selection_methods = ['roulette']
         mutation_methods = ['element_wise']
         crossover_methods = ['one_point']
@@ -92,12 +96,19 @@ def get_all_configurations(
     
 
 def run_genetic_algorithm(configuration):
+    r"""
+    Given a dictionary of hyperparameters, run the QMLA genetic algorithm 
+    using F score as objective function. 
+
+    """
+
+
     try:
         print("Running genetic algorithm with config ", configuration)
         print("Num sites: ", configuration['number_sites'], " has type ", type(configuration['number_sites']))
         ga = qmla.exploration_strategies.genetic_algorithm.GeneticAlgorithmFullyConnectedLikewisePauliTerms(
             num_sites = configuration['number_sites'],
-            base_terms = ['z'],
+            base_terms = ['x', 'y', 'z'],
             mutation_method = configuration['mutation_method'], 
             selection_method = configuration['selection_method'],
             crossover_method = configuration['crossover_method'],
@@ -139,11 +150,8 @@ def run_genetic_algorithm(configuration):
         return configuration
     except Exception as e:
         print("Job failed with exception \n{}\n".format(e), flush=True)
-        raise
-        # return None
-
-
-
+        # raise
+        return None
 
 
 def plot_configuration_sweep(results, save_to_file=None):
