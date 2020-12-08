@@ -69,15 +69,16 @@ class DemoObjectiveFunctions(
         self.initial_num_models = len(self.initial_models)
         self.fitness_method = 'f_score'
         self.branch_comparison_strategy = 'all' # 'minimal'
+        
         # speed things up
-        self.fraction_experiments_for_bf = 0.1 # TODO remove
+        self.fraction_experiments_for_bf = 0.1
         self.fraction_own_experiments_for_bf = 0.1
         self.fraction_opponents_experiments_for_bf = 0.1
         self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
 
         self.tree_completed_initially = True
         self.max_num_models_by_shape = {
-            self.num_sites : self.initial_num_models,
+            self.num_sites : self.initial_num_models / 10,
             'other': 0
         }
         self.num_processes_to_parallelise_over = int(self.initial_num_models)
