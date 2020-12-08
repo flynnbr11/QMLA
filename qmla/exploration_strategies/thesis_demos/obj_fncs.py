@@ -59,6 +59,7 @@ class DemoObjectiveFunctions(
             'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5', 
             'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5'
         ]
+        self.initial_num_models = len(self.initial_models)
         self.fitness_method = 'f_score'
         self.branch_comparison_strategy = 'all' # 'minimal'
 
