@@ -52,9 +52,8 @@ class DemoObjectiveFunctions(
         )
         # true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
 
-
         self.initial_models = [
-            'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5+pauliSet_1J5_zJz_d5', # F=0, k=3
+            'pauliSet_1J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', # F=0, k=3
             'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2, k=4
             'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5', # F=0.4, k=5
             'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.5, k=7
@@ -63,12 +62,18 @@ class DemoObjectiveFunctions(
             # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8, k=5
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8, k=7
         ]
+
         self.initial_models = [
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
         self.initial_num_models = len(self.initial_models)
         self.fitness_method = 'f_score'
         self.branch_comparison_strategy = 'all' # 'minimal'
+        # speed things up
+        self.fraction_experiments_for_bf = 0.1 # TODO remove
+        self.fraction_own_experiments_for_bf = 0.1
+        self.fraction_opponents_experiments_for_bf = 0.1
+        self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
 
         self.tree_completed_initially = True
         self.max_num_models_by_shape = {
