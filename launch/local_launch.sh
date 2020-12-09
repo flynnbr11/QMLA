@@ -34,45 +34,7 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locally, currently
 ###############
 
-# exploration_strategy='AnalyticalLikelihood'
-# exploration_strategy='IsingLatticeSet'
-# exploration_strategy='TestSimulatedNVCentre'
-# exploration_strategy='NVCentreRevivals'
-# exploration_strategy='NVCentreRevivalsSimulated'
-# exploration_strategy='NVCentreNQubitBath'
-# exploration_strategy='NVCentreGenticAlgorithmPrelearnedParameters'
-# exploration_strategy='NVPrelearnedTest'
-# exploration_strategy='HeisenbergLatticeSet'
-# exploration_strategy='FermiHubbardLatticeSet'
-# exploration_strategy='DemoIsing'
-# exploration_strategy='IsingLatticeSet'
-# exploration_strategy='Demonstration'
-
-exploration_strategy="DemoObjectiveFunctions"
-# exploration_strategy='HeisenbergGenetic'
-# exploration_strategy='HeisenbergGeneticXXZ'
-# exploration_strategy='IsingGenetic'
-# exploration_strategy='IsingGeneticTest'
-# exploration_strategy='HeisenbergGeneticXXZ'
-# exploration_strategy='IsingGeneticSingleLayer'
-# exploration_strategy='GenAlgObjectiveFncTest'
-# exploration_strategy='ObjFncResiduals'
-# exploration_strategy='ObjFncElo'
-# exploration_strategy='SimulatedNVCentre'
-# exploration_strategy='ExperimentNVCentreNQubits'
-# exploration_strategy='NVCentreSimulatedShortDynamicsGenticAlgorithm'
-# exploration_strategy='NVCentreExperimentalShortDynamicsGenticAlgorithm'
-# exploration_strategy='NVCentreRevivalSimulation'
-# exploration_strategy='NVCentreSimulatedLongDynamicsGenticAlgorithm'
-
-# exploration_strategy='ExplorationStrategyTemplate'
-# exploration_strategy='GRTest'
-# exploration_strategy='IsingLatticeSet'
-# exploration_strategy='HeisenbergLatticeSet'
-# exploration_strategy='NVLargeSpinBath'
-# exploration_strategy='GeneticTest'
-# exploration_strategy='Genetic'
-# exploration_strategy='NVExperimentalData'
+exploration_strategy="DemoBayesFactorsByFscore"
 
 alt_exploration_strategies=(
     # 'IsingLatticeSet'
