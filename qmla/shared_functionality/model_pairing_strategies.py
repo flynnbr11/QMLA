@@ -11,12 +11,77 @@ import pandas as pd
 import seaborn as sns
 import random
 import sklearn
-import networkx
+import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import GridSpec
 
 import qmla.shared_functionality.elo_graphs
+
+def generate_random_regular_graph(
+    model_list, 
+    degree_rate=0.2,
+):
+    g = nx.random_regular_graph(
+        n = len(model_list), 
+        d = int(degree_rate*len(model_list))
+    )
+    
+    model_list_iter = iter(model_list)
+    node_labels = {
+        n : next(model_list_iter)
+        for n in list(g.nodes)
+    }
+    nx.relabel_nodes(g,node_labels,False)
+
+    for n in g.nodes:
+        g.nodes[n]['longest_path_to_any_target'] = 0
+
+    node_edges = { n : len(g.edges(n)) for n in model_list}
+
+    lowest_connectivity = min( node_edges.values() )
+    highest_connectivity = max( node_edges.values() )
+
+    for n in g:
+        for target in g:
+            if n != target:
+                shortest_path = nx.shortest_path_length(
+                    g, 
+                    source = n, 
+                    target = target
+                )
+
+                this_node_current_longest_path = g.nodes[n]['longest_path_to_any_target']
+                if shortest_path  > this_node_current_longest_path:
+                    g.nodes[n]['longest_path_to_any_target'] = shortest_path
+
+    distance_between_nodes = [ g.nodes[n]['longest_path_to_any_target'] for n in g]                
+
+    lowest_distance_between_nodes = min(distance_between_nodes)
+    highest_distance_between_nodes = max(distance_between_nodes)
+    
+    connections = list(g.edges)
+    summary = "{} connections, lowest_conn={}, highest_conn={}, max_distance={}".format(
+        len(connections), 
+        lowest_connectivity, 
+        highest_connectivity,
+        highest_distance_between_nodes
+    )
+
+    result = {
+        'connections' : connections, 
+        'num_connections': len(connections),
+        'lowest_distance' : lowest_distance_between_nodes, 
+        'highest_distance' : highest_distance_between_nodes, 
+        'lowest_connectivity' : lowest_connectivity, 
+        'highest_connectivity' : highest_connectivity,
+        'graph' : g,
+        'node_edges' : node_edges, 
+        'summary' : summary, 
+    }
+
+    return connections, g
+
 
 def generate_graph(
     model_list, 
@@ -36,7 +101,7 @@ def generate_graph(
         all_pairs, int(num_connections)
     )
 
-    g = networkx.Graph()
+    g = nx.Graph()
     for n in model_list:
         g.add_node(n)
         g.nodes[n]['longest_path_to_any_target'] = 0
@@ -51,7 +116,7 @@ def generate_graph(
     for n in g:
         for target in g:
             if n != target:
-                shortest_path = networkx.shortest_path_length(
+                shortest_path = nx.shortest_path_length(
                     g, 
                     source = n, 
                     target = target
@@ -219,7 +284,9 @@ def attempt_minimal_graph(model_list, num_iterations_per_graph = 10):
         ))
         return graph_result
     else:
-        print("No such graph found after {} attempts. [{} failed graph generations]".format(counter, fail_counter))
+        print(
+            "No such graph found after {} attempts. [{} failed graph generations]".format(counter, fail_counter)
+        )
         
         
 def find_efficient_comparison_pairs(model_names):
@@ -264,7 +331,7 @@ def find_efficient_comparison_pairs(model_names):
             graph=None
             return model_pairs, graph
 
-        # networkx.draw(graph)
+        # nx.draw(graph)
         graph_data = try_get_graph
         pickle.dump(
             graph_data,
@@ -278,4 +345,5 @@ def find_efficient_comparison_pairs(model_names):
         ( model_id_names[m1], model_id_names[m2] ) for m1, m2 in connections
     ]
     
+    print("model_pairs: ", model_pairs)
     return model_pairs, graph

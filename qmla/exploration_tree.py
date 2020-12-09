@@ -96,13 +96,18 @@ class ExplorationTree():
         elif self.exploration_class.branch_comparison_strategy == 'optimal_graph':
             self.log_print(["Getting optimal comparison graph for {} models".format(
                 len(self.initial_models))])
-            pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
-                model_names=self.initial_models
+            # pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
+            #     model_names=self.initial_models
+            # )
+            pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.generate_random_regular_graph(
+                model_list=self.initial_models
             )
+
             self.log_print([
                 "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
                     len(pairs_to_compare)),
             ])
+            self.log_print(["Got pairs to compare:", pairs_to_compare])
             self.graphs[self.spawn_step] = graph
         elif self.exploration_class.branch_comparison_strategy == 'minimal':
             # TODO very few connections, only used to avoid crash
