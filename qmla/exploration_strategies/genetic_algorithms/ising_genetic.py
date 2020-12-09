@@ -78,7 +78,7 @@ class IsingGenetic(
         self.fraction_particles_for_bf = 0.25
         self.fraction_own_experiments_for_bf = 0.5
         self.fraction_opponents_experiments_for_bf = 0.5
-        self.iqle_mode = False
+        self.iqle_mode = True
 
         self.max_num_models_by_shape = {
             self.num_sites : 0.1*(len(self.initial_models) * self.max_spawn_depth),
@@ -201,97 +201,6 @@ class IsingGeneticSingleLayer(
         self.timing_insurance_factor = 0.75
 
 
-class HeisenbergGeneticXXZ(
-    IsingGenetic
-):
 
-    def __init__(
-        self,
-        exploration_rules,
-        true_model = None, 
-        **kwargs
-    ):
-        xyz = True # whether to use HeixXYZ model; False gives HeisXXZ
-        if true_model is None: 
-            if xyz:
-                # true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4'
-                true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
-                self.base_terms = [
-                    'x', 'y', 'z',
-                ]
-            else:
-                true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_zJz_d4'
-                self.base_terms = [
-                    'x', 'z',
-                ]
-            
-            true_model = qmla.construct_models.alph(true_model)
-        
-        super().__init__(
-            exploration_rules=exploration_rules,
-            true_model = true_model,
-            **kwargs
-        )
-        self.true_model_terms_params = {
-            # parameters for interesing HeisXXZ true model
-            # 'pauliSet_1J2_zJz_d4': 0.4,
-            # 'pauliSet_1J3_zJz_d4': 0.3,
-            # 'pauliSet_3J4_zJz_d4': 0.2,
-            
-            # 'pauliSet_2J3_xJx_d4': 0.1,
-            # 'pauliSet_2J4_xJx_d4': 0.6,
-            # 'pauliSet_3J4_xJx_d4' : 0.7,
-
-            # 'pauliSet_2J3_yJy_d4': 0.8,
-            # 'pauliSet_1J2_yJy_d4' : 0.9,
-            # 'pauliSet_1J4_yJy_d4' : 0.5,
-
-            # reasonably interesting dynamics within 0.5 \pm 0.25
-            'pauliSet_1J2_yJy_d4': 0.5215104901916923,
-            'pauliSet_1J2_zJz_d4': 0.677532102219103,
-            'pauliSet_1J3_zJz_d4': 0.2856421361482581,
-            'pauliSet_1J4_yJy_d4': 0.2520347900489445,
-            'pauliSet_2J3_xJx_d4': 0.2805221884243438,
-            'pauliSet_2J3_yJy_d4': 0.6289731115726565,
-            'pauliSet_2J4_xJx_d4': 0.3658869278936159,
-            'pauliSet_3J4_xJx_d4': 0.464429107089917,
-            'pauliSet_3J4_zJz_d4': 0.3901210315999691
-        }
-
-        # test F map for random set of 10 models
-        # Elo method
-        self.fitness_method = 'elo_rating'
-        self.branch_comparison_strategy = 'optimal_graph'
-        self.force_evaluation = False
-        self.fraction_particles_for_bf = 0.2
-        self.fraction_opponents_experiments_for_bf = 0.2
-        self.fraction_own_experiments_for_bf = 0.2
-        self.timing_insurance_factor = 0.1
-
-        # Residuals
-        # self.fitness_method = 'rs_mean_sq'
-        # self.branch_comparison_strategy = 'minimal'
-        # self.force_evaluation = True
-        # self.fraction_particles_for_bf = 0.05
-        # self.fraction_opponents_experiments_for_bf = 0
-        # self.fraction_own_experiments_for_bf = 0.05
-        # self.timing_insurance_factor = 0.125
-
-        self.max_time_to_consider = 60
-        self.iqle_mode = True
-        self.max_spawn_depth = 1 # 32 
-        self.initial_num_models = 6 # 28
-
-        self.initial_models = self.genetic_algorithm.random_initial_models(
-            num_models=self.initial_num_models
-        )
-        # self.prior_distribution_subroutine = qmla.shared_functionality.prior_distributions.uniform_prior
-        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-
-        self.initial_num_models = len(self.initial_models)
-        self.max_num_models_by_shape = {
-            self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
-            'other': 0
-        }
 
 

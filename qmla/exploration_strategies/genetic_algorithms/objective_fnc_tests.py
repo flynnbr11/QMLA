@@ -11,13 +11,13 @@ import sklearn
 
 from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy import \
     Genetic, hamming_distance, GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
-from qmla.exploration_strategies.genetic_algorithms.ising_genetic import IsingGenetic, HeisenbergGeneticXXZ
+from qmla.exploration_strategies.genetic_algorithms.ising_genetic import IsingGenetic
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
 
 
-class ObjectiveFncTestHeisXXZ(
-    HeisenbergGeneticXXZ
+class ObjectiveFncTestHeisXYZ(
+    IsingGenetic
 ):
 
     def __init__(
@@ -26,6 +26,12 @@ class ObjectiveFncTestHeisXXZ(
         true_model = None, # using that set by parent 
         **kwargs
     ):
+
+        true_model = 'pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
+        self.base_terms = [
+            'x', 'y', 'z',
+        ]
+
         super().__init__(
             exploration_rules=exploration_rules,
             true_model = true_model, 
@@ -83,7 +89,18 @@ class ObjectiveFncTestHeisXXZ(
         ]
 
         self.test_fitness_models = self.xyz_test_fitness_models
-        self.test_fitness_models = self.xxz_test_fitness_models
+        self.true_model_terms_params = {
+            # reasonably interesting dynamics within 0.5 \pm 0.25
+            'pauliSet_1J2_yJy_d4': 0.5215104901916923,
+            'pauliSet_1J2_zJz_d4': 0.677532102219103,
+            'pauliSet_1J3_zJz_d4': 0.2856421361482581,
+            'pauliSet_1J4_yJy_d4': 0.2520347900489445,
+            'pauliSet_2J3_xJx_d4': 0.2805221884243438,
+            'pauliSet_2J3_yJy_d4': 0.6289731115726565,
+            'pauliSet_2J4_xJx_d4': 0.3658869278936159,
+            'pauliSet_3J4_xJx_d4': 0.464429107089917,
+            'pauliSet_3J4_zJz_d4': 0.3901210315999691
+        }
 
 
 class ObjectiveFncTestIsing(
@@ -129,7 +146,7 @@ class ObjectiveFncTestIsing(
 
 class GenAlgObjectiveFncTest(
     # switch between these parent classes to change target to test obj fncs against
-    ObjectiveFncTestHeisXXZ
+    ObjectiveFncTestHeisXYZ
     # ObjectiveFncTestIsing 
 ):
 
