@@ -9,12 +9,13 @@ import time
 import pandas as pd
 import sklearn
 
-from qmla.exploration_strategies.genetic_algorithms.ising_genetic import IsingGenetic
+from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy \
+    import GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
 
 class HeisenbergGeneticXYZ(
-    IsingGenetic
+    GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
 ):
 
     def __init__(
@@ -57,23 +58,57 @@ class HeisenbergGeneticXYZ(
             'pauliSet_3J4_zJz_d4': 0.3901210315999691
         }
 
-        # Elo fitness function settings
-        self.fitness_method = 'elo_rating'
-        self.branch_comparison_strategy = 'optimal_graph'
-        self.force_evaluation = False
-        self.fraction_particles_for_bf = 0.2
-        self.fraction_opponents_experiments_for_bf = 0.2
-        self.fraction_own_experiments_for_bf = 0.2
-        self.timing_insurance_factor = 0.1
+        # Logistics
+        self.prune_completed_initially = True
+        self.prune_complete = True
+        self.fitness_by_f_score = pd.DataFrame()
+        self.fitness_df = pd.DataFrame()
+        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
 
-        self.max_time_to_consider = 60
-        self.iqle_mode = True
+        self.num_probes = 50
+        self.max_num_qubits = 7
+        self.num_possible_models = 2**len(self.true_chromosome)
+        self.max_num_probe_qubits = self.num_sites
+
+        self.qhl_models = [
+            self.true_model
+        ]
+        self.true_param_cov_mtx_widen_factor = 1
+
+        # Genetic algorithm settings
+        self.mutation_probability = 0.15
+        self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
+        self.true_chromosome = self.genetic_algorithm.true_chromosome
+        self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
+        
+        # WIDTH/DEPTH OF GENETIC ALGORITHM
         self.max_spawn_depth = 2 # 32 
         self.initial_num_models =  60 # 28
+
+        # Get starting population
         self.initial_models = self.genetic_algorithm.random_initial_models(
             num_models=self.initial_num_models
         )
 
+        # Settings for model search
+        self.branch_comparison_strategy = 'optimal_graph'
+        self.tree_completed_initially = False
+        self.fraction_particles_for_bf = 0.2
+        self.fraction_own_experiments_for_bf = 0.2
+        self.fraction_opponents_experiments_for_bf = 0.2
+        self.iqle_mode = True
+
+        # Parameter learning
+        self.max_time_to_consider = 15
+        self.min_param = 0.25
+        self.max_param = 0.75
+        self.force_evaluation = False
+        self.max_time_to_consider = 60
+        self.iqle_mode = True
+
+        # Timing info for cluster
+        self.num_processes_to_parallelise_over = 16
+        self.timing_insurance_factor = 0.1
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 3,
             'other': 0
