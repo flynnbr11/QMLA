@@ -34,7 +34,7 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locally, currently
 ###############
 
-exploration_strategy="DemoBayesFactorsByFscore"
+exploration_strategy="DemoFractionalResourcesBayesFactorsByFscore"
 
 alt_exploration_strategies=(
     # 'IsingLatticeSet'

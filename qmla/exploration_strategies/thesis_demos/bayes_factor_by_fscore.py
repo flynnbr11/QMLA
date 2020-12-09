@@ -68,9 +68,9 @@ class DemoBayesFactorsByFscore(
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.branch_comparison_strategy = 'all'
         self.tree_completed_initially = True
-        self.fraction_particles_for_bf = 0.5
-        self.fraction_own_experiments_for_bf = 0.5
-        self.fraction_opponents_experiments_for_bf = 0.5
+        self.fraction_particles_for_bf = 1
+        self.fraction_own_experiments_for_bf = 1
+        self.fraction_opponents_experiments_for_bf = 1
         self.iqle_mode = True
         
         self.max_time_to_consider = 15
@@ -80,28 +80,28 @@ class DemoBayesFactorsByFscore(
         test_fitness_models = [
             # F=0
             'pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5', 
-            'pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
+            # 'pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
             # 0.2 <= f < 0.3
             'pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5', # F=0.2
-            'pauliSet_1J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
             # 0.3 <= f < 0.4
             'pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
             # 0.4 <= f < 0.5
             'pauliSet_1J2_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J4_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_3J5_zJz_d5',
             # 0.5 <= f < 0.6
             'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
-            'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
             # 0.6 <= f < 0.7
             'pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
-            'pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
             # 0.7 <= f < 0.8
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J4_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5+pauliSet_4J5_zJz_d5',
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',            
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_1J5_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_4J5_zJz_d5',            
             # 0.8 <= f < 0.9
             'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5', # F=0.8
-            'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
+            # 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J4_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_3J5_zJz_d5',
             # 0.9 <= f < 1
             'pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5',
             # F = 1
@@ -126,4 +126,48 @@ class DemoBayesFactorsByFscore(
         
         self.num_processes_to_parallelise_over = 16
         self.timing_insurance_factor = 0.75
+
+class DemoFractionalResourcesBayesFactorsByFscore(
+    DemoBayesFactorsByFscore
+):
+
+    def __init__(
+        self,
+        exploration_rules,
+        true_model = None, 
+        **kwargs
+    ):
+
+        super().__init__(
+            exploration_rules=exploration_rules,
+            true_model = true_model,
+            **kwargs
+        )
+
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_own_experiments_for_bf = 0.25
+        self.fraction_opponents_experiments_for_bf = 0.25
+
+
+class DemoBayesFactorsByFscoreEloGraphs(
+    DemoBayesFactorsByFscore
+):
+
+    def __init__(
+        self,
+        exploration_rules,
+        true_model = None, 
+        **kwargs
+    ):
+
+        super().__init__(
+            exploration_rules=exploration_rules,
+            true_model = true_model,
+            **kwargs
+        )
+
+        self.fraction_particles_for_bf = 0.25
+        self.fraction_own_experiments_for_bf = 0.25
+        self.fraction_opponents_experiments_for_bf = 0.25
+        self.branch_comparison_strategy = 'optimal_graph'
 
