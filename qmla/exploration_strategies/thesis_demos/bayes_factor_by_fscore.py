@@ -144,9 +144,9 @@ class DemoFractionalResourcesBayesFactorsByFscore(
             **kwargs
         )
 
-        self.fraction_particles_for_bf = 0.25
-        self.fraction_own_experiments_for_bf = 0.25
-        self.fraction_opponents_experiments_for_bf = 0.25
+        self.fraction_particles_for_bf = 0.2
+        self.fraction_own_experiments_for_bf = 0.2
+        self.fraction_opponents_experiments_for_bf = 0.2
 
 
 class DemoBayesFactorsByFscoreEloGraphs(
@@ -166,8 +166,8 @@ class DemoBayesFactorsByFscoreEloGraphs(
             **kwargs
         )
 
-        self.fraction_particles_for_bf = 0.25
-        self.fraction_own_experiments_for_bf = 0.25
-        self.fraction_opponents_experiments_for_bf = 0.25
+        self.fraction_particles_for_bf = 0.2
+        self.fraction_own_experiments_for_bf = 0.2
+        self.fraction_opponents_experiments_for_bf = 0.2
         self.branch_comparison_strategy = 'optimal_graph'
 
