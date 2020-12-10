@@ -1719,7 +1719,6 @@ class QuantumModelLearningAgent():
             )
         except:
             self.log_print(["Failed to plot branch graphs."])
-            raise
 
         # Store model IDs and names
         model_data = self.model_database[

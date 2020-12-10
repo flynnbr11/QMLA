@@ -85,7 +85,7 @@ class HeisenbergGeneticXYZ(
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
         
         # WIDTH/DEPTH OF GENETIC ALGORITHM
-        self.max_spawn_depth = 2 # 32 
+        self.max_spawn_depth = 16 
         self.initial_num_models = 60
 
         # Get starting population

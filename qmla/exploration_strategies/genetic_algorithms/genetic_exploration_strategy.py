@@ -95,7 +95,6 @@ class Genetic(
             **kwargs, 
         )
 
-
         self.true_chromosome = self.genetic_algorithm.true_chromosome
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
 
