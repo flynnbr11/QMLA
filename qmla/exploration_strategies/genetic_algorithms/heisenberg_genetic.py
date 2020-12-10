@@ -85,8 +85,8 @@ class HeisenbergGeneticXYZ(
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
         
         # WIDTH/DEPTH OF GENETIC ALGORITHM
-        self.max_spawn_depth = 1 # 32 
-        self.initial_num_models = 16 #  60
+        self.max_spawn_depth = 2 # 32 
+        self.initial_num_models = 60
 
         # Get starting population
         self.initial_models = self.genetic_algorithm.random_initial_models(
@@ -113,6 +113,6 @@ class HeisenbergGeneticXYZ(
         self.num_processes_to_parallelise_over = 16
         self.timing_insurance_factor = 0.1
         self.max_num_models_by_shape = {
-            self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 3,
+            self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 6,
             'other': 0
         }
