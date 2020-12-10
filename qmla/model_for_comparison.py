@@ -192,8 +192,6 @@ class ModelInstanceForComparison():
         # Reconstruct the updater from results of learning
         self.reconstruct_updater = True  # optionally just load it
         if self.reconstruct_updater:
-
-
             try:
                 posterior_distribution = qi.MultivariateNormalDistribution(
                     self.estimated_mean_params,

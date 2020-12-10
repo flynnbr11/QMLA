@@ -107,7 +107,7 @@ class ExplorationTree():
                 "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
                     len(pairs_to_compare)),
             ])
-            self.log_print(["Got pairs to compare:", pairs_to_compare])
+            # self.log_print(["Got pairs to compare:", pairs_to_compare])
             self.graphs[self.spawn_step] = graph
         elif self.exploration_class.branch_comparison_strategy == 'minimal':
             # TODO very few connections, only used to avoid crash
@@ -179,7 +179,7 @@ class ExplorationTree():
                 #     model_names=model_list
                 # )
                 pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.generate_random_regular_graph(
-                    model_list=self.initial_models
+                    model_list=model_list
                 )
                 self.log_print([
                     "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
@@ -462,6 +462,7 @@ class BranchQMLA():
         :param dict models_points: results of comparisons
         """
 
+        self.log_print(["Updating branch {}. \n pair_list: {}".format(self.branch_id, pair_list)])
         # Track calls to this method for this branch
         self.result_counter += 1
 
@@ -479,7 +480,10 @@ class BranchQMLA():
             ])
 
         # Inspect the pairwise comparisons;
-        pair_list = [(min(pair), max(pair)) for pair in pair_list]
+        pair_list = [
+            (int(min(pair)), int(max(pair))) 
+            for pair in pair_list
+        ]
         bayes_factors = {
             pair:
             self.model_storage_instances[min(pair)].model_bayes_factors[max(pair)][-1]
@@ -487,6 +491,7 @@ class BranchQMLA():
         }
 
         # Update the ES ratings system
+        self.log_print(["Updating ratings for branch {}".format(self.branch_id)])
         self.exploration_class.ratings_class.batch_update(
             model_pairs_bayes_factors=bayes_factors,
             spawn_step=self.tree.spawn_step,
@@ -494,6 +499,7 @@ class BranchQMLA():
         )
 
         # Use exploration strategy's reasoning to decide if a champion can be set
+        self.log_print(["Selecting champion(s) for branch {}".format(self.branch_id)])
         if self.exploration_class.branch_champion_selection_stratgey == 'number_comparison_wins':
             self.log_print(
                 ["Choosing champion from number of wins on branch."])

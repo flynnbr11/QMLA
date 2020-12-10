@@ -954,6 +954,7 @@ class QuantumModelLearningAgent():
         # is always defined (lower, higher) for consistency
         lower_id = min(a, b)
         higher_id = max(a, b)
+        self.log_print(["processing BF {}/{}".format(lower_id, higher_id)])
 
         mod_low = self.get_model_storage_instance_by_id(lower_id)
         mod_high = self.get_model_storage_instance_by_id(higher_id)

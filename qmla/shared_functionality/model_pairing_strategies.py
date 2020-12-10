@@ -34,6 +34,7 @@ def generate_random_regular_graph(
         else:
             degree_rate = 0.2
 
+
     g = nx.random_regular_graph(
         n = len(model_list), 
         d = int(degree_rate*len(model_list))
