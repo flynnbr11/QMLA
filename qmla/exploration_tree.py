@@ -171,8 +171,15 @@ class ExplorationTree():
             if self.exploration_class.branch_comparison_strategy == 'all':
                 pairs_to_compare = 'all'
             elif self.exploration_class.branch_comparison_strategy == 'optimal_graph':
-                pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
-                    model_names=model_list
+                self.log_print([
+                    "Getting graph for restricted comparisons"
+                ])
+                
+                # pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
+                #     model_names=model_list
+                # )
+                pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.generate_random_regular_graph(
+                    model_list=self.initial_models
                 )
                 self.log_print([
                     "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(

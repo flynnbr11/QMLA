@@ -20,8 +20,20 @@ import qmla.shared_functionality.elo_graphs
 
 def generate_random_regular_graph(
     model_list, 
-    degree_rate=0.2,
+    degree_rate=None,
 ):
+    num_models = len(model_list)
+    if degree_rate is None: 
+        # set degree based on num models - must be high enough that there is a path between every pair
+        if num_models < 10:
+            degree_rate = 0.5
+        elif num_models < 20:
+            degree_rate = 0.4
+        elif num_models < 30:
+            degree_rate = 0.3
+        else:
+            degree_rate = 0.2
+
     g = nx.random_regular_graph(
         n = len(model_list), 
         d = int(degree_rate*len(model_list))
