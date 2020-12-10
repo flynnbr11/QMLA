@@ -275,7 +275,7 @@ else:
     qmla_instance.get_statistical_metrics(
         save_to_file=os.path.join(
             qmla_controls.plots_directory, 
-            "metrics_{}.png".format(qmla_controls.long_id)
+            "metrics.png"
         )
     )
 

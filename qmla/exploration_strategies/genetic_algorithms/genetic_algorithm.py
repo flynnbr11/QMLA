@@ -27,7 +27,7 @@ class GeneticAlgorithmQMLA():
         mutation_probability=0.1,
         selection_truncation_rate = 0.5, 
         num_protected_elite_models = 2, 
-        unchanged_elite_num_generations_cutoff = 4,
+        unchanged_elite_num_generations_cutoff = 5,
         log_file=None, 
         **kwargs
     ):
@@ -537,11 +537,10 @@ class GeneticAlgorithmQMLA():
         )
         num_models = len(ranked_models)
         self.log_print([
-            "Considering truncation for {} models".format(num_models),
-            "ranked models:", ranked_models
-        ])
-        self.log_print([
-            "Models ordered by ranking with their fitness:"
+            "Considering truncation for {} models. Truncation rate = {}".format(
+                num_models,
+                self.selection_truncation_rate
+            ),
         ])
         for m in ranked_models: 
             self.log_print(["fitness = {} \t Model={} ".format(model_fitnesses[m], m )])

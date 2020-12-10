@@ -74,16 +74,19 @@ class HeisenbergGeneticXYZ(
             self.true_model
         ]
         self.true_param_cov_mtx_widen_factor = 1
+        self.check_champion_reducibility = False
 
         # Genetic algorithm settings
         self.mutation_probability = 0.15
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.true_chromosome = self.genetic_algorithm.true_chromosome
+        self.genetic_algorithm.unchanged_elite_num_generations_cutoff = 5
+        self.genetic_algorithm.selection_truncation_rate = 2/6
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
         
         # WIDTH/DEPTH OF GENETIC ALGORITHM
-        self.max_spawn_depth = 2 # 32 
-        self.initial_num_models = 60
+        self.max_spawn_depth = 1 # 32 
+        self.initial_num_models = 16 #  60
 
         # Get starting population
         self.initial_models = self.genetic_algorithm.random_initial_models(

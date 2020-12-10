@@ -2730,8 +2730,7 @@ class QuantumModelLearningAgent():
             bayes_factors_df=self.bayes_factors_df)
         fig.savefig(
             os.path.join(
-                self.qmla_controls.plots_directory, "bayes_factors_by_f_score_{}".format(
-                    self.qmla_controls.long_id)
+                self.qmla_controls.plots_directory, "bayes_factors_by_f_score"
             )
         )
 

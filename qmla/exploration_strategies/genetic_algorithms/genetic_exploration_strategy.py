@@ -91,7 +91,6 @@ class Genetic(
             genes = genes, 
             num_sites=self.num_sites,
             true_model = self.true_model,
-            # base_terms=self.base_terms,
             mutation_probability=self.mutation_probability,
             **kwargs, 
         )
