@@ -29,11 +29,8 @@ def generate_random_regular_graph(
             degree_rate = 0.5
         elif num_models < 20:
             degree_rate = 0.4
-        elif num_models < 30:
-            degree_rate = 0.3
-        else:
-            degree_rate = 0.2
-
+        else: 
+            degree_rate = 1/3
 
     g = nx.random_regular_graph(
         n = len(model_list), 

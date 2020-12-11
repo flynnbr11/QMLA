@@ -506,7 +506,7 @@ class Genetic(
         self.storage.fitness_by_f_score = self.fitness_by_f_score
         self.storage.fitness_df = self.fitness_df
         self.storage.true_model_chromosome = self.true_chromosome_string
-        self.storage.ratings = self.ratings_class.ratings_df
+        self.storage.ratings_df = self.ratings_class.ratings_df
         gene_pool = self.genetic_algorithm.gene_pool
         gene_pool['objective_function'] = self.fitness_mechanism_names[self.fitness_method]
         self.storage.gene_pool = gene_pool
