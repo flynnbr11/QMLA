@@ -14,7 +14,7 @@ prt=5 # number of particles
 ###############
 # QMLA settings - user
 ###############
-plot_level=6
+plot_level=2
 debug_mode=0
 
 ###############

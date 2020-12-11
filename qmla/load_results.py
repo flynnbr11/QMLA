@@ -88,7 +88,8 @@ def load_results(
         'exploration_strategy' : es, 
         'results_dir' : results_dir,
         'true_measurements' : true_measurements, 
-        'run_info' : run_info
+        'run_info' : run_info,
+        'storage' : storage
     }
     
     return results

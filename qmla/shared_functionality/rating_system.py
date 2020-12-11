@@ -39,7 +39,7 @@ class RatingSystem():
     ):
         if model_id in self.models.keys():
             print("Model already present; not adding.")
-            if force_new_rating:
+            if force_new_rating and initial_rating > self.models[model_id].rating:
                 # move rating e.g. to align with others in batch
                 print("Reassigning rating for model {} to {} points".format(model_id, initial_rating))
                 self.models[model_id].update_rating(
@@ -47,6 +47,12 @@ class RatingSystem():
                     winner_id=None, 
                     new_rating=initial_rating,
                 )
+            else: 
+                print("NOT reassigning rating for model {}, as its current rating ({}) is higher than the proposed ({})".format(
+                    model_id, 
+                    self.models[model_id].rating,
+                    initial_rating
+                ))
 
             return
         print("Adding {} with starting rating {}".format(model_id, initial_rating))
@@ -338,7 +344,6 @@ class RatingSystem():
             ncols=1,
             hspace=0.2,
         )
-
 
         # Actual ratings
         ax0 = plt.subplot(gs[0])

@@ -1684,7 +1684,6 @@ class QuantumModelLearningAgent():
                 times = self.times_to_plot
             )
 
-
         # Get metrics for all models tested
         for i in self.models_learned:
             # dict of all Bayes factors for each model considered.
