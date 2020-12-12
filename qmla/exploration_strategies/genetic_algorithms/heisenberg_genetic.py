@@ -85,8 +85,8 @@ class HeisenbergGeneticXYZ(
         self.true_chromosome_string = self.genetic_algorithm.true_chromosome_string
         
         # WIDTH/DEPTH OF GENETIC ALGORITHM
-        self.max_spawn_depth = 16
-        self.initial_num_models = 60
+        self.max_spawn_depth = 2 # 16
+        self.initial_num_models = 10 # 60
 
         # Get starting population
         self.initial_models = self.genetic_algorithm.random_initial_models(
@@ -97,8 +97,8 @@ class HeisenbergGeneticXYZ(
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
         self.fraction_particles_for_bf = 0.2
-        self.fraction_own_experiments_for_bf = 0.2
-        self.fraction_opponents_experiments_for_bf = 0.2
+        self.fraction_own_experiments_for_bf = 0.4
+        self.fraction_opponents_experiments_for_bf = 0.4
         self.iqle_mode = True
 
         # Parameter learning

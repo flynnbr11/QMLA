@@ -20,11 +20,13 @@ class RatingSystem():
     def __init__(
         self,
         initial_rating=1000,
-        k_const=30 # constant in calculation of ELO rating (?)
+        k_const=30, # constant in calculation of ELO rating (?),
+        reset_rating_at_each_generation=True, 
     ):
         self.models = {}
         self.initial_rating = initial_rating
         self.k_const = k_const
+        self.reset_rating_at_each_generation = reset_rating_at_each_generation
         self.ratings_df = pd.DataFrame()
         self.all_ratings = pd.DataFrame()
         self.recorded_points= pd.DataFrame()
@@ -39,7 +41,17 @@ class RatingSystem():
     ):
         if model_id in self.models.keys():
             print("Model already present; not adding.")
-            if force_new_rating and initial_rating > self.models[model_id].rating:
+            if self.reset_rating_at_each_generation:
+                print("Resetting model's rating to {}".format(self.initial_rating))
+                self.models[model_id].update_rating(
+                    opponent_id=None, 
+                    winner_id=None, 
+                    new_rating=self.initial_rating,
+                )
+            elif (
+                force_new_rating 
+                and initial_rating > self.models[model_id].rating
+            ):
                 # move rating e.g. to align with others in batch
                 print("Reassigning rating for model {} to {} points".format(model_id, initial_rating))
                 self.models[model_id].update_rating(
@@ -55,9 +67,13 @@ class RatingSystem():
                 ))
 
             return
-        print("Adding {} with starting rating {}".format(model_id, initial_rating))
-        if initial_rating is None:
+        if (
+            self.reset_rating_at_each_generation
+            or initial_rating is None 
+        ):
             initial_rating = self.initial_rating
+
+        print("Adding {} with starting rating {}".format(model_id, initial_rating))
         new_model = RateableModel(
             model_id = model_id, 
             initial_rating = initial_rating,
