@@ -922,7 +922,7 @@ def r_squared_from_epoch_list(
         r_squared_by_epoch = {}
 
         mod_num_qubits = construct_models.get_num_qubits(mod.model_name)
-        probe = qmla.shared_functionality.expectation_value_functionsn_qubit_plus_state(mod_num_qubits)
+        probe = qmla.shared_functionality.expectation_value_functions.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.num_experiments - 1])
         if len(mod.epochs_after_resampling) > 0:
             epochs.extend(mod.epochs_after_resampling)

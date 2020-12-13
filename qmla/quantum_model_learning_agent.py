@@ -19,6 +19,11 @@ import redis
 import rq
 import seaborn as sns
 
+try:
+    from lfig import LatexFigure
+except:
+    from qmla.shared_functionality.latex_figure import LatexFigure
+
 # QMLA functionality
 import qmla.analysis
 import qmla.construct_models as construct_models
@@ -1659,6 +1664,17 @@ class QuantumModelLearningAgent():
         }
         return add_model_output
 
+    def finalise_instance(self):
+        self.compute_statistical_metrics_by_generation()
+        self.exploration_class.exploration_strategy_finalise()
+
+        if self.qhl_mode_multiple_models:
+            self.log_print(["No special analysis for this mode"])
+        elif self.qhl_mode:
+            self.log_print(["No special analysis for this mode"])
+        else:
+            self.finalise_qmla()
+
     def finalise_qmla(self):
         r"""
         Steps to end QMLA algorithm, such as storing analytics.
@@ -1692,19 +1708,6 @@ class QuantumModelLearningAgent():
             )
 
         self.bayes_factors_data()
-        try:
-            self.exploration_class.exploration_strategy_specific_plots(
-                save_directory=self.qmla_controls.plots_directory,
-                qmla_id=self.qmla_controls.long_id,
-                true_model_id = self.true_model_id, 
-                champion_model_id=self.champion_model_id, 
-                plot_level = plot_level
-            )
-        except:
-            # TODO log print the reason for failure
-            pass
-        self.exploration_class.exploration_strategy_finalise()
-        self.get_statistical_metrics()
 
         # Prepare model/name maps
         self.model_id_to_name_map = {}
@@ -1766,7 +1769,7 @@ class QuantumModelLearningAgent():
                     })
                     new_idx = len(self.bayes_factors_df)
                     self.bayes_factors_df.loc[new_idx] = d
-        self.plot_bayes_factors()
+        
 
     def get_results_dict(
         self,
@@ -2229,7 +2232,8 @@ class QuantumModelLearningAgent():
         ])
         self._update_database_model_info()
         self.exploration_class.exploration_strategy_finalise()
-        self.get_statistical_metrics()
+        self.finalise_instance()
+        # self._plot_statistical_metrics()
 
     def run_quantum_hamiltonian_learning_multiple_models(
         self,
@@ -2305,7 +2309,6 @@ class QuantumModelLearningAgent():
             mod.model_update_learned_values()
 
         self.exploration_class.exploration_strategy_finalise()
-        self.get_statistical_metrics()
         self.model_id_to_name_map = {}
         for k in self.model_name_id_map:
             v = self.model_name_id_map[k]
@@ -2314,6 +2317,7 @@ class QuantumModelLearningAgent():
             self.log_print([
                 "QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))
             ])
+        self.finalise_instance()
 
     def run_complete_qmla(
         self,
@@ -2397,7 +2401,7 @@ class QuantumModelLearningAgent():
             self.check_champion_reducibility()
 
         # Tidy up and finish QMLA.
-        self.finalise_qmla()
+        self.finalise_instance()
 
         self.log_print([
             "\nFinal winner:", self.global_champion_name,
@@ -2527,6 +2531,108 @@ class QuantumModelLearningAgent():
     # Section: Analysis/plotting methods
     ##########
 
+    def analyse_instance(self):
+        r""" Basic analysis of this instance"""
+        
+        pickle.dump(
+            self.get_results_dict(),
+            open(self.qmla_controls.results_file, "wb"),
+            protocol=4
+        )
+        storage_location = os.path.join(
+            self.qmla_controls.results_directory, 
+            'storage_{}.p'.format(self.qmla_controls.long_id), 
+        )
+        pickle.dump(
+            self.storage, 
+            open(storage_location, 'wb'),
+            protocol = 4, 
+        )
+
+        if self.qhl_mode: 
+            self._analyse_qhl()
+
+        elif self.qhl_mode_multiple_models:
+            self._analyse_multiple_model_qhl()
+        
+        else: 
+            self._analyse_qmla()
+
+    def _analyse_qhl(self):
+        return
+
+    def _analyse_multiple_model_qhl(self):
+        model_ids = [
+            self._get_model_id_from_name(
+                model_name=mod
+            ) for mod in self.exploration_class.qhl_models
+        ]
+        
+        for mid in model_ids:
+            mod = self.get_model_storage_instance_by_id(mid)
+            name = mod.model_name
+            results_file = str(
+                self.qmla_controls.results_directory +
+                output_prefix +
+                'results_' +
+                str("m{}_q{}.p".format(
+                    int(mid), self.qmla_controls.long_id)
+                )
+            )
+
+            pickle.dump(
+                self.get_results_dict(model_id = mid),
+                open(results_file, "wb"),
+                protocol=4
+            )
+    
+    def _analyse_qmla(self):
+        expec_value_mods_to_plot = []
+        try:
+            expec_value_mods_to_plot = [self.true_model_id]
+        except BaseException:
+            pass
+
+        expec_value_mods_to_plot.append(self.champion_model_id)
+        champ_mod = self.get_model_storage_instance_by_id(
+            self.champion_model_id
+        )
+
+        try:
+            self.store_bayes_factors_to_csv(
+                save_to_file=str(
+                    self.qmla_controls.results_directory +
+                    'bayes_factors_' + str(self.qmla_controls.long_id) + '.csv'
+                ),
+                names_ids='latex'
+            )
+        except Exception as e:
+            self.log_print([
+                "failed to store_bayes_factors_to_csv with error {}".format(e)
+            ])
+
+    def store_bayes_factors_to_csv(
+        self, 
+        save_to_file, 
+        names_ids='latex'
+    ):
+        r"""
+        *deprecated* Store the pairwise comparisons computed during this instance.
+        :func:`~qmla.analysis.model_bayes_factorsCSV` removed and is needed
+        TODO if wanted, find in old github commits and reimplement.
+
+        Wrapper for :func:`~qmla.analysis.model_bayes_factorsCSV`.
+        """
+        qmla.analysis.model_bayes_factorsCSV(
+            self, save_to_file, names_ids=names_ids)
+
+    def store_bayes_factors_to_shared_csv(self, bayes_csv):
+        r"""
+        Store the pairwise comparisons computed during this instance in a CSV shared by all concurrent instances.
+        """
+        # TODO this doesn't get used anywhere useful any more; remove
+        qmla.analysis.update_shared_bayes_factor_csv(self, self.qmla_controls.cumulative_csv)
+
     def compute_model_f_score(
         self,
         model_id,
@@ -2584,10 +2690,46 @@ class QuantumModelLearningAgent():
         self.model_sensitivities[model_id] = sensitivity
         return f_score
 
-    def get_statistical_metrics(
-        self,
-        save_to_file=None
+    def plot_instance_outcomes(
+        self, 
     ):
+        self.log_print([
+            "Plotting instance outcomes"
+        ])
+
+        plot_methods = [
+            self._plot_model_terms,
+            self._plot_dynamics_all_models_on_branches,
+            self._plot_one_qubit_probes_bloch_sphere, 
+            self._plot_evaluation_normalisation_records,
+            self._plot_bayes_factors,
+            self._plot_branch_champs_quadratic_losses,
+            self._plot_branch_champs_volumes,
+            self._plot_exploration_tree,
+            self._plot_r_squared_by_epoch_for_model_list,
+            self._plot_statistical_metrics
+        ]
+
+        for method in plot_methods:
+            try:
+                method()
+            except Exception as e:
+                self.log_print([
+                    "plot failed {} with exception: {}".format(method.__name__, e)
+                ])
+
+        self.log_print([
+            "Plotting exploration strategy analysis"
+        ])
+        self.exploration_class.exploration_strategy_specific_plots(
+            save_directory = self.qmla_controls.plots_directory,
+            qmla_id = self.qmla_controls.long_id,
+            true_model_id = self.true_model_id, 
+            champion_model_id = self.champion_model_id, 
+            plot_level = self.plot_level
+        )
+
+    def compute_statistical_metrics_by_generation(self):
         r"""
         Compute, store and plot various statistical metrics of all studied models.
 
@@ -2595,7 +2737,7 @@ class QuantumModelLearningAgent():
         """
         generations = sorted(set(self.branches.keys()))
         self.log_print([
-            "[get_statistical_metrics",
+            "[compute_statistical_metrics_by_generation]",
             "generations: ", generations
         ])
 
@@ -2632,41 +2774,46 @@ class QuantumModelLearningAgent():
                     self.get_model_storage_instance_by_id(
                         m).evaluation_log_likelihood
                 )
+        self.generational_f_score = generational_f_score
+        self.generational_sensitivity = generational_sensitivity
+        self.generational_precision = generational_precision
 
-        include_plots = [
-            {'name': 'F-score', 'data': generational_f_score, 'colour': 'red'},
-            {'name': 'Precision', 'data': generational_precision, 'colour': 'blue'},
+        self.stat_data = [
+            {'name': 'F-score', 'data': self.generational_f_score, 'colour': 'red'},
+            {'name': 'Precision', 'data': self.generational_precision, 'colour': 'blue'},
             {'name': 'Sensitivity',
-             'data': generational_sensitivity,
+             'data': self.generational_sensitivity,
              'colour': 'green'},
         ]
-        self.generational_f_score = generational_f_score
         self.generational_statistical_metrics = {
             k['name']: k['data']
-            for k in include_plots
+            for k in self.stat_data
         }
+
+    
+    def _plot_statistical_metrics(
+        self,
+        save_to_file=None
+    ):
+        generations = sorted(set(self.branches.keys()))
         self.alt_generational_statistical_metrics = {
             b: {
-                'Precision': generational_precision[b],
-                'Sensitivity': generational_sensitivity[b],
-                'F-score': generational_f_score[b]
+                'Precision': self.generational_precision[b],
+                'Sensitivity': self.generational_sensitivity[b],
+                'F-score': self.generational_f_score[b]
             }
             for b in generations
         }
-
-        fig = plt.figure(
-            figsize=(15, 5),
-            tight_layout=True
+        include_plots = self.stat_data
+        lf = LatexFigure(
+            gridspec_layout=(1, len(include_plots))
         )
-        gs = GridSpec(
-            nrows=1,
-            ncols=len(include_plots),
-        )
+        
         plot_col = 0
-
         for plotting_data in include_plots:
 
-            ax = fig.add_subplot(gs[0, plot_col])
+            # ax = fig.add_subplot(gs[0, plot_col])
+            ax = lf.new_axis()
             data = plotting_data['data']
             ax.plot(
                 generations,
@@ -2687,18 +2834,19 @@ class QuantumModelLearningAgent():
             ax.set_xlabel("Generation")
             ax.legend()
             ax.set_ylim(0, 1)
-            plot_col += 1
+            # plot_col += 1
 
         self.log_print(["getting statistical metrics complete"])
         if save_to_file is not None:
             plt.savefig(save_to_file)
 
-    def plot_bayes_factors(
+    def _plot_bayes_factors(
         self,
     ):
         r"""
         Plot Bayes factors between pairs of models, both by model IDs and by their F-scores.
         """
+
         # Plot Bayes factors of this instance
         bayes_factor_by_id = pd.pivot_table(
             self.bayes_factors_df,
@@ -2708,15 +2856,20 @@ class QuantumModelLearningAgent():
             aggfunc=np.median
         )
         mask = np.tri(bayes_factor_by_id.shape[0], k=-1).T
+        
+        lf = LatexFigure()
+        ax = lf.new_axis()
         plt.clf()
-        s = sns.heatmap(
+        sns.heatmap(
             bayes_factor_by_id,
             # cmap='RdYlGn',
             cmap=self.exploration_class.bf_cmap, 
             mask=mask,
+            ax=ax, 
             annot=False
         )
-        s.get_figure().savefig(
+        # s.get_figure().savefig(
+        lf.save(
             os.path.join(
                 self.qmla_controls.plots_directory,
                 'bayes_factors.png'.format(self.qmla_controls.long_id)
@@ -2732,20 +2885,25 @@ class QuantumModelLearningAgent():
             )
         )
 
-    def plot_branch_champs_quadratic_losses(
+    def _plot_branch_champs_quadratic_losses(
         self,
-        save_to_file=None,
     ):
         r"""Wrapper for :func:`~qmla.analysis.plot_quadratic_loss`."""
         qmla.analysis.plot_quadratic_loss(
             qmd=self,
             champs_or_all='champs',
-            save_to_file=save_to_file
+            save_to_file=os.path.join(
+                self.qmla_controls.plots_directory,
+                "quadratic_losses_branch_champs.pdf"
+            )
         )
 
-    def plot_branch_champs_volumes(
-        self, model_id_list=None, branch_champions=False,
-        branch_id=None, save_to_file=None
+    def _plot_branch_champs_volumes(
+        self, 
+        model_id_list=None, 
+        branch_champions=True,
+        branch_id=None, 
+        save_to_file=None
     ):
         r"""
         Plot the volume of each branch champion within this instance.
@@ -2805,25 +2963,49 @@ class QuantumModelLearningAgent():
                 save_to_file, bbox_extra_artists=(
                     lgd,), bbox_inches='tight')
 
-    def store_bayes_factors_to_csv(self, save_to_file, names_ids='latex'):
+    def _plot_parameter_learning_champion(
+        self,
+    ):
         r"""
-        *deprecated* Store the pairwise comparisons computed during this instance.
-        :func:`~qmla.analysis.model_bayes_factorsCSV` removed and is needed
-        TODO if wanted, find in old github commits and reimplement.
+        Plot parameter estimates vs experiment number for a single model.
 
-        Wrapper for :func:`~qmla.analysis.model_bayes_factorsCSV`.
+        Wrapper for :func:`~qmla.analysis.plot_parameter_estimates`
+        :param bool true_model: whether to force only plotting the true
+            model's parameter estimeates
         """
-        qmla.analysis.model_bayes_factorsCSV(
-            self, save_to_file, names_ids=names_ids)
 
-    def store_bayes_factors_to_shared_csv(self, bayes_csv):
+        qmla.analysis.plot_parameter_estimates(
+            qmd=self,
+            model_id=self.champion_model_id,
+            save_to_file=os.path.join(
+                self.qmla_controls.plots_directory, 
+                "champion_parameters.png"
+            )
+        )
+
+    def _plot_parameter_learning_true(
+        self,
+    ):
         r"""
-        Store the pairwise comparisons computed during this instance in a CSV shared by all concurrent instances.
-        """
-        # TODO this doesn't get used anywhere useful any more; remove
-        qmla.analysis.update_shared_bayes_factor_csv(self, self.qmla_controls.cumulative_csv)
+        Plot parameter estimates vs experiment number for a single model.
 
-    def plot_parameter_learning_single_model(
+        Wrapper for :func:`~qmla.analysis.plot_parameter_estimates`
+        :param bool true_model: whether to force only plotting the true
+            model's parameter estimeates
+        """
+        if self.true_model_id == -1:
+            return 
+
+        qmla.analysis.plot_parameter_estimates(
+            qmd=self,
+            model_id=self.true_model_id,
+            save_to_file=os.path.join(
+                self.qmla_controls.plots_directory, 
+                "champion_parameters.png"
+            )
+        )
+
+    def _plot_parameter_learning_single_model(
         self,
         model_id=0,
         true_model=False,
@@ -2844,11 +3026,10 @@ class QuantumModelLearningAgent():
                                                save_to_file=save_to_file
                                                )
 
-    def plot_branch_champions_dynamics(
+    def _plot_branch_champions_dynamics(
         self,
         all_models=False,
         model_ids=None,
-        save_to_file=None,
     ):
         r"""
         Plot reproduced dynamics of all branch champions
@@ -2899,7 +3080,7 @@ class QuantumModelLearningAgent():
             self.log_print(["Failed to plot dynamics"])
             # raise
 
-    def plot_volume_after_qhl(self,
+    def _plot_volume_after_qhl(self,
                               model_id=None,
                               true_model=True,
                               show_resamplings=True,
@@ -2917,13 +3098,19 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_exploration_tree(
+    def _plot_exploration_tree(
         self,
         modlist=None,
         only_adjacent_branches=True,
         save_to_file=None
     ):
-        r"""Wrappter for :func:`~qmla.analysis.plot_qmla_single_instance_tree`"""
+        r"""Wrapper for :func:`~qmla.analysis.plot_qmla_single_instance_tree`"""
+        if save_to_file is None: 
+            save_to_file = os.path.join(
+                self.qmla_controls.plots_directory, 
+                "exploration_tree.png"
+            )
+
         qmla.analysis.plot_qmla_single_instance_tree(
             self,
             modlist=modlist,
@@ -2931,7 +3118,7 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_qmla_radar_scores(self, modlist=None, save_to_file=None):
+    def _plot_qmla_radar_scores(self, modlist=None, save_to_file=None):
         r"""*deprecated* Wrapper for :func:`~qmla.analysis.plotRadar`."""
         plot_title = str("Radar Plot QMD " + str(self.qmla_id))
         if modlist is None:
@@ -2943,13 +3130,13 @@ class QuantumModelLearningAgent():
             plot_title=plot_title
         )
 
-    def plot_r_squared_by_epoch_for_model_list(
+    def _plot_r_squared_by_epoch_for_model_list(
         self,
         modlist=None,
         save_to_file=None
     ):
         r"""
-        Plot R^2 vs experiment number for given model list.
+        Plot $R^2$ vs experiment number for given model list.
         """
         if modlist is None:
             modlist = []
@@ -2961,6 +3148,12 @@ class QuantumModelLearningAgent():
                 modlist.append(self.true_model_id)
             except BaseException:
                 pass
+        
+        if save_to_file is None: 
+            save_to_file = os.path.join(
+                self.qmla_controls.plots_directory, 
+                "r_squareds.png"
+            )
 
         qmla.analysis.r_squared_from_epoch_list(
             qmd=self,
@@ -2968,7 +3161,10 @@ class QuantumModelLearningAgent():
             save_to_file=save_to_file
         )
 
-    def plot_one_qubit_probes_bloch_sphere(self, save=False):
+    def _plot_one_qubit_probes_bloch_sphere(
+        self, 
+        save=False
+    ):
         r"""Show all one qubit probes on Bloch sphere."""
 
         qmla.utilities.plot_probes_on_bloch_sphere(
@@ -2980,7 +3176,7 @@ class QuantumModelLearningAgent():
             )
         )
 
-    def _plot_model_terms(self, colour_by = 'binary'):
+    def _plot_model_terms(self, colour_by='binary'):
         """
         Plot the terms of each model by model ID. 
 
@@ -3048,7 +3244,9 @@ class QuantumModelLearningAgent():
         ).transpose()
 
         # Plot as heatmap
-        fig, ax = plt.subplots(figsize=(15,10))
+        # fig, ax = plt.subplots(figsize=(15,10))
+        lf = LatexFigure()
+        ax = lf.new_axis()
 
         if colour_by == 'f_score':
             sns.heatmap(
@@ -3077,9 +3275,14 @@ class QuantumModelLearningAgent():
             labelsize=fontsize
         )
         ax.set_ylabel('Model ID', fontsize=2*fontsize)
-        ax.set_x_label('Term')
+        ax.set_xlabel('Term')
 
-        fig.savefig(
+        # fig.savefig(
+        #     os.path.join(
+        #         self.qmla_controls.plots_directory, "composition_of_models.png"
+        #     )
+        # )
+        lf.save(
             os.path.join(
                 self.qmla_controls.plots_directory, "composition_of_models.png"
             )

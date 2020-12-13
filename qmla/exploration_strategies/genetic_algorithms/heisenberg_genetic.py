@@ -116,3 +116,29 @@ class HeisenbergGeneticXYZ(
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 6,
             'other': 0
         }
+
+class TestHeisenbergGeneticXYZ(
+    HeisenbergGeneticXYZ
+):
+
+    def __init__(
+        self,
+        exploration_rules,
+        true_model = None, 
+        **kwargs
+    ):
+
+        super().__init__(
+            exploration_rules=exploration_rules,
+            true_model = true_model,
+            **kwargs
+        )        
+
+        self.max_spawn_depth = 2
+        self.initial_num_models = 8
+        self.branch_comparison_strategy = 'minimal'
+
+        # Get starting population
+        self.initial_models = self.genetic_algorithm.random_initial_models(
+            num_models=self.initial_num_models
+        )

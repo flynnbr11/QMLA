@@ -1288,10 +1288,10 @@ class ExplorationStrategy():
         
     def exploration_strategy_specific_plots(
         self,
-        save_directory, 
-        champion_model_id,
         **kwargs
     ):
+        self.save_directory = kwargs.pop("save_directory")
+        self.champion_model_id = kwargs.pop("champion_model_id")
         self.log_print(
             ['No exploration strategy plots specified.']
         )

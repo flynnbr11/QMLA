@@ -602,127 +602,56 @@ class Genetic(
 
     def exploration_strategy_specific_plots(
         self,
-        save_directory,
-        champion_model_id, 
         true_model_id,
         qmla_id=0, 
         plot_level=2, 
         **kwargs
     ):
-        try:
-            self.plot_correlation_fitness_with_f_score(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'correlations_bw_fitness_and_f_score.png'.format(qmla_id)
-                )
-            )
-        except: 
-            self.log_print([
-                "Failed to plot_correlation_fitness_with_f_score"
-            ])
+        self.qmla_id = qmla_id
+        self.plot_level = plot_level
+        self.log_print(["genetic alg plots"])
+        super().exploration_strategy_specific_plots(
+            **kwargs
+        )
 
-        try:
-            self.plot_fitness_v_fscore_by_generation(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'fitness_types.png'.format(qmla_id)
-                )
-            )
-        except:
-            self.log_print([
-                "failed to plot_fitness_v_fscore_by_generation"
-            ])
-            pass
+        plot_methods = [
+            self.plot_correlation_fitness_with_f_score,
+            self.plot_fitness_v_fscore_by_generation,
+            self.plot_fitness_v_fscore,
+            self.plot_fitness_v_generation,
+            self.plot_model_ratings,
+            self.plot_gene_pool,
+            self.plot_generational_metrics,
+            self.plot_selection_probabilities
+        ]
+        self.log_print([
+            "Plotting methods:", plot_methods
+        ])
 
-        try:
-            self.plot_fitness_v_fscore(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'fitness_v_fscore.png'.format(qmla_id)
-                )
-            )
-        except:
-            self.log_print([
-                "failed to plot_fitness_v_fscore"
-            ])
-            pass 
-
-        try:
-            self.plot_fitness_v_generation(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'fitness_v_generation.png'.format(qmla_id)
-                )
-            )
-        except:
-            pass
-
-        try:
-            self.plot_model_ratings(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'ratings.png'.format(qmla_id)
-                )
-            )
-        except Exception as e:
-            self.log_print([
-                "failed to plot_model_ratings. exception:", e
-            ])
-
-        try:
-            self.plot_gene_pool(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'gene_pool.png'
-                )
-            )
-        except:
-            self.log_print([
-                "failed to plot_gene_pool"
-            ])
-
-        try:          
-            self.plot_generational_metrics(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'generation_progress.png'
-                )
-            )
-        except:
-            self.log_print([
-                "failed to plot_generational_metrics"
-            ])
-        
-        try:
-            self.plot_selection_probabilities(
-                save_to_file = os.path.join(
-                    save_directory, 
-                    'selection_probabilities.png'
-                )
-
-            )
-        except Exception as e:
-            self.log_print([
-                "failed to plot pie charts of selection probabilities. with exception:", e
-            ])
+        for method in plot_methods:
+            try:
+                method()
+            except Exception as e:
+                self.log_print([
+                    "plot failed {} with exception: {}".format(method.__name__, e)
+                ])
 
         try:
             self.ratings_class.plot_models_ratings_against_generation(
                 f_scores = self.model_f_scores, 
-                save_directory = save_directory,
+                save_directory = self.save_directory,
                 f_score_cmap=self.f_score_cmap
             )
         except Exception as e:
             self.log_print([
-                "failed to plot_models_ratings_against_generation with error ", e
+                "plot failed plot_models_ratings_against_generation with error ", e
             ])
-            raise
 
         try:
             self.ratings_class.plot_rating_progress_single_model(
                 target_model_id = champion_model_id,
                 save_to_file  = os.path.join(
-                    save_directory, 
+                    self.save_directory, 
                     "ratings_progress_champion.png"
                 )
             )
@@ -734,13 +663,14 @@ class Genetic(
                         "ratings_progress_true_model.png"
                     )
                 )
-        except:
-            pass
-            # raise     
+        except Exception as e:
+            self.log_print([
+                "plot failed plot_rating_progress_single_model with error ", e
+            ])
 
     def plot_correlation_fitness_with_f_score(
         self,
-        save_to_file
+        save_to_file=None, 
     ):
         plt.clf()
         correlations = pd.DataFrame(
@@ -802,6 +732,13 @@ class Genetic(
                 markers = ['*', 'X', '<', '^'],
             )
         ax.axhline(0, ls='--', c='k')
+
+        if save_to_file is None:
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'correlations_bw_fitness_and_f_score.png'.format(self.qmla_id)
+            )
+
         plt.savefig(save_to_file)
 
 
@@ -828,12 +765,17 @@ class Genetic(
         ax.set_ylabel('Fitness')
         ax.set_title("Fitness method: {}".format(self.fitness_method))
         # ax.set_xlim((0,1))
-        if save_to_file is not None:
-            plt.savefig(save_to_file)
+        if save_to_file is None:
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'fitness_v_generation.png'.format(self.qmla_id)
+            )
+
+        plt.savefig(save_to_file)
 
 
     def plot_fitness_v_fscore_by_generation(
-        self, save_to_file
+        self, save_to_file=None
     ):
         plt.clf()
         sanity_check_df = self.fitness_df[ 
@@ -860,9 +802,15 @@ class Genetic(
         g = (
             g.map(plt.scatter,  'f_score', 'fitness').add_legend()
         )
+
+        if save_to_file is None: 
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'fitness_types.png'.format(self.qmla_id)
+            )
         plt.savefig(save_to_file)
 
-    def plot_model_ratings(self, save_to_file):
+    def plot_model_ratings(self, save_to_file=None):
         plt.clf()
         ratings = self.ratings_class.all_ratings
         generations = [int(g) for g in ratings.generation.unique()]
@@ -899,10 +847,16 @@ class Genetic(
             ax.set_xlabel("")
             ax.set_ylabel("Elo rating")
             ax.legend(bbox_to_anchor=(1, 1))
+
+        if save_to_file is None: 
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'ratings.png'.format(self.qmla_id)
+            )
+
         lf.save(save_to_file)
 
-
-    def plot_fitness_v_fscore(self, save_to_file):
+    def plot_fitness_v_fscore(self, save_to_file=None):
         plt.clf()
         fig, ax = plt.subplots()
         sns.set(rc={'figure.figsize':(11.7,8.27)})
@@ -933,9 +887,15 @@ class Genetic(
         ax.set_ylabel('Fitness (as probability)')
         # bplot.set_ylim((0,1))
         ax.set_xlim((-0.05,1.05))
+        if save_to_file is None:
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'fitness_v_fscore.png'.format(self.qmla_id)
+            )
+
         ax.figure.savefig(save_to_file)
 
-    def plot_gene_pool(self, save_to_file):
+    def plot_gene_pool(self, save_to_file=None):
         ga = self.genetic_algorithm
 
         plt.clf()
@@ -1000,11 +960,15 @@ class Genetic(
         ax.set_xlabel('F-score',  fontsize=label_fontsize)
 
         # Save figure
+        if save_to_file is None:
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'gene_pool.png'
+            )
+
         fig.savefig(save_to_file)
 
-
-    
-    def plot_selection_probabilities(self, save_to_file): 
+    def plot_selection_probabilities(self, save_to_file=None): 
         generations = sorted(self.genetic_algorithm.gene_pool.generation.unique())
         self.log_print(["[plot_selection_probabilities] generations:", generations])
         lf = LatexFigure(auto_gridspec=len(generations))
@@ -1023,10 +987,16 @@ class Genetic(
                 colors = colours, 
                 radius=2,
             )
+
+        if save_to_file is None:
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'selection_probabilities.png'
+            )
         lf.save(save_to_file)
 
 
-    def plot_generational_metrics(self, save_to_file):
+    def plot_generational_metrics(self, save_to_file=None):
 
         fig, axes = plt.subplots(figsize=(15, 10), constrained_layout=True)
         gs = GridSpec(nrows=2, ncols = 1, )
@@ -1057,6 +1027,12 @@ class Genetic(
         ax.legend()
 
         # Save figure
+        if save_to_file is None:
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'generation_progress.png'
+            )
+
         fig.savefig(save_to_file)
 
 

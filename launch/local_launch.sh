@@ -34,7 +34,7 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locally, currently
 ###############
 
-exploration_strategy="HeisenbergGeneticXYZ"
+exploration_strategy="TestHeisenbergGeneticXYZ"
 
 alt_exploration_strategies=(
     # 'IsingLatticeSet'

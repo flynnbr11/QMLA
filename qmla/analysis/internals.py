@@ -21,6 +21,8 @@ __all__ = [
 
 
 def generational_analysis(combined_results, save_directory=None):
+    # TODO broken because tries to get GenerationalFscore from results dict -
+    # TODO use storage instances instead
     if not os.path.exists(save_directory):
         try:
             os.makedirs(save_directory)
