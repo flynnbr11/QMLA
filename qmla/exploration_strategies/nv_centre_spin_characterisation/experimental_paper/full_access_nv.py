@@ -8,31 +8,42 @@ import qmla.shared_functionality.experiment_design_heuristics
 from qmla.construct_models import alph, get_num_qubits
 
 __all__ = [
-    'ExperimentFullAccessNV'
+    'FullAccessNVCentre'
 ]
 
-class ExperimentFullAccessNV(
+class FullAccessNVCentre(
     ExplorationStrategy
 ):
+    r"""
+    Exploration strategy for NV system described in experimental paper, 
+    assuming full access to the state so the likelihood is based on 
+    $\bra{++} e^{ -i\hat{H(\vec{x})} t } \ket{++}$. 
+
+    This is the base class for results presented in the experimental paper, 
+    namely Fig 2. 
+    The same model generation strategy is used in each case (i), (ii), (iii):
+        this ES is for (i) pure simulation. 
+
+    """
+
     def __init__(
         self,
         exploration_rules,
         **kwargs
     ):
-        # print("[Exploration Strategies] init nv_spin_experiment_full_tree")
         super().__init__(
             exploration_rules=exploration_rules,
             **kwargs
         )
 
         # self.true_model = 'xTz'
-        self.true_model = 'xTiPPxTxPPyTiPPyTyPPzTiPPzTz'
+        self.true_model = 'xTi+xTx+yTi+yTy+zTi+zTz'
         self.initial_models = ['xTi', 'yTi', 'zTi']
         self.qhl_models = [
-            'xTiPPxTxPPxTyPPyTiPPyTyPPzTiPPzTz',
-            'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz',
-            # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
-            'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
+            'xTi+xTx+xTy+yTi+yTy+zTi+zTz',
+            'xTi+xTx+xTz+yTi+yTy+zTi+zTz',
+            # 'xTi+xTx+xTy+xTz+yTi+yTy+yTz+zTi+zTz',
+            'xTi+xTx+yTi+yTy+zTi+zTz',
             # 'zTi'
         ]
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic

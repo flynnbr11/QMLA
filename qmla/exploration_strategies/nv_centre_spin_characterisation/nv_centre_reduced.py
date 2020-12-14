@@ -5,7 +5,7 @@ from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centr
 
 
 class ExperimentReducedNV(
-    nv_centre_full_access.ExperimentFullAccessNV
+    nv_centre_full_access.FullAccessNVCentre
 ):
     def __init__(
         self,

@@ -1,13 +1,13 @@
 import sys
 import os
 
-from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centre_experiment
+from qmla.exploration_strategies.nv_centre_spin_characterisation import NVCentreSimulatedExperiment
 import qmla.shared_functionality.probe_set_generation
 from qmla import construct_models
 
 
 class ExpAlternativeNV(
-    nv_centre_experiment.ExperimentNVCentre  # inherit from this
+    NVCentreSimulatedExperiment  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations
@@ -39,7 +39,7 @@ class ExpAlternativeNV(
 
 
 class ExpAlternativeNV_second(
-    nv_centre_experiment.ExperimentNVCentre  # inherit from this
+    nv_centre_experiment.NVCentreSimulatedExperiment  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations

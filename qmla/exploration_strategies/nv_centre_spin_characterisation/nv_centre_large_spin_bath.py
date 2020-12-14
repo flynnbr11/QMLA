@@ -9,7 +9,7 @@ from qmla import construct_models
 
 
 class NVLargeSpinBath(
-    nv_centre_full_access.ExperimentFullAccessNV  # inherit from this
+    nv_centre_full_access.FullAccessNVCentre  # inherit from this
 ):
     # Uses some of the same functionality as
     # default NV centre spin experiments/simulations

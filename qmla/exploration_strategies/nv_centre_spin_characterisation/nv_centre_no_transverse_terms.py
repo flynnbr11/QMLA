@@ -1,7 +1,7 @@
 from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centre_experiment
 
 class ExperimentNVCentreNoTransvereTerms(
-        nv_centre_experiment.ExperimentNVCentre
+        nv_centre_experiment.NVCentreSimulatedExperiment
 ):
     def __init__(
         self,

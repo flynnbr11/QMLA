@@ -17,8 +17,6 @@ import qmla.shared_functionality.latex_model_names
 import qmla.shared_functionality.expectation_value_functions
 import qmla.construct_models
 
-
-
 class NVCentreGenticAlgorithmPrelearnedParameters(
     Genetic
 ):

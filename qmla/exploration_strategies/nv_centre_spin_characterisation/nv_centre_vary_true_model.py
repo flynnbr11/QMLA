@@ -8,7 +8,7 @@ from qmla import construct_models
 
 
 class ExperimentNVCentreVaryTrueModel(
-    nv_centre_experiment.ExperimentNVCentre  # inherit from this
+    nv_centre_experiment.NVCentreSimulatedExperiment  # inherit from this
 ):
     # Uses all the same functionality, growth etc as
     # default NV centre spin experiments/simulations

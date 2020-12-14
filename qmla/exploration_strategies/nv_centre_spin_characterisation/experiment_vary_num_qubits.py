@@ -15,7 +15,7 @@ from qmla import construct_models
 
 
 class ExperimentNVCentreNQubits(
-    nv_centre_full_access.ExperimentFullAccessNV  
+    nv_centre_full_access.FullAccessNVCentre  
 ):
     def __init__(
         self,

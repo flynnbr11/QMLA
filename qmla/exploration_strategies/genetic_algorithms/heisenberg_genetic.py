@@ -97,8 +97,8 @@ class HeisenbergGeneticXYZ(
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
         self.fraction_particles_for_bf = 0.2
-        self.fraction_own_experiments_for_bf = 0.4
-        self.fraction_opponents_experiments_for_bf = 0.4
+        self.fraction_own_experiments_for_bf = 0.2
+        self.fraction_opponents_experiments_for_bf = 0.2
         self.iqle_mode = True
 
         # Parameter learning

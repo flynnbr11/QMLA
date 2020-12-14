@@ -8,7 +8,6 @@ from qmla.exploration_strategies.ising import *
 from qmla.exploration_strategies.heisenberg_xyz import * 
 
 from qmla.exploration_strategies.template import * 
-from qmla.exploration_strategies.presentation_plot_generation import *
 from qmla.exploration_strategies.test_gr import *
 
 from qmla.exploration_strategies.nv_centre_spin_characterisation import * 
