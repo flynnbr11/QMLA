@@ -9,7 +9,7 @@ num_instances=1
 run_qhl=0 # perform QHL on known (true) model
 run_qhl_mulit_model=0 # perform QHL for defined list of models.
 exp=5 # number of experiments
-prt=50 # number of particles
+prt=10 # number of particles
 
 ###############
 # QMLA settings - user
@@ -34,7 +34,7 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locally, currently
 ###############
 
-exploration_strategy="FullAccessNVCentre"
+exploration_strategy="TestHeisenbergGeneticXYZ"
 
 alt_exploration_strategies=(
     # 'IsingLatticeSet'

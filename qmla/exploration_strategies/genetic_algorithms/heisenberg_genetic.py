@@ -136,7 +136,7 @@ class TestHeisenbergGeneticXYZ(
 
         self.max_spawn_depth = 2
         self.initial_num_models = 8
-        self.branch_comparison_strategy = 'minimal'
+        self.branch_comparison_strategy = 'optimal_graph' # minimal'
 
         # Get starting population
         self.initial_models = self.genetic_algorithm.random_initial_models(

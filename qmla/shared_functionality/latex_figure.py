@@ -89,7 +89,9 @@ class LatexFigure():
         pad=1.08, # for tight_layout
         rc_params={},
         plot_style='default',
-        legend_axis=None
+        auto_label=True, 
+        legend_axis=None,
+        legend_span=(1,1)
     ):
         r"""
         Wrapper around matplotlib functionality to produce Latex-compatible figures. 
@@ -135,6 +137,7 @@ class LatexFigure():
         self.specific_rc_params = rc_params
         self.square_plot = square_plot
         self.ax_counter = 0
+        self.auto_label = auto_label
 
         # Setup gridspec 
         if auto_gridspec is not None :
@@ -166,7 +169,7 @@ class LatexFigure():
         
         # Setup figure
         self.set_fonts()
-        self.delta = pad * self.rc_params["font.size"]
+        self.delta = pad # * self.rc_params["font.size"] # was multiplied by font size - why??
         self.size = self.set_size(
             width_pt = self.width_pt, 
             fraction = self.fraction,
@@ -193,7 +196,7 @@ class LatexFigure():
             self.col = 0 # because first call adds 1 to self.col and want to start at 0
 
             if legend_axis is not None:
-                self.legend_ax = self.new_axis(force_position=legend_axis)
+                self.legend_ax = self.new_axis(force_position=legend_axis, span=legend_span, auto_label=False)
                 self.legend_grid_pos = legend_axis
         else:
             self.fig, self.ax = plt.subplots(1, 1, figsize=self.size)
@@ -300,7 +303,7 @@ class LatexFigure():
         force_position=None, 
         label=None, 
         label_position=(0, 1.05), 
-        auto_label=True, 
+        auto_label=None, 
         ax_params={},
         span=(1,1),
     ):
@@ -314,6 +317,8 @@ class LatexFigure():
             e.g. {'sharex' : ax1}
         :returns ax: matplotlib ax object
         """
+        if auto_label is None: 
+            auto_label = self.auto_label
 
         if self.use_gridspec:
             if force_position is not None:
@@ -382,7 +387,7 @@ class LatexFigure():
             self.ax.text(
                 x = label_position[0], 
                 y = label_position[1], 
-                s = r'({})'.format(self.ax.label),
+                s = r'\textbf{{({})}}'.format(self.ax.label),
                 transform = self.ax.transAxes,
                 fontdict={
                     'fontsize' : self.rc_params["font.size"],
@@ -404,7 +409,8 @@ class LatexFigure():
     def save(
         self, 
         save_to_file, 
-        file_format='pdf'
+        file_format='pdf',
+        **kwargs
     ):
         r"""
         Save figure.
@@ -417,5 +423,6 @@ class LatexFigure():
         self.fig.tight_layout(pad = self.delta)
         self.fig.savefig(
             save_to_file, 
-            bbox_inches='tight'
+            bbox_inches='tight',
+            **kwargs
         )
