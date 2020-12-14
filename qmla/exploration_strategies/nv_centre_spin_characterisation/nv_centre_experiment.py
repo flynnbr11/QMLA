@@ -36,7 +36,7 @@ class ExperimentNVCentre(
             **kwargs
         )
 
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.true_model = 'xTiPPyTiPPzTiPPzTz'
 
@@ -122,20 +122,21 @@ class NVCentreExperimentalData(
         # self.true_model = 'iTi'
         # self.max_spawn_depth = 3
         self.true_model = qmla.construct_models.alph(self.true_model) 
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionshahn_evolution
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.hahn_evolution
         self.qinfer_model_subroutine =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
+        self.probe_noise_level = 1e-3
         self.max_time_to_consider = 4.24
 
-    def get_true_parameters(
-        self,
-    ):        
-        self.fixed_true_terms = True
-        self.true_hamiltonian = None
-        self.true_params_dict = {}
-        self.true_params_list = []
+    # def get_true_parameters(
+    #     self,
+    # ):        
+    #     self.fixed_true_terms = True
+    #     self.true_hamiltonian = None
+    #     self.true_params_dict = {}
+    #     self.true_params_list = []
 
 
     def get_measurements_by_time(

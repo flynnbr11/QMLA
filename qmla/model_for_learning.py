@@ -646,6 +646,9 @@ class ModelInstanceForLearning():
                 )
             except BaseException:
                 self.log_print(["Failed to plot_heuristic_attributes"])
+
+        if self.plot_level >= 7:
+            # very heavy, not very informative
             try:
                 self._plot_posterior_mesh_pairwise()
             except BaseException:

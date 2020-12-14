@@ -69,7 +69,8 @@ class ControlsQMLA():
             raise
         self.exploration_class.get_true_parameters() # either retrieve or assign true parameters
         self.log_print([
-            "ES set by controls has ID {} has true model {}".format(arguments.qmla_id, self.exploration_class.true_model)
+            "ES set by controls has ID {} has true model {}".format(
+                arguments.qmla_id, self.exploration_class.true_model)
         ])
 
         self.alternative_exploration_strategies = arguments.alternative_exploration_strategies
@@ -102,14 +103,12 @@ class ControlsQMLA():
             )
 
         # Attributes about true model
-        # self.true_model = true_params_info['true_model']
         self.true_model = construct_models.alph(self.exploration_class.true_model)
         self.true_model_name = self.true_model # TODO remove redundancy
         self.true_model_class = construct_models.Operator(
             self.true_model_name
         )
         self.true_model_terms_matrices = self.true_model_class.constituents_operators
-        # self.true_model_terms_params = true_params_info['params_list']
         self.run_info_file = arguments.run_info_file
         self.log_print(["Shared true params set for this instance."])
 

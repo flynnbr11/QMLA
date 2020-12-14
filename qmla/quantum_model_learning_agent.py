@@ -273,8 +273,8 @@ class QuantumModelLearningAgent():
 
         # Get probes used for learning
         self.exploration_class.generate_probes(
-            noise_level=self.exploration_class.probe_noise_level,
-            minimum_tolerable_noise=0.0,
+            # noise_level=self.exploration_class.probe_noise_level,
+            # minimum_tolerable_noise=0.0,
             # tell it the max number of qubits required by any ES under consideration
             probe_maximum_number_qubits = max(
                 [gr.max_num_probe_qubits for gr in self.qmla_controls.unique_exploration_strategy_instances.values()]

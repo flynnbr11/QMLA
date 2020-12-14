@@ -1,10 +1,11 @@
 from __future__ import absolute_import
 import sys
 import os
+import random
 
 from qmla.exploration_strategies.exploration_strategy import ExplorationStrategy
 import qmla.shared_functionality.experiment_design_heuristics
-from qmla import construct_models
+from qmla.construct_models import alph, get_num_qubits
 
 __all__ = [
     'ExperimentFullAccessNV'
@@ -32,13 +33,13 @@ class ExperimentFullAccessNV(
             'xTiPPxTxPPxTzPPyTiPPyTyPPzTiPPzTz',
             # 'xTiPPxTxPPxTyPPxTzPPyTiPPyTyPPyTzPPzTiPPzTz',
             'xTiPPxTxPPyTiPPyTyPPzTiPPzTz',
-
             # 'zTi'
         ]
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
+        self.prune_completed_initially = False
         # self.max_num_qubits = 3
         self.max_num_probe_qubits = 8
         self.tree_completed_initially = False
@@ -72,10 +73,8 @@ class ExperimentFullAccessNV(
         model_list,
         spawn_step,
         model_dict,
-        # log_file,
         **kwargs
     ):
-        import random
         self.log_print([
             "Generating. input model list:", model_list
         ])
@@ -86,8 +85,6 @@ class ExperimentFullAccessNV(
                                + transverse_terms
                                )
         model = model_list[0]
-        # present_terms = model.split('PP')
-        # p_str = 'PP'
         present_terms = model.split('+')
         p_str = '+'
 

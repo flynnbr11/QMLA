@@ -394,7 +394,7 @@ class ExplorationStrategy():
         # Tree development
         self.initial_models = ['xTi', 'yTi', 'zTi']
         self.tree_completed_initially = False
-        self.prune_completed_initially = False
+        self.prune_completed_initially = True
         self.max_spawn_depth = 10
         self.max_num_qubits = 8
         self.max_num_probe_qubits = 6
@@ -803,6 +803,11 @@ class ExplorationStrategy():
 
         if 'new_probes' not in kwargs:
             kwargs['num_probes'] = self.num_probes
+        if 'noise_level' not in kwargs: 
+            kwargs['noise_level'] = self.probe_noise_level
+        if 'minimum_tolerable_noise' in kwargs: 
+            kwargs['minimum_tolerable_noise'] = 0.0
+
         # Generate a set of probes
         new_probes = self.system_probes_generation_subroutine(
             max_num_qubits=probe_maximum_number_qubits,
@@ -1171,10 +1176,10 @@ class ExplorationStrategy():
                     "Getting child/parents for branch", branch.branch_id
                 ])
                 try:
-                    champ = branch.champion_id
-                    parent_champ = branch.parent_branch.champion_id
+                    champ = branch.champion_name
+                    parent_champ = branch.parent_branch.champion_name
                     pair = (champ, parent_champ)
-                    if champ != parent_champ:
+                    if champ != parent_champ:                        
                         pruning_sets.append(pair)
                 except:
                     self.log_print([
@@ -1193,10 +1198,10 @@ class ExplorationStrategy():
             prev_branch_models = list(set(prev_branch_models))
 
             models_to_prune = []
-            for pair in pruned_branch.pairs_to_compare:
-                id_1 = pair[0]
-                id_2 = pair[1]
-                mod_1 = pruned_branch.model_for_learning[id_1]
+            for id_1, id_2 in pruned_branch.pairs_to_compare:
+                # id_1 = pair[0]
+                # id_2 = pair[1]
+                mod_1 = pruned_branch.model_storage_instances[id_1]
                 try:
                     bf_1_v_2 = mod_1.model_bayes_factors[ float(id_2) ][-1]
                 except:
@@ -1213,18 +1218,18 @@ class ExplorationStrategy():
                 elif bf_1_v_2 < float(1 / prune_collapse_threshold):
                     models_to_prune(id_1)
 
-                models_to_keep = list(
-                    set(prev_branch_models)
-                    - set(models_to_prune)
-                )
-                pruning_models = [
-                    pruned_branch.models_by_id[m]
-                    for m in models_to_keep
-                ]
-                pruning_sets = list(itertools.combinations(
-                    models_to_keep, 
-                    2
-                ))
+            models_to_keep = list( # by ID
+                set(prev_branch_models)
+                - set(models_to_prune)
+            )
+            pruning_models = [ # by name
+                pruned_branch.models_by_id[m]
+                for m in models_to_keep
+            ]
+            pruning_sets = list(itertools.combinations( # by name
+                pruning_models, 
+                2
+            ))
             self.prune_complete = True
 
         self.log_print([
@@ -1240,7 +1245,7 @@ class ExplorationStrategy():
         return list(set(pruning_models)), pruning_sets
     
     def check_tree_pruned(self, prune_step, **kwargs):
-        if prune_step >= 2 : 
+        if prune_step >= 2 or self.prune_complete: 
             return True
         else:
             return False

@@ -160,8 +160,8 @@ pickle.dump(
 # Store an example of the probes used
 exploration_class.generate_probes(
     probe_maximum_number_qubits = probe_max_num_qubits_all_exploration_strategies, 
-    noise_level=0, # TODO get directly in ES
-    minimum_tolerable_noise=0.0,
+    # noise_level=0, # TODO get directly in ES
+    # minimum_tolerable_noise=0.0,
 )
 
 probes_dir = os.path.join(
