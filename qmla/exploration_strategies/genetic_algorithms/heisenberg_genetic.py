@@ -111,7 +111,7 @@ class HeisenbergGeneticXYZ(
 
         # Timing info for cluster
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.1
+        self.timing_insurance_factor = 0.07
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 6,
             'other': 0
