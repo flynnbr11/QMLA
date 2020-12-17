@@ -25,7 +25,7 @@ def generate_random_regular_graph(
     num_models = len(model_list)
     if degree_rate is None: 
         # set degree based on num models - must be high enough that there is a path between every pair
-        degree_rate = 0.4
+        degree_rate = 1/3
         # if num_models < 10:
         #     degree_rate = 0.5
         # elif num_models < 20:

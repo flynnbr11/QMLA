@@ -96,9 +96,9 @@ class HeisenbergGeneticXYZ(
         # Settings for model search
         self.branch_comparison_strategy = 'optimal_graph'
         self.tree_completed_initially = False
-        self.fraction_particles_for_bf = 0.2
-        self.fraction_own_experiments_for_bf = 0.2
-        self.fraction_opponents_experiments_for_bf = 0.2
+        self.fraction_particles_for_bf = 0.4
+        self.fraction_own_experiments_for_bf = 0.4
+        self.fraction_opponents_experiments_for_bf = 0.4
         self.iqle_mode = True
 
         # Parameter learning
@@ -111,7 +111,7 @@ class HeisenbergGeneticXYZ(
 
         # Timing info for cluster
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.075
+        self.timing_insurance_factor = 0.125
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 6,
             'other': 0
