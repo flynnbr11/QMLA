@@ -276,7 +276,7 @@ def n_qubit_hahn_evolution_double_time_reverse(
 
 def n_qubit_hahn_evolution(
     ham, t, state,
-    second_time_evolution_factor = 1,
+    second_time_evolution_factor=1,
     precision=1e-10,
     log_file=None,
     log_identifier=None
