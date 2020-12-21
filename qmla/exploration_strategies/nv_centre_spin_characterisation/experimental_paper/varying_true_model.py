@@ -43,12 +43,10 @@ class VariableTrueModelNVCentre(
             'xTi+yTi+zTi+zTz',
             'xTi+yTi+zTi+yTy',
             'xTi+yTi+zTi+xTx+zTz',
-            'xTi+yTi+zTi+xTx+yTy',
             'xTi+yTi+zTi+yTy+zTz',
             'xTi+yTi+zTi+xTx+yTy+zTz',
             'xTi+yTi+zTi+xTx+yTy+zTz+xTy',
             'xTi+yTi+zTi+xTx+yTy+zTz+xTz',
-            'xTi+yTi+zTi+xTx+yTy+zTz+yTz',
         ]
 
         self.true_model = true_models[self.qmla_id % len(true_models)]
