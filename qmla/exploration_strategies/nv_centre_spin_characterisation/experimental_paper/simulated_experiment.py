@@ -56,9 +56,13 @@ class NVCentreSimulatedExperiment(
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         self.max_num_qubits = 3
-        # self.experimental_dataset = 'NVB_rescale_dataset.p'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis
+
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = 0.1
+        self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
+
 
         # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
         # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.NV_centre_ising_probes_plus
@@ -74,11 +78,6 @@ class NVCentreSimulatedExperiment(
         self.gaussian_prior_means_and_widths = {
         }
 
-        # self.true_model_terms_params = {
-        #     'xTi' : 0.602,
-        #     'yTy' : 0.799
-
-        # }
         if self.true_model == 'xTiPPyTiPPzTiPPzTz':
             self.true_model_terms_params = {  # from Jul_05/16_40
                 'xTi': 0.92450565,
@@ -86,17 +85,17 @@ class NVCentreSimulatedExperiment(
                 'zTi': 1.65998543,
                 'zTz': 0.76546868,
             }
-        # self.gaussian_prior_means_and_widths = {
-        #     'xTi': [4.0, 1.5],
-        #     'yTi': [4.0, 1.5],
-        #     'zTi': [4.0, 1.5],
-        #     'xTx': [4.0, 1.5],
-        #     'yTy': [4.0, 1.5],
-        #     'zTz': [4.0, 1.5],
-        #     'xTy': [4.0, 1.5],
-        #     'xTz': [4.0, 1.5],
-        #     'yTz': [4.0, 1.5],
-        # }
+        self.gaussian_prior_means_and_widths = {
+            'xTi': [4.0, 1.5],
+            'yTi': [4.0, 1.5],
+            'zTi': [4.0, 1.5],
+            'xTx': [4.0, 1.5],
+            'yTy': [4.0, 1.5],
+            'zTz': [4.0, 1.5],
+            'xTy': [4.0, 1.5],
+            'xTz': [4.0, 1.5],
+            'yTz': [4.0, 1.5],
+        }
 
         self.max_num_models_by_shape = {
             1: 0,

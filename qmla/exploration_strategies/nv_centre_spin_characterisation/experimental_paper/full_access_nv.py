@@ -39,23 +39,13 @@ class FullAccessNVCentre(
         # self.true_model = 'xTz'
         self.true_model = 'xTi+xTx+yTi+yTy+zTi+zTz'
         self.initial_models = ['xTi', 'yTi', 'zTi']
-        self.qhl_models = [
-            'xTi+xTx+xTy+yTi+yTy+zTi+zTz',
-            'xTi+xTx+xTz+yTi+yTy+zTi+zTz',
-            # 'xTi+xTx+xTy+xTz+yTi+yTy+yTz+zTi+zTz',
-            'xTi+xTx+yTi+yTy+zTi+zTz',
-            # 'zTi'
-        ]
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         self.prune_completed_initially = False
-        # self.max_num_qubits = 3
         self.max_num_probe_qubits = 8
         self.tree_completed_initially = False
-        # self.experimental_dataset = 'NVB_rescale_dataset.p'
-        # self.measurement_type = 'full_access'
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis
 
@@ -65,7 +55,7 @@ class FullAccessNVCentre(
         self.max_num_models_by_shape = {
             1: 0,
             2: 18,
-            'other': 1
+            'other': 0
         }
 
         self.true_model_terms_params = {
@@ -77,6 +67,17 @@ class FullAccessNVCentre(
             'yTy': 2.7377867056770397,  # 0.27377867056770397,
             'zTi': 0.96477790489201143,  # 0.096477790489201143,
             'zTz': 1.6034234519563935,  # 0.16034234519563935,
+        }
+        self.gaussian_prior_means_and_widths = {
+            'xTi': [4.0, 1.5],
+            'yTi': [4.0, 1.5],
+            'zTi': [4.0, 1.5],
+            'xTx': [4.0, 1.5],
+            'yTy': [4.0, 1.5],
+            'zTz': [4.0, 1.5],
+            'xTy': [4.0, 1.5],
+            'xTz': [4.0, 1.5],
+            'yTz': [4.0, 1.5],
         }
 
     def generate_models(

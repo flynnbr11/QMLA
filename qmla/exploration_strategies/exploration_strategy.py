@@ -1199,6 +1199,9 @@ class ExplorationStrategy():
 
             models_to_prune = []
             for id_1, id_2 in pruned_branch.pairs_to_compare:
+                self.log_print([
+                    "id_1 = {}; id_2={}".format(id_1, id_2)
+                ])
                 # id_1 = pair[0]
                 # id_2 = pair[1]
                 mod_1 = pruned_branch.model_storage_instances[id_1]
