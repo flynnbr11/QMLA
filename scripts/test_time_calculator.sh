@@ -7,9 +7,9 @@ script_path="$RESULTS_DIR/$script_name"
 # additional_es="-agr=IsingGenetic -agr=hubbard_square_lattice_generalised"
 additional_es=""
 
-exploration_strategy='HeisenbergGeneticXYZ'
-num_experiments=500
-num_particles=2500
+exploration_strategy='VariableTrueModelNVCentre'
+num_experiments=1000
+num_particles=3000
 
 
 python3 time_required_calculation.py \
