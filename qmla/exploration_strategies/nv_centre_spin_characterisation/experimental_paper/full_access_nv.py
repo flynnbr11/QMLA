@@ -39,7 +39,7 @@ class FullAccessNVCentre(
         # self.true_model = 'xTz'
         self.true_model = 'xTi+xTx+yTi+yTy+zTi+zTz'
         self.initial_models = ['xTi', 'yTi', 'zTi']
-        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
@@ -48,9 +48,13 @@ class FullAccessNVCentre(
         self.tree_completed_initially = False
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis
+        self.check_champion_reducibility = True
+        self.learned_param_limit_for_negligibility = 0.05
+        self.reduce_champ_bayes_factor_threshold = 1e1
 
         self.min_param = 0
         self.max_param = 10
+        self.num_processes_to_parallelise_over = 4
 
         self.max_num_models_by_shape = {
             1: 0,
@@ -61,12 +65,15 @@ class FullAccessNVCentre(
         self.true_model_terms_params = {
             # Decohering param set
             # From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
-            'xTi': -0.98288958683093952,  # -0.098288958683093952
-            'xTx': 6.7232235286284681,  # 0.67232235286284681,
-            'yTi': 6.4842202054983122,  # 0.64842202054983122, #
-            'yTy': 2.7377867056770397,  # 0.27377867056770397,
-            'zTi': 0.96477790489201143,  # 0.096477790489201143,
-            'zTz': 1.6034234519563935,  # 0.16034234519563935,
+            'xTi' : -0.98288958683093952,
+            'xTx' : 6.7232235286284681,  
+            'yTi' : 6.4842202054983122,  
+            'yTy' : 2.7377867056770397,  
+            'zTi' : 0.96477790489201143, 
+            'zTz' : 1.6034234519563935, 
+            'xTy' : 1.5,
+            'xTz' : 7, 
+            'yTz' : 2 
         }
         self.gaussian_prior_means_and_widths = {
             'xTi': [4.0, 1.5],
