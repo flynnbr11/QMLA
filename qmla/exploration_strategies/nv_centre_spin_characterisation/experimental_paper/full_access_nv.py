@@ -54,13 +54,9 @@ class FullAccessNVCentre(
 
         self.min_param = 0
         self.max_param = 10
-        self.num_processes_to_parallelise_over = 4
-
-        self.max_num_models_by_shape = {
-            1: 0,
-            2: 18,
-            'other': 0
-        }
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = 0.1
+        self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
 
         self.true_model_terms_params = {
             # Decohering param set
@@ -85,6 +81,13 @@ class FullAccessNVCentre(
             'xTy': [4.0, 1.5],
             'xTz': [4.0, 1.5],
             'yTz': [4.0, 1.5],
+        }
+
+        self.num_processes_to_parallelise_over = 4
+        self.max_num_models_by_shape = {
+            1: 0,
+            2: 18,
+            'other': 0
         }
 
     def generate_models(
