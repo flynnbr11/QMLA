@@ -37,12 +37,8 @@ class VariableTrueModelNVCentre(
             **kwargs
         )
         true_models = [
-            'xTi+yTi',
-            'xTi+yTi',
-            'xTi+yTi',
-            'xTi+yTi',
             'xTi+yTi+zTz',
-            'xTi+zTi+zTz',
+            'xTi+zTi+xTx+zTz',
             'xTi+yTi+zTi+xTx',
             'xTi+yTi+zTi+zTz',
             'xTi+yTi+zTi+yTy',
@@ -56,7 +52,6 @@ class VariableTrueModelNVCentre(
         ]
 
         self.true_model = true_models[self.qmla_id % len(true_models)]
-        # self.true_model = 'xTi+yTi'
         self.true_model = qmla.construct_models.alph(self.true_model)
         self._shared_true_parameters = False
         self.log_print(["starting rotational ES; true model is {}".format(self.true_model)])

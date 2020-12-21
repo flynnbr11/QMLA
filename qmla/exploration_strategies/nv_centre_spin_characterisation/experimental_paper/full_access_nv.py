@@ -37,7 +37,7 @@ class FullAccessNVCentre(
         )
 
         # self.true_model = 'xTz'
-        self.true_model = 'xTi+xTx+yTi+yTy+zTi+zTz'
+        self.true_model = 'xTi+yTi+zTi+zTz'
         self.initial_models = ['xTi', 'yTi', 'zTi']
         # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
