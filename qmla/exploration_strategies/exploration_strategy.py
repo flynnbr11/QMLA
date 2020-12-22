@@ -1200,11 +1200,14 @@ class ExplorationStrategy():
             models_to_prune = []
             for id_1, id_2 in pruned_branch.pairs_to_compare:
                 self.log_print([
-                    "id_1 = {}; id_2={}".format(id_1, id_2)
+                    "prune pair: id_1={}; id_2={}".format(id_1, id_2)
                 ])
                 # id_1 = pair[0]
                 # id_2 = pair[1]
                 mod_1 = pruned_branch.model_storage_instances[id_1]
+                self.log_print([
+                    "prune mod_1: {}".format(mod_1)
+                ])
                 try:
                     bf_1_v_2 = mod_1.model_bayes_factors[ float(id_2) ][-1]
                 except:
@@ -1216,10 +1219,11 @@ class ExplorationStrategy():
                             mod_1.model_bayes_factors
                         )
                     ])
+                self.log_print(["prune bf_1_v_2 = {}".format(bf_1_v_2)])
                 if bf_1_v_2 > prune_collapse_threshold:
                     models_to_prune.append(id_2)
                 elif bf_1_v_2 < float(1 / prune_collapse_threshold):
-                    models_to_prune(id_1)
+                    models_to_prune.append(id_1)
 
             models_to_keep = list( # by ID
                 set(prev_branch_models)
