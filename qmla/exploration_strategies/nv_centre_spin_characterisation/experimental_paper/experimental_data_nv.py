@@ -4,7 +4,7 @@ import os
 
 import pickle 
 
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import NVCentreSimulatedExperiment
+from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import SimulatedExperimentNVCentre
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
@@ -18,13 +18,13 @@ __all__ = [
 
 
 class NVCentreExperimentalData(
-    NVCentreSimulatedExperiment
+    SimulatedExperimentNVCentre
 ):
     r"""
     Study experimental data.
 
     Uses the same model generation/comparison strategies as 
-    NVCentreSimulatedExperiment, FullAccessNVCentre, 
+    SimulatedExperimentNVCentre, FullAccessNVCentre, 
     but targets data measured from a real system. 
     This is done by using an alternative qinfer_model_subroutine,   
     which searches in the dataset for the system's likelihood, 

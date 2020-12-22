@@ -163,6 +163,7 @@ class ExplorationTree():
         if not self.exploration_class.check_tree_completed(
                 spawn_step=self.spawn_step):
             self.spawn_step += 1
+            self.exploration_class.spawn_step = self.spawn_step
             self.log_print(["Next layer - spawn"])
             model_list = self.exploration_class.generate_models(
                 spawn_step=self.spawn_step,

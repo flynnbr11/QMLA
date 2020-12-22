@@ -44,7 +44,7 @@ class FullAccessNVCentre(
         self.max_num_parameter_estimate = 9
         self.max_spawn_depth = 8
         self.prune_completed_initially = False
-        self.max_num_probe_qubits = 8
+        self.max_num_probe_qubits = 2
         self.tree_completed_initially = False
         self.fixed_axis_generator = False
         self.fixed_axis = 'z'  # e.g. transverse axis
@@ -58,19 +58,28 @@ class FullAccessNVCentre(
         self.fraction_opponents_experiments_for_bf = 0.1
         self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
 
-        self.true_model_terms_params = {
-            # Decohering param set
-            # From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
-            'xTi' : -0.98288958683093952,
-            'xTx' : 6.7232235286284681,  
-            'yTi' : 6.4842202054983122,  
-            'yTy' : 2.7377867056770397,  
-            'zTi' : 0.96477790489201143, 
-            'zTz' : 1.6034234519563935, 
-            'xTy' : 1.5,
-            'xTz' : 7, 
-            'yTz' : 2 
-        }
+
+        if self.true_model == 'xTiPPyTiPPzTiPPzTz':
+            self.true_model_terms_params = {  # from Jul_05/16_40
+                'xTi': 0.92450565,
+                'yTi': 6.00664336,
+                'zTi': 1.65998543,
+                'zTz': 0.76546868,
+            }
+        else:
+            self.true_model_terms_params = {
+                # Decohering param set
+                # From 3000exp/20000prt, BC SelectedRuns/Nov_28/15_14/results_049
+                'xTi' : -0.98288958683093952,
+                'xTx' : 6.7232235286284681,  
+                'yTi' : 6.4842202054983122,  
+                'yTy' : 2.7377867056770397,  
+                'zTi' : 0.96477790489201143, 
+                'zTz' : 1.6034234519563935, 
+                'xTy' : 1.5,
+                'xTz' : 7, 
+                'yTz' : 2 
+            }
         self.gaussian_prior_means_and_widths = {
             'xTi': [4.0, 1.5],
             'yTi': [4.0, 1.5],
