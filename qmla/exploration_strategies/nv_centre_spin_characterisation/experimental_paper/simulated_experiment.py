@@ -39,9 +39,9 @@ class SimulatedExperimentNVCentre(
             **kwargs
         )
 
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution
         self.true_model = 'xTi+yTi+zTi+zTz'
 
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False

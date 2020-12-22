@@ -44,5 +44,4 @@ class VariableTrueModelNVCentre(
         self.true_model = true_models[self.qmla_id % len(true_models)]
         self.true_model = qmla.construct_models.alph(self.true_model)
         self._shared_true_parameters = False
-        self.timing_insurance_factor = 0.5
         self.log_print(["starting rotational ES; true model is {}".format(self.true_model)])

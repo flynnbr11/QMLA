@@ -22,6 +22,8 @@ import itertools
 from scipy import linalg, stats
 import random
 
+from expm import expm
+
 import qmla.utilities
 import qmla.construct_models
 
@@ -487,6 +489,70 @@ def NV_centre_ising_probes_plus(
                     ).flatten(order='c')
                 )
     return separable_probes
+
+def random_initialised_qubit_for_hahn_sequence(
+    hahn_rotation = None
+):
+    pauli_y = np.array([
+        [0,-1j], 
+        [1j, 0]
+    ])
+    spin_qubit = np.array([1,0]) # prepared in |0>
+    if hahn_rotation is None: 
+        hahn_rotation = np.random.uniform(-1, 1)
+    hahn_angle = hahn_rotation*(np.pi/2)
+
+    hahn_gate = expm(
+        -1j * hahn_angle * pauli_y
+    )
+
+    spin_qubit = np.dot(hahn_gate, spin_qubit)
+    return spin_qubit
+
+def hahn_sequence_random_initial(
+    max_num_qubits=2,
+    num_probes=40,
+    noise_level=0.03,  
+    **kwargs
+):
+
+    separable_probes = {}
+    for i in range(num_probes):
+        rand_init_state = random_initialised_qubit_for_hahn_sequence()
+        # rand_init_state = harr_random_probe()
+        separable_probes[i, 0] = rand_init_state
+        for j in range(1, 1 + max_num_qubits):
+            if j == 1:
+                separable_probes[i, j] = separable_probes[i, 0]
+            else:
+                
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        rand_init_state,
+                        axes=0
+                    ).flatten(order='c')
+                )
+            while (
+                np.isclose(
+                    1.0,
+                    np.linalg.norm(separable_probes[i, j]),
+                    atol=1e-14
+                ) is False
+            ):
+                print("non-unit norm: ",
+                      np.linalg.norm(separable_probes[i, j])
+                      )
+                # keep replacing until a unit-norm
+                separable_probes[i, j] = (
+                    np.tensordot(
+                        separable_probes[i, j - 1],
+                        rand_init_state,
+                        axes=0
+                    ).flatten(order='c')
+                )
+    return separable_probes
+
 
 
 def plus_plus_with_phase_difference(

@@ -4,3 +4,4 @@ from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_pa
 from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper.tiered_greedy import *
 from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper.varying_true_model import *
 from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper.large_model_space import *
+from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper.inspect_probe_bias import *

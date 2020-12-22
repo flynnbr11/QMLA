@@ -93,6 +93,8 @@ class FullAccessNVCentre(
         }
 
         self.num_processes_to_parallelise_over = 4
+        self.timing_insurance_factor = 0.5
+
         self.max_num_models_by_shape = {
             1: 0,
             2: 18,
