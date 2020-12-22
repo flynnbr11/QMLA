@@ -1414,7 +1414,7 @@ class QuantumModelLearningAgent():
             called_by_branch=branch_id,
             branch_model_points=self.branches[branch_id].bayes_points,
             evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
-            # model_dict=self.model_lists,  # is this used by any ES? TODO remove
+            model_dict=self.model_lists,  # only used by FullAccessNVCentre TODO remove properly and don't pass
         )
 
         self.log_print([

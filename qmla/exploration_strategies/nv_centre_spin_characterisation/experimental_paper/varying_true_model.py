@@ -3,35 +3,27 @@ import sys
 import os
 import random
 
-from qmla.exploration_strategies.exploration_strategy import ExplorationStrategy
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre
-import qmla.shared_functionality.experiment_design_heuristics
-from qmla.construct_models import alph, get_num_qubits
+import qmla.construct_models
+from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre, TieredGreedySearchNVCentre
 
 __all__ = [
     'VariableTrueModelNVCentre'
 ]
 
 class VariableTrueModelNVCentre(
-    FullAccessNVCentre
+    TieredGreedySearchNVCentre 
+    # FullAccessNVCentre
 ):
-    r"""
-    Exploration strategy for NV system described in experimental paper, 
-    assuming full access to the state so the likelihood is based on 
-    $\bra{++} e^{ -i\hat{H(\vec{x})} t } \ket{++}$. 
-
-    This is the base class for results presented in the experimental paper, 
-    namely Fig 2. 
-    The same model generation strategy is used in each case (i), (ii), (iii):
-        this ES is for (i) pure simulation. 
-
-    """
 
     def __init__(
         self,
         exploration_rules,
         **kwargs
     ):
+        r"""
+        Cycle through target model.
+
+        """
         super().__init__(
             exploration_rules=exploration_rules,
             **kwargs

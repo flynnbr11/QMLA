@@ -3,10 +3,8 @@ import sys
 import os
 import random
 
-from qmla.exploration_strategies.exploration_strategy import ExplorationStrategy
 from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre
-import qmla.shared_functionality.experiment_design_heuristics
-from qmla.construct_models import alph, get_num_qubits
+from qmla.construct_models import alph
 
 __all__ = [
     'TieredGreedySearchNVCentre'
@@ -44,11 +42,10 @@ class TieredGreedySearchNVCentre(
         }
         self.tier = 1
         self.max_tier = max(self.term_tiers)
-        self.tier_spawn_steps = {k : [] for k in self.term_tiers} 
-        self.champion_by_spawn_step = {}
         self.tier_branch_champs = {k : [] for k in self.term_tiers} 
         self.tier_champs = {}
         self.prune_completed_initially = True
+        self.check_champion_reducibility = True
 
     def generate_models(
         self,
@@ -64,7 +61,6 @@ class TieredGreedySearchNVCentre(
         if self.spawn_stage[-1] is None:
             try:
                 previous_branch_champ = model_list[0]
-                self.champion_by_spawn_step[self.spawn_step -1] = previous_branch_champ
                 self.tier_branch_champs[self.tier].append(previous_branch_champ)
             except:
                 previous_branch_champ = None
@@ -123,7 +119,7 @@ class TieredGreedySearchNVCentre(
 
     def check_tree_pruned(self, prune_step, **kwargs):
         return self.prune_completed_initially
-        
+
 def greedy_add(
     current_model, 
     terms,

@@ -34,7 +34,7 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locally, currently
 ###############
 
-exploration_strategy="TieredGreedySearchNVCentre"
+exploration_strategy="VariableTrueModelNVCentre"
 
 alt_exploration_strategies=(
     # 'IsingLatticeSet'

@@ -106,6 +106,8 @@ class FullAccessNVCentre(
         model_dict,
         **kwargs
     ):
+        # TODO replace with newer greedy add mechanism (as in TieredGreedySearchNVCentre)
+        # TODO then remove model_dict from qmla's call to next_layer
         self.log_print([
             "Generating. input model list:", model_list
         ])
