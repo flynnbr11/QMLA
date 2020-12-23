@@ -55,7 +55,7 @@ class FullAccessNVCentre(
         self.min_param = 0
         self.max_param = 10
         self.fraction_own_experiments_for_bf = 0.5
-        self.fraction_opponents_experiments_for_bf = 0.1
+        self.fraction_opponents_experiments_for_bf = 0 # the last half of models' training data are deterministally the same anyway
         self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
 
 

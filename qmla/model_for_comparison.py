@@ -309,7 +309,7 @@ class ModelInstanceForComparison():
 
             epoch_id += 1
         
-        self.log_print_debug(["BF times:", self.bf_times])
+        self.log_print(["BF times:", self.bf_times])
         self.bf_times = qmla.utilities.flatten(self.bf_times)
         return self.qinfer_updater.log_total_likelihood
 
