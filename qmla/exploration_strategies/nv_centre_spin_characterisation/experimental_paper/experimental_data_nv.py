@@ -51,7 +51,8 @@ class NVCentreExperimentalData(
         # self.true_model = 'iTi'
         # self.max_spawn_depth = 3
         self.true_model = qmla.construct_models.alph(self.true_model) 
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
+        # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.hahn_via_z_pi_gate
         self.qinfer_model_subroutine =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine

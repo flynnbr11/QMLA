@@ -260,6 +260,16 @@ def make_inversion_gate(num_qubits):
 
     return inversion_gate
 
+def hahn_via_z_pi_gate(
+    **kwargs
+):
+    return n_qubit_hahn_evolution(
+        pi_rotation='y', 
+        second_time_evolution_factor=2,
+        **kwargs
+    )
+
+
 
 def n_qubit_hahn_evolution_double_time_reverse(
     ham, t, state,
@@ -277,6 +287,7 @@ def n_qubit_hahn_evolution_double_time_reverse(
 def n_qubit_hahn_evolution(
     ham, t, state,
     second_time_evolution_factor=1,
+    pi_rotation='y', 
     precision=1e-10,
     log_file=None,
     log_identifier=None
@@ -305,11 +316,12 @@ def n_qubit_hahn_evolution(
     from scipy import linalg
     num_qubits = int(np.log2(np.shape(ham)[0]))
 
-    from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
-    inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
-
-    # from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_z_inversion_gates
-    # inversion_gate = precomputed_hahn_z_inversion_gates[num_qubits]
+    if pi_rotation == 'y':
+        from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
+        inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
+    elif pi_rotation == 'z':
+        from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_z_inversion_gates
+        inversion_gate = precomputed_hahn_z_inversion_gates[num_qubits]
 
 
     # inversion_gate = make_inversion_gate_rotate_y(num_qubits)
