@@ -264,7 +264,7 @@ def hahn_via_z_pi_gate(
     **kwargs
 ):
     return n_qubit_hahn_evolution(
-        pi_rotation='y', 
+        pi_rotation='z', 
         second_time_evolution_factor=2,
         **kwargs
     )

@@ -59,7 +59,7 @@ class FullAccessNVCentre(
         self.fraction_particles_for_bf = 0.1 # testing whether reduced num particles for BF can work 
 
 
-        if self.true_model == 'xTiPPyTiPPzTiPPzTz':
+        if self.true_model == 'xTi+yTi+zTi+zTz':
             self.true_model_terms_params = {  # from Jul_05/16_40
                 'xTi': 0.92450565,
                 'yTi': 6.00664336,

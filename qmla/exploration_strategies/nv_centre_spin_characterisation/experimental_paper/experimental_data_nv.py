@@ -45,8 +45,8 @@ class NVCentreExperimentalData(
         # for an unused term so it doesn't interfere
         # this should be looked after by not having a true model in these cases (?)
         # self.true_model = 'xTiPPyTiPPzTiPPzTz'
-        # self.true_model = 'xTi+yTi+zTi+zTz'
-        self.true_model = 'xTi+xTx+yTi+yTy+zTi+zTz+xTy+xTz+yTz'
+        self.true_model = 'xTi+yTi+zTi+zTz'
+        # self.true_model = 'xTi+xTx+yTi+yTy+zTi+zTz+xTy+xTz+yTz'
         
         # self.true_model = 'iTi'
         # self.max_spawn_depth = 3
