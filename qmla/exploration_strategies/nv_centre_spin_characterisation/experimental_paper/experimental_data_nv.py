@@ -18,7 +18,8 @@ __all__ = [
 
 
 class NVCentreExperimentalData(
-    TieredGreedySearchNVCentre, # SimulatedExperimentNVCentre
+    # TieredGreedySearchNVCentre, #
+    SimulatedExperimentNVCentre
 ):
     r"""
     Study experimental data.
