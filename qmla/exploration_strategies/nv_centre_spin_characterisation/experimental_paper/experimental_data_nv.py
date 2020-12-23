@@ -4,7 +4,7 @@ import os
 
 import pickle 
 
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import SimulatedExperimentNVCentre
+from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import SimulatedExperimentNVCentre, TieredGreedySearchNVCentre
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
@@ -18,7 +18,7 @@ __all__ = [
 
 
 class NVCentreExperimentalData(
-    SimulatedExperimentNVCentre
+    TieredGreedySearchNVCentre, # SimulatedExperimentNVCentre
 ):
     r"""
     Study experimental data.
