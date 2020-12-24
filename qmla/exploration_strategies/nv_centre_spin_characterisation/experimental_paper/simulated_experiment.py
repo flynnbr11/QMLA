@@ -41,8 +41,8 @@ class SimulatedExperimentNVCentre(
 
         self.true_model = 'xTi+yTi+zTi+zTz'
 
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
-        # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.hahn_via_z_pi_gate
+        # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.hahn_via_z_pi_gate
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
