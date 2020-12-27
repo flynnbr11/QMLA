@@ -40,6 +40,7 @@ class SimulatedExperimentNVCentre(
         )
 
         self.true_model = 'xTi+yTi+zTi+zTz'
+        self.qhl_models = ['xTi', 'yTi', 'zTi']
 
         # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
         self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.hahn_via_z_pi_gate

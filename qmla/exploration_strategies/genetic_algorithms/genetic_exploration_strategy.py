@@ -614,27 +614,40 @@ class Genetic(
             **kwargs
         )
 
-        plot_methods = [
-            self.plot_correlation_fitness_with_f_score,
-            self.plot_fitness_v_fscore_by_generation,
-            self.plot_fitness_v_fscore,
-            self.plot_fitness_v_generation,
-            self.plot_model_ratings,
-            self.plot_gene_pool,
-            self.plot_generational_metrics,
-            self.plot_selection_probabilities
-        ]
+        plot_methods_by_level = {
+            1 : [],
+            2 : [
+                self.plot_correlation_fitness_with_f_score,
+                self.plot_fitness_v_fscore_by_generation,
+            ], 
+            3 : [
+                self.plot_fitness_v_fscore,
+                self.plot_fitness_v_generation,
+            ], 
+            4 : [
+                self.plot_model_ratings,
+                self.plot_gene_pool,
+            ], 
+            5 : [
+                self.plot_generational_metrics,
+                self.plot_selection_probabilities
+            ], 
+            6 : [], 
+        }
         self.log_print([
             "Plotting methods:", plot_methods
         ])
 
-        for method in plot_methods:
-            try:
-                method()
-            except Exception as e:
-                self.log_print([
-                    "plot failed {} with exception: {}".format(method.__name__, e)
-                ])
+        for pl in range(self.plot_level + 1):
+            if pl in plot_methods_by_level:
+                self.log_print(["Plotting for plot_level={}".format(pl)])
+                for method in plot_methods_by_level[pl]:
+                    try:
+                        method()
+                    except Exception as e:
+                        self.log_print([
+                            "plot failed {} with exception: {}".format(method.__name__, e)
+                        ])
 
         try:
             self.ratings_class.plot_models_ratings_against_generation(

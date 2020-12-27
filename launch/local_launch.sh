@@ -7,14 +7,14 @@
 ###############
 num_instances=1
 run_qhl=0 # perform QHL on known (true) model
-run_qhl_mulit_model=0 # perform QHL for defined list of models.
+run_qhl_multi_model=0 # perform QHL for defined list of models.
 exp=10 # number of experiments
 prt=20 # number of particles
 
 ###############
 # QMLA settings - user
 ###############
-plot_level=2
+plot_level=3
 debug_mode=0
 
 ###############
@@ -49,7 +49,7 @@ do
     exploration_strategies_command+=" -aes $item" 
 done
 
-if (( "$run_qhl" == 1 )) 
+if (( "$run_qhl" == 1 )) || (( "$run_qhl_multi_model" == 1 ))
 then	
     plot_level=6
 fi
@@ -125,7 +125,7 @@ python3 ../../../../scripts/generate_results_pdf.py \
     -run_desc=\"localdevelopemt\" \
     -git_commit=$git_commit \
     -qhl=$run_qhl \
-    -mqhl=$run_qhl_mulit_model \
+    -mqhl=$run_qhl_multi_model \
     -cb=$bayes_csv \
 
 " > $analysis_script
@@ -144,7 +144,7 @@ do
         ../scripts/implement_qmla.py \
         -qid=$q_id \
         -qhl=$run_qhl \
-        -mqhl=$run_qhl_mulit_model \
+        -mqhl=$run_qhl_multi_model \
         -p=$prt \
         -e=$exp \
         -rq=$use_rq \

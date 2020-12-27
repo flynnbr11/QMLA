@@ -2697,26 +2697,35 @@ class QuantumModelLearningAgent():
             "Plotting instance outcomes"
         ])
 
-        plot_methods = [
-            self._plot_model_terms,
-            self._plot_dynamics_all_models_on_branches,
-            self._plot_one_qubit_probes_bloch_sphere, 
-            self._plot_evaluation_normalisation_records,
-            self._plot_bayes_factors,
-            self._plot_branch_champs_quadratic_losses,
-            self._plot_branch_champs_volumes,
-            self._plot_exploration_tree,
-            self._plot_r_squared_by_epoch_for_model_list,
-            self._plot_statistical_metrics
-        ]
+        plot_methods_by_level = {
+            1 : [
+                self._plot_model_terms,
+            ],
+            2: [
+                self._plot_dynamics_all_models_on_branches,
+                self._plot_one_qubit_probes_bloch_sphere, 
+            ],
+            3 : [
+                self._plot_bayes_factors,
+                self._plot_branch_champs_quadratic_losses,
+            ],
+            4 : [
+                self._plot_exploration_tree,
+                self._plot_r_squared_by_epoch_for_model_list,
+                self._plot_statistical_metrics
+            ]
+        }
 
-        for method in plot_methods:
-            try:
-                method()
-            except Exception as e:
-                self.log_print([
-                    "plot failed {} with exception: {}".format(method.__name__, e)
-                ])
+        for pl in range(self.plot_level + 1):
+            if pl in plot_methods_by_level:
+                self.log_print(["Plotting for plot_level={}".format(pl)])
+                for method in plot_methods_by_level[pl]:
+                    try:
+                        method()
+                    except Exception as e:
+                        self.log_print([
+                            "plot failed {} with exception: {}".format(method.__name__, e)
+                        ])
 
         self.log_print([
             "Plotting exploration strategy analysis"

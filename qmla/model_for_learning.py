@@ -607,7 +607,54 @@ class ModelInstanceForLearning():
         self._compute_expectation_values()
 
 
-    def _model_plots(self):
+    def _model_plots(
+        self, 
+    ):
+        self.log_print([
+            "Plotting instance outcomes"
+        ])
+
+        plot_methods_by_level = {
+            3 : [
+                self._plot_dynamics,
+            ],
+            4 : [
+                self._plot_distributions, 
+            ],
+            5 : [
+                self._plot_preliminary_preparation,
+            ],
+            6 : [
+                self._plot_posterior_mesh_pairwise,
+            ]
+        }
+
+        for pl in range(self.plot_level + 1):
+            if pl in plot_methods_by_level:
+                self.log_print(["Plotting for plot_level={}".format(pl)])
+                for method in plot_methods_by_level[pl]:
+                    try:
+                        method()
+                    except Exception as e:
+                        self.log_print([
+                            "plot failed {} with exception: {}".format(method.__name__, e)
+                        ])
+
+        if self.plot_level >= 4:
+            try:
+                self.model_heuristic.plot_heuristic_attributes(
+                    save_to_file=os.path.join(
+                        self.model_learning_plots_directory,
+                        '{}heuristic_attributes_{}.png'.format(
+                            self.plot_prefix, self.model_id)
+                    )
+                )
+            except BaseException:
+                self.log_print(["Failed to plot_heuristic_attributes"])
+
+
+
+    def _model_plots_old(self):
         r"""
         Generate plots specific to this model.
         Which plots are drawn depends on the ``plot_level`` set in the launch script.
