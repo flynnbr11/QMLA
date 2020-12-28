@@ -4,7 +4,7 @@ import os
 
 import pickle 
 
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre
+from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre, TieredGreedySearchNVCentre
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
@@ -17,7 +17,8 @@ __all__ = [
 ]
 
 class SimulatedExperimentNVCentre(
-    FullAccessNVCentre  # inherit from this
+    TieredGreedySearchNVCentre
+    # FullAccessNVCentre  # inherit from this
 ):
     r"""
     Uses all the same functionality, growth etc as

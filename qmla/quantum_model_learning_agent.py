@@ -1715,13 +1715,6 @@ class QuantumModelLearningAgent():
             v = self.model_name_id_map[k]
             self.model_id_to_name_map[v] = k
 
-        try:
-            self.branch_graphs = qmla.analysis.branch_graphs.plot_qmla_branches(
-                q=self, return_graphs=False
-            )
-        except:
-            self.log_print(["Failed to plot branch graphs."])
-
         # Store model IDs and names
         model_data = self.model_database[
             # subset of columns to store
@@ -2726,6 +2719,14 @@ class QuantumModelLearningAgent():
                         self.log_print([
                             "plot failed {} with exception: {}".format(method.__name__, e)
                         ])
+
+        if self.plot_level >=3:
+            try:
+                self.branch_graphs = qmla.analysis.branch_graphs.plot_qmla_branches(
+                    q=self, return_graphs=False
+                )
+            except:
+                self.log_print(["Failed to plot branch graphs."])
 
         self.log_print([
             "Plotting exploration strategy analysis"

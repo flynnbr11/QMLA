@@ -44,7 +44,6 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         kwargs['unchanged_elite_num_generations_cutoff'] = 3*self.true_n_qubits
         kwargs['num_protected_elite_models'] = 2
 
-
         super().__init__(
             exploration_rules=exploration_rules,
             true_model = self.true_model,
