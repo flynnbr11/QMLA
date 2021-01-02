@@ -589,9 +589,10 @@ try:
             str( plot_desc + 'quadratic_losses.png')
         )
     )
-except:
-    print("ANAYSIS FAILURE: quadratic losses.")
-    raise
+except Exception as e:
+    print("ANAYSIS FAILURE: {} with exception {}".format(
+        average_quadratic_losses, e
+    ))
 
 try:
     qmla.analysis.volume_average(
@@ -603,9 +604,10 @@ try:
             str(plot_desc + 'volumes.png')
         )
     )
-except: 
-    print("ANALYSIS FAILURE: volumes.")
-    raise
+except Exception as e:
+    print("ANAYSIS FAILURE: {} with exception {}".format(
+        volume_average, e
+    ))
 
 try:
     qmla.analysis.all_times_learned_histogram(
