@@ -591,7 +591,8 @@ try:
     )
 except Exception as e:
     print("ANAYSIS FAILURE: {} with exception {}".format(
-        average_quadratic_losses, e
+        "average_quadratic_losses", 
+        e
     ))
 
 try:
@@ -606,7 +607,7 @@ try:
     )
 except Exception as e:
     print("ANAYSIS FAILURE: {} with exception {}".format(
-        volume_average, e
+        "volume_average", e
     ))
 
 try:
