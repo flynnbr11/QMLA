@@ -129,7 +129,9 @@ autodoc_mock_imports = [
   'autopep8',
   'psutil',
   'projectq',
-  'sklearn'
+  'sklearn',
+  'expm', 
+  'lfig'
 ]
 autosectionlabel_prefix_document = True
 
