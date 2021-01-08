@@ -14,6 +14,8 @@
 #
 import os
 import sys
+from recommonmark.parser import CommonMarkParser
+
 sys.path.insert(0, os.path.abspath('..'))
 # sys.path.insert(0, os.path.abspath('../qmla'))
 
@@ -94,6 +96,10 @@ preamble = r"""
 \makeatother
 """.replace("ABSTRACT_HERE", abstract)
 
+source_parsers = {
+    '.md': CommonMarkParser,
+}
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -113,6 +119,7 @@ extensions = [
   'sphinx.ext.todo',
   'sphinx.ext.viewcode', 
   'sphinx.ext.extlinks',
+  'recommonmark'
   # 'sphinxcontrib.bibtex', # must install from pip first # also needs python3.6 :(
   # 'matplotlib.sphinxext.plot_directive'
 ]
@@ -141,8 +148,8 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
+# source_suffix = '.rst'
 
 # The master toctree document.
 master_doc = 'index'
