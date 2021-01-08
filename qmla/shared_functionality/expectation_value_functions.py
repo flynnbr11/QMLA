@@ -108,7 +108,6 @@ def default_expectation_value(
         raise NameError("Unphysical expectation value")
     return prob_of_measuring_input_state
 
-
 # Expectation value function using Hahn inversion gate:
 def hahn_evolution(
     ham,
