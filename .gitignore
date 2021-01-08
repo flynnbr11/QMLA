@@ -43,7 +43,7 @@ launch/results/*
 # But want redis configuration:
 !qmla/RedisConfig.conf
 !qmla/RedisDatabaseConfig.conf
-
+DevelopmentNotebooks/*
 # Output files from cluster
 *.e*
 *.o*
