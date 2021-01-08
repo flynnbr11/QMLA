@@ -160,7 +160,7 @@ def hahn_evolution(
         #     t,
         #     precision=precision
         # )
-        unitary_time_evolution = qutip.Qobj(-1j * ham * t).expm().full()
+        unitary_time_evolution = qutip.Qobj(-1j * ham * t).expm().full() # TODO deprecated
 
         total_evolution = np.dot(
             unitary_time_evolution,
