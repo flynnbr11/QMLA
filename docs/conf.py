@@ -96,10 +96,9 @@ preamble = r"""
 \makeatother
 """.replace("ABSTRACT_HERE", abstract)
 
-source_parsers = {
-    '.md': CommonMarkParser,
-}
-
+# source_parsers = {
+#     '.md': CommonMarkParser,
+# }
 
 # -- General configuration ---------------------------------------------------
 
