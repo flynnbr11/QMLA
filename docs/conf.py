@@ -25,7 +25,7 @@ copyright = '2021, Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 author = 'Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 
 # The short X.Y version
-version = ''
+version = '1.0'
 # The full version, including alpha/beta/rc tags
 release = '0'
 
