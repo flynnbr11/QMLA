@@ -12,3 +12,4 @@ matplotlib==3.0.3
 redis==2.10.6
 rq==0.10.0
 lfig==0.1.1
+seaborn==0.9.0
