@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# redis-server
+redis-server ../qmla/RedisDatabaseConfig.conf --protected-mode no --port 6379 & 
 
 ###############
 # QMLA run configuration
@@ -233,4 +233,4 @@ then
     # sh $further_analysis_script
 fi
 
-# redis-cli shutdown
+redis-cli shutdown

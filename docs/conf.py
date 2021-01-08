@@ -14,13 +14,13 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../qmla'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'Quantum Model Learning Agent'
-copyright = '2020, Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
+copyright = '2021, Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 author = 'Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 
 # The short X.Y version
@@ -242,7 +242,7 @@ texinfo_documents = [
 
 # allow e.g. arxiv links
 extlinks = {
-    'arxiv': ('http://arxiv.org/abs/%s', 'arXiv:'),
-    'doi': ('https://dx.doi.org/%s', 'doi:'),
-    'hdl': ('https://hdl.handle.net/%s', 'hdl:')
+    'arxiv': ('https://arxiv.org/abs/2002.06169', 'arXiv:'),
+    # 'doi': ('https://dx.doi.org/%s', 'doi:'),
+    # 'hdl': ('https://hdl.handle.net/%s', 'hdl:')
 }
