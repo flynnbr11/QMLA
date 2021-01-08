@@ -117,7 +117,20 @@ extensions = [
   # 'matplotlib.sphinxext.plot_directive'
 ]
 
-autodoc_mock_imports = ['qutip', 'Cython']
+autodoc_mock_imports = [
+  'qutip', 
+  'qinfer',
+  'Cython',
+  'rq-dashboard', 
+  'fermilib', 
+  'networkx', 
+  'fpdf',
+  'future',
+  'autopep8',
+  'psutil',
+  'projectq',
+  'sklearn'
+]
 autosectionlabel_prefix_document = True
 
 # Add any paths that contain templates here, relative to this directory.
