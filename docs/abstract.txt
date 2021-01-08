@@ -1,0 +1,11 @@
+Machine learning protocol for the characterisation of quantum mechanical systems and devices. 
+
+Quantum systems can be approximated by models such as Hamiltonians and Lindbladian operators, 
+which can be used to make predictions about the behaviour of those systems over time, as well 
+as how the system would interact with others. 
+It is difficult, however, to distill the underlying model of a given system, 
+due to their delicate nature. 
+This software provides a machine learning framework to reverse-engineer quantum systems, 
+to find an approximate model which is consistent with the data observed from that system. 
+Models are returned in an interpretable, human-readable format, providing insight of the 
+interactions to which the system is subject at the quantum mechanical level. 
