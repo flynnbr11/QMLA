@@ -24,6 +24,7 @@ __pycache__/
 *conflicted*
 # Documentation build directories
 docs/_build
+!docs/*.txt
 
 ParallelDevelopment/*
 ExperimentalSimulations/*
