@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# ~/redis-4.0.8/src/redis-server ../qmla/RedisDatabaseConfig.conf --protected-mode no --port 6379 & 
+# shutdown redis in case it is still active from previous run and start it fresh
+redis-cli shutdown 
+~/redis-4.0.8/src/redis-server ../qmla/RedisDatabaseConfig.conf --protected-mode no --port 6379 & 
 
 ###############
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=1 # perform QHL on known (true) model
+run_qhl=0 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models.
 exp=10 # number of experiments
 prt=20 # number of particles
@@ -31,7 +33,7 @@ number_best_models_further_qhl=5
 ###############
 # Choose an exploration strategy 
 # This will determine how QMLA proceeds. 
-# use_alt_exploration_strategies=1 # note this is redundant locally, currently
+# use_alt_exploration_strategies=1 # note this is redundant locallycurrently
 ###############
 
 exploration_strategy="HeisenbergLatticeSet"
@@ -39,7 +41,7 @@ exploration_strategy="HeisenbergLatticeSet"
 alt_exploration_strategies=(
     'IsingLatticeSet'
     # 'HeisenbergLatticeSet'
-    'FermiHubbardLatticeSet'
+    'HubbardReducedLatticeSet'
     # 'GeneticTest'
 )
 

@@ -29,7 +29,7 @@ author = 'Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 # The short X.Y version
 version = '1.0'
 # The full version, including alpha/beta/rc tags
-release = '0'
+release = '1'
 
 # -- Abstract ---------------------------------------------------
 
