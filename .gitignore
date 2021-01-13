@@ -22,12 +22,13 @@ __pycache__/
 *~
 *.rdb
 *conflicted*
+
 # Documentation build directories
 docs/_build
+!docs/*.txt
 
-ParallelDevelopment/*
-ExperimentalSimulations/*
-DevelopmentNotebooks/*
+!requirements.txt 
+
 launch/*
 
 !launch/results/
@@ -42,7 +43,7 @@ launch/results/*
 # But want redis configuration:
 !qmla/RedisConfig.conf
 !qmla/RedisDatabaseConfig.conf
-
+DevelopmentNotebooks/*
 # Output files from cluster
 *.e*
 *.o*

@@ -1,2 +1,0 @@
-config_id,crossover_method,log_file,mutation_method,mutation_probability,num_protected_elite_models,number_generations,number_sites,resources,selection_method,starting_population_size,unchanged_elite_num_generations_cutoff,win_rate,mean_f_score,median_f_score,resources_reqd,cost_per_win,win_per_resourrce,f_value
-1.0,one_point,/home/bf16951/QMD/scripts/genetic_alg_param_sweep/output.log,element_wise,0.1,1.0,2.0,6.0,72.0,roulette,8.0,3.0,0.0,0.7207792207792207,0.7207792207792207,1.0,inf,0.0,0.01001082251082251

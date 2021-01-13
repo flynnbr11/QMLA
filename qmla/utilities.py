@@ -6,7 +6,6 @@ import copy
 import random
 import itertools
 
-import qutip as qt
 import qinfer as qi
 import redis
 import pickle
@@ -198,7 +197,12 @@ def plot_probes_on_bloch_sphere(
     save_to_file=None,
     **kwargs
 ):
-    import qutip as qt
+    try:
+        import qutip as qt
+    except:
+        print("Qutip not installed")
+        raise
+
     bloch = qt.Bloch()
 
     # isolate 1 qubit probes
@@ -232,6 +236,11 @@ def plot_subset_eval_probes(
     r"""
     Retained separately in case we later want to plot all eval probes instead of just a sample
     """ 
+    try:
+        import qutip as qt
+    except:
+        print("Qutip not installed")
+        raise
 
     colours = ['red', 'green', 'cyan', 'orange', 'brown', 'blue', 'pink']
     linestyles=['dashed', 'dotted', 'dashdot']

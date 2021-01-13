@@ -14,19 +14,22 @@
 #
 import os
 import sys
+from recommonmark.parser import CommonMarkParser
+
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../qmla'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'Quantum Model Learning Agent'
-copyright = '2020, Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
+copyright = '2021, Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 author = 'Brian Flynn, Antonio Andreas Gentile, Raffaele Santagati'
 
 # The short X.Y version
-version = ''
+version = '1.0'
 # The full version, including alpha/beta/rc tags
-release = '0'
+release = '1'
 
 # -- Abstract ---------------------------------------------------
 
@@ -93,6 +96,9 @@ preamble = r"""
 \makeatother
 """.replace("ABSTRACT_HERE", abstract)
 
+# source_parsers = {
+#     '.md': CommonMarkParser,
+# }
 
 # -- General configuration ---------------------------------------------------
 
@@ -112,10 +118,27 @@ extensions = [
   'sphinx.ext.todo',
   'sphinx.ext.viewcode', 
   'sphinx.ext.extlinks',
+  'recommonmark'
   # 'sphinxcontrib.bibtex', # must install from pip first # also needs python3.6 :(
   # 'matplotlib.sphinxext.plot_directive'
 ]
 
+autodoc_mock_imports = [
+  'qutip', 
+  'qinfer',
+  'Cython',
+  'rq-dashboard', 
+  'fermilib', 
+  'networkx', 
+  'fpdf',
+  'future',
+  'autopep8',
+  'psutil',
+  'projectq',
+  'sklearn',
+  'expm', 
+  'lfig'
+]
 autosectionlabel_prefix_document = True
 
 # Add any paths that contain templates here, relative to this directory.
@@ -242,7 +265,7 @@ texinfo_documents = [
 
 # allow e.g. arxiv links
 extlinks = {
-    'arxiv': ('http://arxiv.org/abs/%s', 'arXiv:'),
-    'doi': ('https://dx.doi.org/%s', 'doi:'),
-    'hdl': ('https://hdl.handle.net/%s', 'hdl:')
+    'arxiv': ('https://arxiv.org/abs/2002.06169', 'arXiv:'),
+    # 'doi': ('https://dx.doi.org/%s', 'doi:'),
+    # 'hdl': ('https://hdl.handle.net/%s', 'hdl:')
 }

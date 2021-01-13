@@ -10,6 +10,12 @@ import qmla.shared_functionality.latex_model_names
 from qmla.shared_functionality import topology_predefined
 from qmla import construct_models
 
+
+__all__ = [
+    "FermiHubbardLatticeSet", 
+    "HubbardReducedLatticeSet"
+]
+
 class FermiHubbardLatticeSet(
     fixed_lattice_set.LatticeSet
 ):
@@ -26,9 +32,6 @@ class FermiHubbardLatticeSet(
             **kwargs
         )        
 
-        # TEST:
-        # self.true_model = 'FH-hopping-sum_down_1h2_d2+FH-onsite-sum_1_2_d2'
-
         self.lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
@@ -36,12 +39,11 @@ class FermiHubbardLatticeSet(
             '_4_site_lattice_fully_connected',
             '_4_site_square',
         ] # TODO excluding 4 sites models for tests against other ESs -- reinstate afterwards
-        # self.rerun_lattices = [
-        #     '_4_site_lattice_fully_connected',
-        #     '_4_site_square',
-        # ]
+        self.setup_models()
 
-        # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
+
+    def setup_models(self):
+
         self.available_lattices_by_name = {
             k : topology_predefined.__getattribute__(k)
             for k in self.lattice_names
@@ -50,18 +52,11 @@ class FermiHubbardLatticeSet(
             topology_predefined.__getattribute__(k)
             for k in self.lattice_names
         ]
-        # self.true_lattice = topology_predefined._4_site_square
-        # randomly select a true model from the available lattices
         if self._shared_true_parameters:
             lattice_idx = -1
         else:
             lattice_idx = self.qmla_id % len(self.available_lattices)  
-            # Rerunning subset with more resources
-            # lattice_idx = self.qmla_id % len(self.rerun_lattices)  
         self.true_lattice_name = self.lattice_names[ lattice_idx ]
-        # self.true_lattice_name = self.rerun_lattices[ lattice_idx ]
-        self.true_lattice_name = '_4_site_square'
-        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.FixedTimeTest # TODO remove - for test
 
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)
@@ -74,28 +69,17 @@ class FermiHubbardLatticeSet(
             for l in self.available_lattices
         ]
 
-        self.quantisation = 'first'
-        # self.quantisation = 'second'  
+        self.quantisation = 'first' # 'second
         if self.quantisation == 'first':
-            # need a probe transformer
-            # self.probe_transformer = qmla.shared_functionality.probe_transformer.FirstQuantisationToJordanWigner(max_num_qubits = 7)
-            # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.test_probes_first_quantisation
-            # self.qinfer_model_subroutine = qmla.shared_functionality.qinfer_model_interface.QInferInterfaceJordanWigner
+            # probe transformer between formalisms - not used currently
             self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()        
             self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict
 
         elif self.quantisation == 'second':
             # Default for FH
-            
             self.probe_transformer = qmla.shared_functionality.probe_transformer.ProbeTransformation()        
-            # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.test_probes_second_quantisation
             self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
             
-            # TEST whether normal probes can be learned upon
-            # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-
-        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_first_site
-        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.fermi_hubbard_half_filled_superposition
         # TODO plot probe dict with meaningful probes wrt FH model 
         self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
 
@@ -103,12 +87,9 @@ class FermiHubbardLatticeSet(
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.num_probes = 25
 
-        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.TimeList
         self.max_time_to_consider = 25
         self.max_num_qubits = 8
         self.max_num_probe_qubits = self.max_num_qubits
-        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_up_in_first_site
-        # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.fermi_hubbard_occupation_basis_down_in_all_sites
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_fermi_hubbard
         self.timing_insurance_factor = 0.8
         self.min_param = 0.25
@@ -154,31 +135,29 @@ class FermiHubbardLatticeSet(
         complete_model = qmla.construct_models.alph(complete_model)
         return complete_model
 
-    # @property
-    # def shared_true_parameters(self):
-    #     return False
 
-    # def expectation_value(self, **kwargs):
-    #     r"""
-    #     Transform probe to the Jordan Wigner basis before computing expectation value. 
-    #     """
+class HubbardReducedLatticeSet(FermiHubbardLatticeSet):
 
-    #     try:
-    #         ex_val = self.expectation_value_function(**kwargs)
-    #         method = 'default'
-    #     except:
-    #         # transform - e.g. probe was from a different starting basis
-    #         probe = kwargs['state']
-    #         transformed_probe = self.probe_transformer.transform(probe = probe)
-    #         kwargs['state'] = transformed_probe
-            
-    #         method = 'transform'
+    def __init__(
+        self,
+        exploration_rules,
+        **kwargs
+    ):
+        r"""
+        Only consider 3-site models. 
+        For use in multi-exploration-strategy tests. 
+        """
+    
+        super().__init__(
+            exploration_rules=exploration_rules,
+            **kwargs
+        )
 
-    #         ex_val = self.expectation_value_function(**kwargs)
-
-    #     return ex_val
-
-
-
+        self.lattice_names = [
+            '_2_site_chain', 
+            '_3_site_chain', 
+            '_3_site_lattice_fully_connected', 
+        ] 
+        self.setup_models()
 
         

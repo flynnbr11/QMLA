@@ -108,7 +108,6 @@ def default_expectation_value(
         raise NameError("Unphysical expectation value")
     return prob_of_measuring_input_state
 
-
 # Expectation value function using Hahn inversion gate:
 def hahn_evolution(
     ham,
@@ -160,7 +159,7 @@ def hahn_evolution(
         #     t,
         #     precision=precision
         # )
-        unitary_time_evolution = qutip.Qobj(-1j * ham * t).expm().full()
+        unitary_time_evolution = qutip.Qobj(-1j * ham * t).expm().full() # TODO deprecated
 
         total_evolution = np.dot(
             unitary_time_evolution,
