@@ -60,6 +60,7 @@ done
 cd $ROOT_DIR
 
 let NUM_RQ_WORKERS="$NUM_WORKERS-1"
+# let NUM_RQ_WORKERS="$NUM_WORKERS"
 set -x 
 mpirun --display-map --tag-output \
 	-np 1 \
