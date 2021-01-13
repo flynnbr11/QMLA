@@ -160,4 +160,12 @@ class HubbardReducedLatticeSet(FermiHubbardLatticeSet):
         ] 
         self.setup_models()
 
+        self.timing_insurance_factor = 0.2
+        self.max_num_models_by_shape = {
+            4: 2,
+            6: 2,
+            'other': 0
+        }
+
+
         
