@@ -24,7 +24,7 @@ debug_mode=0
 ###############
 do_further_qhl=0 # QHL refinement to best performing models 
 q_id=0 # isntance ID can start from other ID if desired
-use_rq=1
+use_rq=0
 further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
