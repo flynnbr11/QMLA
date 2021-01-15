@@ -14,7 +14,7 @@ fermilib==0.1a3
 fpdf==1.7.2
 future==0.17.1
 jupyter-core==4.4.0 #unnecessary but recommended
-matplotlib==3.0.3
+matplotlib # matplotlib==3.0.3
 networkx==2.3
 pep8==1.7.0
 pickleshare==0.7.5

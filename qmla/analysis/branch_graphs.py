@@ -204,7 +204,7 @@ def plot_qmla_branches(
         ax = fig.add_subplot(gs[:, total_ncols-1-int(show_fscore_cmap)])
         fig.colorbar(bf_cmapper, cax = ax)
         ax.set_title(
-            r"$log_{10}(BF)$", 
+            r"$\\log_{10}(BF)$", 
             # fontsize=label_fontsize, 
             loc='center'
         )
