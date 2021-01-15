@@ -607,7 +607,8 @@ class QuantumModelLearningAgent():
                     qid=self.qmla_id,
                     log_file=self.rq_log_file,
                     result_ttl=-1,
-                    timeout=self.rq_timeout
+                    ttl = -1, 
+                    # timeout=self.rq_timeout
                 )
                 self.log_print(
                     ["Model {} on rq job {}".format(model_id, queued_model)])
@@ -725,7 +726,8 @@ class QuantumModelLearningAgent():
                 qid=self.qmla_id,
                 log_file=self.rq_log_file,
                 result_ttl=-1,
-                timeout=self.rq_timeout
+                ttl = -1, 
+                # timeout=self.rq_timeout
             )
             self.log_print([
                 "Bayes factor calculation queued. Models {}/{}".format(
