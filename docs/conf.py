@@ -127,7 +127,6 @@ autodoc_mock_imports = [
   'qutip', 
   'qinfer',
   'Cython',
-  'rq-dashboard', 
   'fermilib', 
   'networkx', 
   'fpdf',

@@ -1,6 +1,6 @@
 numpy==1.15.2
 packaging==20.1
-pandas==0.20.3
+pandas==0.24.2
 scipy==1.1.0
 argparse==1.1
 QInfer==1.0
@@ -17,16 +17,15 @@ pep8==1.7.0
 pickleshare==0.7.5
 psutil==5.6.6
 pytest==5.3.5
-qutip # Not strictly needed and causes errors
+qutip==4.2.0 # Not strictly needed and causes errors
 redis==3.5.3
 # redis-py-cluster==1.3.4
 rq==1.7.0
-rq-dashboard==0.3.10
 scikit-learn==0.21.3
 seaborn==0.9.0
 sklearn==0.0
 Sphinx==1.7.0
 lfig
-# expm
+expm=0.1.5
 
 # redis also required
