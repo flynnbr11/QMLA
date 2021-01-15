@@ -2,16 +2,13 @@ import sys
 import os
 
 from qmla.exploration_strategies import exploration_strategy
-import qmla.shared_functionality.experiment_design_heuristics
-import qmla.shared_functionality.probe_set_generation
-from qmla import construct_models
 
 class ExplorationStrategyTemplate(
     exploration_strategy.ExplorationStrategy  # inherit from this
 ):
-    # Uses all the same functionality, growth etc as
-    # default NV centre spin experiments/simulations
-    # but uses an expectation value which traces out
+    r"""
+    Template exploration strategy
+    """
 
     def __init__(
         self,
@@ -23,31 +20,32 @@ class ExplorationStrategyTemplate(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.initial_models = ['pauliSet_xJx_1J2_d2']
+        self.initial_models = None
         self.tree_completed_initially = False
-        self.true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2'
+        self.true_model = 'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2'
         self.true_model_terms_params = {
-            'pauliSet_1J2_zJz_d2': 0.3,
             'pauliSet_1J2_xJx_d2': 0.1,
-            'pauliSet_1J2_yJy_d2': 0.9
+            'pauliSet_1J2_yJy_d2': 0.9,
+            'pauliSet_1J2_zJz_d2': 0.3,
         }
-        self.spawn_stage = [None]
 
     def generate_models(
         self,
-        model_list,
         **kwargs
     ):
-        # default is to just return given model list and set spawn stage to
-        # complete
-        if self.spawn_stage[-1] is None:
+        if self.spawn_step == 0:
             new_models = [
-                'pauliSet_yJy_1J2_d2'
+                'pauliSet_1J2_xJx_d2', 'pauliSet_yJy_1J2_d2', 'pauliSet_1J2_zJz_d2'
             ]
-            self.spawn_stage.append('round one')
-        elif self.spawn_stage[-1] == 'round one':
+        elif self.spawn_step == 1:
             new_models = [
-                'pauliSet_zJz_1J2_d2'
+                'pauliSet_1J2_xJx_d2+pauliSet_zJz_1J2_d2',
+                'pauliSet_1J2_yJy_d2+pauliSet_zJz_1J2_d2',
+                'pauliSet_1J2_xJx_d2+pauliSet_zJz_1J2_d2'
+            ]
+        elif self.spawn_step == 2:
+            new_models = [
+                'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_zJz_1J2_d2'
             ]
             self.spawn_stage.append('Complete')
         return new_models

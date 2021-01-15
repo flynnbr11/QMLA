@@ -2,10 +2,8 @@ import numpy as np
 import itertools
 import sys
 import os
-import pandas as pd
 
 from qmla.exploration_strategies import exploration_strategy
-import qmla.shared_functionality.qinfer_model_interface
 
 class ExampleBasic(
     exploration_strategy.ExplorationStrategy

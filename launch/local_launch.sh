@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locallycurrently
 ###############
 
-exploration_strategy="ExampleBasic"
+exploration_strategy="ExplorationStrategyTemplate"
 
 alt_exploration_strategies=(
     # 'IsingLatticeSet'

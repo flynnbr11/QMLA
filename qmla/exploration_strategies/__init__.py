@@ -1,4 +1,5 @@
 from qmla.exploration_strategies.exploration_strategy import * 
+from qmla.exploration_strategies.template import *
 
 from qmla.exploration_strategies.nv_centre_spin_characterisation import * 
 from qmla.exploration_strategies.lattice_sets import * 
