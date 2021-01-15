@@ -597,8 +597,11 @@ class QuantumModelLearningAgent():
                 # send model-learning, as task to job queue
                 queued_model = queue.enqueue(
                     remote_learn_model_parameters,
-                    model_name,
-                    model_id,
+                    result_ttl=-1,
+                    # ttl = -1, 
+                    timeout=self.rq_timeout,
+                    name=model_name,
+                    model_id=model_id,
                     exploration_rule=self.branches[branch_id].exploration_strategy,
                     branch_id=branch_id,
                     remote=True,
@@ -606,9 +609,6 @@ class QuantumModelLearningAgent():
                     port_number=self.redis_port_number,
                     qid=self.qmla_id,
                     log_file=self.rq_log_file,
-                    result_ttl=-1,
-                    ttl = -1, 
-                    # timeout=self.rq_timeout
                 )
                 self.log_print(
                     ["Model {} on rq job {}".format(model_id, queued_model)])
@@ -714,6 +714,9 @@ class QuantumModelLearningAgent():
             # the function object is the first argument to RQ enqueue function
             job = queue.enqueue(
                 remote_bayes_factor_calculation,
+                result_ttl=-1,
+                # ttl = -1, 
+                timeout=self.rq_timeout,
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
                 branch_id=branch_id,
@@ -725,9 +728,6 @@ class QuantumModelLearningAgent():
                 port_number=self.redis_port_number,
                 qid=self.qmla_id,
                 log_file=self.rq_log_file,
-                result_ttl=-1,
-                ttl = -1, 
-                # timeout=self.rq_timeout
             )
             self.log_print([
                 "Bayes factor calculation queued. Models {}/{}".format(
