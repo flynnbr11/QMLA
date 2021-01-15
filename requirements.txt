@@ -1,10 +1,7 @@
-# Python packages
-
 numpy==1.15.2
 packaging==20.1
 pandas==0.20.3
 scipy==1.1.0
-
 argparse==1.1
 QInfer==1.0
 autopep8==1.5
@@ -30,6 +27,6 @@ seaborn==0.9.0
 sklearn==0.0
 Sphinx==1.7.0
 lfig
-expm
+# expm
 
 # redis also required
