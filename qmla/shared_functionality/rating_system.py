@@ -294,15 +294,16 @@ class RatingSystem():
         ratings_df, 
         target_model_id, 
         return_df=False, 
+        return_lf=None, 
         save_to_file=None
     ):
-
         # First isolate the ratings for this model
         model_identifiers = ["a", "b"]
         ratings_of_single_model = pd.DataFrame(
             columns=[
                 'target', 'opponent', 
                 'initial_rating_target', 'initial_rating_opponent', 
+                'f_score_target', 'f_score_opponent', 
                 'delta_r_target', 'final_rating_target',
                 'idx', 
                 'bayes_factor', 'generation', 'weight'
@@ -318,6 +319,8 @@ class RatingSystem():
                     'model_{}'.format(opponent),
                     'r_{}_initial'.format(target),
                     'r_{}_initial'.format(opponent),
+                    'f_score_{}'.format(target), 
+                    'f_score_{}'.format(opponent),
                     'delta_r_{}'.format(target),
                     'r_{}_new'.format(target),
                     'idx',
@@ -334,6 +337,8 @@ class RatingSystem():
                     'model_{}'.format(opponent) : 'opponent', 
                     'r_{}_initial'.format(target) : 'initial_rating_target',
                     'r_{}_initial'.format(opponent) : 'initial_rating_opponent', 
+                    'f_score_{}'.format(target) : 'f_score_target', 
+                    'f_score_{}'.format(opponent) : 'f_score_opponent',
                     'r_{}_new'.format(target) : 'final_rating_target',
                     'delta_r_{}'.format(target) : 'delta_r_target'
                 }, 
@@ -343,111 +348,182 @@ class RatingSystem():
             ratings_of_single_model = ratings_of_single_model.append(target_ratings, ignore_index=True)
 
         ratings_of_single_model['won_comparison'] = (ratings_of_single_model.winner == ratings_of_single_model.target)
+        ratings_of_single_model.won_comparison.replace({True: "Won", False : "Lost"}, inplace=True)
         ratings_of_single_model.sort_values('idx', inplace=True)
         ratings_of_single_model['new_idx'] = list(range(len(ratings_of_single_model)))
-        
+
         # Plot 3 perspectives on this data:
         # 1. How rating changes
         # 2. relative change per comparison
         # 3. strength of evidence each comparison
-        
-        fig = plt.figure(
-            figsize=(15, 10),
-            constrained_layout=True,
+
+        plots_to_include = [
+            "ratings_progress", 
+            "delta_r", 
+            "bf"
+        ]
+        include_f_ax = True
+
+        lf = LatexFigure(
+            fraction=0.9, 
+            use_gridspec=True, 
+            gridspec_layout=(len(plots_to_include),1),
+            gridspec_params = {
+                'height_ratios' : [0.35, 0.95, 0.35]
+            }
         )
-        gs = GridSpec(
-            nrows=3,
-            ncols=1,
-            hspace=0.2,
-        )
+
+        if "bf" in plots_to_include:
+
+            # Bayes factor comparisons
+            ax2 = lf.new_axis()
+            sns.barplot(
+                data = ratings_of_single_model, 
+                y = 'weight', 
+                x = 'new_idx',
+                hue='won_comparison',
+                palette = {"Won" : "green", "Lost" : "purple"},
+                dodge=False, 
+                ax = ax2
+            )
+            ax2.legend(title=None, loc="upper left")
+            ax2.set_ylabel(r"$\left| \log_{10}(B_{ij}) \right|$")
+
+            generations = ratings_of_single_model.generation.unique()
+            generation_change_indices = {
+                g : ratings_of_single_model[
+                    ratings_of_single_model.generation == g].new_idx.max() + 0.5
+                for g in generations
+            }
+
 
         # Actual ratings
-        ax0 = plt.subplot(gs[0])
-        sns.lineplot(
-            data = ratings_of_single_model, 
-            x = 'new_idx', 
-            y = 'initial_rating_target',
-            label='Initial',
-            color='grey',
-            ax = ax0,
-        )
+        if "ratings_progress" in plots_to_include:
+            ax0 = lf.new_axis(
+                ax_params = {'sharex' : ax2}
+            )
+            sns.scatterplot(
+                data = ratings_of_single_model, 
+                x = 'new_idx', 
+                y = 'initial_rating_target',
+                label=r"$\hat{H}_i$ \ before",
+                color='green',
+                marker='x', 
+                s = 50,
+                ax = ax0,
+            )
 
-        sns.lineplot(
-            data = ratings_of_single_model, 
-            x = 'new_idx', 
-            y = 'final_rating_target', 
-            label='Final',
-            color = 'blue', 
-            ax = ax0
-        )
+            sns.lineplot(
+                data = ratings_of_single_model, 
+                x = 'new_idx', 
+                y = 'final_rating_target', 
+                label=r"$\hat{H}_i$ \ after",
+                color = 'green', 
+                ax = ax0
+            )
 
-        sns.scatterplot(
-            data = ratings_of_single_model, 
-            x = 'new_idx', 
-            y = 'initial_rating_opponent',
-            label='Opponent', 
-            ax = ax0, 
-        )
-        ax0.legend()
-        ax0.set_ylabel('Rating')
-        ax0.set_xticks([])
-        ax0.set_xlabel("")
+            sns.scatterplot(
+                x = 'new_idx', 
+                y = 'initial_rating_opponent',
+                data = ratings_of_single_model, 
+                label=r"$\hat{H}_j$", 
+                color = 'purple',
+                marker = '+',
+                s = 50, 
+                ax = ax0, 
+            )
+            ax0.legend()
+            ax0.set_ylabel('Rating')
+            ax0.set_xticks([])
+            ax0.set_xlabel("")
+            ax0.legend(title="Ratings", loc="upper left", ncol=3)
 
-        # Change in rating R
-        ax1 = plt.subplot(gs[1], sharex = ax0)
-        sns.barplot(
-            data = ratings_of_single_model, 
-            y = 'delta_r_target', 
-            x = 'new_idx',
-            hue='won_comparison',
-            palette=['red', 'green'],
-            ax = ax1
-        )
-        ax1.set_ylabel(r"$\Delta R$")
-        ax1.set_xticks([])
-        ax1.set_xlabel("")
-        ax1.get_legend().remove()
+        if include_f_ax:
+            f_score_ax = ax0.twinx()
+            sns.scatterplot(
+                x = 'new_idx', 
+                y = 'f_score_opponent',
+                data = ratings_of_single_model, 
+                label = r"$\hat{H}_j$",
+                marker = 'd',
+                s = 50, 
+                color = 'purple',
+                ax = f_score_ax, 
+            )
+            target_f_score = ratings_of_single_model.f_score_target.values[0]
+            f_score_ax.axhline(
+                target_f_score, 
+                color = 'green', 
+                ls = '--', 
+                label = r"$\hat{H}_i$",
+            )
+            f_score_ax.set_ylabel(r"$F_1$-score")
 
-        # Bayes factor comparisons
-        ax2 = plt.subplot(gs[2], sharex = ax0)
-        sns.barplot(
-            data = ratings_of_single_model, 
-            y = 'weight', 
-            x = 'new_idx',
-            hue='won_comparison',
-            palette=['red', 'green'],
-            ax = ax2
-        )
-        ax2.legend(title='Won')
-        ax2.set_ylabel(r"$log_{10}(BF)$")
+            f_score_ax.legend(
+                title=r"$F_1$-score",
+                loc="lower left",
+                ncol=2
+            )
+            f_score_ax.set_ylim(-0.1,1.1)
+            f_score_ax.set_yticks([0, 0.5, 1])    
 
-        generations = ratings_of_single_model.generation.unique()
-        print("Generations:", generations)
-        generation_change_indices = {
-            g : ratings_of_single_model[
-                ratings_of_single_model.generation == g].new_idx.max() + 0.5
-            for g in generations
-        }
 
-        # vertical lines separating generations
-        for ax in [ax0, ax1, ax2]:
-            for g in generation_change_indices.values():
-                ax.axvline(g,ls='--', c='grey', alpha=0.6, )
+        if "delta_r" in plots_to_include:
+            ax1 = lf.new_axis(
+                ax_params = {'sharex' : ax2}
+            )
+            sns.barplot(
+                data = ratings_of_single_model, 
+                y = 'delta_r_target', 
+                x = 'new_idx',
+                hue='won_comparison',
+                palette = {"Won" : "green", "Lost" : "purple"},
+                dodge=False, 
+                ax = ax1
+            )
+            ax1.set_ylabel(r"$\Delta R_i$")
+            ax1.set_xticks([])
+            ax1.set_xlabel("")
+            ax1.get_legend().remove()
 
-        # label x-axis with generations
-        xtick_locations = [generation_change_indices[g] for g in generations]
-        xtick_locations.insert(0,0)
-        centred_xticks = [ 
-            np.mean([xtick_locations[i], xtick_locations[i+1] ]) 
-            for i in range(len(xtick_locations)-1) 
-        ]
-        ax2.set_xticklabels(generations)
-        ax2.set_xticks(centred_xticks)
-        ax2.set_xlabel("Generation")
 
-        if save_to_file is not None: 
-            fig.savefig(save_to_file)
-        
+
+
+        for ax in lf.gridspec_axes.values():
+            ax.set_xlabel("")
+            ax.set_xticks([])
+
+        bottom_ax = lf.gridspec_axes[(lf.num_rows-1, 0)]
+        if len(generations) > 1:
+            # vertical lines separating generations
+            for ax in lf.gridspec_axes.values():
+                for g in generation_change_indices.values():
+                    ax.axvline(g,ls='--', c='grey', alpha=0.6, )
+
+            # label x-axis with generations
+            xtick_locations = [generation_change_indices[g] for g in generations]
+            xtick_locations.insert(0,0)
+            centred_xticks = [ 
+                np.mean([xtick_locations[i], xtick_locations[i+1] ]) 
+                for i in range(len(xtick_locations)-1) 
+            ]
+
+
+            bottom_ax.set_xticklabels(generations)
+            bottom_ax.set_xticks(centred_xticks)
+            bottom_ax.set_xlabel("Generation")
+        else:
+            bottom_ax.set_xticks(
+                range(len(ratings_of_single_model['new_idx'])),
+            )
+            bottom_ax.set_xticklabels(
+                range(1, 1+len(ratings_of_single_model['new_idx']))
+            )
+            bottom_ax.set_xlabel("Comparison")
+
+            
+        if save_to_file is not None:
+            lf.save(save_to_file)    
         if return_df:
             return ratings_of_single_model
 

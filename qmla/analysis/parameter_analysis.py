@@ -3,9 +3,11 @@ import sys
 import os
 import copy 
 
+import glob
 import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
+import lfig 
 
 import qmla.get_exploration_strategy
 import qmla.construct_models
@@ -16,7 +18,8 @@ __all__ = [
     'average_parameters_across_instances',
     'average_parameter_estimates',
     'cluster_results_and_plot',
-    'plot_parameter_estimates'
+    'plot_parameter_estimates',
+    'plot_terms_and_parameters'
 ]
 
 def rank_models(n): 
@@ -941,3 +944,79 @@ def plot_parameter_estimates(
             bbox_inches='tight'
         )
     # print("[pQMD] complete")
+
+
+# Terms and paramters together
+def plot_terms_and_parameters(results_path, save_to_file=None):
+    storage_instances = glob.glob(results_path +'/' + 'storage*')
+
+    all_learned_params = {}
+
+    for s in storage_instances:
+        storage = pickle.load(
+            open(os.path.join(s), "rb")
+        )
+        learned_params = storage.LearnedParameters
+
+        for p in learned_params:
+            if p not in all_learned_params:
+                all_learned_params[p] = [learned_params[p]]
+            else:
+                all_learned_params[p].append(learned_params[p])
+
+
+    run_info = pickle.load(open(os.path.join(results_path, "run_info.p"), "rb"))
+    exploration_strategy = qmla.get_exploration_strategy.get_exploration_class(run_info['exploration_rule'])
+    true_params = run_info['params_dict']
+
+    # Draw figure
+    lf = lfig.LatexFigure(
+        fraction = 1, 
+        auto_gridspec = len(all_learned_params),
+        gridspec_params = {'wspace' : 0.15, 'hspace' : 0.3}
+    )
+    params = sorted(all_learned_params.keys())
+    for p in params:
+        ax = lf.new_axis()
+
+        param_occurences = all_learned_params[p]
+        label = r"$\hat{{t}} \in \hat{{H}}^{{\prime}}$"
+
+        ax.hist(
+            param_occurences,
+            color = 'grey',
+            label = label
+        )
+
+        # median
+        param_median = np.round(np.median(param_occurences), 1)
+        ax.axvline(
+            param_median, 
+            color = 'blue', 
+            ls=':',
+            label = r"$\bar{{ \alpha^{{\prime}} }}$"
+        )
+
+        if p in true_params:
+            true_p = np.round(true_params[p], 1)
+            ax.axvline(
+                true_p, 
+                color='red', 
+                ls='--', 
+                label = r"$\alpha_0$"
+            )
+
+        ax.set_title(
+            exploration_strategy.latex_name(p)
+        )
+        if ax.row == 0 and ax.col == 0 :
+            ax.legend(
+                bbox_to_anchor=(0.75, 1.25), 
+                ncol=3
+            )
+
+    lf.fig.text(0.5, 0.04, r"Parameter ($\alpha$) value", ha='center', )
+    lf.fig.text(0.04, 0.5, "Number  occurences", va='center', rotation='vertical',)
+    
+    if save_to_file is not None:
+        lf.save(save_to_file)

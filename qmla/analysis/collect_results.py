@@ -76,72 +76,10 @@ def collect_results_store_csv(
     return collected_results
 
 
-
-# def _generate_combined_datasets(
-#     directory_name,
-#     results_file_name_start="results",
-#     results_csv_name="results.csv", 
-# ):
-#     r""" DEPRECATED"""
-
-#     pickled_files = []
-#     for file in os.listdir(directory_name):
-#         # TODO unload storage objects instead??
-#         # then could pickle more e.g. pd DataFrames directly
-#         if (
-#             file.endswith(".p")
-#             and
-#             file.startswith(results_file_name_start)
-#         ):
-#             pickled_files.append(file)
-#     filenames = [directory_name + str(f) for f in pickled_files]
-
-#     # datasets to store
-#     fitness_correlations = pd.DataFrame()
-
-#     for f in filenames:
-#         result = pickle.load(open(f, 'rb'))
-#         result_id = result['QID']
-
-#         try:
-#             correlations = pd.DataFrame(result['ExplorationStrategyStorageData']['fitness_correlations'])
-#             correlations['qmla_id'] = result_id
-#             fitness_correlations = fitness_correlations.append(
-#                 correlations, 
-#                 ignore_index = True
-#             )
-#         except:
-#             raise
-#             pass
-
-
-#     try:
-#         fitness_correlations.to_csv(
-#             os.path.join(directory_name, 'fitness_method_correlations.csv')
-#         )
-#         fig = sns.catplot(
-#             y  = 'Correlation', 
-#             x = 'Method',
-#             data = fitness_correlations,
-#             kind='box'
-#         )
-#         fig.savefig(
-#             os.path.join(
-#                 directory_name, "fitness_f_score_correlations.png"
-#             )
-#         )
-#     except:
-#         print("ANALYSIS FAILURE: fitness method  &  score correlations")
-#         raise
-#         # pass
-
 def generate_combined_datasets(
     directory_name, # where storage results are
     combined_datasets_directory, # where to save datasets
 ):
-    # combined_datasets_directory = os.path.join(
-    #     directory_name, 'combined_datasets'
-    # )
     if not os.path.exists(combined_datasets_directory):
         try:
             os.makedirs(combined_datasets_directory)

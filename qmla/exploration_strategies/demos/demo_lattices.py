@@ -14,6 +14,9 @@ import qmla.shared_functionality.topology_predefined as topologies
 class DemoLattice(
     exploration_strategy.ExplorationStrategy
 ):
+    r"""
+    Demo of how lattices can be incorporated in the ES. 
+    """
     def __init__(
         self,
         exploration_rules,
@@ -107,7 +110,9 @@ class DemoLattice(
         )
         
 class DemoIsing(DemoLattice):
-    
+    r"""
+    Demo of lattices where the Ising formalism is used to define the true and considered models. 
+    """
     def __init__(
         self,
         exploration_rules,
@@ -133,8 +138,6 @@ class DemoIsing(DemoLattice):
             "pauliLikewise_lz_1J2_1J3_2J3_d3" : 0.8
         }
         self.tree_completed_initially = True
-
-    
 
     def latex_name(
         self,

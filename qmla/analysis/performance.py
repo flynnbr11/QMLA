@@ -395,7 +395,7 @@ def plot_statistics(
         else:
             ax = top_ax
             top_labels.append(dataset['title'])
-            if dataset['title'] == '# Wins':
+            if dataset['title'] == 'Number Wins':
                 top_colour = colours[to_plot.index(dataset)]
                 this_width = 1 * width
                 alpha = 1.0
@@ -663,8 +663,8 @@ def plot_scores(
         # Line2D([0], [0], color='black', lw=4, ls='--'),
     ]
     custom_handles = [
-        'True ({}%)'.format(int(correct_success_rate)),
-        'True/Close ({}%)'.format(int(batch_success_rate)),
+        r'True ({}$\%$)'.format(int(correct_success_rate)),
+        r'True/Close ({}$\%$)'.format(int(batch_success_rate)),
         'Other',
         # '$R^2$'
     ]
@@ -799,7 +799,7 @@ def stat_metrics_histograms(
             "Champions' {}".format(plotting_data['name'])
         )
         ax.set_xlabel(plotting_data['name'])
-        ax.set_ylabel('# Champions')
+        ax.set_ylabel('Number Champions')
         plot_col += 1
     if save_to_file is not None: 
         plt.savefig(save_to_file)
@@ -1139,7 +1139,7 @@ def plot_evaluation_log_likelihoods(
         ax = fig.add_subplot(gs[n_plots, 0])
         n_plots += 1
         ax.set_ylabel('Percentile of champion')
-        ax.set_xlabel('# Champions')
+        ax.set_xlabel('Number Champions')
         ax.set_title('(True) Champion models percentile log likelihood')
 
         

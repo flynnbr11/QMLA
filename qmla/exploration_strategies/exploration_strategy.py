@@ -388,7 +388,6 @@ class ExplorationStrategy():
             Whether to store the covariance matrix at the end of every experiment. 
             In general it is unnecessary to store. 
         
-
         """
 
         # Tree development

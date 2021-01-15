@@ -2686,6 +2686,12 @@ class QuantumModelLearningAgent():
     def plot_instance_outcomes(
         self, 
     ):
+        r"""
+        Generate plots corresponding to this instance. 
+
+        A number of plotting routines are called, depending on the plot_level 
+        set by the user at launch. 
+        """
         self.log_print([
             "Plotting instance outcomes"
         ])
@@ -3287,11 +3293,6 @@ class QuantumModelLearningAgent():
         ax.set_ylabel('Model ID', fontsize=2*fontsize)
         ax.set_xlabel('Term')
 
-        # fig.savefig(
-        #     os.path.join(
-        #         self.qmla_controls.plots_directory, "composition_of_models.png"
-        #     )
-        # )
         lf.save(
             os.path.join(
                 self.qmla_controls.plots_directory, "composition_of_models.png"

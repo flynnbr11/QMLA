@@ -514,7 +514,7 @@ def volume_average(
         )
         ax.legend(
             bbox_to_anchor=(1.0, 0.9),
-            title='Model (# instances)'
+            title='Model (number instances)'
         )
     plt.semilogy()
     plt.xlabel('Epoch')

@@ -619,6 +619,7 @@ class Genetic(
             2 : [
                 self.plot_correlation_fitness_with_f_score,
                 self.plot_fitness_v_fscore_by_generation,
+                self._plot_gene_pool_progression,
             ], 
             3 : [
                 self.plot_fitness_v_fscore,
@@ -635,7 +636,7 @@ class Genetic(
             6 : [], 
         }
         self.log_print([
-            "Plotting methods:", plot_methods
+            "Plotting methods:", plot_methods_by_level
         ])
 
         for pl in range(self.plot_level + 1):
@@ -649,37 +650,39 @@ class Genetic(
                             "plot failed {} with exception: {}".format(method.__name__, e)
                         ])
 
-        try:
-            self.ratings_class.plot_models_ratings_against_generation(
-                f_scores = self.model_f_scores, 
-                save_directory = self.save_directory,
-                f_score_cmap=self.f_score_cmap
-            )
-        except Exception as e:
-            self.log_print([
-                "plot failed plot_models_ratings_against_generation with error ", e
-            ])
-
-        try:
-            self.ratings_class.plot_rating_progress_single_model(
-                target_model_id = champion_model_id,
-                save_to_file  = os.path.join(
-                    self.save_directory, 
-                    "ratings_progress_champion.png"
+        # Plots that need arguments so are called individually
+        if self.plot_level >= 2:
+            try:
+                self.ratings_class.plot_models_ratings_against_generation(
+                    f_scores = self.model_f_scores, 
+                    save_directory = self.save_directory,
+                    f_score_cmap=self.f_score_cmap
                 )
-            )
-            if true_model_id != -1 and true_model_id != champion_model_id:
+            except Exception as e:
+                self.log_print([
+                    "plot failed plot_models_ratings_against_generation with error ", e
+                ])
+
+            try:
                 self.ratings_class.plot_rating_progress_single_model(
-                    target_model_id = true_model_id,
+                    target_model_id = champion_model_id,
                     save_to_file  = os.path.join(
-                        save_directory, 
-                        "ratings_progress_true_model.png"
+                        self.save_directory, 
+                        "ratings_progress_champion.png"
                     )
                 )
-        except Exception as e:
-            self.log_print([
-                "plot failed plot_rating_progress_single_model with error ", e
-            ])
+                if true_model_id != -1 and true_model_id != champion_model_id:
+                    self.ratings_class.plot_rating_progress_single_model(
+                        target_model_id = true_model_id,
+                        save_to_file  = os.path.join(
+                            save_directory, 
+                            "ratings_progress_true_model.png"
+                        )
+                    )
+            except Exception as e:
+                self.log_print([
+                    "plot failed plot_rating_progress_single_model with error ", e
+                ])
 
     def plot_correlation_fitness_with_f_score(
         self,
@@ -1048,6 +1051,67 @@ class Genetic(
 
         fig.savefig(save_to_file)
 
+    def _plot_gene_pool_progression(
+        self, 
+    ):
+        lf = LatexFigure()
+        ax = lf.new_axis()
+        gene_pool = self.genetic_algorithm.gene_pool
+        gene_pool.sort_values('f_score', inplace=True, ascending=False)
+
+        self.gene_pool_progression(
+            gene_pool = gene_pool,
+            ax = ax, 
+            f_score_cmap = self.f_score_cmap,
+        )
+        lf.save(
+            save_to_file = os.path.join(
+                self.save_directory, 
+                'gene_pool_progression.png'
+            )
+        )
+
+    @staticmethod
+    def gene_pool_progression(gene_pool, ax, f_score_cmap=None, draw_cbar=True, cbar_ax=None):
+        if f_score_cmap is None:
+            f_score_cmap = matplotlib.cm.RdBu
+        num_models_per_generation = len(gene_pool[gene_pool.generation == 1])
+        num_generations = gene_pool.generation.nunique()
+        f_scores_of_gene_pool = np.empty((num_models_per_generation, num_generations))
+        for g in gene_pool.generation.unique():
+
+            f_scores_by_gen = gene_pool[
+                gene_pool.generation == g
+            ].f_score
+
+            f_scores_of_gene_pool[:, g-1] = f_scores_by_gen
+
+        sns.heatmap(
+            f_scores_of_gene_pool,
+            cmap = f_score_cmap,
+            vmin = 0, 
+            vmax=1,
+            ax = ax,
+            cbar=draw_cbar, 
+            cbar_kws = dict(
+                label=r"$F_1$-score",
+                aspect=25, 
+                ticks=[0,0.5,1],
+            )
+        )
+        ax.set_yticks([])
+        xtick_pos = range(5, num_generations+1, 5)
+        ax.set_xticks([g-0.5 for g in xtick_pos])
+        ax.set_xticklabels(
+            xtick_pos
+        )
+        ax.set_xlabel('Generation')
+
+        if cbar_ax is not None:
+            cbar = ax.collections[0].colorbar
+            cbar.ax.set_ylabel(r"$F_1$", rotation=0, labelpad=10) # if F horizontal
+            cbar.ax.yaxis.set_label_position("right", )
+            cbar.ax.tick_params(labelleft=True, labelright=False )
 
 
 

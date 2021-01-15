@@ -613,16 +613,18 @@ class ModelInstanceForLearning():
         self.log_print([
             "Plotting instance outcomes"
         ])
+        self._plot_preliminary_preparation()
 
         plot_methods_by_level = {
             3 : [
+                self._plot_learning_summary, 
                 self._plot_dynamics,
             ],
             4 : [
                 self._plot_distributions, 
             ],
             5 : [
-                self._plot_preliminary_preparation,
+                # nothing at this level
             ],
             6 : [
                 self._plot_posterior_mesh_pairwise,

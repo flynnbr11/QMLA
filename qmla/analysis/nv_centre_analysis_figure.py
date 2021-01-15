@@ -31,18 +31,18 @@ title_padding = fig_base_size / 4
 
 
 
-title_font = {'fontname':'Microsoft Sans Serif', 'size':str(2*plot_mainfontsize), 'color':'black', 'weight':'normal'} 
-axis_font = {'fontname':'Microsoft Sans Serif', 'size': str(2*plot_mainfontsize), 'color':'black', 'weight':'normal'} 
-ticks_font = {'fontname':'Microsoft Sans Serif', 'size':str(2*plot_mainfontsize)} 
-legend_font = {'fontname':'Microsoft Sans Serif', 'fontsize':str(2*plot_mainfontsize)} 
-caption_font = {'fontname':'Microsoft Sans Serif', 'fontsize':str(1.8*plot_mainfontsize), 'weight': 'bold'} 
-inset_caption_font = {'fontname':'Microsoft Sans Serif', 'fontsize':str(1.8*plot_mainfontsize), 'weight': 'normal'} 
+title_font = {'fontname':'Times', 'size':str(2*plot_mainfontsize), 'color':'black', 'weight':'normal'} 
+axis_font = {'fontname':'Times', 'size': str(2*plot_mainfontsize), 'color':'black', 'weight':'normal'} 
+ticks_font = {'fontname':'Times', 'size':str(2*plot_mainfontsize)} 
+legend_font = {'fontname':'Times', 'fontsize':str(2*plot_mainfontsize)} 
+caption_font = {'fontname':'Times', 'fontsize':str(1.8*plot_mainfontsize), 'weight': 'bold'} 
+inset_caption_font = {'fontname':'Times', 'fontsize':str(1.8*plot_mainfontsize), 'weight': 'normal'} 
 legend_fontsize = 1.5*plot_mainfontsize
 axis_label_padding = fig_base_size
 
 rcParams['xtick.direction'] = 'in'
 rcParams['ytick.direction'] = 'in'
-rc('font', family = 'Microsoft Sans Serif')
+rc('font', family = 'Times')
 rc('xtick', labelsize=plot_mainfontsize) 
 rc('ytick', labelsize=plot_mainfontsize) 
 rcParams['legend.title_fontsize'] = legend_fontsize
@@ -360,7 +360,7 @@ def model_wins_and_occurences_by_f_score(
     #         int(0.5*(10**math.floor(np.log10(ax.get_xlim()[1]))))
     #     )
     # ])
-    champ_ax.set_xlabel('# champions', **axis_font)
+    champ_ax.set_xlabel('Number champions', **axis_font)
     champ_ax.legend(fontsize=legend_fontsize, loc='upper right')
 
     legend_elements = [

@@ -1,3 +1,8 @@
+r"""
+    This is an initial effort towards using decorators with exploration strategies, 
+    which is incomplete and not currently in use anywhere. 
+"""
+
 
 class ExplorationStrategyDecorator():
     def __init__(self, exploration_strategy, **kwargs):

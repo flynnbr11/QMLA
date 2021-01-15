@@ -254,7 +254,7 @@ precision = {
     'range': 'cap_1',
 }
 wins = {
-    'title': '# Wins',
+    'title': 'Number Wins',
     'res': [model_score_results['wins'][m] for m in models],
     'range': 'uncapped',
 }
@@ -366,6 +366,15 @@ except:
 #######################################
 # Parameter analysis
 #######################################
+
+try:
+    qmla.analysis.plot_terms_and_parameters(
+        results_path = directory_to_analyse, 
+        save_to_file = os.path.join(directory_to_analyse, "champion_models", "terms_and_params.pdf")
+    )
+except Exception as e:
+    print("ANALYSIS FAILURE {} with exception {}".format(plot_terms_and_parameters, e))
+
 try:
     # Get average parameters of champion models across instances
     average_priors = qmla.analysis.average_parameters_across_instances(
@@ -609,6 +618,7 @@ except Exception as e:
     print("ANAYSIS FAILURE: {} with exception {}".format(
         "volume_average", e
     ))
+    pass
 
 try:
     qmla.analysis.all_times_learned_histogram(

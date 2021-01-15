@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # shutdown redis in case it is still active from previous run and start it fresh
-redis-cli shutdown 
-~/redis-4.0.8/src/redis-server ../qmla/RedisDatabaseConfig.conf --protected-mode no --port 6379 & 
+# redis-cli shutdown 
+# ~/redis-4.0.8/src/redis-server ../qmla/RedisDatabaseConfig.conf --protected-mode no --port 6379 & 
 
 ###############
 # QMLA run configuration
@@ -16,7 +16,7 @@ prt=20 # number of particles
 ###############
 # QMLA settings - user
 ###############
-plot_level=3
+plot_level=5
 debug_mode=0
 
 ###############
@@ -36,12 +36,12 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locallycurrently
 ###############
 
-exploration_strategy="HeisenbergLatticeSet"
+exploration_strategy="ExampleES"
 
 alt_exploration_strategies=(
-    'IsingLatticeSet'
+    # 'IsingLatticeSet'
     # 'HeisenbergLatticeSet'
-    'HubbardReducedLatticeSet'
+    # 'HubbardReducedLatticeSet'
     # 'GeneticTest'
 )
 
@@ -235,4 +235,4 @@ then
     # sh $further_analysis_script
 fi
 
-redis-cli shutdown
+# redis-cli shutdown

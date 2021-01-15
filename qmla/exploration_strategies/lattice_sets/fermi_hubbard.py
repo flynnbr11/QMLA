@@ -3,7 +3,6 @@ import itertools
 import sys
 import os
 
-from qmla.exploration_strategies import connected_lattice, exploration_strategy
 from qmla.exploration_strategies.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names

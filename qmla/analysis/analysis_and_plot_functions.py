@@ -972,7 +972,7 @@ def plot_quadratic_loss(
         to_plot_quad_loss = [qmd.true_model_id]
         plot_title = str('Quadratic Loss for True operator (from QHL)')
     elif champs_or_all == 'champs':
-        to_plot_quad_loss = qmd.branch_champions.values()
+        to_plot_quad_loss = qmd.branch_champions
         plot_title = str('Quadratic Loss for Branch champions')
     else:
         to_plot_quad_loss = qmd.model_name_id_map.keys()
@@ -1038,3 +1038,5 @@ def plot_volume_after_qhl(
     plt.legend()
     if save_to_file is not None:
         plt.savefig(save_to_file, bbox_inches='tight')
+
+
