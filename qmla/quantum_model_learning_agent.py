@@ -589,7 +589,7 @@ class QuantumModelLearningAgent():
                 queue = rq.Queue(
                     self.qmla_id,
                     connection=self.redis_conn,
-                    async=self.use_rq,
+                    is_async=self.use_rq,
                     default_timeout=self.rq_timeout
                 )
                 self.log_print(["Redis queue object:", queue,
@@ -707,7 +707,7 @@ class QuantumModelLearningAgent():
             # launch remotely
             from rq import Connection, Queue, Worker
             queue = Queue(self.qmla_id, connection=self.redis_conn,
-                          async=self.use_rq, default_timeout=self.rq_timeout
+                          is_async=self.use_rq, default_timeout=self.rq_timeout
                           )
 
             # the function object is the first argument to RQ enqueue function
