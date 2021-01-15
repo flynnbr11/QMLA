@@ -25,7 +25,5 @@ scikit-learn==0.21.3
 seaborn==0.9.0
 sklearn==0.0
 Sphinx==1.7.0
+expm==0.1.5
 lfig
-expm=0.1.5
-
-# redis also required
