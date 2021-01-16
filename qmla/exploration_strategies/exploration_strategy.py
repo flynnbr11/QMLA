@@ -1303,9 +1303,9 @@ class ExplorationStrategy():
     ):
         self.save_directory = kwargs.pop("save_directory")
         self.champion_model_id = kwargs.pop("champion_model_id")
-        self.log_print(
-            ['No exploration strategy plots specified.']
-        )
+        self.qmla_id = kwargs['qmla_id']
+        self.plot_level = kwargs['plot_level']
+        self.figure_format = kwargs['figure_format']
 
     ##########
     # Section: Utilities

@@ -134,6 +134,7 @@ def average_parameter_estimates(
     true_params_dict=None,
     save_to_file=None,
     save_directory=None,
+    figure_format='png', 
     plot_prefix='', 
 ):
     r"""
@@ -302,7 +303,7 @@ def average_parameter_estimates(
                 save_directory, 
                 '{}params_{}'.format(plot_prefix, name)
             )
-            lf.save(save_file, file_format='pdf')
+            lf.save(save_file, file_format=figure_format)
 
 
 def cluster_results_and_plot(
@@ -891,7 +892,7 @@ def plot_parameter_estimates(
 
 
 # Terms and paramters together
-def plot_terms_and_parameters(results_path, save_to_file=None):
+def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="png"):
     storage_instances = glob.glob(results_path +'/' + 'storage*')
 
     all_learned_params = {}
@@ -963,4 +964,4 @@ def plot_terms_and_parameters(results_path, save_to_file=None):
     lf.fig.text(0.04, 0.5, "Number  occurences", va='center', rotation='vertical',)
     
     if save_to_file is not None:
-        lf.save(save_to_file)
+        lf.save(save_to_file, file_format=figure_format)

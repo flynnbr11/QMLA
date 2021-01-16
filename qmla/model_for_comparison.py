@@ -91,6 +91,7 @@ class ModelInstanceForComparison():
         self.plots_directory = qmla_core_info_dict['plots_directory']
         self.debug_mode = qmla_core_info_dict['debug_mode']
         self.plot_level = qmla_core_info_dict['plot_level']
+        self.figure_format = qmla_core_info_dict['figure_format']
 
         # Assign attributes based on core data
         self.num_experiments = qmla_core_info_dict['num_experiments']
@@ -239,6 +240,7 @@ class ModelInstanceForComparison():
                        for item in self.qinfer_model.expparams_dtype[1:]
             ],
             max_time_to_enforce=self.exploration_class.max_time_to_consider,
+            figure_format=self.figure_format
         )
 
         # Delete extra data now that everything useful is extracted

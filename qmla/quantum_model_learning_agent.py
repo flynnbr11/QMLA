@@ -445,6 +445,7 @@ class QuantumModelLearningAgent():
             'plots_directory': self.qmla_controls.plots_directory,
             'debug_mode' : self.debug_mode, 
             'plot_level' : self.plot_level, 
+            'figure_format' : self.qmla_controls.figure_format, 
             'long_id': self.qmla_controls.long_id,
             'model_priors': self.model_priors,  # could be path to unpickle within model?
             'experimental_measurements': self.experimental_measurements,
@@ -455,6 +456,7 @@ class QuantumModelLearningAgent():
             'num_probes': self.probe_number,  # from exploration strategy or unneeded,
             'run_info_file': self.qmla_controls.run_info_file,
         }
+        self.log_print(["QMLA settings figure_format:", self.qmla_settings['figure_format']])
 
         # Store qmla_settings and probe dictionaries on the redis database,
         # accessible by all workers.
@@ -2744,7 +2746,8 @@ class QuantumModelLearningAgent():
             qmla_id = self.qmla_controls.long_id,
             true_model_id = self.true_model_id, 
             champion_model_id = self.champion_model_id, 
-            plot_level = self.plot_level
+            plot_level = self.plot_level,
+            figure_format = self.qmla_controls.figure_format
         )
 
     def compute_statistical_metrics_by_generation(self):
@@ -2890,8 +2893,9 @@ class QuantumModelLearningAgent():
         lf.save(
             os.path.join(
                 self.qmla_controls.plots_directory,
-                'bayes_factors.png'.format(self.qmla_controls.long_id)
-            )
+                'bayes_factors'.format(self.qmla_controls.long_id)
+            ),
+            file_format=self.qmla_controls.figure_format
         )
 
         # Heat map BF against F(A)/F(B)
@@ -3297,8 +3301,9 @@ class QuantumModelLearningAgent():
 
         lf.save(
             os.path.join(
-                self.qmla_controls.plots_directory, "composition_of_models.png"
-            )
+                self.qmla_controls.plots_directory, "composition_of_models"
+            ),
+            file_format=self.qmla_controls.figure_format
         )
 
     def _plot_dynamics_all_models_on_branches(self, branches=None):

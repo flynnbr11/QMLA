@@ -122,6 +122,9 @@ class ControlsQMLA():
         self.pickle_qmla_instance = bool(arguments.pickle_qmla_instance)
         self.rq_timeout = arguments.rq_timeout
         self.plot_level = arguments.plot_level
+        self.figure_format = arguments.figure_format
+        self.log_print(["Figure format:", self.figure_format])
+
 
         # Redis
         self.host_name = arguments.host_name
@@ -320,6 +323,12 @@ def parse_cmd_line_args(args):
         help='Whether to pickle QMLA class used. Large memory requirement, recommend not to except during development.',
         type=int,
         default=0
+    )
+    parser.add_argument(
+        '-ff', '--figure_format',
+        help="Format of figures generated.",
+        type=str,
+        default="png"
     )
     parser.add_argument(
         '-log', '--log_file',

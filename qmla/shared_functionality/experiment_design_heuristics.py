@@ -89,6 +89,7 @@ class ExperimentDesignHueristic(qi.Heuristic):
         self._maxiters = maxiters
         self._oplist = oplist
         self._num_experiments = kwargs['num_experiments']
+        self._figure_format = kwargs["figure_format"]
         self._log_file = log_file
 
         # probe ID
@@ -241,7 +242,7 @@ class ExperimentDesignHueristic(qi.Heuristic):
 
         # Save figure
         self.log_print(["LatexFigure has size:", lf.size])
-        lf.save(save_to_file)
+        lf.save(save_to_file, file_format=self._figure_format)
 
 
     def _plot_suggested_times(self, ax, **kwargs):
@@ -902,7 +903,7 @@ class VolumeAdaptiveParticleGuessHeuristic(ExperimentDesignHueristic):
 
         # Save figure
         self.log_print(["LatexFigure has size:", lf.size])
-        lf.save(save_to_file)
+        lf.save(save_to_file, file_format=self._figure_format)
 
     def add_time_factor_change_points_to_ax(self, ax):
 

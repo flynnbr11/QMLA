@@ -7,7 +7,7 @@
 ###############
 # QMLA run configuration
 ###############
-num_instances=3
+num_instances=5
 run_qhl=0 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models.
 exp=5 # number of experiments
@@ -29,6 +29,7 @@ further_qhl_factor=1
 further_qhl_num_runs=$num_instances
 plots=0
 number_best_models_further_qhl=5
+figure_format="pdf"
 
 ###############
 # Choose an exploration strategy 
@@ -115,7 +116,8 @@ python3 ../../../../scripts/analyse_qmla.py \
     -es=$exploration_strategy \
     -plotprobes=$plot_probe_file \
     -latex=$latex_mapping_file \
-    -gs=1
+    -gs=1 \
+    -ff=$figure_format
 
 python3 ../../../../scripts/generate_results_pdf.py \
     -t=$num_instances \
@@ -161,6 +163,7 @@ do
         -sysmeas=$system_measurements_file \
         -plotprobes=$plot_probe_file \
         -latex=$latex_mapping_file \
+        -ff=$figure_format \
         -es=$exploration_strategy \
         $exploration_strategies_command \
         > $this_run_directory/output.txt

@@ -605,10 +605,12 @@ class Genetic(
         true_model_id,
         qmla_id=0, 
         plot_level=2, 
+        figure_format="png", 
         **kwargs
     ):
         self.qmla_id = qmla_id
         self.plot_level = plot_level
+        self.figure_format = figure_format
         self.log_print(["genetic alg plots"])
         super().exploration_strategy_specific_plots(
             **kwargs
@@ -867,10 +869,10 @@ class Genetic(
         if save_to_file is None: 
             save_to_file = os.path.join(
                 self.save_directory, 
-                'ratings.png'.format(self.qmla_id)
+                'ratings'.format(self.qmla_id)
             )
 
-        lf.save(save_to_file)
+        lf.save(save_to_file, file_format=self.figure_format)
 
     def plot_fitness_v_fscore(self, save_to_file=None):
         plt.clf()
@@ -1007,9 +1009,9 @@ class Genetic(
         if save_to_file is None:
             save_to_file = os.path.join(
                 self.save_directory, 
-                'selection_probabilities.png'
+                'selection_probabilities'
             )
-        lf.save(save_to_file)
+        lf.save(save_to_file, figure_format=self.figure_format)
 
 
     def plot_generational_metrics(self, save_to_file=None):
@@ -1067,8 +1069,9 @@ class Genetic(
         lf.save(
             save_to_file = os.path.join(
                 self.save_directory, 
-                'gene_pool_progression.png'
-            )
+                'gene_pool_progression'
+            ),
+            file_format=self.figure_format
         )
 
     @staticmethod

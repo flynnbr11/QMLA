@@ -167,6 +167,7 @@ class ModelInstanceForLearning():
         self.plots_directory = qmla_core_info_dict['plots_directory']
         self.debug_mode = qmla_core_info_dict['debug_mode']
         self.plot_level = qmla_core_info_dict['plot_level']
+        self.figure_format = qmla_core_info_dict['figure_format']
 
         # Instantiate exploration strategy
         self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
@@ -263,6 +264,7 @@ class ModelInstanceForLearning():
             inv_field=[item[0]
                        for item in self.qinfer_model.expparams_dtype[1:]],
             max_time_to_enforce=self.exploration_class.max_time_to_consider,
+            figure_format=self.figure_format 
         )
         self.log_print(["Heuristic built"])
         self.model_heuristic_class = self.model_heuristic.__class__.__name__
@@ -647,7 +649,7 @@ class ModelInstanceForLearning():
                 self.model_heuristic.plot_heuristic_attributes(
                     save_to_file=os.path.join(
                         self.model_learning_plots_directory,
-                        '{}heuristic_attributes_{}.png'.format(
+                        '{}heuristic_attributes_{}'.format(
                             self.plot_prefix, self.model_id)
                     )
                 )
@@ -885,6 +887,7 @@ class ModelInstanceForLearning():
             inv_field=[item[0]
                        for item in self.qinfer_model.expparams_dtype[1:]],
             max_time_to_enforce=self.exploration_class.max_time_to_consider,
+            figure_format=self.figure_format
         )
 
         evaluation_updater._log_total_likelihood = 0.0
@@ -1118,11 +1121,12 @@ class ModelInstanceForLearning():
         # save the plot
         lf.save(
             os.path.join(
-                self.model_learning_plots_directory, "{}distributions_{}.png".format(
+                self.model_learning_plots_directory, "{}distributions_{}".format(
                     self.plot_prefix,
                     self.model_id
                 )
-            )
+            ),
+            file_format = self.figure_format
         )
 
         # Plot covariance matrix heatmap
@@ -1133,7 +1137,8 @@ class ModelInstanceForLearning():
         sns.heatmap(self.qinfer_updater.est_covariance_mtx(), ax=ax)
         lf.save(
             os.path.join(self.model_learning_plots_directory,
-                         '{}cov_mtx_final_{}.png'.format(self.plot_prefix, self.model_id))
+                         '{}cov_mtx_final_{}.png'.format(self.plot_prefix, self.model_id)),
+            file_format = self.figure_format
         )
 
 
@@ -1387,7 +1392,8 @@ class ModelInstanceForLearning():
         # Save figure
         lf.save(
             os.path.join(self.model_learning_plots_directory,
-                         '{}learning_summary_{}.png'.format(self.plot_prefix, self.model_id))
+                         '{}learning_summary_{}'.format(self.plot_prefix, self.model_id)),
+            file_format = self.figure_format                         
         )
 
     def _plot_posterior_mesh_pairwise(self):
@@ -1549,7 +1555,8 @@ class ModelInstanceForLearning():
         )
         lf.save(
             os.path.join(self.model_learning_plots_directory,
-                         '{}dynamics_{}.png'.format(self.plot_prefix, self.model_id))
+                         '{}dynamics_{}'.format(self.plot_prefix, self.model_id)),
+            file_format = self.figure_format
         )
 
 

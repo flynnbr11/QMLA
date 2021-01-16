@@ -37,7 +37,8 @@ def plot_dynamics_multiple_models(
     save_true_expec_vals_alone_plot=True,
     collective_analysis_pickle_file=None,
     return_results=False,
-    save_to_file=None
+    save_to_file=None,
+    figure_format='png'
 ):
     r"""
     Plots reproduced dynamics against time
@@ -403,7 +404,10 @@ def plot_dynamics_multiple_models(
 
     if save_to_file is not None:
         lf.fig.suptitle("Dynamics of trained models")
-        lf.save(save_to_file, file_format='pdf')
+        lf.save(
+            save_to_file, 
+            file_format=figure_format
+        )
 
     # Also save an image of the only the system dynamics
     if (
@@ -418,7 +422,7 @@ def plot_dynamics_multiple_models(
             true_exp,
             marker='o',
             color='r',
-            label='True System'
+            label='System'
             # alpha = 0.3
         )
         ax.set_xlabel('Time')
@@ -426,12 +430,12 @@ def plot_dynamics_multiple_models(
         ax.legend()
         true_only_fig_file = str(
             save_to_file
-            + '_true_expec_vals'
+            + '_system'
         )
         ax.set_title("True model dynamics")
         lf.save(
             true_only_fig_file,
-            file_format='png'
+            file_format=figure_format
         )
 
     # add the combined analysis dict

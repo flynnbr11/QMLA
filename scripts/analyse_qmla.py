@@ -107,6 +107,13 @@ parser.add_argument(
     type=str,
     default=None
 )
+parser.add_argument(
+    '-ff', '--figure_format',
+    help="Format of figures generated.",
+    type=str,
+    default="png"
+)
+
 
 # Parse command line arguments
 arguments = parser.parse_args()
@@ -126,6 +133,7 @@ true_exploration_class = qmla.get_exploration_class(
     log_file=log_file
 )
 latex_mapping_file = arguments.latex_mapping_file
+figure_format = arguments.figure_format
 probes_plot_file = arguments.probes_plot_file
 results_collection_file = "{}/collect_analyses.p".format(
     directory_to_analyse
@@ -355,7 +363,8 @@ try:
         save_to_file=os.path.join(
             results_directories['performance'], 
             str(plot_desc + 'dynamics')
-        )
+        ),
+        figure_format=figure_format
     )
 except:
     print("ANALYSIS FAILURE: dynamics.")
@@ -370,7 +379,7 @@ except:
 try:
     qmla.analysis.plot_terms_and_parameters(
         results_path = directory_to_analyse, 
-        save_to_file = os.path.join(directory_to_analyse, "champion_models", "terms_and_params.pdf")
+        save_to_file = os.path.join(directory_to_analyse, "champion_models", "terms_and_params")
     )
 except Exception as e:
     print("ANALYSIS FAILURE {} with exception {}".format(plot_terms_and_parameters, e))
@@ -402,7 +411,8 @@ try:
             directory_to_analyse,
             "{}param_avg".format('param_avg')
         ),
-        save_directory = results_directories['champions']
+        save_directory = results_directories['champions'],
+        figure_format=figure_format
     )
 except:
     print("ANALYSIS FAILURE: average parameter plots.")
