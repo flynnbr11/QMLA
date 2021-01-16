@@ -401,8 +401,8 @@ def plot_dynamics_multiple_models(
         full_plot_axis.set_xlabel("Time (a.u)")
 
     if save_to_file is not None:
-        lf.fig.suptitle("Dynamics of trained models.")
-        lf.save(save_to_file)
+        lf.fig.suptitle("Dynamics of trained models")
+        lf.save(save_to_file, file_format='pdf')
 
     # Also save an image of the only the system dynamics
     if (
@@ -424,12 +424,13 @@ def plot_dynamics_multiple_models(
         ax.set_ylabel('Expectation Value')
         ax.legend()
         true_only_fig_file = str(
-            save_to_file[:-4]
-            + '_true_expec_vals.png'
+            save_to_file
+            + '_true_expec_vals'
         )
-        ax.set_title("Expectation Values of True model.")
+        ax.set_title("True model dynamics")
         lf.save(
             true_only_fig_file,
+            file_format='png'
         )
 
     # add the combined analysis dict

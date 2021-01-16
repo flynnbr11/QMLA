@@ -296,13 +296,15 @@ def average_parameter_estimates(
             ax.set_title(str(latex_term))
 
         latex_name = exploration_classes[name].latex_name(name)
-
+        lf.fig.text(0.45, -0.04, 'Experiment', ha='center')
+        lf.fig.text(-0.04, 0.5, 'Parameter', va='center', rotation='vertical')
+        
         if save_directory is not None:
             save_file = os.path.join(
                 save_directory, 
-                '{}params_{}.png'.format(plot_prefix, name)
+                '{}params_{}'.format(plot_prefix, name)
             )
-            lf.save(save_file)
+            lf.save(save_file, file_format='pdf')
 
 
 def cluster_results_and_plot(

@@ -354,7 +354,7 @@ try:
         collective_analysis_pickle_file=results_collection_file,
         save_to_file=os.path.join(
             results_directories['performance'], 
-            str(plot_desc + 'dynamics.png')
+            str(plot_desc + 'dynamics')
         )
     )
 except:
@@ -398,10 +398,9 @@ try:
         exploration_rule=exploration_rule,
         unique_exploration_classes=unique_exploration_classes,
         true_params_dict=true_params_dict,
-        save_to_file=str(
-            directory_to_analyse +
-            plot_desc +
-            'param_avg.png'
+        save_to_file=os.path.join(
+            directory_to_analyse,
+            "{}param_avg".format('param_avg')
         ),
         save_directory = results_directories['champions']
     )
