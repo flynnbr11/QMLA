@@ -142,7 +142,7 @@ class ControlsQMLA():
         )
         self.long_id = '{0:03d}'.format(self.qmla_id)
         self.plots_directory = os.path.join(
-            self.results_directory, 'single_instance_plots', "qmla_{}".format(
+            self.results_directory, 'instances', "qmla_{}".format(
                 self.qmla_id)
         )
         if not os.path.exists(self.results_directory):

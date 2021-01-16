@@ -25,9 +25,9 @@ class ExampleBasic(
         self.initial_models = None
         self.max_spawn_depth = 1
         self.true_model_terms_params = {
-            'pauliSet_1J2_zJz_d3' : 2.5,
-            'pauliSet_2J3_zJz_d3' : 7.5,
-            'pauliSet_4J5_zJz_d3' : 3.5,
+            'pauliSet_1J2_zJz_d4' : 2.5,
+            'pauliSet_2J3_zJz_d4' : 7.5,
+            'pauliSet_3J4_zJz_d4' : 3.5,
         }
         self.min_param = 0
         self.max_param = 10

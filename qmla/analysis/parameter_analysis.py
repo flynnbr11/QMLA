@@ -186,9 +186,6 @@ def average_parameter_estimates(
         fname = directory_name + '/' + str(f)
         result = pickle.load(open(fname, 'rb'))
         track_parameter_estimates = result['Trackplot_parameter_estimates']
-    # for i in list(results.index):
-    #     result = results.iloc(i)   
-    #     track_parameter_estimates = eval(result['Trackplot_parameter_estimates'])
 
         alph = result['NameAlphabetical']
         if alph in parameter_estimates_from_qmd.keys():
@@ -214,36 +211,18 @@ def average_parameter_estimates(
 
     for name in winning_models:
         num_experiments = num_experiments_by_name[name]
-        # epochs = range(1, 1+num_experiments)
         epochs = range(num_experiments_by_name[name] + 1)
-
-        plt.clf()
-        fig = plt.figure()
-        ax = plt.subplot(111)
 
         parameters_for_this_name = parameter_estimates_from_qmd[name]
         num_wins_for_name = len(parameters_for_this_name)
         terms = sorted(qmla.construct_models.get_constituent_names_from_name(name))
         num_terms = len(terms)
-
-        ncols = int(np.ceil(np.sqrt(num_terms)))
-        nrows = int(np.ceil(num_terms / ncols))
-
-        fig, axes = plt.subplots(
-            figsize=(10, 7),
-            nrows=nrows,
-            ncols=ncols,
-            squeeze=False,
-        )
-        row = 0
-        col = 0
-        axes_so_far = 0
+        lf = lfig.LatexFigure(auto_gridspec=num_terms)
 
         cm_subsection = np.linspace(0, 0.8, num_terms)
         colours = [cm.Paired(x) for x in cm_subsection]
 
         parameters = {}
-
         for t in terms:
             parameters[t] = {}
 
@@ -270,17 +249,12 @@ def average_parameter_estimates(
                 std_devs[p][e] = np.std(parameters[p][e])
 
         for term in sorted(terms):
-            ax = axes[row, col]
-            axes_so_far += 1
-            col += 1
-            if (row == 0 and col == ncols):
+            ax = lf.new_axis()
+            if (ax.row == 0 and ax.col == lf.num_cols -1 ):
                 leg = True
             else:
                 leg = False
 
-            if col == ncols:
-                col = 0
-                row += 1
             latex_terms[term] = exploration_classes[name].latex_name(term)
             averages = np.array(
                 [avg_parameters[term][e] for e in epochs]
@@ -304,42 +278,20 @@ def average_parameter_estimates(
             except BaseException:
                 pass
 
-            # ax.axhline(
-            #     0,
-            #     linestyle='--',
-            #     alpha=0.5,
-            #     color='black',
-            #     label='0'
-            # )
             fill_between_sigmas(
                 ax,
                 parameters[term],
                 epochs,
-                # colour = 'blue', 
-                # alpha = 0.3,
                 legend=leg,
                 only_one_sigma=True, 
             )
             ax.plot(
                 [e + 1 for e in epochs],
                 averages,
-                # marker='o',
-                # markevery=0.1,
-                # markersize=2*param_lw,
                 lw=param_lw,
                 label=latex_terms[term],
                 color='blue'
             )
-
-            # ax.scatter(
-            #     [e + 1 for e in epochs],
-            #     averages,
-            #     s=max(1, 50 / num_experiments),
-            #     label=latex_terms[term],
-            #     color='black'
-            # )
-
-
             latex_term = exploration_classes[name].latex_name(term)
             ax.set_title(str(latex_term))
 
@@ -350,15 +302,7 @@ def average_parameter_estimates(
                 save_directory, 
                 '{}params_{}.png'.format(plot_prefix, name)
             )
-            try:
-                plt.savefig(save_file)
-            except:
-                # model name too long, using index
-                save_file = os.path.join(
-                    save_directory, 
-                    '{}params_{}.png'.format(plot_prefix, winning_models.index(name))
-                )
-                plt.savefig(save_file)
+            lf.save(save_file)
 
 
 def cluster_results_and_plot(

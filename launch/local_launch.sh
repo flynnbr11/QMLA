@@ -7,7 +7,7 @@
 ###############
 # QMLA run configuration
 ###############
-num_instances=1
+num_instances=3
 run_qhl=1 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models.
 exp=5 # number of experiments
@@ -36,7 +36,7 @@ number_best_models_further_qhl=5
 # use_alt_exploration_strategies=1 # note this is redundant locallycurrently
 ###############
 
-exploration_strategy="ExplorationStrategyTemplate"
+exploration_strategy="ExampleBasic"
 
 alt_exploration_strategies=(
     # 'IsingLatticeSet'

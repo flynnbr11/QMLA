@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.gridspec import GridSpec
 from scipy import stats
+import lfig
 
 __all__ = [
     'plot_dynamics_multiple_models'
@@ -45,6 +46,7 @@ def plot_dynamics_multiple_models(
     TODO: refactor this code - it should not need to unpickle
     all the files which have already been unpickled and stored in the summary
     results CSV.
+    TODO: this is a very old method and can surely be improved using Pandas dataframes now stored. 
 
     :param directory_name: path to directory where results .p files are stored.
     :param results_path: path to CSV with all results for this run.
@@ -91,10 +93,7 @@ def plot_dynamics_multiple_models(
 
     cm_subsection = np.linspace(0, 0.8, len(winning_models))
     colours = [cm.viridis(x) for x in cm_subsection]
-    # colours = [ cm.Spectral(x) for x in cm_subsection ]
 
-    # Relies on results folder structure -- not safe?!
-    # ie ExperimentalSimulations/results/Sep_10/14_32/results_001.p, etc
     experimental_measurements = pickle.load(
         open(str(true_expectation_value_path), 'rb')
     )
@@ -153,34 +152,18 @@ def plot_dynamics_multiple_models(
     }
     success_rate_by_term = {}
     nmod = len(winning_models)
-    ncols = int(np.ceil(np.sqrt(nmod)))
-    nrows = int(np.ceil(nmod / ncols)) + 1  # 1 extra row for "master"
-
-    fig = plt.figure(
-        figsize=(15, 8),
-        # constrained_layout=True,
-        tight_layout=True
-    )
-    gs = GridSpec(
-        nrows,
-        ncols,
-        # figure=fig # not available on matplotlib 2.1.1 (on BC)
-    )
-
-    row = 1
-    col = 0
+    if nmod == 1:
+        lf = lfig.LatexFigure(auto_label=False, fraction=0.75)
+    else:
+        ncols = int(np.ceil(np.sqrt(nmod)))
+        nrows = int(np.ceil(nmod / ncols)) + 1  # 1 extra row for "master"
+        lf = lfig.LatexFigure(gridspec_layout=(nrows, ncols))
 
     axes_so_far = 1
-    # full_plot_axis = axes[0,0]
-    full_plot_axis = fig.add_subplot(gs[0, :])
-    # i=0
+    full_plot_axis = lf.new_axis(force_position=(0,0), span = (1, 'all'))
     model_statistics = {}
 
     for term in winning_models:
-        # plt.clf()
-        # ax.clf()
-        # ax = axes[row, col]
-        ax = fig.add_subplot(gs[row, col])
         expectation_values = {}
         num_sets_of_this_name = len(
             expectation_values_by_name[term]
@@ -316,32 +299,12 @@ def plot_dynamics_multiple_models(
 
         name = exploration_classes[term].latex_name(term)
         try:
-            description = str(
-                name +
-                ' (' + str(num_sets_of_this_name) + ')'
-                + ' [$R^2=$' +
-                str(
-                    # np.round(final_r_squared, 2)
-                    # np.format_float_scientific(
-                    #     final_r_squared,
-                    #     precision=2
-                    # )
-                    format_exponent(final_r_squared)
-                )
-                + ']'
-            )
+            description = r" {} [R^2={}]".format(name, format_exponent(final_r_squared))
         except BaseException:
-            print(
-                "Failed to format exponent; final r squared:",
-                final_r_squared)
-            description = str(
-                name +
-                ' (' + str(num_sets_of_this_name) + ')'
-                + ' [$R^2=0$]'
-            )
+            description = r" {} [R^2=NaN]".format(name)
 
         if term == true_model:
-            description += ' (True)'
+            description += " (True)"
 
         description_w_bayes_t_value = str(
             name + ' : ' +
@@ -366,61 +329,42 @@ def plot_dynamics_multiple_models(
             'higher_iqr_r_sq': higher_iqr_r_sq,
             'times': times
         }
+        if nmod > 1:
+            ax = lf.new_axis()
+            ax.plot(
+                times,
+                mean_exp,
+                c=colours[winning_models.index(term)],
+                label=description
+            )
+            ax.fill_between(
+                times,
+                mean_exp - std_dev_exp,
+                mean_exp + std_dev_exp,
+                alpha=0.2,
+                facecolor=colours[winning_models.index(term)],
+            )
+            ax.set_ylim(0, 1)
+            ax.set_xlim(0, max(times))
 
-        ax.plot(
-            times,
-            mean_exp,
-            c=colours[winning_models.index(term)],
-            label=description
-        )
-        ax.fill_between(
-            times,
-            mean_exp - std_dev_exp,
-            mean_exp + std_dev_exp,
-            alpha=0.2,
-            facecolor=colours[winning_models.index(term)],
-        )
-        ax.set_ylim(0, 1)
-        ax.set_xlim(0, max(times))
+            success_rate_by_term[term] = success_rate
+            ax.set_title('Mean Expectation Values')
+            ax.scatter(
+                times,
+                true_exp,
+                color='r',
+                s=5,
+                label='System'
+            )
+            ax.plot(
+                times,
+                true_exp,
+                color='r',
+                alpha=0.3
+            )
+            ax.set_title(description)
 
-        success_rate_by_term[term] = success_rate
-
-        # plt.title('Mean Expectation Values')
-        # plt.xlabel('Time')
-        # plt.ylabel('Expectation Value')
-        # true_exp = [true[t] for t in times]
-        # ax.set_xlim(0,1)
-        # plt.xlim(0,1)
-
-        ax.set_title('Mean Expectation Values')
-        # if col == 0:
-        #     ax.set_ylabel('Expectation Value')
-        # if row == nrows-1:
-        #     ax.set_xlabel('Time')
-        # ax.set_xlim(0,1)
-        # plt.xlim(0,1)
-
-        ax.scatter(
-            times,
-            true_exp,
-            color='r',
-            s=5,
-            label='True Expectation Value'
-        )
-        ax.plot(
-            times,
-            true_exp,
-            color='r',
-            alpha=0.3
-        )
-
-        # ax.legend(
-        #     loc='center left',
-        #     bbox_to_anchor=(1, 0.5),
-        #     title=' Model : Bayes t-test (instances)'
-        # )
-
-        # fill in "master" plot
+        # Add this model to "master" plot
 
         high_level_label = str(name)
         if term == true_model:
@@ -432,57 +376,43 @@ def plot_dynamics_multiple_models(
             c=colours[winning_models.index(term)],
             label=high_level_label
         )
-        if axes_so_far == 1:
-            full_plot_axis.scatter(
-                times,
-                true_exp,
-                color='r',
-                s=5,
-                label='True Expectation Value'
-            )
-            full_plot_axis.plot(
-                times,
-                true_exp,
-                color='r',
-                alpha=0.3
-            )
-        full_plot_axis.legend(
-            loc='center left',
-            bbox_to_anchor=(1, 0),
+        full_plot_axis.scatter(
+            times,
+            true_exp,
+            color='r',
+            s=5,
+            label='System'
         )
-        # full_plot_axis.legend(
-        #     ncol = ncols,
-        #     loc='lower center',
-        #     bbox_to_anchor=(0.5, -1.3),
-        # )
-        full_plot_axis.set_ylim(0, 1)
-        full_plot_axis.set_xlim(0, max(times))
+        full_plot_axis.plot(
+            times,
+            true_exp,
+            color='r',
+            alpha=0.3
+        )
 
-        axes_so_far += 1
-        col += 1
-        if col == ncols:
-            col = 0
-            row += 1
-        # ax.set_title(str(name))
-        ax.set_title(description)
-
-    fig.text(0.45, -0.04, 'Time', ha='center')
-    fig.text(-0.04, 0.5, 'Expectation Value', va='center', rotation='vertical')
+    full_plot_axis.legend()
+    full_plot_axis.set_ylim(0, 1)
+    full_plot_axis.set_xlim(0, max(times))
+    if nmod > 1:
+        lf.fig.text(0.45, -0.04, 'Time', ha='center')
+        lf.fig.text(-0.04, 0.5, 'Expectation Value', va='center', rotation='vertical')
+    else:
+        ax.set_ylabel("Expectation value")
+        ax.set_xlabel("Time (a.u)")
 
     if save_to_file is not None:
-        fig.suptitle("Expectation Values of learned models.")
-        # fig.tight_layout(rect=[0, 0.03, 1, 0.95])
-        plt.savefig(save_to_file, bbox_inches='tight')
+        lf.fig.suptitle("Dynamics of trained models.")
+        lf.save(save_to_file)
 
-    # Also save an image of the true expectation values without overlaying
-    # results
+    # Also save an image of the only the system dynamics
     if (
         save_true_expec_vals_alone_plot == True
         and
         save_to_file is not None
     ):
-        plt.clf()
-        plt.plot(
+        lf = lfig.LatexFigure(fraction=0.75, auto_label=False)
+        ax = lf.new_axis()
+        ax.plot(
             times,
             true_exp,
             marker='o',
@@ -490,17 +420,16 @@ def plot_dynamics_multiple_models(
             label='True System'
             # alpha = 0.3
         )
-        plt.xlabel('Time')
-        plt.ylabel('Expectation Value')
-        plt.legend()
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Expectation Value')
+        ax.legend()
         true_only_fig_file = str(
             save_to_file[:-4]
             + '_true_expec_vals.png'
         )
-        plt.title("Expectation Values of True model.")
-        plt.savefig(
+        ax.set_title("Expectation Values of True model.")
+        lf.save(
             true_only_fig_file,
-            bbox_inches='tight'
         )
 
     # add the combined analysis dict
@@ -509,11 +438,6 @@ def plot_dynamics_multiple_models(
 
     if collective_analysis_pickle_file is not None:
         if os.path.isfile(collective_analysis_pickle_file) is False:
-            # combined_analysis = {
-            #     # 'expectation_values' : collect_expectation_values,
-            #     # 'statistics' : model_statistics,
-            #     'model_statistics' : model_statistics,
-            # }
             pickle.dump(
                 model_statistics,
                 open(collective_analysis_pickle_file, 'wb')

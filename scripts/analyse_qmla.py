@@ -528,31 +528,6 @@ except:
     print("ANALYSIS FAILURE: summarising txt")
     raise
 
-# Plots used for comparing parameter sweeps; show wins by over/mis/under-fit
-try:
-    qmla.analysis.parameter_sweep_analysis(
-        directory_name=directory_to_analyse,
-        results_csv=results_csv,
-        save_to_file=os.path.join(
-            results_directories['meta'], 
-            str(plot_desc + 'sweep_param_total.png')
-        )
-    )
-    qmla.analysis.parameter_sweep_analysis(
-        directory_name=directory_to_analyse,
-        results_csv=results_csv,
-        use_log_times=True,
-        use_percentage_models=True,
-        save_to_file=os.path.join(
-            results_directories['meta'], 
-            str(plot_desc + 'sweep_param_percentage.png')
-        )
-    )
-except BaseException:
-    print("ANALYSIS FAILURE: parameter sweeps.")
-    pass
-
-
 #######################################
 # QMLA Internals
 ## How QMLA proceeds 
@@ -632,20 +607,6 @@ try:
 except:
     print("ANALYSIS FAILURE: times learned upon.")
 
-# Bayes factors Vs true model
-try:
-    qmla.analysis.plot_bayes_factors_v_true_model(
-        results_csv_path=all_bayes_csv,
-        correct_mod=true_model,
-        exploration_rule=exploration_rule,
-        save_to_file=os.path.join(
-            results_directories['performance'],
-            'bayes_comparisons_true_model.png'
-        )
-    )
-except:
-    print("ANALYSIS FAILURE: Bayes factors v true models.")
-    pass
 
 
 #######################################

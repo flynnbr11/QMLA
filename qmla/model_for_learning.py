@@ -1520,19 +1520,16 @@ class ModelInstanceForLearning():
         """        
         
         # Plot dynamics of model vs system
-        plt.clf()
-        fig, ax = plt.subplots(
-            figsize=(18, 10),
-            constrained_layout=True
-        )
-
+        lf = LatexFigure(auto_label=False, fraction=0.75)
+        ax = lf.new_axis()
         # System
         times = sorted(self.expectation_values.keys())
         ax.scatter(
             times, 
             [self.experimental_measurements[t] for t in times], 
             color='red',
-            label = 'System'
+            label = 'System',
+            s = 3, 
         )
 
         # This model
@@ -1540,15 +1537,17 @@ class ModelInstanceForLearning():
             times, 
             [self.expectation_values[t] for t in times], 
             color='blue', 
-            label='Model. $LL$={}'.format(self.evaluation_log_likelihood)
+            label='Model'
         )
-        label_fontsize = 15
+        # label_fontsize = 15
         ax.set_xlim(0, max(times))
-        ax.set_ylabel('Expectation value', fontsize = label_fontsize)
-        ax.set_xlabel('Time', fontsize = label_fontsize)
-        ax.set_title('Dynamics for {}'.format(self.model_name_latex), fontsize = 1.5*label_fontsize)
-        ax.legend(prop={'size' : label_fontsize})
-        fig.savefig(
+        ax.set_ylabel('Expectation value',)
+        ax.set_xlabel('Time', )
+        ax.set_title('Dynamics for {}'.format(self.model_name_latex),)
+        ax.legend(
+            # prop={'size' : label_fontsize}
+        )
+        lf.save(
             os.path.join(self.model_learning_plots_directory,
                          '{}dynamics_{}.png'.format(self.plot_prefix, self.model_id))
         )
