@@ -397,8 +397,8 @@ def plot_dynamics_multiple_models(
         lf.fig.text(0.45, -0.04, 'Time', ha='center')
         lf.fig.text(-0.04, 0.5, 'Expectation Value', va='center', rotation='vertical')
     else:
-        ax.set_ylabel("Expectation value")
-        ax.set_xlabel("Time (a.u)")
+        full_plot_axis.set_ylabel("Expectation value")
+        full_plot_axis.set_xlabel("Time (a.u)")
 
     if save_to_file is not None:
         lf.fig.suptitle("Dynamics of trained models.")
