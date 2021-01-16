@@ -250,10 +250,6 @@ def average_parameter_estimates(
 
         for term in sorted(terms):
             ax = lf.new_axis()
-            if (ax.row == 0 and ax.col == lf.num_cols -1 ):
-                leg = True
-            else:
-                leg = False
 
             latex_terms[term] = exploration_classes[name].latex_name(term)
             averages = np.array(
@@ -269,11 +265,10 @@ def average_parameter_estimates(
                 true_term_latex = exploration_classes[name].latex_name(term)
                 ax.axhline(
                     true_val,
-                    label=str('True value'),
+                    label=str('True'),
                     ls='--',
                     color='red',
                     lw=param_lw
-
                 )
             except BaseException:
                 pass
@@ -282,18 +277,21 @@ def average_parameter_estimates(
                 ax,
                 parameters[term],
                 epochs,
-                legend=leg,
+                legend=False,
                 only_one_sigma=True, 
             )
             ax.plot(
                 [e + 1 for e in epochs],
                 averages,
                 lw=param_lw,
-                label=latex_terms[term],
+                label="Estimate",
                 color='blue'
             )
             latex_term = exploration_classes[name].latex_name(term)
             ax.set_title(str(latex_term))
+
+            if (ax.row == 0 and ax.col == lf.num_cols -1 ):
+                ax.legend(bbox_to_anchor=(1.05, 0.85))
 
         latex_name = exploration_classes[name].latex_name(name)
         lf.fig.text(0.45, -0.04, 'Experiment', ha='center')

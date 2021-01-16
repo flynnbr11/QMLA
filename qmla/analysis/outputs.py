@@ -298,13 +298,10 @@ def plot_dynamics_multiple_models(
                                higher_iqr_sum_of_squares)
 
         name = exploration_classes[term].latex_name(term)
-        try:
-            description = r" {} [R^2={}]".format(name, format_exponent(final_r_squared))
-        except BaseException:
-            description = r" {} [R^2=NaN]".format(name)
+        description = r"{}".format(name)
 
         if term == true_model:
-            description += " (True)"
+            description += ' (= $\hat{{H}}_0$)'
 
         description_w_bayes_t_value = str(
             name + ' : ' +
@@ -362,13 +359,14 @@ def plot_dynamics_multiple_models(
                 color='r',
                 alpha=0.3
             )
+            ax.set_yticks([0, 0.5, 0.1])
             ax.set_title(description)
 
         # Add this model to "master" plot
 
         high_level_label = str(name)
         if term == true_model:
-            high_level_label += ' (True)'
+            high_level_label += ' (= $\hat{{H}}_0$)'
 
         full_plot_axis.plot(
             times,
@@ -376,22 +374,25 @@ def plot_dynamics_multiple_models(
             c=colours[winning_models.index(term)],
             label=high_level_label
         )
-        full_plot_axis.scatter(
-            times,
-            true_exp,
-            color='r',
-            s=5,
-            label='System'
-        )
-        full_plot_axis.plot(
-            times,
-            true_exp,
-            color='r',
-            alpha=0.3
-        )
+    full_plot_axis.scatter(
+        times,
+        true_exp,
+        color='r',
+        s=5,
+        label='System'
+    )
+    full_plot_axis.plot(
+        times,
+        true_exp,
+        color='r',
+        alpha=0.3
+    )
 
-    full_plot_axis.legend()
-    full_plot_axis.set_ylim(0, 1)
+    full_plot_axis.legend(
+        ncol=5,
+    )
+    full_plot_axis.set_ylim(0, 1.25)
+    full_plot_axis.set_yticks([0, 0.5, 0.1])
     full_plot_axis.set_xlim(0, max(times))
     if nmod > 1:
         lf.fig.text(0.45, -0.04, 'Time', ha='center')
