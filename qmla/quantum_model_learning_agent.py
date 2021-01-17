@@ -2705,10 +2705,10 @@ class QuantumModelLearningAgent():
                 self._plot_model_terms,
             ],
             2: [
-                self._plot_dynamics_all_models_on_branches,
                 self._plot_one_qubit_probes_bloch_sphere, 
             ],
             3 : [
+                self._plot_dynamics_all_models_on_branches,
                 self._plot_bayes_factors,
                 self._plot_branch_champs_quadratic_losses,
             ],
@@ -3320,10 +3320,6 @@ class QuantumModelLearningAgent():
         except:
             pass
 
-        if not self.plot_level >= 3:
-            return
-
-
         if branches is None:
             branches = sorted(list(self.branches.keys()))
 
@@ -3338,16 +3334,6 @@ class QuantumModelLearningAgent():
         for branch_id in branches:
             models = self.branches[branch_id].resident_model_ids
             times = sorted(self.experimental_measurements.keys())
-
-            # plt.clf()
-            # fig = plt.figure(
-            #     figsize=(15, 10),
-            #     tight_layout=True
-            # )
-            # gs = GridSpec(
-            #     nrows=num_rows,
-            #     ncols=1,
-            # )
             num_rows = math.ceil( len(models) / max_models_per_subplot )
 
             lf  = LatexFigure(
@@ -3361,11 +3347,8 @@ class QuantumModelLearningAgent():
                 )
             ])
 
-            col = 0
-            row = 0
             n_models_this_row = 0
             ax = lf.new_axis()
-            # ax = fig.add_subplot(gs[row, col])
 
             for m in models:
                 
@@ -3384,7 +3367,8 @@ class QuantumModelLearningAgent():
                 ax.plot(
                     computed_expec_val_times, 
                     exp_vals, 
-                    label="{} (ID={}, $LL$={})".format(mod.model_name_latex, m, mod.evaluation_log_likelihood),
+                    label = r"${}$".format(m), 
+                    # label="{} (ID={}, $LL$={})".format(mod.model_name_latex, m, mod.evaluation_log_likelihood),
                     color=next(colours), 
                     ls=next(linestyles)
                 )
@@ -3396,11 +3380,9 @@ class QuantumModelLearningAgent():
                     row += 1
                     n_models_this_row = 0 
                     ax = lf.new_axis()
-                    # ax = fig.add_subplot(gs[row, col])
                     
             for row in range(num_rows):
-                # Finish each subplot
-                # ax = fig.add_subplot(gs[row, col])
+                # Add system dynamics to each subplot
                 ax = lf.gridspec_axes[(row, 0)]
 
                 ax.scatter(
@@ -3424,10 +3406,6 @@ class QuantumModelLearningAgent():
                 'dynamics_branch_{}'.format(branch_id)
             )
             lf.save(path, file_format=self.qmla_controls.figure_format)
-
-            # fig.savefig(
-            #     path
-            # )
 
 
     def _plot_evaluation_normalisation_records(self):

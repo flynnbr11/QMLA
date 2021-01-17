@@ -29,6 +29,7 @@ class ExampleBasic(
             'pauliSet_3J4_zJz_d4' : 3.5,
         }
         self.tree_completed_initially = True
+        self.max_time_to_consider = 5
         self.min_param = 0
         self.max_param = 10
 

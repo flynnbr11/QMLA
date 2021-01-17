@@ -8,7 +8,11 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-import lfig 
+
+try:
+    from lfig import LatexFigure
+except:
+    from qmla.shared_functionality.latex_figure import LatexFigure
 
 import qmla.construct_models as construct_models
 import qmla.model_for_comparison
@@ -389,10 +393,7 @@ def plot_dynamics_from_models(
     """
 
     times = list(sorted(exp_msmts.keys()))
-    # fig, ax1 = plt.subplots(
-    #     figsize=(15, 10)
-    # )
-    lf = lfig.LatexFigure(auto_label=False)
+    lf = LatexFigure(auto_label=False)
     ax1 = lf.new_axis()
 
     # Plot true measurements
