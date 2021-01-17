@@ -509,9 +509,9 @@ def plot_scores(
     exploration_rule=None,
     batch_nearest_num_params_as_winners=True,
     collective_analysis_pickle_file=None,
-    save_file='model_scores.png'
+    save_file='model_scores.png',
+    figure_format="png"
 ):
-    plt.clf()
     models = list(scores.keys())
     latex_true_op = unique_exploration_classes[exploration_rule].latex_name(
         name=true_model
@@ -614,12 +614,8 @@ def plot_scores(
     except BaseException:
         pass
 
-    fig, ax1 = plt.subplots(
-        figsize=(
-            max(max(scores), 5),
-            max((len(scores) / 4), 3)
-        )
-    )
+    lf = lfig.LatexFigure(auto_label=False)
+    ax1 = lf.new_axis()
 
     # ax.barh(ind, scores, width, color="blue")
     ax1.barh(ind, scores, width, color=colours)
@@ -716,16 +712,8 @@ def plot_scores(
         bbox_to_anchor=(1.0, 0.4),
     )
 
-    # plt.legend(
-    #     custom_lines,
-    #     custom_handles
-    # )
-    # plt.title(plot_title)
-    plt.ylabel('Model')
-    # plt.xlabel('Number of wins')
-    #plt.bar(scores, latex_model_names)
-
-    plt.savefig(save_file, bbox_inches='tight')
+    ax1.set_ylabel('Model')
+    lf.save(save_file, file_format=figure_format)
 
 
 def stat_metrics_histograms(

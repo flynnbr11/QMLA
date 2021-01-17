@@ -1137,7 +1137,7 @@ class ModelInstanceForLearning():
         sns.heatmap(self.qinfer_updater.est_covariance_mtx(), ax=ax)
         lf.save(
             os.path.join(self.model_learning_plots_directory,
-                         '{}cov_mtx_final_{}.png'.format(self.plot_prefix, self.model_id)),
+                         '{}cov_mtx_final_{}'.format(self.plot_prefix, self.model_id)),
             file_format = self.figure_format
         )
 

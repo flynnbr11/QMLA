@@ -956,11 +956,11 @@ def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="pn
         )
         if ax.row == 0 and ax.col == 0 :
             ax.legend(
-                bbox_to_anchor=(0.75, 1.25), 
+                bbox_to_anchor=(1, 1.3), 
                 ncol=3
             )
 
-    lf.fig.text(0.5, 0.04, r"Parameter ($\alpha$) value", ha='center', )
+    lf.fig.text(0.5, -0.04, r"Parameter ($\alpha$) value", ha='center', )
     lf.fig.text(0.04, 0.5, "Number  occurences", va='center', rotation='vertical',)
     
     if save_to_file is not None:

@@ -8,6 +8,7 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
+import lfig 
 
 import qmla.construct_models as construct_models
 import qmla.model_for_comparison
@@ -123,7 +124,8 @@ def remote_bayes_factor_calculation(
 
     # Whether to build plots
     save_plots_of_posteriors = False
-    plot_level = qmla_core_info_dict['plot_level']  
+    plot_level = qmla_core_info_dict['plot_level']
+    figure_format = qmla_core_info_dict['figure_format']
 
     # Get model instances
     for k in range(num_redis_retries):
@@ -252,7 +254,8 @@ def remote_bayes_factor_calculation(
             exp_msmts = qmla_core_info_dict['experimental_measurements'],
             bayes_factor = bayes_factor,
             bf_times = model_a.bf_times, # same as model_b.bf_times
-            save_directory=bf_data_folder
+            save_directory=bf_data_folder,
+            figure_format = figure_format
         )
     else:
         log_print([
@@ -368,7 +371,8 @@ def plot_dynamics_from_models(
     exp_msmts, 
     bf_times, 
     bayes_factor, 
-    save_directory
+    save_directory,
+    figure_format="png"
 ):
     """Plot the dynamics of the pair of models considered in a Bayes factor comparison. 
 
@@ -385,9 +389,11 @@ def plot_dynamics_from_models(
     """
 
     times = list(sorted(exp_msmts.keys()))
-    fig, ax1 = plt.subplots(
-        figsize=(15, 10)
-    )
+    # fig, ax1 = plt.subplots(
+    #     figsize=(15, 10)
+    # )
+    lf = lfig.LatexFigure(auto_label=False)
+    ax1 = lf.new_axis()
 
     # Plot true measurements
     ax1.scatter(
@@ -435,12 +441,13 @@ def plot_dynamics_from_models(
 
     plot_path = os.path.join(
         save_directory,
-        'BF_{}_{}.png'.format(
+        'BF_{}_{}'.format(
             str(models[0].model_id),
             str(models[1].model_id)
         )
     )
-    plt.savefig(plot_path)
+    # plt.savefig(plot_path)
+    lf.save(plot_path, file_format=figure_format)
 
 
 def plot_models_dynamics(

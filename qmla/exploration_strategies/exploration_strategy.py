@@ -9,6 +9,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import scipy 
 import qinfer as qi
+from lfig import LatexFigure 
 
 import qmla.shared_functionality.prior_distributions
 import qmla.shared_functionality.experiment_design_heuristics
@@ -998,26 +999,28 @@ class ExplorationStrategy():
         except:
             pass
 
-        plt.clf()
-        plt.hist(
+        lf = LatexFigure(auto_label=False)
+        ax = lf.new_axis()
+        ax.hist(
             evaluation_times,
             bins = 2*len(evaluation_times) - 1
             # bins=list(np.linspace(0, max(evaluation_times), 3*len(evaluation_times))),
             # align='left'
         )
-        plt.title('Times used for evaluation')
-        plt.ylabel('Frequency')
-        plt.xlabel('Time')
+        ax.set_title('Times used for evaluation')
+        ax.set_ylabel('Frequency')
+        ax.set_xlabel('Time')
         fig_path = os.path.join(
             eval_directory,
-            'times.png'
+            'times'
         )
-        plt.savefig(fig_path)
+        figure_format = "pdf"
+        lf.save(fig_path, file_format=figure_format)
 
         qmla.utilities.plot_probes_on_bloch_sphere(
             probe_dict = probes, 
             num_probes = num_probes, 
-            save_to_file=os.path.join(eval_directory, 'probes.png')
+            save_to_file=os.path.join(eval_directory, 'probes.{}'.format(figure_format))
         )
 
         return eval_data

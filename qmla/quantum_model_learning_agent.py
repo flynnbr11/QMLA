@@ -3194,7 +3194,7 @@ class QuantumModelLearningAgent():
             num_probes = self.probe_number, 
             save_to_file=os.path.join(
                 self.qmla_controls.plots_directory,
-                'probes_bloch_sphere.png'
+                'probes_bloch_sphere.{}'.format(self.qmla_controls.figure_format)
             )
         )
 
@@ -3339,26 +3339,33 @@ class QuantumModelLearningAgent():
             models = self.branches[branch_id].resident_model_ids
             times = sorted(self.experimental_measurements.keys())
 
-            plt.clf()
-            fig = plt.figure(
-                figsize=(15, 10),
-                tight_layout=True
-            )
+            # plt.clf()
+            # fig = plt.figure(
+            #     figsize=(15, 10),
+            #     tight_layout=True
+            # )
+            # gs = GridSpec(
+            #     nrows=num_rows,
+            #     ncols=1,
+            # )
             num_rows = math.ceil( len(models) / max_models_per_subplot )
+
+            lf  = LatexFigure(
+                gridspec_layout = (num_rows, 1),
+                auto_label=False
+            )
+
             self.log_print([
                 "plotting branch dynamics. On branch {} there are {} rows".format(
                     branch_id, num_rows
                 )
             ])
-            gs = GridSpec(
-                nrows=num_rows,
-                ncols=1,
-            )
 
             col = 0
             row = 0
             n_models_this_row = 0
-            ax = fig.add_subplot(gs[row, col])
+            ax = lf.new_axis()
+            # ax = fig.add_subplot(gs[row, col])
 
             for m in models:
                 
@@ -3388,11 +3395,13 @@ class QuantumModelLearningAgent():
                 ):
                     row += 1
                     n_models_this_row = 0 
-                    ax = fig.add_subplot(gs[row, col])
+                    ax = lf.new_axis()
+                    # ax = fig.add_subplot(gs[row, col])
                     
             for row in range(num_rows):
                 # Finish each subplot
-                ax = fig.add_subplot(gs[row, col])
+                # ax = fig.add_subplot(gs[row, col])
+                ax = lf.gridspec_axes[(row, 0)]
 
                 ax.scatter(
                     times, 
@@ -3406,18 +3415,19 @@ class QuantumModelLearningAgent():
                 ax.set_ylabel('Expectation Value')
                 ax.set_xlabel('Time ($s$)')
                 ax.legend(
-                    bbox_to_anchor=(1.2, 1.05),
-                    fontsize=12, 
+                    # bbox_to_anchor=(1.2, 1.05),
+                    # fontsize=12, 
                 )
 
             path = os.path.join(
                 self.branch_results_dir, 
-                'dynamics_branch_{}.png'.format(branch_id)
+                'dynamics_branch_{}'.format(branch_id)
             )
+            lf.save(path, file_format=self.qmla_controls.figure_format)
 
-            fig.savefig(
-                path
-            )
+            # fig.savefig(
+            #     path
+            # )
 
 
     def _plot_evaluation_normalisation_records(self):

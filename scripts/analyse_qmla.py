@@ -379,7 +379,11 @@ except:
 try:
     qmla.analysis.plot_terms_and_parameters(
         results_path = directory_to_analyse, 
-        save_to_file = os.path.join(directory_to_analyse, "champion_models", "terms_and_params")
+        save_to_file = os.path.join(
+            directory_to_analyse, 
+            "champion_models", 
+            "terms_and_params"),
+        figure_format=figure_format
     )
 except Exception as e:
     print("ANALYSIS FAILURE {} with exception {}".format(plot_terms_and_parameters, e))
@@ -456,11 +460,12 @@ try:
         f_scores=f_scores,
         true_model=true_model,
         exploration_rule=exploration_rule,
-        save_file=os.path.join(results_directories['performance'], 'model_wins.png')
+        save_file=os.path.join(results_directories['performance'], 'model_wins'),
+        figure_format=figure_format,
     )
 except:
     print("ANALYSIS FAILURE: plotting model win rates.")
-    raise
+    pass
 
 # Model statistics (f-score, precision, sensitivty)
 try:
