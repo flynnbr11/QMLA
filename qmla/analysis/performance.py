@@ -45,6 +45,7 @@ def bayes_factor_f_score_heatmap(
         columns=['f_score_b'],
         aggfunc=np.median
     )
+    print("bayes_factor_by_id: \n")
 
     mask = np.tri(bayes_factor_by_f_score.shape[0], k=0).T
     sns.heatmap(
@@ -54,7 +55,6 @@ def bayes_factor_f_score_heatmap(
         annot=True, 
         ax = ax1,
         cbar_kws={
-            # "orientation": "horizontal"
             "orientation": "vertical",
             "label" : r"$\log_{10}\left(B_{a,b}\right)$"
         }

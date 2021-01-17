@@ -56,12 +56,6 @@ def plot_qmla_branches(
             nrows = int( np.ceil(num_branches / ncols))  
         
         # Generate plot
-        plt.clf()
-        lf = LatexFigure()
-        fig = plt.figure( 
-            figsize=lf.size,
-            constrained_layout=True
-        )
         widths = [1]*ncols
         widths.append(0.1)
         if show_fscore_cmap:
@@ -71,11 +65,13 @@ def plot_qmla_branches(
         size_scaler = min(2, 4 / num_branches)
         label_fontsize = 15*size_scaler
 
-        gs = GridSpec(
-            nrows = nrows,
-            ncols = total_ncols,
-            width_ratios = widths,
-            wspace=0.25, 
+        lf = LatexFigure(
+            auto_label=False, 
+            gridspec_layout = (nrows, total_ncols), 
+            gridspec_params = {
+                'width_ratios' : widths,
+                'wspace' : 0.25
+            } 
         )
 
         # colour maps
@@ -87,14 +83,40 @@ def plot_qmla_branches(
         bf_cmapper = plt.cm.ScalarMappable(norm=norm, cmap=bf_cmap)
         bf_cmapper.set_array([]) # still no idea what this is for??
 
-        row = 0
-        col = 0 
+        # BF cmap
+        cbar_ax = lf.new_axis(
+            force_position=(0, total_ncols-1-int(show_fscore_cmap)),
+            span = ('all', 1)
+        )
+        lf.fig.colorbar(bf_cmapper, cax = cbar_ax)        
+        cbar_ax.set_title(
+            r"$\\log_{10}(BF)$", 
+            loc='center'
+        )
+
+        # F score cmap
+        if show_fscore_cmap:
+            ax = lf.new_axis(
+                force_position=[0, total_ncols-1],
+                span = ('all', 1)
+            )
+
+            sm = plt.cm.ScalarMappable(
+                cmap = f_score_cmap, 
+                norm=plt.Normalize(vmin=0, vmax=1)
+            )
+            sm.set_array([])
+            lf.fig.colorbar(sm, cax=ax, orientation='vertical')
+            ax.set_ylabel(
+                r"F-score", 
+            )
+
+        # Plot graphs
 
         min_seen_bf = 0
         max_seen_bf = 0
-
         for branch in branches:
-            ax = fig.add_subplot(gs[row, col])
+            ax = lf.new_axis()
             
             models = branch.models.keys()
             pairs = branch.pairs_to_compare
@@ -122,7 +144,6 @@ def plot_qmla_branches(
                 )    
 
             pos = nx.kamada_kawai_layout(graph) # could use spring_layout or other
-            # pos = nx.spring_layout(graph)
             labels = nx.get_node_attributes(graph, 'model_id')
             node_colours = [ graph.nodes[m]['colour'] for m in models]
             edge_colours = [ graph.edges[e]['colour'] for e in graph.edges ]
@@ -192,45 +213,10 @@ def plot_qmla_branches(
                     va  ='center'
             )
             ax.axis('off')
-    #         ax.set_title("Branch {}".format(branch.branch_id), fontsize=0.7*label_fontsize)
-            
-            col += 1
-            if col == ncols:
-                col = 0
-                row += 1
+           
             graphs[branch.branch_id] =  graph
 
-        # BF cmap
-        ax = fig.add_subplot(gs[:, total_ncols-1-int(show_fscore_cmap)])
-        fig.colorbar(bf_cmapper, cax = ax)
-        ax.set_title(
-            r"$\\log_{10}(BF)$", 
-            # fontsize=label_fontsize, 
-            loc='center'
-        )
-
-        # F score
-        if show_fscore_cmap:
-            ax = fig.add_subplot(gs[:, total_ncols-1])
-
-            sm = plt.cm.ScalarMappable(
-                cmap = f_score_cmap, 
-                norm=plt.Normalize(vmin=0, vmax=1)
-            )
-            sm.set_array([])
-            fig.colorbar(sm, cax=ax, orientation='vertical')
-            ax.set_ylabel(
-                r"F-score", 
-                # fontsize=label_fontsize, 
-            )
-
         # Save figure
-        save_file = 'graphs_of_branches_{}.png'.format(tree.exploration_strategy)
+        save_file = 'graphs_of_branches_{}'.format(tree.exploration_strategy)
         q.log_print(["Storing ", save_file])
-        fig.savefig(
-            os.path.join(q.qmla_controls.plots_directory, save_file)
-        )
-
-        # TODO return dict of graphs organised by ES, if ever used
-        # if return_graphs:
-        #     return graphs
+        lf.save(os.path.join(q.qmla_controls.plots_directory, save_file), file_format = q.qmla_controls.figure_format)

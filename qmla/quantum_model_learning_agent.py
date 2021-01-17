@@ -2877,22 +2877,20 @@ class QuantumModelLearningAgent():
             aggfunc=np.median
         )
         mask = np.tri(bayes_factor_by_id.shape[0], k=-1).T
-        self.log_print([
-            "bayes_factor_by_id : \n {} \n mask: \n {}".format(bayes_factor_by_id.head(), mask)
-        ])
         
-        lf = LatexFigure()
+        lf = LatexFigure(auto_label=False)
         ax = lf.new_axis()
-        plt.clf()
         sns.heatmap(
             bayes_factor_by_id,
-            # cmap='RdYlGn',
             cmap=self.exploration_class.bf_cmap, 
             mask=mask,
             ax=ax, 
-            annot=False
+            annot=False,
+            cbar_kws={
+                "orientation": "vertical",
+                "label" : r"$\log_{10}\left(B_{a,b}\right)$"
+            }
         )
-        # s.get_figure().savefig(
         lf.save(
             os.path.join(
                 self.qmla_controls.plots_directory,

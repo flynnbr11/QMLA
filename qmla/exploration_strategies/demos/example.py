@@ -23,6 +23,48 @@ class ExampleBasic(
         )
 
         self.initial_models = None
+        self.true_model_terms_params = {
+            'pauliSet_1J2_zJz_d4' : 2.5,
+            'pauliSet_2J3_zJz_d4' : 7.5,
+            'pauliSet_3J4_zJz_d4' : 3.5,
+        }
+        self.tree_completed_initially = True
+        self.min_param = 0
+        self.max_param = 10
+
+    def generate_models(self, **kwargs):
+
+        self.log_print(["Generating models; spawn step {}".format(self.spawn_step)])
+        if self.spawn_step == 0:
+            # chains up to 4 sites
+            new_models = [
+                'pauliSet_1J2_zJz_d4',
+                'pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4',
+                'pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4',
+            ]
+            self.spawn_stage.append('Complete')
+
+        return new_models
+
+
+class ExampleTwoBranches(
+    exploration_strategy.ExplorationStrategy
+):
+
+    def __init__(
+        self,
+        exploration_rules,
+        true_model=None,
+        **kwargs
+    ):
+        self.true_model = 'pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4'
+        super().__init__(
+            exploration_rules=exploration_rules,
+            true_model=self.true_model,
+            **kwargs
+        )
+
+        self.initial_models = None
         self.max_spawn_depth = 1
         self.true_model_terms_params = {
             'pauliSet_1J2_zJz_d4' : 2.5,
