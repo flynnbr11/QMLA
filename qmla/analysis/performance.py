@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
 import scipy
+import lfig 
 
 import qmla.construct_models
 
@@ -30,18 +31,12 @@ __all__ = [
     'inspect_times_on_nodes'
 ]
 
-def bayes_factor_f_score_heatmap(bayes_factors_df):
-    plt.clf()
-    fig = plt.figure(
-        figsize=(15, 5),
-        tight_layout=True
-    )
-    gs = GridSpec(
-        nrows=1,
-        ncols=2,
-        width_ratios=[11, 1]
-        # height_ratios=[6, 1]
-    )
+def bayes_factor_f_score_heatmap(
+    bayes_factors_df,
+    save_to_file=None,
+):
+    lf = lfig.LatexFigure()
+    ax1 = lf.new_axis()
 
     bayes_factor_by_f_score = pd.pivot_table(
         bayes_factors_df, 
@@ -52,45 +47,26 @@ def bayes_factor_f_score_heatmap(bayes_factors_df):
     )
 
     mask = np.tri(bayes_factor_by_f_score.shape[0], k=0).T
-    ax1 = fig.add_subplot(gs[0,0])
-    # ax2 = fig.add_subplot(gs[0,1])
-    cbar_ax = fig.add_subplot(gs[:,1])
-
     sns.heatmap(
         bayes_factor_by_f_score,
-        # cmap='RdYlGn',
         cmap=matplotlib.cm.PRGn, # TODO get from ES?
         mask=mask,
         annot=True, 
         ax = ax1,
-        cbar_ax = cbar_ax,
         cbar_kws={
             # "orientation": "horizontal"
-            "orientation": "vertical"
+            "orientation": "vertical",
+            "label" : r"$\log_{10}\left(B_{a,b}\right)$"
         }
     )
     ax1.set_ylabel('$F(a)$')
     ax1.set_xlabel('$F(b)$')
     ax1.set_title('$F(A) > F(B)$')
 
-    # mask = np.tri(bayes_factor_by_f_score.shape[0], k=-1)
-    # sns.heatmap(
-    #     bayes_factor_by_f_score,
-    #     cmap='RdYlGn',
-    #     mask=mask,
-    #     annot=True, 
-    #     ax = ax2,
-    #     cbar_ax = cbar_ax,
-    #     cbar_kws={"orientation": "horizontal"}
-    # )
-    # ax2.set_ylabel('$F(a)$')
-    # ax2.set_xlabel('$F(b)$')
-    # ax2.set_title('$F(A) \leq F(B)$')
+    lf.fig.suptitle(r"$\log_{10}$ Bayes factor by F score", fontsize=25, y=1.15)
 
-    cbar_ax.set_title('$log_{10} BF$', fontsize=20)
-
-    fig.suptitle("$log_{10}$ Bayes factor by F score", fontsize=25, y=1.15)
-    return fig
+    if save_to_file is not None:
+        lf.save(save_to_file)
 
 
 def cross_instance_bayes_factor_heatmap(
@@ -111,10 +87,12 @@ def cross_instance_bayes_factor_heatmap(
     bayes_factors = pd.read_csv(
         os.path.join(combined_datasets_directory, 'bayes_factors.csv')
     )
-    f = bayes_factor_f_score_heatmap(bayes_factors)
-    f.savefig(
-        os.path.join(save_directory, 'bayes_factors_by_f_scores.png')
+    f = bayes_factor_f_score_heatmap(
+        bayes_factors, 
+        save_to_file = os.path.join(save_directory, 'bayes_factors_by_f_scores')
     )
+    # f.savefig(
+    # )
 
 
 def update_shared_bayes_factor_csv(qmd, all_bayes_csv):

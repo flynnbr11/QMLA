@@ -2877,6 +2877,9 @@ class QuantumModelLearningAgent():
             aggfunc=np.median
         )
         mask = np.tri(bayes_factor_by_id.shape[0], k=-1).T
+        self.log_print([
+            "bayes_factor_by_id : \n {} \n mask: \n {}".format(bayes_factor_by_id.head(), mask)
+        ])
         
         lf = LatexFigure()
         ax = lf.new_axis()
@@ -2899,10 +2902,9 @@ class QuantumModelLearningAgent():
         )
 
         # Heat map BF against F(A)/F(B)
-        fig = qmla.analysis.bayes_factor_f_score_heatmap(
-            bayes_factors_df=self.bayes_factors_df)
-        fig.savefig(
-            os.path.join(
+        qmla.analysis.bayes_factor_f_score_heatmap(
+            bayes_factors_df=self.bayes_factors_df,
+            save_to_file = os.path.join(
                 self.qmla_controls.plots_directory, "bayes_factors_by_f_score"
             )
         )
@@ -3266,8 +3268,7 @@ class QuantumModelLearningAgent():
         ).transpose()
 
         # Plot as heatmap
-        # fig, ax = plt.subplots(figsize=(15,10))
-        lf = LatexFigure()
+        lf = LatexFigure(auto_label=False) # TODO make figure size depend on num terms. 
         ax = lf.new_axis()
 
         if colour_by == 'f_score':
@@ -3287,16 +3288,16 @@ class QuantumModelLearningAgent():
             )
 
         ax.tick_params(which='y', rotation=0)
-        fontsize = 20
+        # fontsize = 20
         ax.tick_params(
             top=True, 
             bottom=False,
             labeltop=True,
             labelbottom=False,
             labelrotation=0,
-            labelsize=fontsize
+            # labelsize=fontsize
         )
-        ax.set_ylabel('Model ID', fontsize=2*fontsize)
+        ax.set_ylabel('Model ID')
         ax.set_xlabel('Term')
 
         lf.save(
