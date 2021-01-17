@@ -8,10 +8,10 @@
 # QMLA run configuration
 ###############
 num_instances=1
-run_qhl=0 # perform QHL on known (true) model
+run_qhl=1 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models.
-exp=5 # number of experiments
-prt=20 # number of particles
+exp=1000 # number of experiments
+prt=5000 # number of particles
 
 ###############
 # QMLA settings - user
@@ -34,7 +34,7 @@ figure_format="pdf"
 ###############
 # Choose an exploration strategy 
 # This will determine how QMLA proceeds. 
-# use_alt_exploration_strategies=1 # note this is redundant locallycurrently
+# use_alt_exploration_strategies=1 # note this is currently redundant locally
 ###############
 
 exploration_strategy="ExampleBasic"

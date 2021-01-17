@@ -1161,8 +1161,10 @@ class ModelInstanceForLearning():
             # 'quad_loss',  'residuals', 'likelihoods'
         ]
         resample_colour = 'grey'
-
-        ncols = int(np.ceil(np.sqrt(num_terms)))
+        if num_terms <=3:
+            ncols = num_terms
+        else:          
+            ncols = int(np.ceil(np.sqrt(num_terms)))
         nrows_for_params = int(np.ceil(num_terms / ncols))
         nrows = nrows_for_params + len(extra_plots)
         height_ratios = [1]*nrows_for_params
@@ -1177,7 +1179,7 @@ class ModelInstanceForLearning():
         # Parameter estimates
         for term in terms:
             ax = lf.new_axis(
-                label_position=(-.3, 1.1)
+                # label_position=(-.3, 1.1)
             )
             estimates = self.track_param_estimate_v_epoch[term]
             uncertainty = self.track_param_uncertainty_v_epoch[term]
@@ -1227,11 +1229,17 @@ class ModelInstanceForLearning():
                 ax.legend(
                     bbox_to_anchor=(1.1, 1.1)
                 )
+            if ax.col == 0 :
+                ax.set_ylabel("Parameter")
+            if ax.row == nrows_for_params -1:
+                ax.set_xlabel("Epoch")
+            else:
+                ax.set_xlabel("")
 
         if 'volume' in extra_plots:
             # Volume and experimental times
             ax = lf.new_axis(
-                label_position=(-0.1, 1.05),
+                # label_position=(-0.1, 1.05),
                 span=(1, 'all')
             )
 
