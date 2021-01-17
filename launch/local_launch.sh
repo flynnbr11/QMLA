@@ -10,8 +10,8 @@
 num_instances=1
 run_qhl=1 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models.
-exp=1000 # number of experiments
-prt=5000 # number of particles
+exp=500 # number of experiments
+prt=2000 # number of particles
 
 ###############
 # QMLA settings - user
