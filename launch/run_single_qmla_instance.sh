@@ -84,6 +84,7 @@ mpirun --display-map --tag-output \
 	-plotprobes=$PLOT_PROBES_FILE \
 	-latex=$LATEX_MAP_FILE \
 	-pl=$PLOT_LEVEL \
+	-ff=$FIGURE_FORMAT \
 	-debug=$DEBUG \
 	-es=$EXPLORATION_STRATEGY \
 	$ALT_ES \

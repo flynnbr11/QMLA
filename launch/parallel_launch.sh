@@ -1,6 +1,6 @@
 #!/bin/bash
 # note monitor script currently turned off (at very bottom)
-test_description='thesis-demo__obj-fnc-table'
+test_description='example-ES__qmla-isntance'
 
 ### ---------------------------------------------------###
 # Essential choices for how to run multiple 
@@ -8,19 +8,19 @@ test_description='thesis-demo__obj-fnc-table'
 ### ---------------------------------------------------###
 
 ## Number and type of QMLA instances to perform in this run.
-num_instances=2
+num_instances=10
 run_qhl=0 # do a test on QHL only -> 1; for full QMLA -> 0
 run_qhl_multi_model=0
 multiple_exploration_strategies=0
 do_further_qhl=0 # perform further QHL parameter tuning on average values found by QMLA. 
-plot_level=2
+plot_level=5
 debug_mode=0
 time_request_insurance_factor=1
-min_time_to_request=12000 # 1300 by default
+min_time_to_request=20000 # 1300 by default
 
 # QHL parameters.
-e=10 # experiments
-p=50 # particles
+e=500 # experiments
+p=2000 # particles
 
 ### ---------------------------------------------------###
 # Choose growth rule 
@@ -28,13 +28,13 @@ p=50 # particles
 # and value of experimental_data.
 ### ---------------------------------------------------###
 
-exploration_strategy='DemoObjectiveFunctions'
+exploration_strategy='ExampleBasic'
 
 # Alternative growth rules, i.e. to learn alongside the true one. Used if multiple_exploration_strategies set to 1 above
 alt_exploration_strategies=(  
-# 	'IsingLatticeSet'
- 	'FermiHubbardLatticeSet'
-	'HeisenbergLatticeSet'
+ 	'IsingLatticeSet'
+ 	'HubbardReducedLatticeSet'
+#	'HeisenbergLatticeSet'
 )
 exploration_strategies_command=""
 for item in ${alt_exploration_strategies[*]}
@@ -51,8 +51,9 @@ done
 # QMD settings - for learning (QHL) and comparison (BF)
 further_qhl_resource_factor=1
 do_plots=0
-pickle_class=1
+pickle_class=0
 top_number_models=4
+figure_format="pdf"
 
 ### ---------------------------------------------------###
 # Everything from here downwards uses the parameters
@@ -176,7 +177,7 @@ do
 	this_error_file="$output_dir/error_$qmla_id.txt"
 	this_output_file="$output_dir/output_$qmla_id.txt"
 
-	qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmla_dir,QMLA_ID=$qmla_id,RUN_QHL=$run_qhl,RUN_QHL_MULTI_MODEL=$run_qhl_multi_model,FURTHER_QHL=0,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXPERIMENTS=$e,PLOTS=$do_plots,PICKLE_INSTANCE=$pickle_class,BAYES_CSV=$bayes_csv,EXPLORATION_STRATEGY=$exploration_strategy,MULTIPLE_EXPLORATION_STRATEGIES=$multiple_exploration_strategies,ALT_ES="$exploration_strategies_command",LATEX_MAP_FILE=$latex_mapping_file,RUN_INFO_FILE=$run_info_file,SYS_MEAS_FILE=$system_measurements_file,PLOT_PROBES_FILE=$plot_probe_file,PLOT_LEVEL=$plot_level,DEBUG=$debug_mode -N $this_qmla_name -l $node_req,$time -o $this_output_file -e $this_error_file run_single_qmla_instance.sh
+	qsub -v RUNNING_DIR=$running_dir,LIBRARY_DIR=$lib_dir,SCRIPT_DIR=$script_dir,ROOT_DIR=$qmla_dir,QMLA_ID=$qmla_id,RUN_QHL=$run_qhl,RUN_QHL_MULTI_MODEL=$run_qhl_multi_model,FIGURE_FORMAT=$figure_format,FURTHER_QHL=0,RESULTS_DIR=$this_run_directory,DATETIME=$day_time,NUM_PARTICLES=$p,NUM_EXPERIMENTS=$e,PLOTS=$do_plots,PICKLE_INSTANCE=$pickle_class,BAYES_CSV=$bayes_csv,EXPLORATION_STRATEGY=$exploration_strategy,MULTIPLE_EXPLORATION_STRATEGIES=$multiple_exploration_strategies,ALT_ES="$exploration_strategies_command",LATEX_MAP_FILE=$latex_mapping_file,RUN_INFO_FILE=$run_info_file,SYS_MEAS_FILE=$system_measurements_file,PLOT_PROBES_FILE=$plot_probe_file,PLOT_LEVEL=$plot_level,DEBUG=$debug_mode -N $this_qmla_name -l $node_req,$time -o $this_output_file -e $this_error_file run_single_qmla_instance.sh
 
 done
 echo "Launched $num_instances instances."
@@ -201,6 +202,7 @@ python3 analyse_qmla.py \
 	-sysmeas=$system_measurements_file \
 	-latex=$latex_mapping_file \
 	-gs=1 \
+	-ff=$figure_format \
 	-es=$exploration_strategy
 
 python3 generate_results_pdf.py \
