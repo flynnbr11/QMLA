@@ -1,5 +1,4 @@
 #!/bin/bash
-# note monitor script currently turned off (at very bottom)
 test_description='example-ES__qmla-isntance'
 
 ### ---------------------------------------------------###
@@ -19,8 +18,8 @@ time_request_insurance_factor=1
 min_time_to_request=20000 # 1300 by default
 
 # QHL parameters.
-e=500 # experiments
-p=2000 # particles
+experiments=500
+particles=2000 
 
 ### ---------------------------------------------------###
 # Choose growth rule 
@@ -103,7 +102,7 @@ git_commit="$(git rev-parse HEAD)"
 python3 ../scripts/set_qmla_params.py \
 	-dir=$this_run_directory \
 	-es=$exploration_strategy \
-	-prt=$p \
+	-prt=$particles\
 	-runinfo=$run_info_file \
 	-sysmeas=$system_measurements_file \
 	-plotprobes=$plot_probe_file \
@@ -116,8 +115,8 @@ python3 ../scripts/time_required_calculation.py \
 	-es=$exploration_strategy \
 	-use_aes=$multiple_exploration_strategies \
 	$exploration_strategies_command \
-	-e=$e \
-	-p=$p \
+	-e=$experiments\
+	-p=$particles\
 	-proc=1 \
 	-scr=$time_required_script \
 	-time_insurance=$time_request_insurance_factor \
@@ -162,7 +161,7 @@ echo "After calling scipt(s), num processes=$num_proc, seconds_reqd=$seconds_req
 ### ---------------------------------------------------###
 # Submit instances as jobs to job scheduler.
 ### ---------------------------------------------------###
-printf "$day_time: e=$e; p=$p \t $exploration_strategy \t $test_description \n" >> paths_to_results.log
+printf "$day_time: e=$e; p=$particles\t $exploration_strategy \t $test_description \n" >> paths_to_results.log
 
 
 min_id=0
@@ -207,8 +206,8 @@ python3 analyse_qmla.py \
 
 python3 generate_results_pdf.py \
 	-dir=$this_run_directory \
-	-p=$p \
-	-e=$e \
+	-p=$particles\
+	-e=$experiments\
 	-t=$num_instances \
 	-es=$exploration_strategy \
 	-run_desc=$test_description \
@@ -263,7 +262,7 @@ echo "
 
 	python3 generate_results_pdf.py \
 		-dir=$this_run_directory \
-		-p=$p -e=$e -bt=$bt -t=$num_instances \
+		-p=$particles-e=$experiments-bt=$bt -t=$num_instances \
 		-nprobes=$num_probes \
 		-pnoise=$probe_noise_level \
 		-special_probe=$special_probe \

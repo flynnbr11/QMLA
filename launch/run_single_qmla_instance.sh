@@ -1,5 +1,4 @@
 #!/bin/bash
-#PBS -l nodes=1:ppn=5,walltime=00:06:00
 
 rm dump.rdb 
 echo "inside run single instance script".
@@ -43,9 +42,7 @@ QMLA_JOB=$PBS_JOBNAME
 echo "PBS job name is $QMLA_JOB"
 QMLA_LOG="$INSTANCE_LOG_DIRECTORY/$QMLA_JOB.qmd.$job_number.log"
 
-
-# Create the node file ---------------
-# 
+# Create node file 
 cat $PBS_NODEFILE
 export nodes=`cat $PBS_NODEFILE`
 export nnodes=`cat $PBS_NODEFILE | wc -l`
@@ -53,14 +50,13 @@ export confile="$OUTPUT_ERROR_DIR/node_info.$QMLA_JOB.conf"
 for i in $nodes; do
 	echo ${i} >>$confile
 done
-# -------------------------------------
 
-
-# Launch RQ workers from QMLA root directory so that import statements calling qmla are understood
+# Launch RQ workers from QMLA root directory 
+# so that import statements calling qmla are understood
 cd $ROOT_DIR
-
 let NUM_RQ_WORKERS="$NUM_WORKERS-1"
 # let NUM_RQ_WORKERS="$NUM_WORKERS"
+
 set -x 
 mpirun --display-map --tag-output \
 	-np 1 \
@@ -92,7 +88,6 @@ mpirun --display-map --tag-output \
 	: \
 	-np $NUM_RQ_WORKERS \
 	python3 rq_worker_qmla.py -host=$SERVER_HOST -port=$REDIS_PORT -qid=$QMLA_ID >> $INSTANCE_LOG_DIRECTORY/$QMLA_JOB.worker.$job_number.log 2>&1 
-
 
 echo "$job_number" >> $RESULTS_DIR/job_ids_completed.txt
 echo "QMLA instace $QMLA_ID finished at time: $(date +%H:%M:%S)"
