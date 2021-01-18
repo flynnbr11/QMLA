@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Assumed to be running on backend -> load redis as module
+module load tools/redis-4.0.8
+
 rm dump.rdb 
 echo "inside run single instance script".
 
@@ -9,9 +12,6 @@ if (( "$MULTIPLE_EXPLORATION_STRATEGIES" == 0))
 then
 	ALT_ES=""
 fi
-
-# Assumed to be running on backend -> load redis as module
-module load tools/redis-4.0.8
 
 SERVER_HOST=$(head -1 "$PBS_NODEFILE")
 let REDIS_PORT="6300 + $QMLA_ID"
