@@ -218,7 +218,10 @@ def average_parameter_estimates(
         num_wins_for_name = len(parameters_for_this_name)
         terms = sorted(qmla.construct_models.get_constituent_names_from_name(name))
         num_terms = len(terms)
-        lf = lfig.LatexFigure(auto_gridspec=num_terms)
+        lf = lfig.LatexFigure(
+            auto_label=False, 
+            auto_gridspec=num_terms
+        )
 
         cm_subsection = np.linspace(0, 0.8, num_terms)
         colours = [cm.Paired(x) for x in cm_subsection]
@@ -916,7 +919,9 @@ def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="pn
 
     # Draw figure
     lf = lfig.LatexFigure(
-        fraction = 1, 
+        # fraction = 0.73,
+        # fraction = 1, 
+        auto_label=False, 
         auto_gridspec = len(all_learned_params),
         gridspec_params = {'wspace' : 0.15, 'hspace' : 0.3}
     )
@@ -954,14 +959,14 @@ def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="pn
         ax.set_title(
             exploration_strategy.latex_name(p)
         )
-        if ax.row == 0 and ax.col == 0 :
+        if ax.row == 0 and ax.col == lf.num_cols-1 :
             ax.legend(
-                bbox_to_anchor=(1, 1.3), 
-                ncol=3
+                bbox_to_anchor=(1.025, 0.85), 
+                # ncol=3
             )
 
-    lf.fig.text(0.5, -0.04, r"Parameter ($\alpha$) value", ha='center', )
-    lf.fig.text(0.04, 0.5, "Number  occurences", va='center', rotation='vertical',)
+    lf.fig.text(0.5, -0.12, r"Parameter ($\alpha$) value", ha='center', )
+    lf.fig.text(0.04, 0.5, "Occurences", va='center', rotation='vertical',)
     
     if save_to_file is not None:
         lf.save(save_to_file, file_format=figure_format)

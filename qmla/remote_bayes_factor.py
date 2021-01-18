@@ -393,52 +393,79 @@ def plot_dynamics_from_models(
     """
 
     times = list(sorted(exp_msmts.keys()))
-    lf = LatexFigure(auto_label=False)
+    lf = LatexFigure(
+        fraction=0.45, 
+        auto_label=False
+    )
     ax1 = lf.new_axis()
+    lines = []
 
-    # Plot true measurements
-    ax1.scatter(
+    for model in models:
+        l = model.plot_dynamics(
+            ax = ax1, 
+            times = times
+        )
+        lines.extend(l)
+    ax1.set_xlim((min(times), max(times)))
+
+    # Plot system measurements
+    l = ax1.scatter(
         times,
         [exp_msmts[t] for t in times],
-        label='System',
+        label=r"$Q$",
         color='red',
         alpha=0.6,
         s=5
     )
+    lines.append(l)
     ax1.set_ylabel('Expectation Value')
 
-    for model in models:
-        model.plot_dynamics(
-            ax = ax1, 
-            times = times
-        )
-    ax1.set_xlim((min(times), max(times)))
-    
     # Overlay times 
     try:
         # in background, show how often that time was considered
         ax2 = ax1.twinx()
         num_times = int(len(times)) - 1
-        ax2.hist(
+        l = ax2.hist(
             bf_times,
             bins=num_times,
             # TODO put on separate plot to see when higher times compared on
             range=(min(times), max(times)),
             histtype='stepfilled',
             fill=False,
-            label=str("{} times total".format(len(bf_times))),
+            label=r"$t$",
             alpha=0.25
         )
-        ax2.set_ylabel('Frequency time was during comparison')
+        ax2.set_ylabel('Frequency')
+        max_freq = max(l[0])
+        ax2.set_ylim(0, 1.6*max_freq)
+        ax2.set_yticks([0, int(max_freq/2), max_freq])
+
+        lines.append(l[-1][0])
     except BaseException:
         raise
         # pass
 
     bf = np.log10(bayes_factor)
-    plt.title(
-        "[$log_{10}$ Bayes Factor]: " + str(np.round(bf, 2))
+    # plt.title(
+    #     r"[$\log_{10}$ Bayes Factor]: " + str(np.round(bf, 2))
+    # )
+    # plt.figlegend()
+    # ax1.legend(bbox_to_anchor=(0.5, 0.75), ncol=1)
+    # ax2.legend()
+
+    labels = [l.get_label() for l in lines]
+    ax1.set_ylim(0, 1.6)
+    ax1.set_yticks([0, 0.5, 1])
+    ax1.legend(
+        lines, 
+        labels, 
+        ncol=2,
+        loc = "upper center"
+        # bbox_to_anchor=(1.15,0.75),
+        # bbox_to_anchor=(0.5, 1.15),
+        # ncol=4
     )
-    plt.figlegend()
+
 
     plot_path = os.path.join(
         save_directory,

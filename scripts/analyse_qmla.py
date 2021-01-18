@@ -465,7 +465,8 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: plotting model win rates.")
-    pass
+    raise
+    # pass
 
 # Model statistics (f-score, precision, sensitivty)
 try:

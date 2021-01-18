@@ -341,11 +341,12 @@ class ModelInstanceForComparison():
                 state = plot_probe # TODO
             )
 
-        ax.plot(
+        l = ax.plot(
             times, 
             [self.expectation_values[t] for t in times],
-            label = "{}: {}".format(self.model_id, self.model_name_latex), 
+            label = "{}".format(self.model_id), 
         )
+        return l
 
     ##########
     # Section: Utilities

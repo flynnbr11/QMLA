@@ -7,11 +7,11 @@
 ###############
 # QMLA run configuration
 ###############
-num_instances=1
+num_instances=2
 run_qhl=0 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models.
-exp=5 # number of experiments
-prt=10 # number of particles
+exp=250 # number of experiments
+prt=1000 # number of particles
 
 ###############
 # QMLA settings - user

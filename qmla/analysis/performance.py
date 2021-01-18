@@ -548,13 +548,13 @@ def plot_scores(
                 qmla.construct_models.get_constituent_names_from_name(mod)
             )
 
-            if (
-                np.abs(num_true_params - num_params) == 1
-            ):
-                # must be exactly one parameter smaller
-                batch_correct_models.append(
-                    mod
-                )
+            # if (
+            #     np.abs(num_true_params - num_params) == 1
+            # ):
+            #     # must be exactly one parameter smaller
+            #     batch_correct_models.append(
+            #         mod
+            #     )
 
     mod_scores = scores
     scores = list(scores.values())
@@ -614,7 +614,10 @@ def plot_scores(
     except BaseException:
         pass
 
-    lf = lfig.LatexFigure(auto_label=False)
+    lf = lfig.LatexFigure(
+        fraction=0.5, 
+        auto_label=False
+    )
     ax1 = lf.new_axis()
 
     # ax.barh(ind, scores, width, color="blue")
@@ -624,7 +627,7 @@ def plot_scores(
         latex_model_names,
         minor=False
     )
-    ax1.set_xlabel('Number wins')
+    ax1.set_xlabel('Wins')
     xticks_pos = list(range(max(scores) + 1))
     ax1.set_xticks(
         xticks_pos,
@@ -632,13 +635,13 @@ def plot_scores(
     )
     custom_lines = [
         Line2D([0], [0], color='green', lw=4),
-        Line2D([0], [0], color='orange', lw=4),
+        # Line2D([0], [0], color='orange', lw=4),
         Line2D([0], [0], color='blue', lw=4),
         # Line2D([0], [0], color='black', lw=4, ls='--'),
     ]
     custom_handles = [
-        r'True ({}$\%$)'.format(int(correct_success_rate)),
-        r'True/Close ({}$\%$)'.format(int(batch_success_rate)),
+        r'$\hat{{H}}_0$ ({}$\%$)'.format(int(correct_success_rate)),
+        # r'True/Close ({}$\%$)'.format(int(batch_success_rate)),
         'Other',
         # '$R^2$'
     ]
@@ -709,10 +712,10 @@ def plot_scores(
     ax1.legend(
         custom_lines,
         custom_handles,
-        bbox_to_anchor=(1.0, 0.4),
+        bbox_to_anchor=(1.0, 0.8),
     )
 
-    ax1.set_ylabel('Model')
+    # ax1.set_ylabel('Model')
     lf.save(save_file, file_format=figure_format)
 
 

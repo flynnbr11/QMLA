@@ -2878,7 +2878,10 @@ class QuantumModelLearningAgent():
         )
         mask = np.tri(bayes_factor_by_id.shape[0], k=-1).T
         
-        lf = LatexFigure(auto_label=False)
+        lf = LatexFigure(
+            fraction=0.45, 
+            auto_label=False
+        )
         ax = lf.new_axis()
         sns.heatmap(
             bayes_factor_by_id,
@@ -2888,9 +2891,11 @@ class QuantumModelLearningAgent():
             annot=False,
             cbar_kws={
                 "orientation": "vertical",
-                "label" : r"$\log_{10}\left(B_{a,b}\right)$"
+                "label" : r"$\log_{10}\left(B_{i,j}\right)$"
             }
         )
+        ax.set_ylabel(r"ID $\hat{H}_i$")
+        ax.set_xlabel(r"ID $\hat{H}_j$")
         lf.save(
             os.path.join(
                 self.qmla_controls.plots_directory,
@@ -3266,7 +3271,10 @@ class QuantumModelLearningAgent():
         ).transpose()
 
         # Plot as heatmap
-        lf = LatexFigure(auto_label=False) # TODO make figure size depend on num terms. 
+        lf = LatexFigure(
+            fraction=0.45, 
+            auto_label=False
+        ) # TODO make figure size depend on num terms. 
         ax = lf.new_axis()
 
         if colour_by == 'f_score':
@@ -3337,6 +3345,7 @@ class QuantumModelLearningAgent():
             num_rows = math.ceil( len(models) / max_models_per_subplot )
 
             lf  = LatexFigure(
+                fraction=0.45, 
                 gridspec_layout = (num_rows, 1),
                 auto_label=False
             )
@@ -3389,16 +3398,19 @@ class QuantumModelLearningAgent():
                     times, 
                     [self.experimental_measurements[t] for t in times],
                     c = 'red',
-                    label = 'System',
+                    label = r"$Q$",
                     s = 5, 
                 )
 
                 ax.set_xlim(0, max(times))
+                ax.set_ylim(0, 1.05)
+                ax.set_yticks([0, 0.5, 1])
                 ax.set_ylabel('Expectation Value')
-                ax.set_xlabel('Time ($s$)')
+                ax.set_xlabel('Time')
                 ax.legend(
-                    # bbox_to_anchor=(1.2, 1.05),
-                    # fontsize=12, 
+                    bbox_to_anchor = (1, 0.8)
+                    # loc = "upper center",
+                    # ncol=2
                 )
 
             path = os.path.join(

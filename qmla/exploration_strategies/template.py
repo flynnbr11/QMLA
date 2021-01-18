@@ -59,3 +59,34 @@ class ExplorationStrategyTemplate(
             return True
         else:
             return False
+
+class TestInstall(
+    exploration_strategy.ExplorationStrategy  # inherit from this
+):
+    r"""
+    Template exploration strategy
+    """
+
+    def __init__(
+        self,
+        exploration_rules,
+        **kwargs
+    ):
+        # print("[Exploration Strategies] init nv_spin_experiment_full_tree")
+        super().__init__(
+            exploration_rules=exploration_rules,
+            **kwargs
+        )
+        self.initial_models = None
+        self.tree_completed_initially = True
+        self.initial_models = [
+            'pauliSet_1J2_xJx_d2'
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2'
+            'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2'
+        ]
+        self.true_model = 'pauliSet_1J2_xJx_d2+pauliSet_1J2_yJy_d2+pauliSet_1J2_zJz_d2'
+        self.true_model_terms_params = {
+            'pauliSet_1J2_xJx_d2': 0.1,
+            'pauliSet_1J2_yJy_d2': 0.9,
+            'pauliSet_1J2_zJz_d2': 0.3,
+        }

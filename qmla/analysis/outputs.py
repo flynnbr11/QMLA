@@ -158,7 +158,11 @@ def plot_dynamics_multiple_models(
     else:
         ncols = int(np.ceil(np.sqrt(nmod)))
         nrows = int(np.ceil(nmod / ncols)) + 1  # 1 extra row for "master"
-        lf = lfig.LatexFigure(gridspec_layout=(nrows, ncols))
+        lf = lfig.LatexFigure(
+            auto_label=False, 
+            fraction=0.75,
+            gridspec_layout=(nrows, ncols)
+        )
 
     axes_so_far = 1
     full_plot_axis = lf.new_axis(force_position=(0,0), span = (1, 'all'))
@@ -360,7 +364,7 @@ def plot_dynamics_multiple_models(
                 color='r',
                 alpha=0.3
             )
-            ax.set_yticks([0, 0.5, 0.1])
+            ax.set_yticks([0, 0.5, 1.0])
             ax.set_title(description)
 
         # Add this model to "master" plot
@@ -393,7 +397,7 @@ def plot_dynamics_multiple_models(
         ncol=5,
     )
     full_plot_axis.set_ylim(0, 1.25)
-    full_plot_axis.set_yticks([0, 0.5, 0.1])
+    full_plot_axis.set_yticks([0, 0.5, 1.0])
     full_plot_axis.set_xlim(0, max(times))
     if nmod > 1:
         lf.fig.text(0.45, -0.04, 'Time', ha='center')
