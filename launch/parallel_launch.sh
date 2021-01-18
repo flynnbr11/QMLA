@@ -1,9 +1,9 @@
 #!/bin/bash
 run_description='example-ES__qmla-isntance'
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # QMLA run configuration
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 num_instances=10 # number of instances in run
 run_qhl=0 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models
@@ -12,24 +12,25 @@ particles=1000
 plot_level=5
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Choose an exploration strategy 
 # This will determine how QMLA proceeds. 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 exploration_strategy='ExampleBasic'
 
 
-##### --------------------------------------------------------------- #####
-# Timing options to enforce, in case QMLA requests too much/little time.
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
+# Time requests to enforce, 
+# in case QMLA requests too much/little time.
+##### -------------------------------------------------- #####
 time_request_insurance_factor=1
 min_time_to_request=3600 # one hour by default
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # The below parameters are used by QMLA but are less crucial
 # They may be changed by users as desired. 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 debug_mode=0
 figure_format="pdf" # analysis plots stored as this type
 top_number_models=4
@@ -37,10 +38,10 @@ do_plots=0
 pickle_instances=0
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Alternative exploration strategies,
 # used only if multiple_exploration_strategies=1
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 multiple_exploration_strategies=0
 alt_exploration_strategies=(  
  	'IsingLatticeSet'
@@ -54,12 +55,12 @@ do
 done
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Everything from here downwards uses the parameters
 # defined above to run QMLA. 
 # These should not need to be considered by users for each 
 # run, provided the default outputs are okay.
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 
 # Further QHL on top models to refine parameters
 do_further_qhl=0
@@ -98,10 +99,10 @@ num_jobs_launched=0
 log_for_entire_run="$this_run_directory/qmla_log.log"
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Set up parameters/data to be used by all instances
 # of QMLA within this run. 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 python3 ../scripts/set_qmla_params.py \
 	-dir=$this_run_directory \
 	-es=$exploration_strategy \
@@ -162,9 +163,9 @@ time="walltime=00:00:$seconds_reqd"
 echo "After calling scipt(s), num processes=$num_proc, seconds_reqd=$seconds_reqd"
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Submit instances as jobs to job scheduler.
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 printf "$day_time: e=$experiments; p=$particles\t $exploration_strategy \t $run_description \n" >> paths_to_results.log
 
 min_id=0

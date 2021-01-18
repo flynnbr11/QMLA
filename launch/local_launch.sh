@@ -1,8 +1,8 @@
 #!/bin/bash
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # QMLA run configuration
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 num_instances=2 # number of instances in run
 run_qhl=0 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models
@@ -11,16 +11,16 @@ particles=10 # number of particles
 plot_level=5
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Choose an exploration strategy 
 # This will determine how QMLA proceeds. 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 exploration_strategy="ExampleBasic"
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # QMLA settings - default
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 debug_mode=0
 q_id=0 # instance ID of first instance
 use_rq=0 # use RQ workers for learning
@@ -30,10 +30,10 @@ plots=0
 pickle_instances=1
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Alternative exploration strategies,
 # used if alt_exploration_strategies is not empty
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 alt_exploration_strategies=(
     # 'IsingLatticeSet'
     # 'HeisenbergLatticeSet'
@@ -48,12 +48,12 @@ do
 done
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Everything from here downwards uses the parameters
 # defined above to run QMLA. 
 # These should not need to be considered by users for each 
 # run, provided the default outputs are okay.
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 
 # Further QHL on top models to refine parameters
 do_further_qhl=0 # QHL refinement to best performing models 
@@ -83,10 +83,10 @@ cp $(pwd)/local_launch.sh "$this_run_directory/launched_script.txt"
 git_commit=$(git rev-parse HEAD)
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # First set up parameters/data to be used by all 
 # instances of QMLA for this run. 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 python3 ../scripts/set_qmla_params.py \
     -dir=$this_run_directory \
     -es=$exploration_strategy \
@@ -100,10 +100,10 @@ python3 ../scripts/set_qmla_params.py \
 echo "Generated run configuration."
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Write analysis script before launch in case
 # run is stopped before some instances complete.
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 
 echo "
 cd $this_run_directory
@@ -140,9 +140,9 @@ python3 ../../../../scripts/generate_results_pdf.py \
 chmod a+x $analysis_script
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Run instances
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 let max_qmla_id="$num_instances + $q_id"
 for i in `seq 1 $max_qmla_id`;
 do
@@ -178,9 +178,9 @@ echo "
 "
 
 
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 # Further QHL (optional)
-##### --------------------------------------------------------------- #####
+##### -------------------------------------------------- #####
 
 if (( $do_further_qhl == 1 )) 
 then
