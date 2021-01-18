@@ -418,8 +418,7 @@ def plot_dynamics_from_models(
         s=5
     )
     lines.append(l)
-    ax1.set_ylabel('Expectation Value')
-
+ 
     # Overlay times 
     try:
         # in background, show how often that time was considered
@@ -446,24 +445,17 @@ def plot_dynamics_from_models(
         # pass
 
     bf = np.log10(bayes_factor)
-    # plt.title(
-    #     r"[$\log_{10}$ Bayes Factor]: " + str(np.round(bf, 2))
-    # )
-    # plt.figlegend()
-    # ax1.legend(bbox_to_anchor=(0.5, 0.75), ncol=1)
-    # ax2.legend()
-
     labels = [l.get_label() for l in lines]
     ax1.set_ylim(0, 1.6)
     ax1.set_yticks([0, 0.5, 1])
+    ax1.set_ylabel('Expectation Value')
+    ax1.set_xlabel("Time")
+
     ax1.legend(
         lines, 
         labels, 
         ncol=2,
         loc = "upper center"
-        # bbox_to_anchor=(1.15,0.75),
-        # bbox_to_anchor=(0.5, 1.15),
-        # ncol=4
     )
 
     plot_path = os.path.join(

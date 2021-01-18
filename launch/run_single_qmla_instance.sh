@@ -72,7 +72,6 @@ mpirun --display-map --tag-output \
 	-host=$SERVER_HOST \
 	-port=$REDIS_PORT \
 	-pkl=$PICKLE_INSTANCE \
-	-pt=$PLOTS \
 	-cb=$BAYES_CSV \
 	-log=$QMLA_LOG \
 	-runinfo=$RUN_INFO_FILE \
