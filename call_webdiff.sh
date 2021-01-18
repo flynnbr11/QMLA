@@ -1,6 +1,6 @@
 #!/bin/bash
 
-nov_22='326481054bfd914203cd081e95179a979f5419e9'
-nov_23='8f37d5f4a0f35bfcca832adea65e62ac728e9632'
+old='51e5894704c905fa4cf4897463c831e8b53d36d4'
+new='1ee551c58cc2a3275ff83bf7e4710886b69d44ac'
 
-git webdiff $nov_22 $nov_23
+git webdiff $old $new

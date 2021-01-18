@@ -466,7 +466,6 @@ def plot_dynamics_from_models(
         # ncol=4
     )
 
-
     plot_path = os.path.join(
         save_directory,
         'BF_{}_{}'.format(
