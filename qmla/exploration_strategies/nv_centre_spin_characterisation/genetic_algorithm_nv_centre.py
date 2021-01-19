@@ -61,7 +61,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
         # Genetic algorithm options

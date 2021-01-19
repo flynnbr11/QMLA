@@ -20,6 +20,21 @@ import qmla.construct_models
 class NVCentreGenticAlgorithmPrelearnedParameters(
     Genetic
 ):
+    r"""
+    Exploration strategy for studying large model space through a genetic algorithm, 
+        considering a nitrogen vacancy centre through the Gali approximation. 
+    
+    Model generation is through the genetic algorithm exploration strategy.
+    This ES sets up the true model as an NV centre spin interacting with a number 
+    of nuclei, and makes a wider number of nuceli searchable by the genetic algorithm. 
+    Candidate models are assumed to have been learned extremely well by a parameter esimation 
+    algorithm, which may be unrealistic in some cases. 
+    In the genetic algorithm, to assess candidate models, 
+    we use an objective function which computes the average residual between 
+    the candidate and the system's dynamics, against a representative dataset. 
+
+    """
+
     def __init__(
         self,
         exploration_rules,
@@ -28,12 +43,11 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
     ):
 
         # Fundamental set up
-        # if true_model is None:
-        #     true_model = 'pauliSet_1J2_zJz_d2+pauliSet_1_z_d2+pauliSet_2_x_d2+pauliSet_2_y_d2+pauliSet_2_z_d2'
-        # true_model = qmla.construct_models.alph(true_model)
         self.true_n_qubits = 6
         self.available_axes = ['x', 'y', 'z']
-        self._set_true_params()
+
+        # Set up the target model/parameters
+        self._set_true_params() 
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
@@ -44,6 +58,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         kwargs['unchanged_elite_num_generations_cutoff'] = 3*self.true_n_qubits
         kwargs['num_protected_elite_models'] = 2
 
+        # Instantiate exploration strategy super class
         super().__init__(
             exploration_rules=exploration_rules,
             true_model = self.true_model,
@@ -51,107 +66,78 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
             **kwargs
         )
 
-        self._set_true_params() # again in case over written by parent __init__
-
-        # Modular functions
-        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
-        # self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
-        # self.evaluation_probe_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
-        # self.evaluation_probe_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict
-        self.evaluation_probe_generation_subroutine = qmla.shared_functionality.probe_set_generation.tomographic_basis
-        self.num_eval_probes = 36
-        self.num_eval_points = 100
-        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
-        self.shared_probes = True
-        self.num_probes = 5
+        self._set_true_params() # call again in case something was over written by parent __init__
         self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution
-        # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
-        # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.default_expectation_value
-        self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.TimeList
-        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
-        # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
-
-        self.iqle_mode = False
-        self.qinfer_resampler_a = 1
-        self.qinfer_resampler_threshold = 0.0
-
-        self.qhl_models = [
-            'pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # True
-
-            # extra coupling in X,Y
-            'pauliSet_1J2_xJx_d{N}+pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # 1 extra invisible to |+>
-            'pauliSet_1J2_yJy_d{N}+pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # 1 extra invisible to |+>
-            'pauliSet_1J2_xJx_d{N}+pauliSet_1J2_yJy_d{N}+pauliSet_1J2_zJz_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), # 1 extra invisible to |+>
-
-            # extra rotation on spin qubit
-            'pauliSet_1J2_zJz_d{N}+pauliSet_1_x_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), 
-            'pauliSet_1J2_zJz_d{N}+pauliSet_1_y_d{N}+pauliSet_1_z_d{N}+pauliSet_2_x_d{N}+pauliSet_2_y_d{N}+pauliSet_2_z_d{N}'.format(N=self.true_n_qubits), 
-        ]
-
+        self.qhl_models = [self.true_model]
         self.qhl_models = [
             qmla.construct_models.alph(m) for m in self.qhl_models
         ]
 
+        # Modular functions
+        self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_probe_dict # doesn't matter here
+        self.evaluation_probe_generation_subroutine = qmla.shared_functionality.probe_set_generation.tomographic_basis
+        self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution
+
+        # Training parameters
+        self.num_eval_probes = 36
+        self.num_eval_points = 100
+        self.shared_probes = True
+        self.num_probes = 5
+        self.iqle_mode = False
+        self.qinfer_resampler_a = 1
+        self.qinfer_resampler_threshold = 0.0
+
         # Genetic algorithm options
         self.tree_completed_initially =  False
-        self.branch_comparison_strategy = 'minimal' # 'optimal_graph' #'sparse_connection'
-        self.fitness_method =  'rs_mean_sq' # 'rs_median_sq'  # 'mean_residuals_sq' #  # 'rs_median' # 
+        self.branch_comparison_strategy = 'minimal'  # no need to compare with other models since objective fnc is absolute
+        self.fitness_method = 'rs_mean_sq' # squared mean residual 
 
-        test = False
-        single_gen_force_true_model = False
+        test = False # ensure it runs quickly without performing full search
         if test:
             num_models_per_generation = 4
             self.max_spawn_depth = 2
-        elif single_gen_force_true_model:
-            num_models_per_generation = 6
-            self.max_spawn_depth = 1
         else:
             num_models_per_generation =  12*self.true_n_qubits # TODO INCREASE NUM EVAL POINTS
             self.max_spawn_depth =  10*self.true_n_qubits
+
+        # Get initial generation's models
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
             qmla.construct_models.alph(m) for m in self.initial_models
         ]
         if self.tree_completed_initially:
-            self.initial_models = self.qhl_models
-        # if single_gen_force_true_model:
-        #     if self.true_model not in self.initial_models:
-        #         self.initial_models[-1] = self.true_model
-                
+            self.initial_models = self.qhl_models               
+        self.initial_num_models = len(self.initial_models)
 
         # Logistics
         self.force_evaluation = True
-        self.fraction_particles_for_bf = 0.1 # BF not meaningful here so minimising cost
+        self.fraction_particles_for_bf = 0.1 # BF not meaningful here so minimise cost
         self.fraction_own_experiments_for_bf = 0.1
         self.fraction_opponents_experiments_for_bf = 0
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
-        self.initial_num_models = len(self.initial_models)
         self.max_num_models_by_shape = {
             self.num_sites : (len(self.initial_models) * self.max_spawn_depth) / 8,
             'other': 0
         }
-        # self.num_processes_to_parallelise_over = 16
         self.num_processes_to_parallelise_over = min(16, len(self.initial_models))
         self.timing_insurance_factor = 0.15
 
     def _set_true_params(self):
+        r"""
+        Set up the target model: 
+        call a series of subroutines to define the true model,
+        as well as setting the parameters to represent the physics appropriately.
+        """
 
-        # set target model
-        # self._setup_true_model_2_qubit_approx()
-        n_qubits = self.true_n_qubits
-        available_axes = self.available_axes
-        # self.availalbe_pauli_terms  = ['x', 'y', 'z']
-
-        # self._setup_true_model_secular_approx(
-        #     n_qubits=n_qubits
-        # ) 
-        self.true_model_terms_params = self._get_secular_approx_true_params(4, n_qubits)
+        self.true_model_terms_params = self._get_secular_approx_true_params(
+            num_qubits = 4, # num qubits in target system
+            total_num_qubits = self.true_n_qubits
+        )
         self._setup_available_terms_gali_model(
-            n_qubits=n_qubits, 
-            available_axes = available_axes
+            n_qubits = self.n_qubits, 
+            available_axes = self.available_axes
         )
         self._setup_prior_by_parameters()
 
@@ -163,18 +149,75 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.max_time_to_consider = 100e-6
         self.plot_time_increment = self.max_time_to_consider / 100
 
+    def _get_secular_approx_true_params(
+        self, 
+        num_qubits = 2,
+        total_num_qubits = 5, 
+    ):
+        r"""
+        Using the secular approximation, define true parameters for all present terms. 
+
+        :param int num_qubits: number of qubits in the target model
+        :param int total_num_qubits: number of qubits of the search space, 
+            i.e. terms will be defined in this dimension, even if the system is not 
+            expected to be this large. 
+
+        :returns dict true_params: frequencies of each term to include in the true model
+        """
+
+        nuclei_terms = {
+            'x' : 66e3, 
+            'y' : 66e3, 
+            'z' : 15e3
+        }
+        
+        true_params = {}      
+
+        # Spin rotation terms only about Z axis
+        spin_term = 'pauliSet_1_z_d{N}'.format(N=total_num_qubits)
+        true_params[spin_term] = 2e9
+        
+        # Coupling and nuclear terms between the spin and all other qubits
+        for n in range(2, 1+num_qubits):
+            coupling_term = 'pauliSet_1J{n}_zJz_d{N}'.format(
+                n=n, N=total_num_qubits)
+            true_params[coupling_term] = 0.2e6
+
+            # Nuclei rotations independent of the spin
+            for pauli in ['x', 'y', 'z']:
+
+                    nuclei_rotation = 'pauliSet_{n}_{p}_d{N}'.format(
+                        n = n, 
+                        p = pauli, 
+                        N = total_num_qubits
+                    )
+                    true_params[nuclei_rotation] = nuclei_terms[pauli]
+
+        return true_params
+
     def _setup_prior_by_parameters(self):
+        r"""
+        Constructs the prior distribution to assign true parameters in the model. 
+
+        These are set in the gaussian_prior_means_and_widths attribute of this 
+        exploration strategy class.
+
+        """
+
         test_prior_info = {}      
 
         for pauli in self.available_axes:
             for num_qubits in range(1, 1+self.true_n_qubits):
-        
+                
+                # Spin rotation
                 spin_rotation_term = 'pauliSet_1_{p}_d{N}'.format(
                     p=pauli, N=num_qubits)
                 test_prior_info[spin_rotation_term] = (5e9, 2e9)
 
+                # Nuclear terms
                 for j in range(2, 1+num_qubits):
-
+                    
+                    # Nuclei independent rotation
                     nuclei_rotation = 'pauliSet_{j}_{p}_d{N}'.format(
                         j = j, 
                         p = pauli, 
@@ -182,6 +225,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
                     )
                     test_prior_info[nuclei_rotation] = (5e4, 2e4)
 
+                    # Coupling between spin and nuclei
                     coupling_w_spin = 'pauliSet_1J{j}_{p}J{p}_d{N}'.format(
                         j = j, 
                         p = pauli,
@@ -189,31 +233,24 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
                     )
                     test_prior_info[coupling_w_spin] = (5e5, 2e5)
 
-                    # TODO add transverse terms
-
         self.gaussian_prior_means_and_widths = test_prior_info
 
-    def _setup_true_model_secular_approx(
+    def _setup_available_terms_gali_model(
         self, 
-        n_qubits=2,
-        available_axes = ['x']
+        n_qubits=2, 
+        available_axes=['z']
     ):
-        self.true_model_terms_params = {
-            # spin
-            'pauliSet_1_z_d{}'.format(n_qubits) : 2e9,
-            
-            # coupling with 2nd qubit
-            'pauliSet_1J2_zJz_d{}'.format(n_qubits) : 0.2e6, 
-            # 'pauliSet_1J2_yJy_d{}'.format(n_qubits) : 0.4e6, 
-            # 'pauliSet_1J2_xJx_d{}'.format(n_qubits) : 0.2e6, 
+        r"""
+        Generates the set of terms to include in the genetic algorithm. 
 
-            # carbon nuclei - 2nd qubit
-            'pauliSet_2_x_d{}'.format(n_qubits) : 66e3,
-            'pauliSet_2_y_d{}'.format(n_qubits) : 66e3,
-            'pauliSet_2_z_d{}'.format(n_qubits) : 15e3,
-        }
+        Terms are stored as an attribute of the class.
 
-    def _setup_available_terms_gali_model(self, n_qubits=2, available_axes=['z']):
+        :param int n_qubits: number of qubits to construct terms up to
+        :param lsit available_axes: axes about which to generate terms, 
+            under the Gali approximation
+
+        """
+
         available_terms = []
         
         # spin_terms
@@ -230,47 +267,26 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         
         self.available_terms = available_terms
 
-    def _get_secular_approx_true_params(
-        self, 
-        num_qubits = 2,
-        total_num_qubits = 5, 
-    ):
-        nuclei_terms = {
-            'x' : 66e3, 
-            'y' : 66e3, 
-            'z' : 15e3
-        }
-        
-        true_params = {}      
-        # rotation of the spin
-        spin_term = 'pauliSet_1_z_d{N}'.format(N=total_num_qubits)
-        true_params[spin_term] = 2e9
-        
-        for n in range(2, 1+num_qubits):
-            coupling_term = 'pauliSet_1J{n}_zJz_d{N}'.format(
-                n=n, N=total_num_qubits)
-            true_params[coupling_term] = 0.2e6
-
-            # nuclei rotations
-            for pauli in ['x', 'y', 'z']:
-
-                    nuclei_rotation = 'pauliSet_{n}_{p}_d{N}'.format(
-                        n = n, 
-                        p = pauli, 
-                        N = total_num_qubits
-                    )
-                    true_params[nuclei_rotation] = nuclei_terms[pauli]
-
-        return true_params
 
     def get_prior(self, model_name, **kwargs):
+        r"""
+        Given a candidate model, constructs a very thin prior. 
+        
+        This is done to skip the model training stage, and assumes the training has performed 
+        extremely well. 
+        This method is called by QMLA in constructing candidate models. 
+
+        :param str model_name: string representing the model which is being tested.
+        :returns prior: QInfer object, used for sampling parameter values when considering 
+            the given model
+        """
+
         prior = qmla.shared_functionality.prior_distributions.prelearned_true_parameters_prior(
             model_name = model_name, 
             true_parameters = self.true_model_terms_params, 
             prior_specific_terms=self.gaussian_prior_means_and_widths,
             default_parameter = 0, 
             default_width = 1e-1, 
-            # fraction_true_parameter_width = 1e-6, # works v well with 1e-6 -> testing higher error
             fraction_true_param_found_within=1e-9,
             fraction_true_parameter_width=1e-8, 
             log_file = self.log_file, 
@@ -284,20 +300,18 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         **kwargs
     ):
         r"""
-        Generates sequential, equally spaced times
+        Generates sequential, equally spaced times for evaluating the candidate models against. 
+
+        :param int num_times: number of datapoints to generate
+        :returns dict eval_data: set of experiments for model evaluation
         """
-        # times = np.random.rand(num_times)
-        # min_t = self.max_time_to_consider / int(num_times)
-        # delta_t = 10*min_t # effectively how many iterations each time is eventually learned for
         times = np.arange(
             self.plot_time_increment, 
-            # 10*self.max_time_to_consider, 
             self.max_time_to_consider, 
-            # 10*self.plot_time_increment # to speedup test
             self.plot_time_increment
         )
         self.log_print([
-            "Generating evaluation data. Max time={}".format(max(times))
+            "Generating evaluation data with max time={}".format(max(times))
         ])
         eval_data = super().generate_evaluation_data(
             num_probes = self.num_eval_probes, 
@@ -315,7 +329,17 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         cov_mt, 
         **kwargs
     ):
-        # Make this slightly wider to simulate some error in model learning
+        r"""
+        Generate a QInfer distribution representing the trained model's paramterisation, 
+        in order to evaluate that model. 
+
+        :param str model_name: string representing the candidate model
+        :param dict estimated_params: average values of the posterior distribution 
+            after training, representing the parameter estimates for the model
+        :param np.array cov_mt: covariance matrix, i.e. the relationship between 
+            parameters after training
+        """
+
         posterior_distribution = self.get_prior(model_name = model_name)
         return posterior_distribution
 

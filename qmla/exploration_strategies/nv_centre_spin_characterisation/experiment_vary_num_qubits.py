@@ -44,7 +44,7 @@ class ExperimentNVCentreNQubits(
         self.max_num_probe_qubits = self.max_num_qubits
 
         # experiment design and running
-        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
+        self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
         # self.experimental_dataset = 'NVB_rescale_dataset.p'
         # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic

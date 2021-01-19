@@ -114,12 +114,11 @@ class ExampleGreedySearch(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.true_model = 'pauliSet_1_x_d3+pauliSet_1J2_yJy_d3+pauliSet_1J2J3_zJzJz_d3'
+        self.true_model = 'pauliSet_1_x_d3+pauliSet_1J2_yJy_d3'
         self.initial_models = None
         self.available_terms = [
-            'pauliSet_1_x_d3', 'pauliSet_1_y_d3', 'pauliSet_1_z_d3',
-            'pauliSet_1J2_xJx_d3', 'pauliSet_1J2_yJy_d3', 'pauliSet_1J2_zJz_d3',
-            'pauliSet_1J2J3_xJxJx_d3', 'pauliSet_1J2J3_yJyJy_d3', 'pauliSet_1J2J3_zJzJz_d3',
+            'pauliSet_1_x_d3', 'pauliSet_1_y_d3',
+            'pauliSet_1J2_xJx_d3', 'pauliSet_1J2_yJy_d3',
         ]
         self.branch_champions = []
         self.prune_completed_initially = True
@@ -157,24 +156,24 @@ class ExampleGreedySearch(
 
         return new_models
 
-    def check_tree_completed(
-        self,
-        spawn_step,
-        **kwargs
-    ):
-        r"""
-        QMLA asks the exploration tree whether it has finished growing; 
-        the exploration tree queries the exploration strategy through this method
-        """
-        if self.tree_completed_initially:
-            return True
-        elif self.spawn_stage[-1] == "Complete":
-            return True
-        else:
-            return False
+    # def check_tree_completed(
+    #     self,
+    #     spawn_step,
+    #     **kwargs
+    # ):
+    #     r"""
+    #     QMLA asks the exploration tree whether it has finished growing; 
+    #     the exploration tree queries the exploration strategy through this method
+    #     """
+    #     if self.tree_completed_initially:
+    #         return True
+    #     elif self.spawn_stage[-1] == "Complete":
+    #         return True
+    #     else:
+    #         return False
 
-    def check_tree_pruned(self, prune_step, **kwargs):
-        return self.prune_completed_initially
+    # def check_tree_pruned(self, prune_step, **kwargs):
+    #     return self.prune_completed_initially
 
 
 class ExampleGreedySearchTiered(
@@ -206,6 +205,7 @@ class ExampleGreedySearchTiered(
             3 : ['pauliSet_1J2J3_xJxJx_d3', 'pauliSet_1J2J3_yJyJy_d3', 'pauliSet_1J2J3_zJzJz_d3'],
         }
         self.tier = 1
+        self.max_spawn_depth = 25
         self.max_tier = max(self.term_tiers)
         self.tier_branch_champs = {k : [] for k in self.term_tiers} 
         self.tier_champs = {}
@@ -243,6 +243,7 @@ class ExampleGreedySearchTiered(
             if self.tier > self.max_tier:
                 self.log_print(["Completed tree for ES"])
                 self.spawn_stage.append('Complete')
+                self.log_print(["Terminating search; tier champions:", self.tier_champs.values()])
                 return list(self.tier_champs.values())
         else:
             self.log_print([
@@ -282,8 +283,8 @@ class ExampleGreedySearchTiered(
         else:
             return False
 
-    def check_tree_pruned(self, prune_step, **kwargs):
-        return self.prune_completed_initially
+    # def check_tree_pruned(self, prune_step, **kwargs):
+    #     return self.prune_completed_initially
 
 
 

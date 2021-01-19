@@ -15,15 +15,46 @@ import qmla
 import qmla.construct_models
 
 class GeneticAlgorithmQMLA():
+    r"""
+    Standalone genetic algorithm implementation for integration with :class:`qmla.QuantumModelLearningAgent`. 
+
+    This class works with the :class:`~qmla.exploration_strategies.ExplorationStrategy`
+    to construct models according to the genetic strategy. 
+
+    :param list genes: individual terms which can be combined to form chromosomes
+    :param int num_sites: maximum dimension permitted in model search
+    :param str true_model: target model. if None, set at random from space of valid models.
+    :param list base_terms: deprecated TODO remove
+    :param str selection_method: mechanism through which to select chromosomes as parents. 
+        Currently only 'roulette' available, but the framework should facilitate 
+        alternatives. 
+    :param str crossover_method : mechanism through which parent chromosomes are combined 
+        to form offspring. 
+        Currently only 'one_point' available, but the framework should facilitate 
+        alternatives. 
+    :param str mutation_method: mechanism through which to perform chromosome mutation
+        Currently only 'element_wise' available, but the framework should facilitate 
+        alternatives. 
+    :param float mutation_probability: rate with which the mutation mechanism incurs mutation. 
+    :param float selection_truncation_rate: fraction of models to retain as viable parents 
+        to the subsequent generation; the lower-rated other models are discarded. 
+    :param int num_protected_elite_models: number of models to automatically admit to the 
+        subsequent generation. 
+    :param int unchanged_elite_num_generations_cutoff: after this number of generations, 
+        if the top model has not changed, the model search is terminated. 
+    :param str log_file: path of QMLA instance's log file.
+
+    """
+
     def __init__(
         self,
         genes,
         num_sites,
         true_model=None,
         base_terms=['x', 'y', 'z'],
-        selection_method = 'roulette', 
-        mutation_method = 'element_wise', 
-        crossover_method = 'one_point',
+        selection_method='roulette', 
+        crossover_method='one_point',
+        mutation_method='element_wise', 
         mutation_probability=0.1,
         selection_truncation_rate = 0.5, 
         num_protected_elite_models = 2, 
@@ -97,6 +128,9 @@ class GeneticAlgorithmQMLA():
 
         
     def get_base_chromosome(self):
+        r"""
+        Creates basic chromosome, i.e. with all genes set to 0. 
+        """
         
         self.num_terms = len(self.genes)
         self.basic_chromosome = np.array([0]  * self.num_terms)        
@@ -107,6 +141,13 @@ class GeneticAlgorithmQMLA():
         self,
         chromosome,
     ):
+        r"""
+        Given a chromosome, get the corresponding model. 
+        
+        :param np.array chromosome: chromosome representing a candidate model
+        :returns str model_string: name of the corresponding model
+        """
+
         if isinstance(chromosome, str):
             chromosome = list(chromosome)
             chromosome = np.array([int(i) for i in chromosome])
@@ -126,20 +167,35 @@ class GeneticAlgorithmQMLA():
         self,
         model
     ):
+        r"""
+        Given a model, get the corresponding chromosome. 
+
+        :param str model: name of candidate model
+        :returns np.array chromosome: array of ones and zeros indicating which genes are active in the model
+        """
+
         terms = qmla.construct_models.get_constituent_names_from_name(model)
         assert \
             np.all([ t in self.chromosome_description for t in terms]), \
             "Cannot map some term(s) to any available gene. Terms: {} \n Genes".format(terms, self.chromosome_description)
             
         locs = [ self.chromosome_description.index(t) for t in terms]
-        new_chromosome = copy.copy(self.basic_chromosome)
-        new_chromosome[np.array(locs)] = 1
-        return new_chromosome
+        chromosome = copy.copy(self.basic_chromosome)
+        chromosome[np.array(locs)] = 1
+        return chromosome
            
     def model_f_score(
         self, 
         model_name
     ):
+        r"""
+        Get the F score of a candidate model. 
+
+        :param str model_name: name of candidate model
+        :returns float f_score: F score, between 0 and 1, indicating how many terms overlap 
+            between the candidate and target models.
+        """
+
         model_as_chromosome = self.map_model_to_chromosome(model_name)
         return self.chromosome_f_score(model_as_chromosome)
 
@@ -147,6 +203,8 @@ class GeneticAlgorithmQMLA():
         self,
         c
     ):
+        r"""Map a chromosome array to a string."""
+
         b = [str(i) for i in c]
         s = ''.join(b)
         if s == '1000000000':
@@ -161,6 +219,15 @@ class GeneticAlgorithmQMLA():
         self, 
         chromosome, 
     ):
+        r"""
+        Get the F score of a candidate model from its chromosome representation. 
+
+        :param np.array chromosome: representation of candidate model
+        :returns float f_score: F score, between 0 and 1, indicating how many terms overlap 
+            between the candidate and target models.
+        
+        """
+
         if not isinstance(chromosome, np.ndarray):            
             chromosome = np.array([int(a) for a in list(chromosome)])
         
@@ -170,6 +237,7 @@ class GeneticAlgorithmQMLA():
         )
 
     def log_print(self, to_print_list):
+        r"""Wrapper for :func:`~qmla.print_to_log`"""
         qmla.logging.print_to_log(
             to_print_list = to_print_list,
             log_file = self.log_file,
@@ -181,6 +249,13 @@ class GeneticAlgorithmQMLA():
         self,
         num_models=5
     ):
+        r"""
+        Generate random models from the space of valid candidates. 
+
+        :param int num_models: number of candidates to generate
+        :returns list new_models: the randomly generated model names
+        """
+
         if num_models > 2**self.num_terms:
             self.log_print([
                 "Number of models requested > number of possible models ({})".format(
@@ -238,6 +313,9 @@ class GeneticAlgorithmQMLA():
         return new_models
 
     def rand_model_f(self):
+        r"""
+        Generate a random model chromosome and evaluate its F score. 
+        """
         
         r = 0
         while r == 0 :
@@ -255,6 +333,10 @@ class GeneticAlgorithmQMLA():
         self,
         num_models=14, 
     ):
+        r"""
+        Generate a set of random models and sort them by F score. 
+        """
+
         n_runs = 1e3 # first sample ~1000 random numbers 
         some_models = [
             self.rand_model_f() for _ in range(int(n_runs))
@@ -329,6 +411,15 @@ class GeneticAlgorithmQMLA():
         chromosome_selection_probabilities,
         **kwargs
     ):
+        r"""
+        Mechanism for selecting two models from the database of potential parents. 
+
+        :param pd.DataFrame chromosome_selection_probabilities: 
+            database indicating the probability that every valid pair of 
+            parents should be selected. 
+        :return tuple selected_chromosomes: two models
+        """
+
         chromosomes = list(chromosome_selection_probabilities.keys())
         probabilities = [chromosome_selection_probabilities[c] for c in chromosomes]
         selected_chromosomes = np.random.choice(
@@ -346,13 +437,16 @@ class GeneticAlgorithmQMLA():
 
     def crossover(
         self,
-        # selection, 
         **kwargs
     ):
+        r"""
+        Wrapper for crossover mechanism. 
+
+        This method assumes only 2 chromosomes to crossover
+        and passes them to the method set as self.crossover_method, which can be easily replaced
+        to facilitate alternative crossover schemes. 
         """
-        This fnc assumes only 2 chromosomes to crossover
-        and passes them to the method set as self.crossover_method which can be easily replaced. 
-        """
+
         return self.crossover_method(**kwargs)
 
 
@@ -361,11 +455,14 @@ class GeneticAlgorithmQMLA():
         **kwargs
     ):
         r"""
-        Input two chromosomes, and a dict selection in kwargs. 
-        selection contains ``chromosome_1`` and ``chromosome_2``
-        and a dict ``other_data`` containing ``cut``, which is the position 
-        about which to crossover the two chromosomes. 
+        Crossover two chromosomes about a single gene. 
+
+        Input two chromosomes, and selection (a dict) in kwargs. 
+        selection contains ``chromosome_1`` and ``chromosome_2``,
+        as well as a dict called  ``other_data`` containing ``cut``, 
+        which is the position about which to crossover the two chromosomes. 
         """
+
         selection = kwargs['selection']
         c1 = np.array(list(selection['chromosome_1']))
         c2 = np.array(list(selection['chromosome_2']))
@@ -383,12 +480,22 @@ class GeneticAlgorithmQMLA():
         self, 
         **kwargs
     ):
+        r"""
+        Wrapper for mutation mechanism. 
+        All input arguments to the mutation method are passed directly to 
+        the nominated mutation function, set as self.mutation_method.
+        """
+
         return self.mutation_method(**kwargs)
 
     def element_wise_mutation(
         self,
         **kwargs
     ):
+        r"""
+        Probabilistically mutate each gene independently. 
+        """
+        
         chromosomes = kwargs['chromosomes']
         force_mutation = kwargs['force_mutation']
 
@@ -432,12 +539,10 @@ class GeneticAlgorithmQMLA():
         **kwargs
     ):
         r"""
-        Wrapper for user-defined elite model selection.
-
-        
+        Wrapper for elite model selection method, 
+            here set to self.elite_ranking_top_n_models.        
         """
 
-        # return []
         return self.elite_ranking_top_n_models(
             **kwargs
         )
@@ -448,7 +553,12 @@ class GeneticAlgorithmQMLA():
         model_fitnesses,
         **kwargs
     ):        
-        elite_models = self.models_ranked_by_fitness[self.genetic_generation][:self.num_protected_elite_models]
+        r"""
+        Get the top N models, and store info on the elite models to date. 
+        """
+
+        elite_models = \
+            self.models_ranked_by_fitness[self.genetic_generation][:self.num_protected_elite_models]
         self.log_print([
             "Elite models at generation {}: {}".format(
                 self.genetic_generation, elite_models
@@ -465,8 +575,8 @@ class GeneticAlgorithmQMLA():
                 }),
                 ignore_index=True
             )
-        self.most_elite_models_by_generation[self.genetic_generation] = self.models_ranked_by_fitness[self.genetic_generation][0]
-        # num_protected_elite_models_for_termination = 2
+        self.most_elite_models_by_generation[self.genetic_generation] = \
+            self.models_ranked_by_fitness[self.genetic_generation][0]
 
         if self.genetic_generation > self.unchanged_elite_num_generations_cutoff + 2:
             gen = self.genetic_generation
@@ -518,9 +628,7 @@ class GeneticAlgorithmQMLA():
         **kwargs
     ):
         r""" 
-        Wrapper for user-defined probability processing function.
-
-        Current iteration truncates and includes only top half of models
+        Wrapper for parent selection function, here set to self.truncate_to_top_half.
         """
         return self.truncate_to_top_half(**kwargs)
 
@@ -530,6 +638,12 @@ class GeneticAlgorithmQMLA():
         model_fitnesses, 
         **kwargs
     ):
+        r"""
+        Retain only the top-performing half of models considered at this generation, 
+        for consideration as parents to offspring on the subsequent generation. 
+
+        """
+
         ranked_models = sorted(
             model_fitnesses,
             key=model_fitnesses.get,
@@ -545,7 +659,6 @@ class GeneticAlgorithmQMLA():
         for m in ranked_models: 
             self.log_print(["fitness = {} \t Model={} ".format(model_fitnesses[m], m )])
         
-        # truncation_cutoff = max( int(num_models*truncation_rate), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = max( int(num_models*self.selection_truncation_rate), 4) # either consider top half, or top 4 if too small
         truncation_cutoff = min( truncation_cutoff, num_models )
         truncated_model_list = ranked_models[:truncation_cutoff]
@@ -554,6 +667,7 @@ class GeneticAlgorithmQMLA():
             mod : model_fitnesses[mod] 
             for mod in truncated_model_list
         }
+
         # keep the others with zero fitness, so the gene pool reflect them
         for m in ranked_models[truncation_cutoff:]:
             self.log_print([
@@ -586,6 +700,12 @@ class GeneticAlgorithmQMLA():
         chromosome_probabilities,
         force_mutation=False,
     ):
+        r"""
+        Given a set of individual chromosome fitnesses, generate database of pairs of 
+        parent chromosomes, with probability proportional to the fitness of both parents. 
+        
+        """
+
         self.log_print([
             "Setting up chromosome pair dataframe with initial probabilities", 
             chromosome_probabilities
@@ -642,7 +762,8 @@ class GeneticAlgorithmQMLA():
                         'force_mutation' : force_mutation
                     }
                     pair_data.append(this_pair_df)
-        self.chrom_pair_df = pd.DataFrame.from_dict(pair_data)                
+        self.chrom_pair_df = pd.DataFrame.from_dict(pair_data)    
+
         # normalise probabilities
         try:
             self.chrom_pair_df.probability = self.chrom_pair_df.probability.astype(float)
@@ -666,6 +787,14 @@ class GeneticAlgorithmQMLA():
         ])
 
     def get_pair_selection_order(self):
+        r"""
+        Use the probabilities of parental selection to define the order in which to generate offspring. 
+        It is cheaper to perform this once than call the database repeatedly. 
+
+        :return list pair_selection_order: list of tuples of the order in which to pass 
+            the model pairs to the crossover mechanism to generate offspring
+        """
+
         pair_idx = self.chrom_pair_df.index.values
         probabilities = self.chrom_pair_df.probability.values
         # only keep nonzero probs
@@ -706,6 +835,13 @@ class GeneticAlgorithmQMLA():
         model_fitnesses, 
         **kwargs
     ):
+        r"""
+        Following the training of all models on a generation, consolidate that generation. 
+
+        This involves determining the strongest models from the generation, 
+        and constructing the database of parent-pairs and their associated selection probabilities. 
+        """
+
         self.fitness_at_generation[self.genetic_generation] = model_fitnesses
         self.models_ranked_by_fitness[self.genetic_generation] = sorted(
             model_fitnesses,
@@ -728,19 +864,20 @@ class GeneticAlgorithmQMLA():
         self.prepare_chromosome_pair_dataframe(
             chromosome_probabilities=self.chromosome_selection_probabilities
         )
-        self.log_print(["Time to prepare chromosome pair df for gen {} = {} sec".format(
-            self.genetic_generation, 
-            np.round(time.time()-t_init, 3)
-        )])
 
     def genetic_algorithm_step(
         self,
         model_fitnesses,
         **kwargs
     ):
-        # self.consolidate_generation(
-        #     model_fitnesses, 
-        # )
+        r"""
+        Perform a complete step of the genetic algorithm, assuming all of the required steps have been performed. 
+        That is, the database for parent selection must already be available. 
+
+        :param dict model_fitnesses: the fitness of each model in this generation according to the 
+            chosen objective function. 
+        :returns list new_models: set of models to place on the next generation. 
+        """
 
         # get the order to iterate through chromosome pairs
         self.log_print(["Genetic algorithm step {}".format(self.genetic_generation)])
@@ -838,13 +975,6 @@ class GeneticAlgorithmQMLA():
 
         # chop extra chromosomes if generated
         proposed_chromosomes = proposed_chromosomes[:num_models_for_next_generation]
-        # self.log_print([
-        #     "Proposed chromosome list now has {} elements after {} trials over {} seconds.".format(
-        #         len(proposed_chromosomes), 
-        #         init_num_chrom_pairs - len(list(pair_selection_order)), 
-        #         time.time() - t_init
-        #     )
-        # ])
         self.previously_considered_chromosomes.extend([
             self.chromosome_string(r) for r in proposed_chromosomes
             ]
@@ -870,6 +1000,16 @@ class GeneticAlgorithmQMLA():
 
 
 class GeneticAlgorithmFullyConnectedLikewisePauliTerms(GeneticAlgorithmQMLA):
+    r"""
+    Exact structure of :class:`~qmla.GeneticAlgorithmQMLA`, where the avaiable terms 
+    are assumed to follow conventional pauliSet format,
+    and all sites are connected. 
+    e.g. terms of the form 
+    pauliSet_1J2_xJx_d2, pauliSet_1J2_yJy_d2, pauliSet_1J2_zJz_d2,
+
+    :param int num_sites: dimension to permit model search within
+    :param list base_terms: terms to use with pauliSet-type terms 
+    """ 
     def __init__(self, num_sites, base_terms=['x', 'y', 'z'], **kwargs):
                 
         terms = []

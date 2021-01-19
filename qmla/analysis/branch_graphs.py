@@ -70,7 +70,8 @@ def plot_qmla_branches(
             gridspec_layout = (nrows, total_ncols), 
             gridspec_params = {
                 'width_ratios' : widths,
-                'wspace' : 0.25
+                'wspace' : 0.3,
+                'hspace' : 0.2, 
             } 
         )
 
@@ -88,11 +89,16 @@ def plot_qmla_branches(
             force_position=(0, total_ncols-1-int(show_fscore_cmap)),
             span = ('all', 1)
         )
-        lf.fig.colorbar(bf_cmapper, cax = cbar_ax)        
+        lf.fig.colorbar(
+            bf_cmapper, 
+            cax = cbar_ax,
+            ticks = [min_bf, 0, max_bf]
+        )        
         cbar_ax.set_title(
             r"$\\log_{10}(BF)$", 
             loc='center'
         )
+        cbar_ax.yaxis.set_ticks_position('left')
 
         # F score cmap
         if show_fscore_cmap:
@@ -106,10 +112,17 @@ def plot_qmla_branches(
                 norm=plt.Normalize(vmin=0, vmax=1)
             )
             sm.set_array([])
-            lf.fig.colorbar(sm, cax=ax, orientation='vertical')
-            ax.set_ylabel(
-                r"F-score", 
+            lf.fig.colorbar(
+                sm, 
+                cax=ax, 
+                orientation='vertical',
+                label=r"$F_1$-score", 
+                ticks = [0, 0.5, 1]
             )
+            # ax.set_ylabel(
+            #     r"F-score", 
+            # )
+            # ax.set_yticks([0, 0.5, 1])
 
         # Plot graphs
 
@@ -195,6 +208,9 @@ def plot_qmla_branches(
             lowest_distance_between_nodes = min(distance_between_nodes)
             highest_distance_between_nodes = max(distance_between_nodes)
 
+            short_summary = "{}".format(
+                branch.branch_id,
+            )
             summary = "Branch {} \n{} models \n {} edges\n ${} \leq  C \leq{}$\n $d \leq {}$".format(
                 branch.branch_id,
                 len(graph.nodes),
@@ -205,9 +221,9 @@ def plot_qmla_branches(
             props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
             
             ax.text(-0.05, 0.95, 
-                    summary, 
+                    short_summary, # summary, 
                     transform=ax.transAxes, 
-                    fontsize = label_fontsize*0.5, 
+                    # fontsize = label_fontsize, 
                     bbox=props,
                     ha = 'center', 
                     va  ='center'

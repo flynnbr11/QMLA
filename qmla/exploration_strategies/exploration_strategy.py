@@ -1254,7 +1254,9 @@ class ExplorationStrategy():
         return list(set(pruning_models)), pruning_sets
     
     def check_tree_pruned(self, prune_step, **kwargs):
-        if prune_step >= 2 or self.prune_complete: 
+        if self.prune_completed_initially:
+            return True
+        elif prune_step >= 2 or self.prune_complete: 
             return True
         else:
             return False
@@ -1271,6 +1273,8 @@ class ExplorationStrategy():
         if self.tree_completed_initially:
             return True
         elif spawn_step >= self.max_spawn_depth:
+            return True
+        elif self.spawn_stage[-1] == "Complete":
             return True
         else:
             return False
@@ -1295,6 +1299,9 @@ class ExplorationStrategy():
 
 
     def exploration_strategy_finalise(self):
+        r"""
+        Steps needed to finalise the exploration strategy. 
+        """
         # TODO consolidate this method with finalise_model_learning()
         # do whatever is needed to wrap up exploration strategy
         # e.g. store data required for analysis

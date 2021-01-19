@@ -37,7 +37,14 @@ class Genetic(
     exploration_strategy.ExplorationStrategy
 ):
     r"""
-    Exploration Strategy where model generation is determined through a genetic algorithm.
+    Exploration Strategy where the model search is mediated through a genetic algorithm.
+    Genetic algorithm is implemented through :class:`qmla.GeneticAlgorithmQMLA`. 
+    This forms the base class for genetic algorithm applications within QMLA.
+
+    :param str exploration_rules: name of exploration strategy used
+    :param list genes: terms which are permitted in the model search, 
+        which become genes in the chromomsomes of the genetic algorithm
+    :param str true_model: name of the target model. 
 
     """
 
@@ -150,19 +157,9 @@ class Genetic(
             'bf_rank' : r"$g^{R}$",  
             'elo_rating' : r"$g^{E}$", 
         }
-        # self.log_print([
-        #     "fitness_mechanism_names:", self.fitness_mechanism_names
-        # ])
 
     def nominate_champions(self):
-        # Choose model with highest fitness on final generation
-        # if self.hypothetical_final_generation:
-        #     self.log_print(["Running hypothetical step to get some models"])
-        #     hypothetical_models = self.genetic_algorithm.genetic_algorithm_step(
-        #         model_fitnesses = self.model_fitness_by_generation[self.spawn_step], 
-        #         num_pairs_to_sample = self.initial_num_models / 2 # for every pair, 2 chromosomes proposed
-        #     )
-        #     self.log_print(["hypothetical generation models:", hypothetical_models])
+        r"""Choose model with highest fitness on final generation"""
 
         self.champion_model = self.models_ranked_by_fitness[self.spawn_step][0]
         self.log_print([
@@ -180,6 +177,16 @@ class Genetic(
         model_names_ids, 
         **kwargs        
     ):
+        r"""
+        Following a complete generation of the genetic algorithm, 
+        perform all necessary processing to enable construction of next set of models.
+
+        :param dict model_points: the number of Bayes factor comparisons for which each candidate 
+            within the generation was deemed superior against a contemporary model
+        :param dict model_names_ids: mapping between models' names and their IDs from the QMLA environment;
+            this enables analaysing further data passed from QMLA within kwargs. 
+        """
+
         self.spawn_step += 1
 
         self.log_print(["Analysing generation at spawn step ", self.spawn_step])
@@ -242,15 +249,6 @@ class Genetic(
         # log_likelihoods['fitness_type'] = 'log_likelihoods'
         model_elo_ratings['fitness_type'] = 'elo_ratings'
         ranking_points['fitness_type'] = 'ranking'
-
-        # TODO don't use available_fitness_data to fill fitness_df - get from full DF
-        # available_fitness_data = [
-        #     model_f_scores, model_hamming_distances, 
-        #     model_number_wins, model_win_ratio, 
-        #     model_elo_ratings, ranking_points, 
-        #     # log_likelihoods, 
-        #     # mean_residuals
-        # ] 
 
         model_instances = [
             self.tree.model_storage_instances[m] for m in model_ids
@@ -386,7 +384,13 @@ class Genetic(
         self,
         model_list,
         **kwargs
-    ):       
+    ):
+        r"""
+        Model generation using genetic algorithm. 
+
+        Follows rules of :meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_models`. 
+        """
+
         # Analysis of the previous generation is called by the exploration strategy tree. 
         genetic_algorithm_fitnesses = self.model_fitness_by_generation[self.spawn_step]
       
@@ -410,6 +414,10 @@ class Genetic(
         test_model,
         target_model=None, 
     ):
+        r"""
+        Compare test_model with target_model by Hamming distance
+        """
+
         if target_model is None:
             target_model = self.true_chromosome_string
         else:
@@ -429,8 +437,16 @@ class Genetic(
         self,
         test_model,
         target_model=None, 
-        beta=1,  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
+        beta=1,
     ):
+        r"""
+        Get F score of candidate model, measure of overlap between the terms of the candidate and target model
+
+        :param str test_model: name of candidate model
+        :param str target_model: name of target model, if None, assumed that target is self.true_model
+        :param float beta: relative importance of precision to sensitivity. in general this is F-beta score, 
+            usually beta = 1
+        """
         if target_model is None:
             target_model = self.true_model
 
@@ -472,6 +488,10 @@ class Genetic(
         self, 
         chromosome, 
     ):
+        r"""
+        F1 score between chromosome and true model
+        """
+
         mod = np.array([int(a) for a in list(chromosome)])
         
         try:
@@ -491,6 +511,10 @@ class Genetic(
     def exploration_strategy_finalise(
         self
     ):        
+        r""" 
+        Genetic algorithm specific version of :meth:`qmla.ExplorationStrategy.exploration_strategy_finalise`. 
+        """
+
         # hypothetical generation_models
         if self.hypothetical_final_generation:
             # TODO this will cause a crash in QHL mode since. 
@@ -570,6 +594,10 @@ class Genetic(
         spawn_step,
         **kwargs
     ):
+        r""" 
+        Genetic algorithm specific version of :meth:`qmla.ExplorationStrategy.check_tree_completed`. 
+        """
+
         if self.spawn_step == self.max_spawn_depth:
             self.log_print(["Terminating at spawn depth ", self.spawn_step])
             return True
@@ -597,6 +625,9 @@ class Genetic(
             return False
 
     def check_tree_pruned(self, **kwargs):
+        r""" 
+        Genetic algorithm specific version of :meth:`qmla.ExplorationStrategy.check_tree_pruned`. 
+        """
         # no pruning for GA, winner is champion of final branch
         return True
 
@@ -608,6 +639,9 @@ class Genetic(
         figure_format="png", 
         **kwargs
     ):
+        r""" 
+        Genetic algorithm specific version of :meth:`qmla.ExplorationStrategy.exploration_strategy_specific_plots`. 
+        """
         self.qmla_id = qmla_id
         self.plot_level = plot_level
         self.figure_format = figure_format
@@ -619,21 +653,21 @@ class Genetic(
         plot_methods_by_level = {
             1 : [],
             2 : [
-                self.plot_correlation_fitness_with_f_score,
-                self.plot_fitness_v_fscore_by_generation,
-                self._plot_gene_pool_progression,
+                self._plot_correlation_fitness_with_f_score,
+                self._plot_fitness_v_fscore_by_generation,
+                self.__plot_gene_pool_progression,
             ], 
             3 : [
-                self.plot_fitness_v_fscore,
-                self.plot_fitness_v_generation,
+                self._plot_fitness_v_fscore,
+                self._plot_fitness_v_generation,
             ], 
             4 : [
-                self.plot_model_ratings,
-                self.plot_gene_pool,
+                self._plot_model_ratings,
+                self._plot_gene_pool,
             ], 
             5 : [
                 self.plot_generational_metrics,
-                self.plot_selection_probabilities
+                self._plot_selection_probabilities
             ], 
             6 : [], 
         }
@@ -686,10 +720,14 @@ class Genetic(
                     "plot failed plot_rating_progress_single_model with error ", e
                 ])
 
-    def plot_correlation_fitness_with_f_score(
+    def _plot_correlation_fitness_with_f_score(
         self,
         save_to_file=None, 
     ):
+        r"""
+        Show how the fitness of models at each generation progress in terms of F score. 
+        """
+
         plt.clf()
         correlations = pd.DataFrame(
             columns = ['Generation', 'Method', 'Correlation']
@@ -761,7 +799,10 @@ class Genetic(
 
 
 
-    def plot_fitness_v_generation(self, save_to_file=None):
+    def _plot_fitness_v_generation(self, save_to_file=None):
+        r"""
+        Plot progression of fitness against generations of the genetic algorithm. 
+        """
         import matplotlib.pyplot as plt
         import seaborn as sns
         plt.clf()
@@ -792,9 +833,13 @@ class Genetic(
         plt.savefig(save_to_file)
 
 
-    def plot_fitness_v_fscore_by_generation(
-        self, save_to_file=None
+    def _plot_fitness_v_fscore_by_generation(
+        self,
     ):
+        r""" 
+        Plot fitness vs f score throughout generations of the genetic algorithm. 
+        """
+
         plt.clf()
         sanity_check_df = self.fitness_df[ 
             (self.fitness_df['fitness_type'] == 'f_score') 
@@ -821,14 +866,17 @@ class Genetic(
             g.map(plt.scatter,  'f_score', 'fitness').add_legend()
         )
 
-        if save_to_file is None: 
-            save_to_file = os.path.join(
-                self.save_directory, 
-                'fitness_types.png'.format(self.qmla_id)
-            )
+        save_to_file = os.path.join(
+            self.save_directory, 
+            'fitness_types.png'.format(self.qmla_id)
+        )
         plt.savefig(save_to_file)
 
-    def plot_model_ratings(self, save_to_file=None):
+    def _plot_model_ratings(self,):
+        r"""
+        Plot ratings of models on all generations, as determined by the RatingSystem 
+        """
+
         plt.clf()
         ratings = self.ratings_class.all_ratings
         generations = [int(g) for g in ratings.generation.unique()]
@@ -866,15 +914,18 @@ class Genetic(
             ax.set_ylabel("Elo rating")
             ax.legend(bbox_to_anchor=(1, 1))
 
-        if save_to_file is None: 
-            save_to_file = os.path.join(
-                self.save_directory, 
-                'ratings'.format(self.qmla_id)
-            )
+        save_to_file = os.path.join(
+            self.save_directory, 
+            'ratings'.format(self.qmla_id)
+        )
 
         lf.save(save_to_file, file_format=self.figure_format)
 
-    def plot_fitness_v_fscore(self, save_to_file=None):
+    def _plot_fitness_v_fscore(self):
+        r"""
+        Plot fitness against f score 
+        """
+
         plt.clf()
         fig, ax = plt.subplots()
         sns.set(rc={'figure.figsize':(11.7,8.27)})
@@ -905,15 +956,17 @@ class Genetic(
         ax.set_ylabel('Fitness (as probability)')
         # bplot.set_ylim((0,1))
         ax.set_xlim((-0.05,1.05))
-        if save_to_file is None:
-            save_to_file = os.path.join(
-                self.save_directory, 
-                'fitness_v_fscore.png'.format(self.qmla_id)
-            )
+        save_to_file = os.path.join(
+            self.save_directory, 
+            'fitness_v_fscore.png'.format(self.qmla_id)
+        )
 
         ax.figure.savefig(save_to_file)
 
-    def plot_gene_pool(self, save_to_file=None):
+    def _plot_gene_pool(self):
+        r"""
+        Show the F scores of all models in all generations
+        """
         ga = self.genetic_algorithm
 
         plt.clf()
@@ -978,17 +1031,20 @@ class Genetic(
         ax.set_xlabel('F-score',  fontsize=label_fontsize)
 
         # Save figure
-        if save_to_file is None:
-            save_to_file = os.path.join(
-                self.save_directory, 
-                'gene_pool.png'
-            )
+        save_to_file = os.path.join(
+            self.save_directory, 
+            'gene_pool.png'
+        )
 
         fig.savefig(save_to_file)
 
-    def plot_selection_probabilities(self, save_to_file=None): 
+    def _plot_selection_probabilities(self): 
+        r"""
+        Plot pie charts of the selection probabilities of prospective parents at each generation. 
+        Models are signified by their F score. 
+        """
         generations = sorted(self.genetic_algorithm.gene_pool.generation.unique())
-        self.log_print(["[plot_selection_probabilities] generations:", generations])
+        self.log_print(["[_plot_selection_probabilities] generations:", generations])
         lf = LatexFigure(auto_gridspec=len(generations))
 
         for g in generations:
@@ -1006,16 +1062,17 @@ class Genetic(
                 radius=2,
             )
 
-        if save_to_file is None:
-            save_to_file = os.path.join(
-                self.save_directory, 
-                'selection_probabilities'
-            )
+        save_to_file = os.path.join(
+            self.save_directory, 
+            'selection_probabilities'
+        )
         lf.save(save_to_file, figure_format=self.figure_format)
 
 
-    def plot_generational_metrics(self, save_to_file=None):
-
+    def plot_generational_metrics(self):
+        r"""
+        Show various metrics across all generations
+        """
         fig, axes = plt.subplots(figsize=(15, 10), constrained_layout=True)
         gs = GridSpec(nrows=2, ncols = 1, )
 
@@ -1045,17 +1102,19 @@ class Genetic(
         ax.legend()
 
         # Save figure
-        if save_to_file is None:
-            save_to_file = os.path.join(
-                self.save_directory, 
-                'generation_progress.png'
-            )
+        save_to_file = os.path.join(
+            self.save_directory, 
+            'generation_progress.png'
+        )
 
         fig.savefig(save_to_file)
 
-    def _plot_gene_pool_progression(
+    def __plot_gene_pool_progression(
         self, 
     ):
+        r"""
+        Succinct representation of the progression of gene pool with respect to F score. 
+        """
         lf = LatexFigure()
         ax = lf.new_axis()
         gene_pool = self.genetic_algorithm.gene_pool
@@ -1076,6 +1135,9 @@ class Genetic(
 
     @staticmethod
     def gene_pool_progression(gene_pool, ax, f_score_cmap=None, draw_cbar=True, cbar_ax=None):
+        r"""
+        Method for plotting succinct summary of progression of gene pool with respect to F score. 
+        """
         if f_score_cmap is None:
             f_score_cmap = matplotlib.cm.RdBu
         num_models_per_generation = len(gene_pool[gene_pool.generation == 1])
@@ -1166,6 +1228,13 @@ class GeneticTest(
 class GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms(
     Genetic
 ):
+    r"""
+    Exact structure of :class:`~qmla.Genetic`, where the avaiable terms 
+    are assumed to follow conventional pauliSet format, and all sites are connected. 
+    e.g. terms of the form:
+    pauliSet_1J2_xJx_d2, pauliSet_1J2_yJy_d2, pauliSet_1J2_zJz_d2,
+    """
+
     def __init__(
         self,
         exploration_rules,

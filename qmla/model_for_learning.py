@@ -832,10 +832,6 @@ class ModelInstanceForLearning():
         estimated_params = self.qinfer_updater.est_mean()
         cov_mt_uncertainty = [1e-10] * np.shape(estimated_params)[0]
         cov_mt = np.diag(cov_mt_uncertainty)
-        # posterior_distribution = qi.MultivariateNormalDistribution(
-        #     estimated_params,
-        #     cov_mt
-        # )
         posterior_distribution = self.exploration_class.get_evaluation_prior(
             model_name = self.model_name, 
             estimated_params = estimated_params, 

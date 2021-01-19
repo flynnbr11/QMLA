@@ -115,7 +115,7 @@ class SimulatedNVCentre(
         self.tree_completed_initially = True
         self.initial_models=None
         self.expectation_value_subroutine = \
-            qmla.shared_functionality.expectation_value_functionsn_qubit_hahn_evolution_double_time_reverse
+            qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
         self.timing_insurance_factor = 2/3
         self.num_probes = 20
         time_basis = 1e-9 # nanoseconds

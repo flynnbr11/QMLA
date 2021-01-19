@@ -2733,7 +2733,9 @@ class QuantumModelLearningAgent():
         if self.plot_level >=3:
             try:
                 self.branch_graphs = qmla.analysis.branch_graphs.plot_qmla_branches(
-                    q=self, return_graphs=False
+                    q=self, 
+                    show_fscore_cmap=True,
+                    return_graphs=False
                 )
             except:
                 self.log_print(["Failed to plot branch graphs."])
@@ -3272,7 +3274,7 @@ class QuantumModelLearningAgent():
 
         # Plot as heatmap
         lf = LatexFigure(
-            fraction=0.45, 
+            fraction=0.75, 
             auto_label=False
         ) # TODO make figure size depend on num terms. 
         ax = lf.new_axis()
