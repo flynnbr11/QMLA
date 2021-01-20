@@ -298,26 +298,48 @@ number of particles and experiments, so we expect to have trained the
 model well. 
 :term:`Instance`-level results are stored (e.g. for the instance
 with ``qmla_id=1``) in ``Jan_01/01_23/instances/qmla_1``. 
-Individual models’ insights can be found in , e.g. the model’s 
-[fig:qmla\_learning\_summary], and in
-[fig:qmla\_model\_dynamics].
+Individual models’ insights can be found in , e.g. the model’s ``leaning_summary``
+(:numref:`fig:qmla_learning_summary`), and in ``dynamics``
+(:numref:`fig:qmla_model_dynamics`).
+
+.. figure:: figures/model_analysis/learning_summary_1.pdf
+   :width: 45.0%
+   :name: fig:qmla_learning_summary
+   
+   The outcome of :term:`QHL` for the given model.
+   Subfigures (a)-(c) show the estimates of the parameters.
+    (d) shows the total parameterisation volume against experiments trained upon, 
+    along with the evolution times used for those experiments. 
+ 
+
+.. figure:: figures/model_analysis/dynamics_1.pdf
+   :width: 45.0%
+   :name: fig:qmla_model_dynamics
+
+   The model's attempt at reproducing dynamics from :math:`\hat{H}_0`.
+
+
+
 
 Instance analysis
 -----------------
 
 Now we can run the full :term:`QMLA` algorithm, i.e. train several
 models and determine the most suitable. :term:`QMLA` will call the
-method of the :term:`Exploration Strategy`, set in [listing:basic\_es],
+method of the :term:`Exploration Strategy`, set in :ref:`section_installation`,
 which tells :term:`QMLA` to construct three models on the first branch,
-then terminate the search. Here we need to train and compare all models
-so it takes considerably longer to run: the purpose of testing, we
-reduce the resources so the entire algorithm runs in about 15 minutes.
+then terminate the search. 
+Here we need to train and compare all models
+so it takes considerably longer to run: 
+for the purpose of testing, 
+we reduce the resources so the entire algorithm runs in about 15 minutes.
 Some applications will require significantly more resources to learn
-effectively. In realistic cases, these processes are run in parallel, as
-we will cover in [apdx:paralllel\_processing].
+effectively. 
+In realistic cases, these processes are run in parallel, as
+we will cover in :ref:`section_parallelisation`.
 
-Reconfigure a subset of the settings in the script
-([listing:local\_launch]) and run it again:
+Reconfigure a subset of the settings in the ``local_launch.sh`` script
+and run it again:
 
 ::
 
@@ -326,17 +348,61 @@ Reconfigure a subset of the settings in the script
     run_qhl=0
     exploration_strategy=ExampleBasic
 
-In the corresponding results directory, navigate to , where instance
-level analysis are available.
+In the corresponding results directory, navigate to ``instances/qmla_1``, 
+where instance level analysis are available.
 
 ::
 
     cd results/Jan_01/01_23/instances/qmla_1
 
 Figures of interest here show the composition of the models
-([fig:qmla\_model\_composition]), as well as the :term:`bf` between
-candidates ([fig:qmla\_bayes\_factors]). Individual model comparisons –
-i.e. :term:`bf` – are shown in [fig:qmla\_bayes\_factor\_comparison],
+(:numref:`fig:qmla_model_composition`), as well as the :term:`BF` between
+candidates (:numref:`fig:qmla_bayes_factors`). 
+Individual model comparisons –
+i.e. :term:`BF` – are shown in :numref:`fig:qmla_bayes_factor_comparison`,
 with the dynamics of all candidates shown in
-[fig:qmla\_branch\_dynamics]. The probes used during the training of all
-candidates are also plotted ([fig:qmla\_training\_probes]).
+:numref:`fig:qmla_branch_dynamics`. 
+The probes used during the training of all
+candidates are also plotted (:numref:`fig:qmla_training_probes`).
+
+.. figure:: figures/instance_analysis/composition_of_models.pdf
+   :width: 45.0%
+   :name: fig:qmla_model_composition
+
+   ``composition_of_models``: constituent terms of all considered models, 
+   indexed by their model IDs. Here model 3 is :math:`\hat{H}_0`
+
+
+.. figure:: figures/instance_analysis/bayes_factors.pdf
+   :width: 45.0%
+   :name: fig:qmla_bayes_factors
+
+   ``bayes_factors``: comparisons between all models are read as :math:`B_{i,j}` where
+   :math:`i` is the model ID on the y-axis and :math:`j` on the x-axis. 
+   Thus :math:`B_{ij} > 0 \ (<0)` indicates :math:`\hat{H}_i$ \ ($\hat{H}_j`), 
+   i.e. the model on the y-axis (x-axis) is the stronger model.
+
+
+.. figure:: figures/instance_analysis/BF_1_3.pdf
+   :width: 45.0%
+   :name: fig:qmla_bayes_factor_comparison
+
+   ``comparisons/BF_1_3``: direct comparison between models with IDs 1 and 3,
+   showing their reproduction of the system dynamics (red dots, :math:`Q`, 
+   as well as the times (experiments) against which the :term:`BF` was calculated. 
+
+
+.. figure:: figures/instance_analysis/dynamics_branch_1.pdf
+   :width: 45.0%
+   :name: fig:qmla_branch_dynamics
+
+   ``branches/dynamics_branch_1``: dynamics of all models considered on the branch
+   compared with system dynamics (red dots, :math:`Q`)
+
+.. figure:: figures/instance_analysis/probes_bloch_sphere.pdf
+   :width: 45.0%
+   :name: fig:qmla_training_probes
+
+   ``probes_bloch_sphere``: probes used for training models in this instance 
+   (only showing 1-qubit versions).
+
