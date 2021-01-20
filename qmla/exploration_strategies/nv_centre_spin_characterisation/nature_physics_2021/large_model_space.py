@@ -21,12 +21,13 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
     Genetic
 ):
     r"""
-    Exploration strategy for studying large model space through a genetic algorithm, 
-        considering a nitrogen vacancy centre through the Gali approximation. 
+    Exploration strategy for studying large model space of NV centre through a genetic algorithm.
     
-    Model generation is through the genetic algorithm exploration strategy.
-    This ES sets up the true model as an NV centre spin interacting with a number 
+    Model generation is through the genetic algorithm exploration strategy, 
+    :class:`~qmla.exploration_strategies.genetic_algorithms.Genetic`.
+    This :term:`Exploration Strategy` sets up the true model as an NV centre spin interacting with a number 
     of nuclei, and makes a wider number of nuceli searchable by the genetic algorithm. 
+    The NV centre is approximated by the Gali approximation [SCG13]_. 
     Candidate models are assumed to have been learned extremely well by a parameter esimation 
     algorithm, which may be unrealistic in some cases. 
     In the genetic algorithm, to assess candidate models, 

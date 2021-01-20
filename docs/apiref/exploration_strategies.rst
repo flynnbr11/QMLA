@@ -11,8 +11,6 @@
 Exploration Strategies
 ===============
 
-
-
 .. currentmodule:: qmla.exploration_strategies
 Classes
 ~~~~~~~~~~~~~~~

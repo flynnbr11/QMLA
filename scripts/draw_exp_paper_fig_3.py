@@ -30,7 +30,7 @@ else:
 
 save_to_file = os.path.join(run_path, 'analysis_figure_3.pdf')
 
-qmla.analysis.nv_centre_experimental_paper_fig_3(
+qmla.analysis.nv_centre_nature_physics_2021_fig_3(
     run_path,
     focus_on_instance,
     branches_to_draw=branches_to_draw,

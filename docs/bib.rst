@@ -23,3 +23,9 @@ Biblography
 
 .. [QInfer]
     Granade, Christopher, et al. "QInfer: Statistical inference software for quantum applications." Quantum 1 (2017): 5. https://github.com/QInfer/python-qinfer
+
+.. [GFK20]
+    Gentile, Andreas A., Flynn, Brian, et al. "Learning models of quantum systems from experiments". :arxiv:`2002.06169`
+
+.. [SCG13]
+    Smeltzer, Benjamin and Childress, Lilian and Gali, Adam. 13C hyperfine interactions in the nitrogen-vacancy centre in diamond. New Journal of Physics **13** 025021 (2013).

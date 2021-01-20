@@ -4,7 +4,7 @@ import os
 import random
 
 import qmla.construct_models
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre
+from qmla.exploration_strategies.nv_centre_spin_characterisation.nature_physics_2021 import FullAccessNVCentre
 
 __all__ = [
     'InspectProbeBiasNVCentre'

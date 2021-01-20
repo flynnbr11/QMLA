@@ -3,7 +3,7 @@ import sys
 import os
 import random
 
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre
+from qmla.exploration_strategies.nv_centre_spin_characterisation.nature_physics_2021 import FullAccessNVCentre
 from qmla.construct_models import alph
 
 __all__ = [
@@ -14,9 +14,9 @@ class TieredGreedySearchNVCentre(
     FullAccessNVCentre
 ):
     r"""
-    Exploration strategy for NV system described in experimental paper, 
+    Exploration strategy for NV system described in Nature Physics 2021 paper, 
     assuming full access to the state so the likelihood is based on 
-    $\bra{++} e^{ -i\hat{H(\vec{x})} t } \ket{++}$. 
+    :math:`\langle++| e^{ -i\hat{H(\vec{x})} t } |++\rangle`. 
 
     This is the base class for results presented in the experimental paper, 
     namely Fig 2. 
@@ -52,6 +52,13 @@ class TieredGreedySearchNVCentre(
         model_list,
         **kwargs
     ):
+        r""" 
+        Overwrites :meth:`qmla.QuantumModelLearningAgent.generate_models`. 
+
+        Constructs models in tiers, where each tier is explored greedily, and only the 
+        strongest model from the tier is progressed as the seed model for the subsequent tier.
+        """
+
         self.log_print([
             "Generating models in tiered greedy search at spawn {}. available kwargs:\n {}".format(
                 self.spawn_step, kwargs
@@ -124,6 +131,9 @@ def greedy_add(
     current_model, 
     terms,
 ):
+    r"""
+    Generate a list of models by appending all individual terms to the current model. 
+    """
     
     try:
         present_terms = current_model.split('+')

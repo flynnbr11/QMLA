@@ -14,7 +14,7 @@
 #
 import os
 import sys
-from recommonmark.parser import CommonMarkParser
+# from recommonmark.parser import CommonMarkParser
 
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../qmla'))
@@ -118,7 +118,7 @@ extensions = [
   'sphinx.ext.todo',
   'sphinx.ext.viewcode', 
   'sphinx.ext.extlinks',
-  'recommonmark'
+  # 'recommonmark'
   # 'sphinxcontrib.bibtex', # must install from pip first # also needs python3.6 :(
   # 'matplotlib.sphinxext.plot_directive'
 ]

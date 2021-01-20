@@ -4,7 +4,7 @@ import os
 
 import pickle 
 
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import FullAccessNVCentre, TieredGreedySearchNVCentre
+from qmla.exploration_strategies.nv_centre_spin_characterisation.nature_physics_2021 import FullAccessNVCentre, TieredGreedySearchNVCentre
 import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
@@ -22,11 +22,10 @@ class SimulatedExperimentNVCentre(
 ):
     r"""
     Uses all the same functionality, growth etc as
-    default FullAccessNVCentre,
-    but uses an expectation value which traces out 
-    the environment, mimicing the Hahn echo measurement. 
+    :class:`~qmla.exploration_strategies.nv_centre_spin_characterisation.TieredGreedySearchNVCentre`,
+    but uses an expectation value which traces out the environment, mimicing the Hahn echo measurement. 
 
-    This is used to generate (ii) simulated data in the experimental paper. 
+    This is used to generate (ii) simulated data in the Nature Physics 2021 paper. 
     """
 
     def __init__(

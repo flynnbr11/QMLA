@@ -12,4 +12,4 @@
 # from qmla.exploration_strategies.nv_centre_spin_characterisation.nv_revival_genetic_algorithm import *
 # from qmla.exploration_strategies.nv_centre_spin_characterisation.genetic_algorithm_long_dynamics import *
 
-from qmla.exploration_strategies.nv_centre_spin_characterisation.experimental_paper import  * 
+from qmla.exploration_strategies.nv_centre_spin_characterisation.nature_physics_2021 import  * 

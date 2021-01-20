@@ -14,6 +14,11 @@ import qmla
 
 import qmla.construct_models
 
+__all__ = [
+    'GeneticAlgorithmQMLA',
+    'GeneticAlgorithmFullyConnectedLikewisePauliTerms'
+]
+
 class GeneticAlgorithmQMLA():
     r"""
     Standalone genetic algorithm implementation for integration with :class:`qmla.QuantumModelLearningAgent`. 
