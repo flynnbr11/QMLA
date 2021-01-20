@@ -140,8 +140,9 @@ Model comparison
 Exploration Strategies
 ----------------------
 .. currentmodule:: qmla.exploration_strategies
-:class:`~qmla.exploration_strategies.ExplorationStrategy` Exploration Strategies do this thing. 
-    TODO.
+:class:`~qmla.exploration_strategies.ExplorationStrategy` 
+Exploration Strategies drive the progression of the :term:`QMLA` algorithm,
+as desribed in :ref:`_section_exploration_strategies`. 
 
 .. autoclass:: ExplorationStrategy
     :members:
