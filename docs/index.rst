@@ -15,6 +15,7 @@ Quantum Model Learning Agent
     overview
     full_guide
     full_api
+    applications
     .. references
     bib
     :maxdepth: 3
