@@ -6,7 +6,7 @@ Tutorial
 
 
 Here we provide a complete example of how to run the framework,
-including how to implement a custom :term:`Exploration Strategy`, and generate/interpret analysis.
+including how to implement a custom :term:`Exploration Strategy` (:term:`ES`), and generate/interpret analysis.
 
 
 .. _section_installation:
@@ -29,7 +29,7 @@ The steps of preparing the codebase are
 #. create a virtual Python environment for installing :term:`QMLA` dependencies
    without damaging other parts of the user’s environment
 
-#. download the :term:`QMLA` codebase from the forked Github repository
+#. download the [QMLA]_ codebase from the forked Github repository
 
 #. install packages upon which :term:`QMLA` depends.
 
@@ -76,17 +76,17 @@ which should give something like :numref:`fig:terminal_redis`.
 
 .. figure:: images/terminal_redis.png
    :alt: Terminal running :code:`redis-server`.
-   :width: 90.0%
+   :width: 75.0%
    :name: fig:terminal_redis
 
    Terminal running :code:`redis-server`.
 
 
-In a text editor, open :code`QMLA/launch/local_launch.sh`, 
+In a text editor, open ``QMLA/launch/local_launch.sh``, 
 the script used to run the codebase;  
 here we will ensure that we are running the
 algorithm, with 5 experiments and 20 particles, on the
-:term:`Exploration Strategy` named :code:`TestInstall`.
+:term:`ES` named :code:`TestInstall`.
 Ensure the first few lines of read:
 
 ::
@@ -146,7 +146,7 @@ it should have generated (in :code:`Jan_01/01_23`) files like
 Custom exploration strategy
 ---------------------------
 
-Next, we design a basic :term:`Exploration Strategy`, for the purpose of
+Next, we design a basic :term:`ES`, for the purpose of
 demonstrating how to run the algorithm. 
 Exploration strategies are placed in the directory 
 :code:`qmla/exploration_strategies`.
@@ -164,11 +164,11 @@ file.
     cp template.py custom_es/example.py
     cd custom_es
 
-Ensure :term:`QMLA` will know where to find the :term:`Exploration Strategy` 
-by importing everything from the custom :term:`Exploration Strategy` 
+Ensure :term:`QMLA` will know where to find the :term:`ES` 
+by importing everything from the custom :term:`ES` 
 directory into to the main module. 
 Then, in the directory, make a file called which imports the new
-:term:`Exploration Strategy` from the file. 
+:term:`ES` from the file. 
 To add any further exploration strategies inside the
 directory :code:`custom_es`, include them in the custom :code:`__init__.py`,
 and they will automatically be available to :term:`QMLA`.
@@ -184,7 +184,7 @@ and they will automatically be available to :term:`QMLA`.
     # __init__.py 
     from qmla.exploration_strategies.custom_es import *
 
-Now, change the structure (and name) of the :term:`Exploration Strategy`
+Now, change the structure (and name) of the :term:`ES`
 inside :code:`custom_es/example.py`. 
 Say we wish to target the true model
 
@@ -205,13 +205,13 @@ and parameters are implicit. So the target model in
     
     pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4
 
-Adapting the template :term:`Exploration Strategy` slightly, we can
+Adapting the template :term:`ES` slightly, we can
 define a model generation strategy with a small number of hard coded
 candidate models introduced at the first branch of the exploration tree.
 We will also set the parameters of the terms which are present in
 :math:`\hat{H}_{0}`, as well as the range in which to search parameters. 
-Keeping the :code:`import`s at the top of the :code:`example.py`, 
-rewrite the :term:`Exploration Strategy` as:
+Keeping the ``import``s at the top of the ``example.py``, 
+rewrite the :term:`ES` as:
 
 ::
 
@@ -256,7 +256,7 @@ rewrite the :term:`Exploration Strategy` as:
 
             return new_models
 
-To run the example :term:`Exploration Strategy` for a meaningful test,
+To run the example :term:`ES` for a meaningful test,
 return to the :code:`local_launch.sh` script above, 
 but change some of the settings:
 
@@ -302,18 +302,19 @@ Individual models’ insights can be found in , e.g. the model’s ``leaning_sum
 (:numref:`fig:qmla_learning_summary`), and in ``dynamics``
 (:numref:`fig:qmla_model_dynamics`).
 
-.. figure:: figures/model_analysis/learning_summary_1.pdf
-   :width: 45.0%
+.. figure:: images/model_analysis/learning_summary_1.png
+   :alt: Learning summary
+   :width: 75.0%
    :name: fig:qmla_learning_summary
    
    The outcome of :term:`QHL` for the given model.
    Subfigures (a)-(c) show the estimates of the parameters.
-    (d) shows the total parameterisation volume against experiments trained upon, 
-    along with the evolution times used for those experiments. 
+   (d) shows the total parameterisation volume against experiments trained upon, 
+   along with the evolution times used for those experiments. 
  
 
-.. figure:: figures/model_analysis/dynamics_1.pdf
-   :width: 45.0%
+.. figure:: images/model_analysis/dynamics_1.png
+   :width: 75.0%
    :name: fig:qmla_model_dynamics
 
    The model's attempt at reproducing dynamics from :math:`\hat{H}_0`.
@@ -324,7 +325,7 @@ Instance analysis
 
 Now we can run the full :term:`QMLA` algorithm, i.e. train several
 models and determine the most suitable. :term:`QMLA` will call the
-method of the :term:`Exploration Strategy`, set in :ref:`section_installation`,
+method of the :term:`ES`, set in :ref:`section_installation`,
 which tells :term:`QMLA` to construct three models on the first branch,
 then terminate the search. 
 Here we need to train and compare all models
@@ -363,16 +364,16 @@ with the dynamics of all candidates shown in
 The probes used during the training of all
 candidates are also plotted (:numref:`fig:qmla_training_probes`).
 
-.. figure:: figures/instance_analysis/composition_of_models.pdf
-   :width: 45.0%
+.. figure:: images/instance_analysis/composition_of_models.png
+   :width: 75.0%
    :name: fig:qmla_model_composition
 
    ``composition_of_models``: constituent terms of all considered models, 
    indexed by their model IDs. Here model 3 is :math:`\hat{H}_0`
 
 
-.. figure:: figures/instance_analysis/bayes_factors.pdf
-   :width: 45.0%
+.. figure:: images/instance_analysis/bayes_factors.png
+   :width: 75.0%
    :name: fig:qmla_bayes_factors
 
    ``bayes_factors``: comparisons between all models are read as :math:`B_{i,j}` where
@@ -381,8 +382,8 @@ candidates are also plotted (:numref:`fig:qmla_training_probes`).
    i.e. the model on the y-axis (x-axis) is the stronger model.
 
 
-.. figure:: figures/instance_analysis/BF_1_3.pdf
-   :width: 45.0%
+.. figure:: images/instance_analysis/BF_1_3.png
+   :width: 75.0%
    :name: fig:qmla_bayes_factor_comparison
 
    ``comparisons/BF_1_3``: direct comparison between models with IDs 1 and 3,
@@ -390,15 +391,15 @@ candidates are also plotted (:numref:`fig:qmla_training_probes`).
    as well as the times (experiments) against which the :term:`BF` was calculated. 
 
 
-.. figure:: figures/instance_analysis/dynamics_branch_1.pdf
-   :width: 45.0%
+.. figure:: images/instance_analysis/dynamics_branch_1.png
+   :width: 75.0%
    :name: fig:qmla_branch_dynamics
 
    ``branches/dynamics_branch_1``: dynamics of all models considered on the branch
    compared with system dynamics (red dots, :math:`Q`)
 
-.. figure:: figures/instance_analysis/probes_bloch_sphere.pdf
-   :width: 45.0%
+.. figure:: images/instance_analysis/probes_bloch_sphere.png
+   :width: 50.0%
    :name: fig:qmla_training_probes
 
    ``probes_bloch_sphere``: probes used for training models in this instance 
@@ -453,18 +454,18 @@ The champion model from each instance can
 attempt to reproduce system dynamics: we group together these
 reproductions for each model in :numref:`fig:run_dynamics`.
 
-.. figure:: figures/run_analysis/model_wins.pdf
+.. figure:: images/run_analysis/model_wins.png
    :name: fig:qmla_win_rates
 
    ``performace/model_wins``: number of instance wins achieved by each model.
 
-.. figure:: figures/run_analysis/params_pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4.pdf
+.. figure:: images/run_analysis/params_pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4.png
    :name: fig:champ_param_progression
 
    ``champion_models/params_params_pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4``: 
    parameter estimation progression for the true model, only for the instances where it was deemed champion. 
 
-.. figure:: figures/run_analysis/terms_and_params.pdf
+.. figure:: images/run_analysis/terms_and_params.png
    :name: fig:run_branch_dynamics
 
    ``champion_models/terms_and_params``: 
@@ -472,7 +473,7 @@ reproductions for each model in :numref:`fig:run_dynamics`.
    with the true parameter (:math:`\alpha_0`) in red and the median learned parameter 
    (:math:`\bar{\alpha}^{\prime}`) in blue.
 
-.. figure:: figures/run_analysis/dynamics.pdf
+.. figure:: images/run_analysis/dynamics.png
    :name: fig:run_dynamics
 
    ``performance/dynamics``: median dynamics of the champion models. The models
@@ -498,7 +499,7 @@ Overall, though, it has mostly a similar structure as the script used above.
 :ref:`section_installation`; this can be a new fork of the repository, 
 though it is sensible to test installation locally as described in this chapter
 so far, then *push* that version, including the new 
-:term:`Exploration Strategy`, to Github, and cloning the latest version. 
+:term:`ES`, to Github, and cloning the latest version. 
 It is again advisable to create a Python virtual environment in order to isolate
 :term:`QMLA` and its dependencies (indeed this is sensibel for any Python development project). 
 Open the parallel launch script, ``QMLA/launch/parallel_launch.sh``, and prepare the first few lines as
@@ -533,14 +534,14 @@ of experiments (:math:`N_e`) and particles (:math:`N_p`), and the number
 of models which must be trained. 
 :term:`QMLA` attempts to determine a
 reasonable time to request based on the ``max_num_models_by_shape``
-attribute  of the :term:`Exploration Strategy`, by calling 
+attribute  of the :term:`ES`, by calling 
 ``QMLA/scripts/time required calculation.py``.
 In practice, this can be difficult to set perfectly, 
-so the attribute of the :term:`Exploration Strategy` can be used to correct
+so the attribute of the :term:`ES` can be used to correct
 for heavily over- or under-estimated time requests. 
 Instances are run in parallel, and each instance trains/compares models in parallel. 
 The number of processes to request, :math:`N_c` for each instance is set as in the 
-:term:`Exploration Strategy`. 
+:term:`ES`. 
 Then, if there are :math:`N_r` instances in the run, we will
 be requesting the job scheduler to admit :math:`N_r` distinct jobs, each
 requiring :math:`N_c` processes, for the time specified.
@@ -589,33 +590,33 @@ Customising exploration strategies
 User interaction with the :term:`QMLA` codebase should be achieveable
 primarily through the exploration strategy framework. 
 Throughout the algorithm(s) available, :term:`QMLA` calls upon the 
-:term:`Exploration Strategy` before determining how to proceed. 
+:term:`ES` before determining how to proceed. 
 The usual mechanism through which the actions of :term:`QMLA` are directed, 
-is to set attributes of the :term:`Exploration Strategy` class: 
+is to set attributes of the :term:`ES` class: 
 the complete set of influential attributes are available at :class:`~qmla.ExplorationStrategy`. 
 
-:term:`QMLA` directly uses several methods of the :term:`Exploration Strategy` 
-class, all of which can be overwritten in the course of customising an :term:`Exploration Strategy`. 
+:term:`QMLA` directly uses several methods of the :term:`ES` 
+class, all of which can be overwritten in the course of customising an :term:`ES`. 
 Most such methods need not be replaced, however, with the exception of , which is the most
-important aspect of any :term:`Exploration Strategy`: 
+important aspect of any :term:`ES`: 
 it determines which models are built and tested by :term:`QMLA`. 
 This method allows the user to impose any logic desired in constructing models; 
 it is called after the completion of every branch of the exploration tree on
-the :term:`Exploration Strategy`.
+the :term:`ES`.
 
 .. _section_greedy_search:
 
 Greedy search
 ~~~~~~~~~~~~~~
 
-A first non-trivial :term:`Exploration Strategy` is to build models
+A first non-trivial :term:`ES` is to build models
 greedily from a set of *primitive* terms,
 :math:`\mathcal{T} = \{ \hat{t} \} `. 
 New models are constructed by combining the previous branch champion with each 
 of the remaining, unused terms. 
 The process is repeated until no terms remain.
 
-.. figure:: figures/greedy_exploration_strategy.pdf
+.. figure:: images/greedy_exploration_strategy.png
    :name: fig:greedy_search
    :width: 75.0%
 
@@ -626,7 +627,7 @@ The process is repeated until no terms remain.
    (marked in green) from the previous branch is combined with all the
    unused terms. 
 
-We can compose an :term:`Exploration Strategy` using these rules, 
+We can compose an :term:`ES` using these rules, 
 say for
 
 .. math:: 
@@ -638,7 +639,7 @@ Note the termination criteria must work in conjunction with
 the model generation routine. 
 Users can overwrite the method ``check tree completed`` for custom
 logic, although a straightforward mechanism is to use the ``spawn_stage`` attribute of
-the :term:`Exploration Strategy` class: when the final element of this
+the :term:`ES` class: when the final element of this
 list is , :term:`QMLA` will terminate the search by default. 
 Also note that the default termination test checks whether the number of branches
 (``spawn_step``s) exceeds the limit , which must be set artifically high to avoid
@@ -745,12 +746,12 @@ models generated (:numref:`fig:greedy_model_composition`),
 as well as the branches they reside on, and the Bayes
 factors between candidates, :numref:`fig:greedy_branches`.
 
-.. figure:: figures/greedy_search/composition_of_models.pdf
+.. figure:: images/greedy_search/composition_of_models.png
    :name: fig:greedy_model_composition
    
    ``composition_of_models``
 
-.. figure:: figures/greedy_search/graphs_of_branches_ExampleGreedySearch.pdf
+.. figure:: images/greedy_search/graphs_of_branches_ExampleGreedySearch.png
    :name: fig:greedy_branches
 
    ``graphs_of_branches_ExampleGreedySearch``: 
@@ -766,7 +767,7 @@ factors between candidates, :numref:`fig:greedy_branches`.
 Tiered greedy search
 ~~~~~~~~~~~~~~~~~~~~
 
-We provide one final example of a non-trivial :term:`Exploration Strategy`: 
+We provide one final example of a non-trivial :term:`ES`: 
 tiered greedy search. 
 Similar to the idea of :ref:`section_greedy_search`, 
 except terms are introduced hierarchically: 
@@ -915,12 +916,12 @@ A corresponding :term:‘Exploration Strategy‘ is given as follows.
 with corresponding results in [fig:example\_es\_tiered\_greedy].
 
 
-.. figure:: figures/tiered_search/composition_of_models.pdf
+.. figure:: images/tiered_search/composition_of_models.png
    :name: fig:greedy_model_composition
    
    ``composition_of_models``
 
-.. figure:: figures/tiered_search/graphs_of_branches_ExampleGreedySearchTiered.pdf
+.. figure:: images/tiered_search/graphs_of_branches_ExampleGreedySearchTiered.png
    :name: fig:greedy_branches
 
    ``graphs_of_branches_ExampleGreedySearchTiered``: 

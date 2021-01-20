@@ -17,7 +17,7 @@ class FullAccessNVCentre(
     r"""
     Exploration strategy for NV system described in experimental paper, 
     assuming full access to the state so the likelihood is based on 
-    :math`\bra{++} e^{ -i\hat{H(\vec{x})} t } \ket{++}`. 
+    :math`\langle++ | e^{ -i\hat{H(\vec{x})} t } | ++ \rangle`. 
 
     This is the base class for results presented in the experimental paper, 
     namely Fig 2. 
