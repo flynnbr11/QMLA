@@ -3,19 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-=====================================================
+============================
 Quantum Model Learning Agent
-=====================================================
+============================
 
 
 .. module:: qmla
 
 .. toctree::
     glossary
-    overview
-    full_guide
-    full_api
-    applications
+    .. overview
+    .. full_guide
+    .. full_api
+    .. applications
     tutorial
     bib
     :maxdepth: 3

@@ -15,9 +15,11 @@
 import os
 import sys
 # from recommonmark.parser import CommonMarkParser
-
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../qmla'))
+
+html_theme = 'sphinx_rtd_theme'
+numfig = True
 
 
 # -- Project information -----------------------------------------------------

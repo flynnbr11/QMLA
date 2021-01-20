@@ -1,10 +1,9 @@
-Applications 
-=============
 
 .. _section_applications:
-  
 
 
+Applications 
+=============
 
 NV centre characterisation  - Nature Physics 2021
 -------------------------------------------------

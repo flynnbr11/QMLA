@@ -1,66 +1,9 @@
 
-In a text editor, open ; here we will ensure that we are running the
-algorithm, with 5 experiments and 20 particles, on the
-:term:`Exploration Strategy` named . Ensure the first few lines of read:
-
-::
-
-    #!/bin/bash
-
-    ##### -------------------------------------------------- #####
-    # QMLA run configuration
-    ##### -------------------------------------------------- #####
-    num_instances=2 # number of instances in run
-    run_qhl=0 # perform QHL on known (true) model
-    run_qhl_multi_model=0 # perform QHL for defined list of models
-    experiments=2 # number of experiments
-    particles=10 # number of particles
-    plot_level=5
-
-
-    ##### -------------------------------------------------- #####
-    # Choose an exploration strategy 
-    # This will determine how QMLA proceeds. 
-    ##### -------------------------------------------------- #####
-    exploration_strategy="TestInstall"
-
-Now we can run Ensure the terminal running redis is kept active, and
-open a separate terminal window. We must activate the Python virtual
-environment configured for :term:`QMLA`, which we set up in
-[listing:qmla\_setup]. Then, we navigate to the :term:`QMLA` directory,
-and launch:
-
-::
-
-
-    # activate the QMLA Python virtual environment 
-    source qmla_test/qmla-env/bin/activate
-
-    # move to the QMLA directory 
-    cd qmla_test/QMLA
-    # Run QMLA
-    cd launch   
-    ./local_launch.sh
-
-There may be numerous warnings, but they should not affect whether
-:term:`QMLA` has succeeded; :term:`QMLA` will any significant error.
-Assuming the has completed successfully, :term:`QMLA` stores the run’s
-results in a subdirectory named by the date and time it was started. For
-example, if the was initialised on January :math:`1^{st}` at 01:23,
-navigate to the corresponding directory by
-
-::
-
-    cd results/Jan_01/01_23
-
-For now it is sufficient to notice that the code has successfully: it
-should have generated (in ) files like and .
-
 Custom 
 =======
 
-Next, we design a basic :term:`Exploration Strategy`, for the purpose of
-demonstrating how to the algorithm. are placed in the directory . To
+Next, we design a basic :term:‘Exploration Strategy‘, for the purpose of
+demonstrating how to run the algorithm. are placed in the directory . To
 make a new one, navigate to the exploration strategies directory, make a
 new subdirectory, and copy the template file.
 
@@ -74,12 +17,12 @@ new subdirectory, and copy the template file.
     cp template.py custom_es/example.py
     cd custom_es
 
-Ensure :term:`QMLA` will know where to find the :term:‘Exploration
+Ensure :term:‘QMLA‘ will know where to find the :term:‘Exploration
 Strategy‘ by importing everything from the custom :term:‘Exploration
 Strategy‘ directory into to the main module. Then, in the directory,
-make a file called which imports the new :term:`Exploration Strategy`
+make a file called which imports the new :term:‘Exploration Strategy‘
 from the file. To add any further inside the directory , include them in
-the custom , and they will automatically be available to :term:`QMLA`.
+the custom , and they will automatically be available to :term:‘QMLA‘.
 
 ::
 
@@ -92,7 +35,7 @@ the custom , and they will automatically be available to :term:`QMLA`.
     # __init__.py 
     from qmla.exploration_strategies.custom_es import *
 
-Now, change the structure (and name) of the :term:`Exploration Strategy`
+Now, change the structure (and name) of the :term:‘Exploration Strategy‘
 inside . Say we wish to target the
 
 .. math::
@@ -100,22 +43,22 @@ inside . Say we wish to target the
    \label{eqn:example_es_true_ham}
        \begin{split}
            \al &= \irow{ \alpha_{1,2} & \alpha_{2,3} & \alpha_{3,4}} \\
-           \terms &= \icol{ \hat{\sigma}_{z}^1 \otimes \hat{\sigma}_{z}^2 \\ \hat{\sigma}_{z}^2 \otimes \hat{\sigma}_{z}^3  \\ \hat{\sigma}_{z}^3 \otimes \hat{\sigma}_{z}^4 } \\
-           \Longrightarrow \ho &= \hat{\sigma}_{z}^{(1,2)} \hat{\sigma}_{z}^{(2,3)} \hat{\sigma}_{z}^{(3,4)} \\
+           \terms &= \icol{ \sz^1 \otimes \sz^2 \\ \sz^2 \otimes \sz^3  \\ \sz^3 \otimes \sz^4 } \\
+           \Longrightarrow \ho &= \sz^{(1,2)} \sz^{(2,3)} \sz^{(3,4)} \\
        \end{split}
 
-:term:`QMLA` interprets models as strings, where terms are separated by
+:term:‘QMLA‘ interprets models as strings, where terms are separated by
 , and parameters are implicit. So the target model in
 [eqn:example\_es\_true\_ham] will be given by
 
 .. math:: \ttt{pauliSet\_1J2\_zJz\_d4+pauliSet\_2J3\_zJz\_d4+pauliSet\_3J4\_zJz\_d4}.
 
-Adapting the template :term:`Exploration Strategy` slightly, we can
+Adapting the template :term:‘Exploration Strategy‘ slightly, we can
 define a model generation strategy with a small number of hard coded
 candidate models introduced at the first branch of the . We will also
 set the parameters of the terms which are present in :math:`\ho`, as
 well as the range in which to search parameters. Keeping the s at the
-top of the , rewrite the :term:`Exploration Strategy` as:
+top of the , rewrite the :term:‘Exploration Strategy‘ as:
 
 ::
 
@@ -160,7 +103,7 @@ top of the , rewrite the :term:`Exploration Strategy` as:
 
             return new_models
 
-To run the example :term:`Exploration Strategy` for a meaningful tests,
+To run the example :term:‘Exploration Strategy‘ for a meaningful tests,
 return to the of [listing:local\_launch], but change some of the
 settings:
 
@@ -177,10 +120,10 @@ in [listing:results\_directory].
 Analysis
 ========
 
-:term:`QMLA` stores results and generates plots over the entire range of
-the algorithm, i.e. the , and models. The depth of analysis performed
-automatically is set by the user control in ; for , only the most
-crucial figures are generated, while generates plots for every
+:term:‘QMLA‘ stores results and generates plots over the entire range of
+the algorithm, i.e. the run, instance and models. The depth of analysis
+performed automatically is set by the user control in ; for , only the
+most crucial figures are generated, while generates plots for every
 individual model considered. For model searches across large model
 spaces and/or considering many candidates, excessive plotting can cause
 considerable slow-down, so users should be careful to generate plots
@@ -192,18 +135,18 @@ Model analysis
 
 We have just run for the model in [eqn:example\_es\_true\_ham] for a
 single instance, using a reasonable number of particles and experiments,
-so we expect to have trained the model well. -level results are stored
-(e.g. for the instance with ) in . Individual models’ insights can be
-found in , e.g. the model’s [fig:qmla\_learning\_summary], and in
+so we expect to have trained the model well. instance-level results are
+stored (e.g. for the instance with ) in . Individual models’ insights
+can be found in , e.g. the model’s [fig:qmla\_learning\_summary], and in
 [fig:qmla\_model\_dynamics].
 
- analysis
----------
+instance analysis
+-----------------
 
-Now we can run the full :term:`QMLA` algorithm, i.e. train several
-models and determine the most suitable. :term:`QMLA` will call the
-method of the :term:`Exploration Strategy`, set in [listing:basic\_es],
-which tells :term:`QMLA` to construct three models on the first branch,
+Now we can run the full :term:‘QMLA‘ algorithm, i.e. train several
+models and determine the most suitable. :term:‘QMLA‘ will call the
+method of the :term:‘Exploration Strategy‘, set in [listing:basic\_es],
+which tells :term:‘QMLA‘ to construct three models on the first branch,
 then terminate the search. Here we need to train and compare all models
 so it takes considerably longer to run: the purpose of testing, we
 reduce the resources so the entire algorithm runs in about 15 minutes.
@@ -236,17 +179,17 @@ candidates shown in [fig:qmla\_branch\_dynamics]. The probes used during
 the training of all candidates are also plotted
 ([fig:qmla\_training\_probes]).
 
- analysis
----------
+run analysis
+------------
 
-Considering a number of together is a **. In general, this is the level
-of analysis of most interest: an individual instance is liable to errors
-due to the probabilistic nature of the model training and generation
-subroutines. On average, however, we expect those elements to perform
-well, so across a significant number of instances, we expect the average
-outcomes to be meaningful.
+Considering a number of together is a *run*. In general, this is the
+level of analysis of most interest: an individual instance is liable to
+errors due to the probabilistic nature of the model training and
+generation subroutines. On average, however, we expect those elements to
+perform well, so across a significant number of instances, we expect the
+average outcomes to be meaningful.
 
-Each has an script to generate plots at the level.
+Each has an script to generate plots at the run level.
 
 ::
 
@@ -277,8 +220,8 @@ where :math:`\ho` was deemed champion – are shown in
 which each term is found in the (:math:`\hat{t} \in \hp`) indicates the
 that the term is really present; these rates – along with the parameter
 values learned – are shown in [fig:qmla\_branch\_dynamics]. The from
-each can attempt to reproduce system dynamics: we group together these
-reproductions for each model in [fig:run\_dynamics].
+each instance can attempt to reproduce system dynamics: we group
+together these reproductions for each model in [fig:run\_dynamics].
 
 .. figure:: qmla_run_data/Jan_17/22_27/performance/dynamics.pdf
    :alt:  Run plot : median dynamics of the . The models which won most
@@ -296,20 +239,20 @@ reproductions for each model in [fig:run\_dynamics].
 Parallel implementation
 =======================
 
-We provide utility to run :term:`QMLA` on parallel processes. Individual
+We provide utility to run :term:‘QMLA‘ on parallel processes. Individual
 models’ training can run in parallel, as well as the calculation of
 between models. The provided script is designed for job scheduler
 running on a compute cluster. It will require a few adjustments to match
 the system being used. Overall, though, it has mostly a similar
 structure as the script used above.
 
-:term:`QMLA` must be downloaded on the compute cluster as in
+:term:‘QMLA‘ must be downloaded on the compute cluster as in
 [listing:qmla\_setup]; this can be a new fork of the repository, though
 it is sensible to test installation locally as described in this chapter
 so far, then *push* that version, including the new :term:‘Exploration
 Strategy‘, to Github, and cloning the latest version. It is again
 advisable to create a Python virtual environment in order to isolate
-:term:`QMLA` and its dependencies [2]_. Open the parallel launch script,
+:term:‘QMLA‘ and its dependencies [2]_. Open the parallel launch script,
 , and prepare the first few lines as
 
 ::
@@ -336,19 +279,19 @@ advisable to create a Python virtual environment in order to isolate
 When submitting jobs to schedulers like , we must specify the time
 required, so that it can determine a fair distribution of resources
 among users. We must therefore *estimate* the time it will take for an
-to complete: clearly this is strongly dependent on the numbers of
-experiments (:math:`\Ne`) and particles (:math:`\Np`), and the number of
-models which must be trained. :term:`QMLA` attempts to determine a
+instance to complete: clearly this is strongly dependent on the numbers
+of experiments (:math:`\Ne`) and particles (:math:`\Np`), and the number
+of models which must be trained. :term:‘QMLA‘ attempts to determine a
 reasonable time to request based on the attribute of the
-:term:`Exploration Strategy`, by calling . In practice, this can be
+:term:‘Exploration Strategy‘, by calling . In practice, this can be
 difficult to set perfectly, so the attribute of the :term:‘Exploration
 Strategy‘ can be used to correct for heavily over- or under-estimated
-time requests. Instances are run in parallel, and each trains/compares
-models in parallel. The number of processes to request, :math:`N_c` for
-each is set as in the :term:`Exploration Strategy`. Then, if there are
-:math:`N_r` in the run, we will be requesting the job scheduler to admit
-:math:`N_r` distinct jobs, each requiring :math:`N_c` processes, for the
-time specified.
+time requests. Instances are run in parallel, and each instance
+trains/compares models in parallel. The number of processes to request,
+:math:`N_c` for each instance is set as in the :term:‘Exploration
+Strategy‘. Then, if there are :math:`N_r` in the run, we will be
+requesting the job scheduler to admit :math:`N_r` distinct jobs, each
+requiring :math:`N_c` processes, for the time specified.
 
 The script works together with , though note a number of steps in the
 latter are configured to the cluster and may need to be adapted. In
@@ -371,7 +314,7 @@ those steps.
     redis-server RedisDatabaseConfig.conf --protected-mode no --port $REDIS_PORT & 
     redis-cli -p $REDIS_PORT flushall
 
-When the modifications are finished, :term:`QMLA` can be launched in
+When the modifications are finished, :term:‘QMLA‘ can be launched in
 parallel similarly to the local version:
 
 ::
@@ -389,28 +332,28 @@ analyses.
 Customising 
 ============
 
-User interaction with the :term:`QMLA` codebase should be achieveable
+User interaction with the :term:‘QMLA‘ codebase should be achieveable
 primarily through the framework. Throughout the algorithm(s) available,
-:term:`QMLA` calls upon the :term:`Exploration Strategy` before
+:term:‘QMLA‘ calls upon the :term:‘Exploration Strategy‘ before
 determining how to proceed. The usual mechanism through which the
-actions of :term:`QMLA` are directed, is to set attributes of the
-:term:`Exploration Strategy` class: the complete set of influential
+actions of :term:‘QMLA‘ are directed, is to set attributes of the
+:term:‘Exploration Strategy‘ class: the complete set of influential
 attributes are available at :raw-latex:`\cite{qmla_docs}`.
 
-:term:`QMLA` directly uses several methods of the :term:‘Exploration
+:term:‘QMLA‘ directly uses several methods of the :term:‘Exploration
 Strategy‘ class, all of which can be overwritten in the course of
-customising an :term:`Exploration Strategy`. Most such methods need not
+customising an :term:‘Exploration Strategy‘. Most such methods need not
 be replaced, however, with the exception of , which is the most
-important aspect of any :term:`Exploration Strategy`: it determines
-which models are built and tested by :term:`QMLA`. This method allows
+important aspect of any :term:‘Exploration Strategy‘: it determines
+which models are built and tested by :term:‘QMLA‘. This method allows
 the user to impose any logic desired in constructing models; it is
 called after the completion of every branch of the on the
-:term:`Exploration Strategy`.
+:term:‘Exploration Strategy‘.
 
 Greedy search
 -------------
 
-A first non-trivial :term:`Exploration Strategy` is to build models
+A first non-trivial :term:‘Exploration Strategy‘ is to build models
 greedily from a set of *primitive* terms,
 :math:`\termset = \{ \hat{t} \} `. New models are constructed by
 combining the previous branch champion with each of the remaining,
@@ -431,16 +374,16 @@ unused terms. The process is repeated until no terms remain.
    (marked in green) from the previous branch is combined with all the
    unused terms. 
 
-We can compose an :term:`Exploration Strategy` using these rules, say
+We can compose an :term:‘Exploration Strategy‘ using these rules, say
 for
 
-.. math:: \termset = \left\{ \hat{\sigma}_{x}^1, \ \hat{\sigma}_{y}^1, \ \hat{\sigma}_{x}^1 \otimes \hat{\sigma}_{x}^2, \ \hat{\sigma}_{y}^1 \otimes \hat{\sigma}_{y}^2 \right\}
+.. math:: \termset = \left\{ \sx^1, \ \sy^1, \ \sx^1 \otimes \sx^2, \ \sy^1 \otimes \sy^2 \right\}
 
 as follows. Note the termination criteria must work in conjunction with
 the model generation routine. Users can overwrite the method for custom
 logic, although a straightforward mechanism is to use the attribute of
-the :term:`Exploration Strategy` class: when the final element of this
-list is , :term:`QMLA` will terminate the search by default. Also note
+the :term:‘Exploration Strategy‘ class: when the final element of this
+list is , :term:‘QMLA‘ will terminate the search by default. Also note
 that the default termination test checks whether the number of branches
 () exceeds the limit , which must be set artifically high to avoid
 ceasing the search too early, if relying solely on . Here we demonstrate
@@ -537,8 +480,8 @@ how to impose custom logic to terminate the seach also.
         
         return new_models
 
-This can be implemented locally or in parallel as described above, and
-analysed as in [listing:analysing\_run], generating figures in
+This run can be implemented locally or in parallel as described above,
+and analysed as in [listing:analysing\_run], generating figures in
 accordance with the set by the user in the launch script. Outputs can
 again be found in the subdirectory, including a map of the models
 generated, as well as the branches they reside on, and the between
@@ -696,7 +639,7 @@ Strategy‘ is given as follows.
 with corresponding results in [fig:example\_es\_tiered\_greedy].
 
 .. [1]
-   This will take about ten minutes
+   This run will take about ten minutes
 
 .. [2]
    Indeed it is sensible to do this for any Python development project.
