@@ -12,10 +12,10 @@ Quantum Model Learning Agent
 
 .. toctree::
     glossary
-    .. overview
-    .. full_guide
-    .. full_api
-    .. applications
+    overview
+    full_guide
+    full_api
+    applications
     tutorial
     bib
     :maxdepth: 3
