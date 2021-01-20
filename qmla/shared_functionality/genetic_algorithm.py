@@ -33,7 +33,7 @@ class GeneticAlgorithmQMLA():
     :param str selection_method: mechanism through which to select chromosomes as parents. 
         Currently only 'roulette' available, but the framework should facilitate 
         alternatives. 
-    :param str crossover_method : mechanism through which parent chromosomes are combined 
+    :param str crossover_method: mechanism through which parent chromosomes are combined 
         to form offspring. 
         Currently only 'one_point' available, but the framework should facilitate 
         alternatives. 
@@ -560,6 +560,10 @@ class GeneticAlgorithmQMLA():
     ):        
         r"""
         Get the top N models, and store info on the elite models to date. 
+
+        :param dict model_fitnesses: the fitness of each model in this generation according to the 
+            chosen objective function. 
+
         """
 
         elite_models = \
@@ -646,6 +650,9 @@ class GeneticAlgorithmQMLA():
         r"""
         Retain only the top-performing half of models considered at this generation, 
         for consideration as parents to offspring on the subsequent generation. 
+
+        :param dict model_fitnesses: the fitness of each model in this generation according to the 
+            chosen objective function. 
 
         """
 
@@ -845,6 +852,9 @@ class GeneticAlgorithmQMLA():
 
         This involves determining the strongest models from the generation, 
         and constructing the database of parent-pairs and their associated selection probabilities. 
+
+        :param dict model_fitnesses: the fitness of each model in this generation according to the 
+            chosen objective function. 
         """
 
         self.fitness_at_generation[self.genetic_generation] = model_fitnesses
