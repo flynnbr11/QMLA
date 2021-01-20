@@ -74,7 +74,7 @@ user’s machine in the above setup section):
 
 which should give something like :numref:`fig:terminal_redis`.
 
-.. figure:: images/terminal_redis.png
+.. figure:: figures/terminal_redis.png
    :alt: Terminal running :code:`redis-server`.
    :width: 75.0%
    :name: fig:terminal_redis
@@ -302,7 +302,7 @@ Individual models’ insights can be found in , e.g. the model’s ``leaning_sum
 (:numref:`fig:qmla_learning_summary`), and in ``dynamics``
 (:numref:`fig:qmla_model_dynamics`).
 
-.. figure:: images/model_analysis/learning_summary_1.png
+.. figure:: figures/model_analysis/learning_summary_1.png
    :alt: Learning summary
    :width: 75.0%
    :name: fig:qmla_learning_summary
@@ -313,7 +313,7 @@ Individual models’ insights can be found in , e.g. the model’s ``leaning_sum
    along with the evolution times used for those experiments. 
  
 
-.. figure:: images/model_analysis/dynamics_1.png
+.. figure:: figures/model_analysis/dynamics_1.png
    :width: 75.0%
    :name: fig:qmla_model_dynamics
 
@@ -364,7 +364,7 @@ with the dynamics of all candidates shown in
 The probes used during the training of all
 candidates are also plotted (:numref:`fig:qmla_training_probes`).
 
-.. figure:: images/instance_analysis/composition_of_models.png
+.. figure:: figures/instance_analysis/composition_of_models.png
    :width: 75.0%
    :name: fig:qmla_model_composition
 
@@ -372,7 +372,7 @@ candidates are also plotted (:numref:`fig:qmla_training_probes`).
    indexed by their model IDs. Here model 3 is :math:`\hat{H}_0`
 
 
-.. figure:: images/instance_analysis/bayes_factors.png
+.. figure:: figures/instance_analysis/bayes_factors.png
    :width: 75.0%
    :name: fig:qmla_bayes_factors
 
@@ -382,7 +382,7 @@ candidates are also plotted (:numref:`fig:qmla_training_probes`).
    i.e. the model on the y-axis (x-axis) is the stronger model.
 
 
-.. figure:: images/instance_analysis/BF_1_3.png
+.. figure:: figures/instance_analysis/BF_1_3.png
    :width: 75.0%
    :name: fig:qmla_bayes_factor_comparison
 
@@ -391,14 +391,14 @@ candidates are also plotted (:numref:`fig:qmla_training_probes`).
    as well as the times (experiments) against which the :term:`BF` was calculated. 
 
 
-.. figure:: images/instance_analysis/dynamics_branch_1.png
+.. figure:: figures/instance_analysis/dynamics_branch_1.png
    :width: 75.0%
    :name: fig:qmla_branch_dynamics
 
    ``branches/dynamics_branch_1``: dynamics of all models considered on the branch
    compared with system dynamics (red dots, :math:`Q`)
 
-.. figure:: images/instance_analysis/probes_bloch_sphere.png
+.. figure:: figures/instance_analysis/probes_bloch_sphere.png
    :width: 50.0%
    :name: fig:qmla_training_probes
 
@@ -454,18 +454,18 @@ The champion model from each instance can
 attempt to reproduce system dynamics: we group together these
 reproductions for each model in :numref:`fig:run_dynamics`.
 
-.. figure:: images/run_analysis/model_wins.png
+.. figure:: figures/run_analysis/model_wins.png
    :name: fig:qmla_win_rates
 
    ``performace/model_wins``: number of instance wins achieved by each model.
 
-.. figure:: images/run_analysis/params_pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4.png
+.. figure:: figures/run_analysis/params_pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4.png
    :name: fig:champ_param_progression
 
    ``champion_models/params_params_pauliSet_1J2_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_3J4_zJz_d4``: 
    parameter estimation progression for the true model, only for the instances where it was deemed champion. 
 
-.. figure:: images/run_analysis/terms_and_params.png
+.. figure:: figures/run_analysis/terms_and_params.png
    :name: fig:run_branch_dynamics
 
    ``champion_models/terms_and_params``: 
@@ -473,7 +473,7 @@ reproductions for each model in :numref:`fig:run_dynamics`.
    with the true parameter (:math:`\alpha_0`) in red and the median learned parameter 
    (:math:`\bar{\alpha}^{\prime}`) in blue.
 
-.. figure:: images/run_analysis/dynamics.png
+.. figure:: figures/run_analysis/dynamics.png
    :name: fig:run_dynamics
 
    ``performance/dynamics``: median dynamics of the champion models. The models
@@ -616,7 +616,7 @@ New models are constructed by combining the previous branch champion with each
 of the remaining, unused terms. 
 The process is repeated until no terms remain.
 
-.. figure:: images/greedy_exploration_strategy.png
+.. figure:: figures/greedy_exploration_strategy.png
    :name: fig:greedy_search
    :width: 75.0%
 
@@ -746,12 +746,12 @@ models generated (:numref:`fig:greedy_model_composition`),
 as well as the branches they reside on, and the Bayes
 factors between candidates, :numref:`fig:greedy_branches`.
 
-.. figure:: images/greedy_search/composition_of_models.png
+.. figure:: figures/greedy_search/composition_of_models.png
    :name: fig:greedy_model_composition
    
    ``composition_of_models``
 
-.. figure:: images/greedy_search/graphs_of_branches_ExampleGreedySearch.png
+.. figure:: figures/greedy_search/graphs_of_branches_ExampleGreedySearch.png
    :name: fig:greedy_branches
 
    ``graphs_of_branches_ExampleGreedySearch``: 
@@ -916,12 +916,12 @@ A corresponding :term:‘Exploration Strategy‘ is given as follows.
 with corresponding results in [fig:example\_es\_tiered\_greedy].
 
 
-.. figure:: images/tiered_search/composition_of_models.png
+.. figure:: figures/tiered_search/composition_of_models.png
    :name: fig:greedy_model_composition
    
    ``composition_of_models``
 
-.. figure:: images/tiered_search/graphs_of_branches_ExampleGreedySearchTiered.png
+.. figure:: figures/tiered_search/graphs_of_branches_ExampleGreedySearchTiered.png
    :name: fig:greedy_branches
 
    ``graphs_of_branches_ExampleGreedySearchTiered``: 
