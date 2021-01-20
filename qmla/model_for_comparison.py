@@ -81,6 +81,7 @@ class ModelInstanceForComparison():
             self.probes_simulator = pickle.loads(
                 qmla_core_info_database['probes_simulator'])
         else:
+            
             qmla_core_info_dict = qmla_core_info_database.get('qmla_settings')
             self.probes_system = qmla_core_info_database['probes_system']
             self.probes_simulator = qmla_core_info_database['probes_simulator']
