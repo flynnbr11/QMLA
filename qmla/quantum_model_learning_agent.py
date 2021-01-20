@@ -3388,7 +3388,6 @@ class QuantumModelLearningAgent():
                 if (
                     n_models_this_row == max_models_per_subplot
                 ):
-                    row += 1
                     n_models_this_row = 0 
                     ax = lf.new_axis()
                     

@@ -22,7 +22,7 @@ from qmla.exploration_strategies import exploration_strategy
 import qmla.shared_functionality.probe_set_generation
 import qmla.construct_models
 
-import qmla.exploration_strategies.genetic_algorithms.genetic_algorithm
+import qmla.shared_functionality.genetic_algorithm
 
 __all__ = [
     'Genetic', 
@@ -94,7 +94,8 @@ class Genetic(
 
         if 'log_file' not in kwargs:
             kwargs['log_file'] = self.log_file
-        self.genetic_algorithm = qmla.exploration_strategies.genetic_algorithms.genetic_algorithm.GeneticAlgorithmQMLA(
+
+        self.genetic_algorithm = qmla.shared_functionality.genetic_algorithm.GeneticAlgorithmQMLA(
             genes = genes, 
             num_sites=self.num_sites,
             true_model = self.true_model,
@@ -631,26 +632,15 @@ class Genetic(
         # no pruning for GA, winner is champion of final branch
         return True
 
-    def exploration_strategy_specific_plots(
+    def set_specific_plots(
         self,
-        true_model_id,
-        qmla_id=0, 
-        plot_level=2, 
-        figure_format="png", 
         **kwargs
     ):
         r""" 
-        Genetic algorithm specific version of :meth:`qmla.ExplorationStrategy.exploration_strategy_specific_plots`. 
+        Genetic algorithm specific version of :meth:`qmla.ExplorationStrategy.set_specific_plots`. 
         """
-        self.qmla_id = qmla_id
-        self.plot_level = plot_level
-        self.figure_format = figure_format
-        self.log_print(["genetic alg plots"])
-        super().exploration_strategy_specific_plots(
-            **kwargs
-        )
 
-        plot_methods_by_level = {
+        self.plot_methods_by_level = {
             1 : [],
             2 : [
                 self._plot_correlation_fitness_with_f_score,
@@ -671,20 +661,6 @@ class Genetic(
             ], 
             6 : [], 
         }
-        self.log_print([
-            "Plotting methods:", plot_methods_by_level
-        ])
-
-        for pl in range(self.plot_level + 1):
-            if pl in plot_methods_by_level:
-                self.log_print(["Plotting for plot_level={}".format(pl)])
-                for method in plot_methods_by_level[pl]:
-                    try:
-                        method()
-                    except Exception as e:
-                        self.log_print([
-                            "plot failed {} with exception: {}".format(method.__name__, e)
-                        ])
 
         # Plots that need arguments so are called individually
         if self.plot_level >= 2:
@@ -692,7 +668,8 @@ class Genetic(
                 self.ratings_class.plot_models_ratings_against_generation(
                     f_scores = self.model_f_scores, 
                     save_directory = self.save_directory,
-                    f_score_cmap=self.f_score_cmap
+                    f_score_cmap=self.f_score_cmap,
+                    figure_format = self.figure_format
                 )
             except Exception as e:
                 self.log_print([
@@ -827,7 +804,7 @@ class Genetic(
         if save_to_file is None:
             save_to_file = os.path.join(
                 self.save_directory, 
-                'fitness_v_generation.png'.format(self.qmla_id)
+                'fitness_v_generation.{}'.format(self.figure_format)
             )
 
         plt.savefig(save_to_file)
@@ -868,7 +845,7 @@ class Genetic(
 
         save_to_file = os.path.join(
             self.save_directory, 
-            'fitness_types.png'.format(self.qmla_id)
+            'fitness_types.{}'.format(self.figure_format)
         )
         plt.savefig(save_to_file)
 
@@ -1033,7 +1010,7 @@ class Genetic(
         # Save figure
         save_to_file = os.path.join(
             self.save_directory, 
-            'gene_pool.png'
+            'gene_pool.{}'.format(self.figure_format)
         )
 
         fig.savefig(save_to_file)

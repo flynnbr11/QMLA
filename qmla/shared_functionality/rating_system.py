@@ -173,7 +173,9 @@ class RatingSystem():
         f_score_cmap,
         save_directory,
         show_fscore_cmap=False,
+        figure_format="png", 
     ):
+        self.figure_format = figure_format
 
         all_model_ratings_by_generation = pd.DataFrame()
         models = self.all_ratings.model_id.unique()
@@ -278,7 +280,10 @@ class RatingSystem():
                 # fontsize=label_fontsize
             )
 
-        lf.save(os.path.join(save_directory, 'elo_ratings_of_all_models.png'))
+        lf.save(
+            os.path.join(save_directory, 'elo_ratings_of_all_models'),
+            file_format = self.figure_format
+        )
 
     def plot_rating_progress_single_model(
         self, 

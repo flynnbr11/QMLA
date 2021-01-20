@@ -1309,13 +1309,48 @@ class ExplorationStrategy():
         
     def exploration_strategy_specific_plots(
         self,
+        save_directory, 
+        champion_model_id, 
+        true_model_id, 
+        qmla_id=0, 
+        plot_level=2, 
+        figure_format="png", 
         **kwargs
     ):
-        self.save_directory = kwargs.pop("save_directory")
-        self.champion_model_id = kwargs.pop("champion_model_id")
-        self.qmla_id = kwargs['qmla_id']
-        self.plot_level = kwargs['plot_level']
-        self.figure_format = kwargs['figure_format']
+
+        self.qmla_id = qmla_id
+        self.plot_level = plot_level
+        self.figure_format = figure_format
+        self.save_directory = save_directory
+        self.champion_model_id = champion_model_id
+        self.true_model_is = true_model_id
+
+        # set plots to perform 
+        self.plot_methods_by_level = {} # in case not overwritten
+        self.set_specific_plots()
+
+        self.log_print([
+            "Plotting methods:", self.plot_methods_by_level
+        ])
+
+        for pl in range(self.plot_level + 1):
+            if pl in self.plot_methods_by_level:
+                self.log_print(["Plotting for plot_level={}".format(pl)])
+                for method in self.plot_methods_by_level[pl]:
+                    try:
+                        method()
+                    except Exception as e:
+                        self.log_print([
+                            "plot failed {} with exception: {}".format(method.__name__, e)
+                        ])
+
+    def set_specific_plots(self):
+        r"""
+        Over-writeable method to set the target plotting methods. 
+        Also place any manual plotting methods in here, i.e. which require arguments.
+        """
+
+        pass
 
     ##########
     # Section: Utilities
