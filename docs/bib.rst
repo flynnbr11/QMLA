@@ -29,3 +29,6 @@ Biblography
 
 .. [SCG13]
     Smeltzer, Benjamin and Childress, Lilian and Gali, Adam. 13C hyperfine interactions in the nitrogen-vacancy centre in diamond. New Journal of Physics **13** 025021 (2013).
+
+.. [QMLA]
+    Flynn, Brian. Quantum Model Learning Agent. https://github.com/flynnbr11/QMLA
