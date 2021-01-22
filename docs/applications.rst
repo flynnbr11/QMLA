@@ -5,8 +5,10 @@
 Applications 
 =============
 
-NV centre characterisation  - Nature Physics 2021
--------------------------------------------------
+NV centre characterisation
+--------------------------
+
+.. TODO : change name of section and reference to indicate publication
 
 The model searches presented in [GFK20]_ have exploration strategies as presented here. 
 

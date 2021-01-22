@@ -39,7 +39,7 @@ Models
 ======
 Models encapsulate the physics of a system.
 We generically refer to `models` 
-because :term:`QMLA` is indifferent to the formulism employed to describe the system. 
+because :term:`QMLA` is indifferent to the formalism employed to describe the system. 
 Usually we mean `Hamiltonian` models, although :term:`QMLA` may also be used to 
 learn `Lindbladian` models. 
 
@@ -56,7 +56,7 @@ Then, :math:`\hat{H}_{xy}` is completely described by the vector
 :math:`\vec{\alpha} =(\alpha_x, \alpha_y)`, when we know the corresponding terms
 :math:`\vec{T} = ( \hat{\sigma}_x, \hat{\sigma_y} )`. 
 In general then, models are given by 
-:math:`\hat{H}(\vec{\alpha}) = \vec{\alpha} \vec{T}`. 
+:math:`\hat{H}(\vec{\alpha}) = \vec{\alpha} \cdot \vec{T}`. 
 
 In the Hamiltonian (closed) formalism, terms included in the model correspond 
 to interactions between particles in the system. 
@@ -91,11 +91,12 @@ or a nearest-neighbour connected Ising chain :math:`\hat{H}_2`:
     + \beta_3  \hat{\sigma}_3^z \hat{\sigma}_{4}^z
 
 
-Then, models exist in a `model space`, i.e. the space of all available terms.
+Then, models exist in a `model space`, i.e. the space of all valid combinations of the available terms.
 Any combination of terms is permissible in a given model. 
 :term:`QMLA` can then be thought of as a search through the model space for 
 the set of terms which produce data that best matches that of the system. 
-
+Since these terms correspond to the physical interactions affecting the system, 
+the outcome can be thought of as a complete characterisation. 
 
 
 Model Training
@@ -137,8 +138,8 @@ Layers/Branches:
     models are grouped in layers, which are thought of as branches on exploration trees.
 
 Exploration trees
-    are the objects on which the model search takes place: we think of models as \emph{leaves} 
-    on \emph{branches} of a tree. 
+    are the objects on which the model search takes place: we think of models as *leaves*
+    on *branches* of a tree. 
     The model search is then the effort to find the single leaf on the tree which best describes the :term:`system`. 
     They grow and are pruned according to rules set out in the exploration strategy. 
 
@@ -154,8 +155,9 @@ Instance:
     each of which corresponds to a unique exploration strategy.
 
 Run
-    Many instances which pertain to the same problem. i.e. :term:`QMLA` is run independently for a number of instances, 
-    allowing for analysis of the algorithm itself, e.g. that :term:`QMLA` finds a particular model in 50% of 100 instances. 
+    many instances which pertain to the same problem. 
+    :term:`QMLA` is run independently for a number of instances, allowing for analysis of the algorithm's performance overall, 
+    e.g. that :term:`QMLA` finds a particular model in 50% of 100 instances. 
 
 
 Outputs
@@ -172,10 +174,11 @@ User Interface
 
 In order to tailor :term:`QMLA` to a user's needs, 
 they must design a bespoke :ref:`section_exploration_strategies`.
-That is, the user must write a class building upong and inheriting from :class:`~qmla.exploration_strategies.ExplorationStrategy`, 
+That is, the user must write a class building upon and inheriting from :class:`~qmla.exploration_strategies.ExplorationStrategy`, 
 encompassing all of the logic required to achieve their use case, 
 for example by incorporating a genetic algorithm within the method called upon for constructing new 
 candidates, :meth:`~qmla.exploration_strategies.ExplorationStrategy.generate_models`.
 Then, that class must be available to :func:`~qmla.get_exploration_class`, 
 by ensuring it is included in one of the ``import`` statements in ``qmla/exploration_strategies/__init__.py``.
 Finally, instruct :term:`QMLA` to use that :term:`ES` for a run in the launch script (see :ref:`section_launch`).
+These steps are laid out in full in :ref:`section_tutorial`.
