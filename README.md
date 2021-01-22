@@ -23,7 +23,7 @@ requirements, or easily add functionality as needed.
 This `README` briefly introduces the core concepts at a high level;
 [full documentation is available](https://quantum-model-learning-agent.readthedocs.io/en/latest/) on `readthedocs`
 
-#Models
+# Models
 
 Models encapsulate the physics of a system. 
 We generically refer to models because QMLA is indifferent to the formalism employed to describe the system. 
