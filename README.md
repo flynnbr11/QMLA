@@ -21,7 +21,7 @@ users to select the combination which suits their requirements, or
 easily add functionality as needed.
 
 This `README` briefly introduces the core concepts at a high level;
-[full documentation is available][] on `readthedocs`
+[full documentation is available][] on `readthedocs`.
 
 # Models
 
@@ -134,7 +134,29 @@ QMLA is structured over several levels:
         of the algorithm’s performance overall, e.g. that QMLA finds a
         particular model in 50% of 100 instances.
 
+# Outputs
+
+`QMLA` automatically performs a series of analyses and produces
+associated plots. These are stored in a unique folder generated for the
+`run` upon launch: this folder is specified by the date and time of the
+launch and is located, relative to the `QMLA` main project directory in,
+e.g., `launch/results/Jan_01/12_34`.
+
+# User Interface
+
+In order to tailor `QMLA` to a user’s needs, they must design a bespoke
+`Exploration Strategy (ES)`. That is, the user must write a class
+building upon and inheriting from the base ES, encompassing all of the
+logic required to achieve their use case, for example by incorporating a
+genetic algorithm within the method called upon for constructing new
+candidates, `ExplorationStrategy.generate_models`. Then, that class must
+be available to QMLA’s `get_exploration_class()` function, by ensuring
+it is included in one of the `import` statements in
+`qmla/exploration_strategies/__init__.py`. Finally, instruct `QMLA` to
+use that `ES` for a run in the launch script. These steps are laid out
+in full in the [QMLA Tutorial][].
+
 [Quantum Hamiltonian Learning (QHL)]: https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.112.190501
 [QInfer]: http://qinfer.org/
-
+[QMLA Tutorial]: https://quantum-model-learning-agent.readthedocs.io/en/latest/tutorial.html
 [full documentation is available]: https://quantum-model-learning-agent.readthedocs.io/en/latest/

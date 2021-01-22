@@ -184,28 +184,3 @@ Then, that class must be available to :func:`~qmla.get_exploration_class`,
 by ensuring it is included in one of the ``import`` statements in ``qmla/exploration_strategies/__init__.py``.
 Finally, instruct :term:`QMLA` to use that :term:`ES` for a run in the launch script (see :ref:`section_launch`).
 These steps are laid out in full in :ref:`section_tutorial`.
-
-# Outputs
-
-`QMLA` automatically performs a series of analyses and produces
-associated plots. These are stored in a unique folder generated for the
-`run` upon launch: this folder is specified by the date and time of the
-launch and is located, relative to the `QMLA` main project directory in,
-e.g., `launch/results/Jan_01/12_34`. These are detailed in
-`section_analysis`.
-
-# User Interface
-
-In order to tailor `QMLA` to a user's needs, they must design a bespoke
-`section_exploration_strategies`. That is, the user must write a class
-building upon and inheriting from
-`~qmla.exploration_strategies.ExplorationStrategy`, encompassing all of
-the logic required to achieve their use case, for example by
-incorporating a genetic algorithm within the method called upon for
-constructing new candidates,
-`~qmla.exploration_strategies.ExplorationStrategy.generate_models`.
-Then, that class must be available to `~qmla.get_exploration_class`, by
-ensuring it is included in one of the `import` statements in
-`qmla/exploration_strategies/__init__.py`. Finally, instruct `QMLA` to
-use that `ES` for a run in the launch script (see `section_launch`).
-These steps are laid out in full in `section_tutorial`.

@@ -1,3 +1,8 @@
+## NOTE: 
+Github markdown doesn't render TeX equations, so to update:
+write the README here, feed it through Pandoc (https://pandoc.org/try/), 
+from Markdown -> Markdown (Github flavoured).
+
 # Quantum Model Learning Agent 
 
 Quantum Model Learning Agent (QMLA) is a machine learning 
@@ -112,3 +117,22 @@ QMLA is structured over several levels:
     * many instances which pertain to the same problem. 
     QMLA is run independently for a number of instances, allowing for analysis of the
     algorithm's performance overall, e.g. that QMLA finds a particular model in 50% of 100 instances.
+
+# Outputs
+
+`QMLA` automatically performs a series of analyses and produces associated plots. 
+These are stored in a unique folder generated for the `run` upon launch: 
+this folder is specified by the date and time of the launch and is located, 
+relative to the `QMLA` main project directory in, e.g., `launch/results/Jan_01/12_34`. 
+
+# User Interface
+
+In order to tailor `QMLA` to a user's needs, they must design a bespoke `Exploration Strategy (ES)`. 
+That is, the user must write a class building upon and inheriting from the base ES, 
+encompassing all of the logic required to achieve their use case, 
+for example by incorporating a genetic algorithm within the method called upon for constructing new candidates,
+`ExplorationStrategy.generate_models`.
+Then, that class must be available to QMLA's `get_exploration_class()` function, 
+by ensuring it is included in one of the `import` statements in  `qmla/exploration_strategies/__init__.py`. 
+Finally, instruct `QMLA` to use that `ES` for a run in the launch script.
+These steps are laid out in full in the [QMLA Tutorial](https://quantum-model-learning-agent.readthedocs.io/en/latest/tutorial.html).
