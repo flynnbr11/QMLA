@@ -2161,9 +2161,13 @@ class QuantumModelLearningAgent():
         ]
 
         # Compare models (using this fnc so we can wait_on_result)
-        self.compare_model_set(
+        # self.compare_model_set(
+        #     pair_list=global_champ_branch.pairs_to_compare,
+        #     wait_on_result=True,
+        # )
+        self.compare_models_within_branch(
+            branch_id=global_champ_branch_id,
             pair_list=global_champ_branch.pairs_to_compare,
-            wait_on_result=True,
         )
         champ_id = self.process_comparisons_within_branch(
             branch_id=global_champ_branch_id
