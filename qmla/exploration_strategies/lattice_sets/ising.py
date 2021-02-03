@@ -54,4 +54,5 @@ class IsingReducedLatticeSet(IsingLatticeSet):
             '_4_site_lattice_fully_connected',
             '_4_site_square',
         ]
+        self._setup_target_models() # to use updated lattice_names
             

@@ -54,11 +54,9 @@ class LatticeSet(
             '_4_site_square',
             '_6_site_grid'
         ]
-        # self.rerun_lattices = [
-        #     '_5_site_lattice_fully_connected',
-        #     '_6_site_grid'
-        # ]
-        # self.lattice_names = list(sorted(self.available_lattices_by_name.keys()))
+        self._setup_target_models()
+
+    def _setup_target_models(self):    
         self.available_lattices_by_name = {
             k : topology_predefined.__getattribute__(k)
             for k in self.lattice_names
