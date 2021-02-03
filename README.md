@@ -40,16 +40,16 @@ using the Pauli operators
 *σ̂*<sub>*x*</sub>, *σ̂*<sub>*y*</sub>, *σ̂*<sub>*z*</sub>,
 e.g. *Ĥ*<sub>*x**y*</sub> = *α*<sub>*x*</sub>*σ̂*<sub>*x*</sub> + *α*<sub>*y*</sub>*σ̂*<sub>*y*</sub>
 Then, *Ĥ*<sub>*x**y*</sub> is completely described by the vector 
-*α* = (*α*<sub>*x*, *α*<sub>*y*) when we know the corresponding terms
+*α* = (*α*<sub>*x*, *α*<sub>*y*</sub>) when we know the corresponding terms
 *T⃗* = ( *σ̂*<sub>*x*</sub>, *σ̂*<sub>*y*</sub> ). 
 In general then, models are given by *Ĥ*(*α⃗*) = *α⃗* ⋅ *T⃗*.
 
 In the Hamiltonian (closed) formalism, terms included in the model
 correspond to interactions between particles in the system. For example,
 the Ising model Hamiltonian on *N* sites (spins),
-*Ĥ*<sup> ⊗ *N*</sup> = *J*∑<sub>*i*</sub> = 1<sup>*N* − 1</sup>*σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i*</sub> + 1<sup>*z*</sup>,
+*Ĥ*<sup> ⊗ *N*</sup> = *J*∑<sub>*i*</sub> = 1<sup>*N* − 1</sup>*σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i+1*</sub><sup>*z*</sup>,
 includes terms *σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i* + 1</sub><sup>*z*</sup> which
-are the interactions between nearest neighbour sites (*i*, *i* + 1).
+are the interactions between nearest neighbour sites (*i*, *i+1*).
 
 QMLA reduces assumptions about which interactions are present, for instance by considering models
 *Ĥ*<sup> ⊗ 5</sup> and *Ĥ*<sup> ⊗ 8</sup>, and determining which model
