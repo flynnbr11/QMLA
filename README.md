@@ -39,17 +39,16 @@ by their parameters. For example, 1-qubit models can be constructed
 using the Pauli operators
 *σ̂*<sub>*x*</sub>, *σ̂*<sub>*y*</sub>, *σ̂*<sub>*z*</sub>,
 e.g. *Ĥ*<sub>*x**y*</sub> = *α*<sub>*x*</sub>*σ̂*<sub>*x*</sub> + *α*<sub>*y*</sub>*σ̂*<sub>*y*</sub>
-Then, *Ĥ*<sub>*x**y*</sub> is completely described by the vector $ =
-(\_x  \_y) $ when we know the corresponding terms
-$\\vec{T} = ( \\hat{\\sigma}\_x, \\hat{\\sigma\_y} )$. In general then,
-models are given by *Ĥ*(*α⃗*) = *α⃗* ⋅ *T⃗*.
+Then, *Ĥ*<sub>*x**y*</sub> is completely described by the vector 
+*α* = (*α*<sub>*x*, *α*<sub>*y*) when we know the corresponding terms
+*T⃗* = ( *σ̂*<sub>*x*</sub>, *σ̂*<sub>*y*</sub> ). 
+In general then, models are given by *Ĥ*(*α⃗*) = *α⃗* ⋅ *T⃗*.
 
 In the Hamiltonian (closed) formalism, terms included in the model
 correspond to interactions between particles in the system. For example,
 the Ising model Hamiltonian on *N* sites (spins),
-$\\hat{H}^{\\otimes N} = J \\sum\\limits\_{i=1}^{N-1} \\hat{\\sigma}\_i^z \\hat{\\sigma}\_{i+1}^z$,
-includes terms
-*σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i* + 1</sub><sup>*z*</sup> which
+*Ĥ*<sup> ⊗ *N*</sup> = *J*∑\_*i* = 1<sup>*N* − 1</sup>*σ̂*\_*i*<sup>*z*</sup>*σ̂*\_*i* + 1<sup>*z*</sup>,
+includes terms *σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i* + 1</sub><sup>*z*</sup> which
 are the interactions between nearest neighbour sites (*i*, *i* + 1).
 
 QMLA reduces assumptions about which interactions are present, for instance by considering models
