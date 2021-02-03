@@ -164,7 +164,7 @@ class HubbardReducedLatticeSet(FermiHubbardLatticeSet):
             4: 2,
             6: 2,
             'other': 0
-        }
+        } # test
 
 
         
