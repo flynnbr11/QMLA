@@ -40,7 +40,7 @@ using the Pauli operators
 *σ̂*<sub>*x*</sub>, *σ̂*<sub>*y*</sub>, *σ̂*<sub>*z*</sub>,
 e.g. *Ĥ*<sub>*x**y*</sub> = *α*<sub>*x*</sub>*σ̂*<sub>*x*</sub> + *α*<sub>*y*</sub>*σ̂*<sub>*y*</sub>
 Then, *Ĥ*<sub>*x**y*</sub> is completely described by the vector 
-*α* = (*α*<sub>*x*, *α*<sub>*y*</sub>) when we know the corresponding terms
+*α* = (*α*<sub>*x*</sub>, *α*<sub>*y*</sub>) when we know the corresponding terms
 *T⃗* = ( *σ̂*<sub>*x*</sub>, *σ̂*<sub>*y*</sub> ). 
 In general then, models are given by *Ĥ*(*α⃗*) = *α⃗* ⋅ *T⃗*.
 
