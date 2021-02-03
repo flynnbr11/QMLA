@@ -33,12 +33,6 @@ launch/*
 
 !launch/results/
 launch/results/*
-!launch/results/Selected_Runs/
-!launch/results/Selected_Runs/*/*/*
-!launch/results/Selected_Runs/*/*/*/*
-!launch/local_launch.sh
-!launch/parallel_launch.sh
-!launch/run_qmd_instance.sh
 
 # But want redis configuration:
 !qmla/RedisConfig.conf
