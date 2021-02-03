@@ -8,7 +8,7 @@ run_qhl=0 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models
 experiments=2
 particles=10
-plot_level=2
+plot_level=6
 
 
 ##### -------------------------------------------------- #####
@@ -24,10 +24,8 @@ exploration_strategy="ExampleBasic"
 debug_mode=0
 q_id=0 # instance ID of first instance
 use_rq=0 # use RQ workers for learning
-figure_format="pdf" # analysis plots stored as this type
-top_number_models=5
-plots=0
-pickle_instances=1
+figure_format="png" # analysis plots stored as this type
+pickle_instances=1 # whether to store the entire QMLA class
 
 
 ##### -------------------------------------------------- #####
@@ -55,6 +53,7 @@ done
 do_further_qhl=0 # QHL refinement to best performing models 
 further_qhl_factor=1
 further_qhl_num_runs=$num_instances
+top_number_models=5 # number of models to present as "best" 
 
 # Generate all plots in QHL mode
 if (( "$run_qhl" == 1 )) || (( "$run_qhl_multi_model" == 1 ))
@@ -206,7 +205,6 @@ then
             -rq=$use_rq \
             -qhl=0 \
             -qid=$q_id \
-            -pt=$plots \
             -pkl=1 \
             -log=$log_for_entire_run \
             -cb=$bayes_csv \

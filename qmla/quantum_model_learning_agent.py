@@ -2881,7 +2881,6 @@ class QuantumModelLearningAgent():
         mask = np.tri(bayes_factor_by_id.shape[0], k=-1).T
         
         lf = LatexFigure(
-            fraction=0.45, 
             auto_label=False
         )
         ax = lf.new_axis()
@@ -3274,7 +3273,8 @@ class QuantumModelLearningAgent():
 
         # Plot as heatmap
         lf = LatexFigure(
-            auto_label=False
+            auto_label=False,
+            font_scale=2, 
         ) # TODO make figure size depend on num terms. 
         ax = lf.new_axis()
 
