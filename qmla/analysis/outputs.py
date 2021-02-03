@@ -154,13 +154,12 @@ def plot_dynamics_multiple_models(
     success_rate_by_term = {}
     nmod = len(winning_models)
     if nmod == 1:
-        lf = lfig.LatexFigure(auto_label=False, fraction=0.75)
+        lf = lfig.LatexFigure(auto_label=False, )
     else:
         ncols = int(np.ceil(np.sqrt(nmod)))
         nrows = int(np.ceil(nmod / ncols)) + 1  # 1 extra row for "master"
         lf = lfig.LatexFigure(
             auto_label=False, 
-            fraction=0.75,
             gridspec_layout=(nrows, ncols)
         )
 

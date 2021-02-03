@@ -3274,7 +3274,6 @@ class QuantumModelLearningAgent():
 
         # Plot as heatmap
         lf = LatexFigure(
-            fraction=0.75, 
             auto_label=False
         ) # TODO make figure size depend on num terms. 
         ax = lf.new_axis()

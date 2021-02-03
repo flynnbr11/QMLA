@@ -919,8 +919,6 @@ def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="pn
 
     # Draw figure
     lf = lfig.LatexFigure(
-        # fraction = 0.73,
-        # fraction = 1, 
         auto_label=False, 
         auto_gridspec = len(all_learned_params),
         gridspec_params = {'wspace' : 0.15, 'hspace' : 0.3}

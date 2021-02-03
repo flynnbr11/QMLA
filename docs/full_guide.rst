@@ -194,7 +194,7 @@ An example of :term:`ES` design, including a simple greedy-addition model genera
             return self.search_exhausted
 
 In order to implement a new :term:`ES`, :term:`QMLA` searches in the directory ``qmla/exploration_strategies``, 
-so the user's :term:`ES` must be ``import``ed to the ``qmla/exploration_strategies/__init__.py``.
+so the user's :term:`ES` must be ``import`` ed to the ``qmla/exploration_strategies/__init__.py``.
 :term:`QMLA` retrieves the :term:`ES` through calls to the function :func:`~qmla.get_exploration_class`, 
 by searching for the :term:`ES` specified in the :ref:`section_launch` script. 
 For example, the launch script (e.g. at ``qmla/launch/local_launch.sh``) should be updated to call the user's :term:`ES`, e.g.
@@ -207,9 +207,9 @@ For example, the launch script (e.g. at ``qmla/launch/local_launch.sh``) should 
     # QMLA run configuration
     ###############
     num_instances=1
-    run_qhl=0 # perform QHL on known (true) model
-    exp=500 # number of experiments
-    prt=2000 # number of particles
+    run_qhl=0 
+    experiments=500 
+    particles=2000 
 
     ###############
     # Choose an exploration strategy 
@@ -217,6 +217,7 @@ For example, the launch script (e.g. at ``qmla/launch/local_launch.sh``) should 
 
     exploration_strategy='UserExplorationStrategy'
 
+A complete step-by-step example of implementing custom :term:`ES` is given in :ref:`section_tutorial`.
 Users should ensure they understand the options for launching :term:`QMLA` as outlined in :ref:`section_launch`. 
 
 Each :term:`ES` is assigned a unique :term:`Exploration Tree (ET) <ET>`, 
