@@ -48,8 +48,8 @@ In the Hamiltonian (closed) formalism, terms included in the model
 correspond to interactions between particles in the system. For example,
 the Ising model Hamiltonian on *N* sites (spins),
 *Ĥ*<sup> ⊗ *N*</sup> = *J*∑<sub>*i*</sub> = 1<sup>*N* − 1</sup>*σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i+1*</sub><sup>*z*</sup>,
-includes terms *σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i* + 1</sub><sup>*z*</sup> which
-are the interactions between nearest neighbour sites (*i*, *i+1*).
+includes terms *σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i* + 1</sub><sup>*z*</sup> 
+which are the interactions between nearest neighbour sites (*i*, *i+1*).
 
 QMLA reduces assumptions about which interactions are present, for instance by considering models
 *Ĥ*<sup> ⊗ 5</sup> and *Ĥ*<sup> ⊗ 8</sup>, and determining which model
