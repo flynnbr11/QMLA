@@ -47,7 +47,7 @@ In general then, models are given by *Ĥ*(*α⃗*) = *α⃗* ⋅ *T⃗*
 In the Hamiltonian (closed) formalism, terms included in the model
 correspond to interactions between particles in the system. For example,
 the Ising model Hamiltonian on *N* sites (spins),
-*Ĥ*<sup> ⊗ *N*</sup> = *J*∑\_*i* = 1<sup>*N* − 1</sup>*σ̂*\_*i*<sup>*z*</sup>*σ̂*\_*i* + 1<sup>*z*</sup>,
+*Ĥ*<sup> ⊗ *N*</sup> = *J*∑<sub>*i*</sub> = 1<sup>*N* − 1</sup>*σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i*</sub> + 1<sup>*z*</sup>,
 includes terms *σ̂*<sub>*i*</sub><sup>*z*</sup>*σ̂*<sub>*i* + 1</sub><sup>*z*</sup> which
 are the interactions between nearest neighbour sites (*i*, *i* + 1).
 
