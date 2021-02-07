@@ -2169,6 +2169,25 @@ class QuantumModelLearningAgent():
             branch_id=global_champ_branch_id,
             pair_list=global_champ_branch.pairs_to_compare,
         )
+
+        # TODO wait until all BF computed on final branch
+        active_branches_bayes = self.redis_databases['active_branches_bayes']
+        num_comparisons_complete_on_branch = active_branches_bayes.get(
+            int(global_champ_branch_id)
+        )
+        self.log_print([
+            "Starting to wait on comparisons between branch champions.",
+            "Initially completed:", num_comparisons_complete_on_branch,
+            "num pairs on branch:", global_champ_branch.num_model_pairs
+        ])
+        while not global_champ_branch.comparisons_complete:
+            num_comparisons_complete_on_branch = int(active_branches_bayes.get(
+                int(global_champ_branch_id)
+            ))
+            if num_comparisons_complete_on_branch == global_champ_branch.num_model_pairs:
+                global_champ_branch.comparisons_complete = True
+        self.log_print(["Comparisons between branch champions complete."])
+
         champ_id = self.process_comparisons_within_branch(
             branch_id=global_champ_branch_id
         )
