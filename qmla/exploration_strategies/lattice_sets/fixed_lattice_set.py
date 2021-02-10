@@ -14,6 +14,20 @@ class LatticeSet(
     exploration_strategy.ExplorationStrategy
 ):
 
+    _vary_true_model = True
+    _lattice_names = [
+        '_2_site_chain', 
+        '_3_site_chain', 
+        '_4_site_chain', 
+        '_5_site_chain', 
+        '_6_site_chain', 
+        '_3_site_lattice_fully_connected', 
+        '_4_site_lattice_fully_connected',
+        '_5_site_lattice_fully_connected',
+        '_4_site_square',
+        '_6_site_grid'
+    ]
+
     def __init__(
         self,
         exploration_rules,
@@ -29,31 +43,15 @@ class LatticeSet(
             **kwargs
         )
 
-        self._shared_true_parameters = False
         self.tree_completed_initially = True # fixed lattice set considered
-        # self.base_terms = ['x', 'z']
-        # self.transverse_field = None
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_grouped_pauli
         self.initial_models = None # so that QMLA will call generate_models first
-        # self.true_model = self.model_from_lattice(self.available_lattices[0])
         self.max_time_to_consider = 45
         self.check_champion_reducibility = False
         self.fraction_own_experiments_for_bf = 0.25
         self.fraction_opponents_experiments_for_bf = self.fraction_own_experiments_for_bf
         self.fraction_particles_for_bf = 0.25
-
-        self.lattice_names = [
-            '_2_site_chain', 
-            '_3_site_chain', 
-            '_4_site_chain', 
-            '_5_site_chain', 
-            '_6_site_chain', 
-            '_3_site_lattice_fully_connected', 
-            '_4_site_lattice_fully_connected',
-            '_5_site_lattice_fully_connected',
-            '_4_site_square',
-            '_6_site_grid'
-        ]
+        self._shared_true_parameters = False
         self._setup_target_models()
 
     def _setup_target_models(self):    
@@ -65,16 +63,18 @@ class LatticeSet(
             topology_predefined.__getattribute__(k)
             for k in self.lattice_names
         ]
-        # self.true_lattice = topology_predefined._4_site_square
-        # randomly select a true model from the available lattices
-        if self._shared_true_parameters:
+        
+        if self.shared_true_parameters:
             lattice_idx = -1
         else:
             lattice_idx = self.qmla_id % len(self.available_lattices)  
+            self.log_print([
+                "true model set by lattice idx = {}".format(lattice_idx)
+            ])
             # Rerunning subset with more resources
             # lattice_idx = self.qmla_id % len(self.rerun_lattices)  
-        # self.true_lattice_name = self.lattice_names[ lattice_idx ]
-        self.true_lattice_name = '_4_site_lattice_fully_connected'
+        self.true_lattice_name = self.lattice_names[ lattice_idx ]
+        # self.true_lattice_name = '_4_site_lattice_fully_connected'
         self.true_lattice = self.available_lattices_by_name[self.true_lattice_name]
         self.true_model = self.model_from_lattice(self.true_lattice)
 
@@ -88,6 +88,20 @@ class LatticeSet(
             'other' : 0
         }
         self.num_processes_to_parallelise_over = len(self.available_lattices)
+
+    @property
+    def vary_true_model(self):
+        self.log_print(["getting _vary_true_model:", self._vary_true_model])
+        return self._vary_true_model
+    
+    @property
+    def shared_true_parameters(self):
+        # self.log_print(["Getting shared_true_parameters = ", self._shared_true_parameters])
+        return self._shared_true_parameters
+
+    @property
+    def lattice_names(self):
+        return self._lattice_names
 
     def model_from_lattice(
         self, 
