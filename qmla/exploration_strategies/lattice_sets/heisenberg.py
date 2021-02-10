@@ -35,8 +35,7 @@ class HeisenbergReducedLatticeSet(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self._shared_true_parameters = False
-        self.lattice_names = [
+        self._lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
             '_4_site_chain', 

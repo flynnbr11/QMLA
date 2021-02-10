@@ -31,7 +31,7 @@ class FermiHubbardLatticeSet(
             **kwargs
         )        
 
-        self.lattice_names = [
+        self._lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
             '_3_site_lattice_fully_connected', 
@@ -152,7 +152,7 @@ class HubbardReducedLatticeSet(FermiHubbardLatticeSet):
             **kwargs
         )
 
-        self.lattice_names = [
+        self._lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
             '_3_site_lattice_fully_connected', 
