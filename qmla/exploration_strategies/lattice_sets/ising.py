@@ -30,7 +30,7 @@ class IsingLatticeSet(
         #     'pauliLikewise_lz_1J2_1J3_1J4_2J3_2J4_3J4_d4': 0.7
         # }
         self.max_time_to_consider = 10
-        self.timing_insurance_factor = 0.2
+        # self.timing_insurance_factor = 0.2
         
 class IsingReducedLatticeSet(IsingLatticeSet):
 

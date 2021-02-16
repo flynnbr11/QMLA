@@ -51,6 +51,7 @@ class LatticeSet(
         self.fraction_own_experiments_for_bf = 0.25
         self.fraction_opponents_experiments_for_bf = self.fraction_own_experiments_for_bf
         self.fraction_particles_for_bf = 0.25
+        self.timing_insurance_factor = 0.05
         self._shared_true_parameters = False
         self._setup_target_models()
 

@@ -21,7 +21,7 @@ class HeisenbergLatticeSet(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.timing_insurance_factor = 0.2
+        # self.timing_insurance_factor = 0.2
 
 class HeisenbergReducedLatticeSet(
     HeisenbergLatticeSet
