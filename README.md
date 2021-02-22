@@ -22,6 +22,7 @@ easily add functionality as needed.
 
 This `README` briefly introduces the core concepts at a high level;
 [full documentation is available][] on `readthedocs`.
+Guidance for installation and getting started are available from the [QMLA Tutorial][]. 
 
 # Models
 
