@@ -15,7 +15,7 @@ plot_level=2
 # Choose an exploration strategy 
 # This will determine how QMLA proceeds. 
 ##### -------------------------------------------------- #####
-exploration_strategy="IsingReducedLatticeSet"
+exploration_strategy="ExampleBasic"
 
 
 ##### -------------------------------------------------- #####
@@ -33,8 +33,6 @@ pickle_instances=1 # whether to store the entire QMLA class
 # used if alt_exploration_strategies is not empty
 ##### -------------------------------------------------- #####
 alt_exploration_strategies=(
-    # "HeisenbergReducedLatticeSet"
-    # "HubbardReducedLatticeSet"
 )
 
 exploration_strategies_command=""
