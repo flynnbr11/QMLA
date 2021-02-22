@@ -42,6 +42,8 @@ The steps of preparing the codebase are
     # Install redis (database broker)
     sudo apt update
     sudo apt install redis-server
+    
+    # Ensure access to python dev tools
     sudo apt-get install python3-dev
      
     # make directory for QMLA
@@ -59,8 +61,10 @@ The steps of preparing the codebase are
     git clone --depth 1 https://github.com/username/QMLA.git # REPLACE username
 
     # Install dependencies
+    # Note some packages demand others are installed first, so are in a separate file.
     cd QMLA 
     pip install -r requirements.txt 
+    pip install -r requirements_further.txt
 
 Note there may be a problem with some packages in the arising from the
 attempt to install them all through a single call to :code:`pip install`. 
