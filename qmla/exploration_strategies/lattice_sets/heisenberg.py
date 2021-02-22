@@ -21,4 +21,28 @@ class HeisenbergLatticeSet(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.timing_insurance_factor = 0.2
+        # self.timing_insurance_factor = 0.2
+
+class HeisenbergReducedLatticeSet(
+    HeisenbergLatticeSet
+):
+    def __init__(
+        self,
+        exploration_rules,
+        **kwargs
+    ):
+        super().__init__(
+            exploration_rules=exploration_rules,
+            **kwargs
+        )
+        self._lattice_names = [
+            '_2_site_chain', 
+            '_3_site_chain', 
+            '_4_site_chain', 
+
+            '_3_site_lattice_fully_connected', 
+            '_4_site_lattice_fully_connected',
+            '_4_site_square',
+        ]
+            
+        self._setup_target_models() # to use updated lattice_names

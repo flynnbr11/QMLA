@@ -386,7 +386,7 @@ try:
         figure_format=figure_format
     )
 except Exception as e:
-    print("ANALYSIS FAILURE {} with exception {}".format(plot_terms_and_parameters, e))
+    print("ANALYSIS FAILURE {} with exception {}".format("plot_terms_and_parameters", e))
 
 try:
     # Get average parameters of champion models across instances
@@ -420,7 +420,7 @@ try:
     )
 except:
     print("ANALYSIS FAILURE: average parameter plots.")
-    raise
+    # raise
 
 # Cluster champion learned parameters.
 try:

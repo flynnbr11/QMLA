@@ -20,9 +20,14 @@ First, *fork* the :term:`QMLA` codebase from
 Now, we must download the code base and
 ensure it runs properly; these instructions are implemented via the
 command line.
-Note: these instructions are tested for Linux and presumed to work on Mac, but untested on Windows. 
+Notes: 
+1. these instructions are tested for Linux and presumed to work on Mac, but untested on Windows. 
 It is likely some of the underlying software (redis servers) can not be installed on Windows,
 so running on *Windows Subsystem for Linux* is advised. 
+2. Python development tools are required by some packages: 
+   if the `pip install -r requirements` fail, here are some `possible solutions 
+   <https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory>`_.
+    
 
 The steps of preparing the codebase are
 
@@ -42,6 +47,9 @@ The steps of preparing the codebase are
     # Install redis (database broker)
     sudo apt update
     sudo apt install redis-server
+    
+    # Ensure access to python dev tools
+    sudo apt-get install python3-dev
      
     # make directory for QMLA
     cd
@@ -58,8 +66,10 @@ The steps of preparing the codebase are
     git clone --depth 1 https://github.com/username/QMLA.git # REPLACE username
 
     # Install dependencies
+    # Note some packages demand others are installed first, so are in a separate file.
     cd QMLA 
     pip install -r requirements.txt 
+    pip install -r requirements_further.txt
 
 Note there may be a problem with some packages in the arising from the
 attempt to install them all through a single call to :code:`pip install`. 

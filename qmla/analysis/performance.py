@@ -479,7 +479,7 @@ def summarise_qmla_text_file(
             true_mod_considered = all_results['TrueModelConsidered'].sum(), 
             true_mod_found = all_results['TrueModelFound'].sum(),
             avg_time = np.round(all_results['Time'].median(), 2),
-            exploration_strategies = list(all_results.ExplorationRule.unique()),
+            exploration_strategies = list(all_results.TrueExplorationStrategy.unique()),
             min_num_mods = int(all_results['NumModels'].min()),
             median_num_mods = int(all_results['NumModels'].median()),
             max_num_mods = int(all_results['NumModels'].max())

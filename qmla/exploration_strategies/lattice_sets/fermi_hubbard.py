@@ -31,7 +31,7 @@ class FermiHubbardLatticeSet(
             **kwargs
         )        
 
-        self.lattice_names = [
+        self._lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
             '_3_site_lattice_fully_connected', 
@@ -90,7 +90,7 @@ class FermiHubbardLatticeSet(
         self.max_num_qubits = 8
         self.max_num_probe_qubits = self.max_num_qubits
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_fermi_hubbard
-        self.timing_insurance_factor = 0.8
+        # self.timing_insurance_factor = 0.8
         self.min_param = 0.25
         self.max_param = 0.75
         self.true_model_terms_params = {
@@ -152,19 +152,19 @@ class HubbardReducedLatticeSet(FermiHubbardLatticeSet):
             **kwargs
         )
 
-        self.lattice_names = [
+        self._lattice_names = [
             '_2_site_chain', 
             '_3_site_chain', 
             '_3_site_lattice_fully_connected', 
         ] 
         self.setup_models()
 
-        self.timing_insurance_factor = 0.2
+        # self.timing_insurance_factor = 0.2
         self.max_num_models_by_shape = {
             4: 2,
             6: 2,
             'other': 0
-        }
+        } # test
 
 
         

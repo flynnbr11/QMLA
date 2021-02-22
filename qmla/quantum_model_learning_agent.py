@@ -1826,15 +1826,20 @@ class QuantumModelLearningAgent():
         elif num_params_champ_model < self.true_model_num_params:
             underfit = 1
         num_params_difference = self.true_model_num_params - num_params_champ_model
+        true_model_family_found = (
+            self.exploration_strategy_of_true_model == mod.exploration_strategy_of_this_model
+        )
 
         # Summarise the results of this model and instance in a dictionary
+        # Note this is used to feed offline analysis including outdated methods
+        # new analysis should use the pandas databases within instances and combined 
+        # at the run level. 
         time_taken = time.time() - self._start_time
         results_dict = {
             # Details about QMLA instance:
             'QID': self.qmla_id,
             'NumParticles': self.num_particles,
             'NumExperiments': mod.num_experiments,
-            # 'NumBayesTimes': self.num_experiments_for_bayes_updates,
             'ConfigLatex': self.latex_config,
             'Heuristic': mod.model_heuristic_class,
             'Time': time_taken,
@@ -1849,6 +1854,7 @@ class QuantumModelLearningAgent():
             'TrueModelBranch': self.true_model_branch,
             'Truemodel_id': self.true_model_id,
             'TrueModelConstituentTerms': self.true_model_constituent_terms_latex,
+            'TrueExplorationStrategy' : self.exploration_strategy_of_true_model,
             # Details about this model
             'ChampID': model_id,
             'ChampLatex': mod.model_name_latex,
@@ -1876,6 +1882,7 @@ class QuantumModelLearningAgent():
             'Overfit': overfit,
             'Misfit': misfit,
             'CorrectModel': correct_model,
+            'TrueFamilyFound' : true_model_family_found, 
             # About QMLA's learning procedure:
             'NumModels': len(self.models_learned),
             'StatisticalMetrics': self.generational_statistical_metrics,
@@ -2169,6 +2176,25 @@ class QuantumModelLearningAgent():
             branch_id=global_champ_branch_id,
             pair_list=global_champ_branch.pairs_to_compare,
         )
+
+        # TODO wait until all BF computed on final branch
+        active_branches_bayes = self.redis_databases['active_branches_bayes']
+        num_comparisons_complete_on_branch = active_branches_bayes.get(
+            int(global_champ_branch_id)
+        )
+        self.log_print([
+            "Starting to wait on comparisons between branch champions.",
+            "Initially completed:", num_comparisons_complete_on_branch,
+            "num pairs on branch:", global_champ_branch.num_model_pairs
+        ])
+        while not global_champ_branch.comparisons_complete:
+            num_comparisons_complete_on_branch = int(active_branches_bayes.get(
+                int(global_champ_branch_id)
+            ))
+            if num_comparisons_complete_on_branch == global_champ_branch.num_model_pairs:
+                global_champ_branch.comparisons_complete = True
+        self.log_print(["Comparisons between branch champions complete."])
+
         champ_id = self.process_comparisons_within_branch(
             branch_id=global_champ_branch_id
         )

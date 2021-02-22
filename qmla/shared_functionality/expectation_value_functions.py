@@ -27,11 +27,6 @@ try:
 except:
     from scipy.linalg import expm
 
-# from scipy.linalg import expm
-# import hexp
-# from scipy.linalg import expm
-
-# from scipy.linalg import expm
 from scipy import linalg
 import qmla.logging
 
