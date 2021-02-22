@@ -20,7 +20,8 @@ sys.path.append(qmla_root)
 import qmla
 from qmla import construct_models
 
-from expm import expm
+# from expm import expm
+from qmla.shared_functionality.matrix_exponential import expm
 from scipy.linalg import expm as lexpm
 
 

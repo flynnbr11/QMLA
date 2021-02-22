@@ -23,15 +23,11 @@ Generically, without referring to the likelihood, these functions are to compute
 import numpy as np
 
 try:
-    from expm import expm
+    # from expm import expm
+    from qmla.shared_functionality.matrix_exponential import expm
 except:
     from scipy.linalg import expm
 
-# from scipy.linalg import expm
-# import hexp
-# from scipy.linalg import expm
-
-# from scipy.linalg import expm
 from scipy import linalg
 import qmla.logging
 

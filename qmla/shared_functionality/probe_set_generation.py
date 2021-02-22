@@ -22,7 +22,7 @@ import itertools
 from scipy import linalg, stats
 import random
 
-from expm import expm
+from scipy.linalg import expm
 
 import qmla.utilities
 import qmla.construct_models

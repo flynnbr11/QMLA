@@ -42,6 +42,7 @@ The steps of preparing the codebase are
     # Install redis (database broker)
     sudo apt update
     sudo apt install redis-server
+    sudo apt-get install python3-dev
      
     # make directory for QMLA
     cd
