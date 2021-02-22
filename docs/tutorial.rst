@@ -31,6 +31,9 @@ Notes:
 3. Here we recommend using a virtual environment to manage the :term:`QMLA` ecosystem; 
    a resource for managing virtual environments is `virtualenvwrapper
    <https://realpython.com/python-virtual-environments-a-primer/>`_. 
+   If using ``virtualenvwrapper``, generate and activate a ``venv`` and disregard step 2 below. 
+4. In the following installation steps, ensure to replace ``python3.6`` with your preferred Python 
+   version. Python3.6 (or above) is preferred. 
     
 
 The steps of preparing the codebase are
@@ -53,7 +56,7 @@ The steps of preparing the codebase are
     sudo apt install redis-server
     
     # Ensure access to python dev tools
-    sudo apt-get install python3-dev
+    sudo apt-get install python3.6-dev
      
     # make directory for QMLA
     cd
