@@ -25,4 +25,5 @@ sklearn==0.0
 Sphinx==1.7.0
 expm==0.1.5
 lfig
-qutip==4.2.0 # Not strictly needed and causes errors during install
+git+git://github.com/ProjectQ-Framework/ProjectQ.git@master
+git+git://github.com/qutip/qutip.git@master
