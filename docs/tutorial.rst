@@ -66,11 +66,12 @@ The steps of preparing the codebase are
     python3.6 -m venv qmla-env    
     source qmla-env/bin/activate
 
-    # Download QMLA
-    git clone --depth 1 https://github.com/username/QMLA.git # REPLACE username
+    # Download QMLA (!! REPLACE username !!)
+    git clone --depth 1 https://github.com/username/QMLA.git
 
     # Install dependencies
-    # Note some packages demand others are installed first, so are in a separate file.
+    # Note some packages demand others are installed first, 
+    # so are in a separate file.
     cd QMLA 
     pip install -r requirements.txt 
     pip install -r requirements_further.txt
