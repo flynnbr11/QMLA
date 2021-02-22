@@ -25,8 +25,8 @@ Notes:
 It is likely some of the underlying software (redis servers) can not be installed on Windows,
 so running on *Windows Subsystem for Linux* is advised. 
 2. Python development tools are required by some packages: 
-   if the `pip install -r requirements` fail, here are some `possible solutions 
-   <https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory>`_.
+if the `pip install -r requirements` fail, here are some `possible solutions 
+<https://stackoverflow.com/questions/21530577/fatal-error-python-h-no-such-file-or-directory>`_.
     
 
 The steps of preparing the codebase are
