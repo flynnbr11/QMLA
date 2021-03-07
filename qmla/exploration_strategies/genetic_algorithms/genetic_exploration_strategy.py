@@ -62,11 +62,6 @@ class Genetic(
 
         self.genes = genes
         self.true_model = true_model
-        self.log_print([
-            "Starting genetic ES"
-            # "Genes:", genes
-        ])
-
         self.ratings_class = qmla.shared_functionality.rating_system.ModifiedEloRating(
             initial_rating=1000,
             k_const=30

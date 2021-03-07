@@ -92,9 +92,6 @@ class GeneticAlgorithmQMLA():
         self.delta_f_by_generation = {}
         self.genetic_generation = 1
         self.log_file = log_file
-        self.log_print([
-            "Genes: {} \n Base chromosome: {} \n log file: {}".format(self.genes, self.basic_chromosome, self.log_file)
-        ])
         self.f_score_change_by_generation = {}
         self.fitness_at_generation = {}
         self.models_ranked_by_fitness = {}
