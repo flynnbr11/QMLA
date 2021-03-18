@@ -178,9 +178,14 @@ class QuantumModelLearningAgent():
             qmla.construct_models.get_constituent_names_from_name(
                 self.true_model_name)
         ]
-        self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
+        self.true_model_num_params = self.qmla_controls.true_model_class.num_terms
         self.true_param_list = self.exploration_class.true_params_list
         self.true_param_dict = self.exploration_class.true_params_dict
+        self.true_model_constructor = self.exploration_class.model_constructor(
+            name = self.true_model_name, 
+            fixed_parameters = self.true_param_list
+        )
+
         self.true_model_branch = -1  # overwrite if true model is added to database
         self.true_model_considered = False
         self.true_model_found = False
@@ -439,6 +444,7 @@ class QuantumModelLearningAgent():
             'true_oplist': self.true_model_constituent_operators,
             'true_model_terms_params': self.true_param_list,
             'true_param_dict': self.true_param_dict,
+            'true_model_constructor' : self.true_model_constructor, 
             'num_particles': self.num_particles,
             'num_experiments': self.num_experiments,
             'results_directory': self.results_directory,
@@ -1583,14 +1589,14 @@ class QuantumModelLearningAgent():
                     model_name, model_id
                 )
             ])
-            op = qmla.construct_models.Operator(
+            op = qmla.construct_models.BaseModel(
                 name=model_name
             )
             # Generate model storage instance
             model_storage_instance = qmla.model_for_storage.ModelInstanceForStorage(
                 model_name=model_name,
                 model_id=int(model_id),
-                model_terms_matrices=op.constituents_operators,
+                model_terms_matrices=op.terms_matrices,
                 true_oplist=self.true_model_constituent_operators,
                 true_model_terms_params=self.true_param_list,
                 qid=self.qmla_id,
@@ -1810,8 +1816,8 @@ class QuantumModelLearningAgent():
         # Compare this model to the true model (only meaningful for simulated
         # cases)
         correct_model = misfit = underfit = overfit = 0
-        num_params_champ_model = construct_models.Operator(
-            model_name).num_constituents
+        num_params_champ_model = construct_models.BaseModel(
+            model_name).num_terms
 
         if model_name == self.true_model_name:
             correct_model = 1

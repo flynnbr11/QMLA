@@ -7,7 +7,7 @@ import pandas as pd
 import qmla.logging
 
 __all__ = [
-    'Operator',
+    'BaseModel',
     'core_operator_dict',
     'get_num_qubits',
     'get_constituent_names_from_name',
@@ -47,17 +47,16 @@ core_operator_dict = {
 }
 
 ##########
-# Section: Operator object
+# Section: BaseModel object
 ##########
 
-
-class Operator():
+class BaseModel():
     r"""
     Operator objects for Hamiltonian models.
 
     Translates a model name (string) into:
-        * constituents_names: strings specifying constituents
-        * constituents_operators: whole matrices of constituents
+        * terms_names: strings specifying constituents
+        * terms_matrices: whole matrices of constituents
         * num_qubits: total dimension of operator [number of qubits it acts on]
         * matrix: total matrix operator
         * qubits_acted_on: list of qubits which are acted on non-trivially
@@ -70,11 +69,16 @@ class Operator():
 
     """
 
-    def __init__(self, name):
-        self.name = name
-
+    def __init__(
+        self, 
+        name,
+        fixed_parameters=None, 
+    ):
+        self.name = name       
+        self.fixed_parameters = fixed_parameters
+            
     @property
-    def constituents_names(self):
+    def terms_names(self):
         """
         List of constituent operators names.
         """
@@ -89,29 +93,30 @@ class Operator():
         return get_num_qubits(self.name)
 
     @property
-    def constituents_operators(self):
+    def terms_matrices(self):
         """
         List of matrices of constituents.
         """
         ops = []
-        for i in self.constituents_names:
+        for i in self.terms_names:
             ops.append(compute(i))
         return ops
 
     @property
-    def num_constituents(self):
+    def num_terms(self):
         """
         Integer, number of constituents (and therefore parameters) in this model.
         """
-        return len(self.constituents_names)
+        return len(self.terms_names)
 
     @property
     def matrix(self):
         """
         Full matrix of operator.
+        Assumes weight 1 on each constituent matrix.
         """
         mtx = None
-        for i in self.constituents_operators:
+        for i in self.terms_matrices:
             if mtx is None:
                 mtx = i
             else:
@@ -130,6 +135,31 @@ class Operator():
     @property
     def eigenvectors(self):
         return get_eigenvectors(self.name)
+
+
+    @property
+    def fixed_matrix(self):
+        # TODO does this need to be a property?
+        if self.fixed_parameters is not None:
+            return self.construct_matrix(
+                self.fixed_parameters
+            )
+        else:
+            return None
+
+    def construct_matrix(self, parameters):
+        r""" 
+        Default: 
+            sum(p[i] * operators[i])
+        """
+        mtx = np.tensordot(
+            np.array(parameters), 
+            np.array(self.terms_matrices), 
+            axes=1
+        )
+        return mtx 
+
+
 
 ##########
 # Section: functions for constructing models.
@@ -417,7 +447,7 @@ def ideal_probe(name):
     Returns a probe state which is the normalised sum of the given operator's
     eigenvectors, ideal for probing that operator.
     """
-    mtx = Operator(name).matrix
+    mtx = BaseModel(name).matrix
     eigvalues = np.linalg.eig(mtx)[1]
     summed_eigvals = np.sum(eigvalues, axis=0)
     normalised_probe = summed_eigvals / np.linalg.norm(summed_eigvals)
@@ -429,7 +459,7 @@ def get_eigenvectors(name):
     Get eigenvectors of a model from its name.
     """
 
-    mtx = Operator(name).matrix
+    mtx = BaseModel(name).matrix
     eigvectors = np.linalg.eig(mtx)[0]
     return eigvectors
 

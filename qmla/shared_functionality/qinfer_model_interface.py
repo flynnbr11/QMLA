@@ -79,6 +79,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         true_oplist,
         truename,
         true_param_dict,
+        true_model_constructor,
         trueparams,
         num_probes,
         probe_dict,
@@ -110,6 +111,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self._truename = truename
         self._true_dim = qmla.construct_models.get_num_qubits(self._truename)
         self.true_param_dict = true_param_dict 
+        self.true_model_constructor = true_model_constructor
         self.store_likelihoods = {x : {} for x in ['system', 'simulator_median', 'simulator_mean']}
         self.likelihood_calls = {_ : 0 for _ in ['system', 'simulator']}
         self.summarise_likelihoods = {

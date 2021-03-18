@@ -160,8 +160,8 @@ class ModelInstanceForComparison():
             self.log_print(["This is the true model for comparison."])
         else:
             self.is_true_model = False
-        op = qmla.construct_models.Operator(self.model_name)
-        self.model_terms_matrices = op.constituents_operators
+        op = qmla.construct_models.BaseModel(self.model_name)
+        self.model_terms_matrices = op.terms_matrices
         self.model_terms_parameters_final = np.array(self.final_learned_params)
         self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
             exploration_rules=self.exploration_strategy_of_this_model,

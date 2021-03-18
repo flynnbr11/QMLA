@@ -132,6 +132,9 @@ class ExplorationStrategy():
         self.evaluation_probe_generation_subroutine = None
         self.probe_noise_level = 1e-5
 
+        # Model class
+        self.model_constructor = qmla.construct_models.BaseModel
+
         # Experiment design
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
                 

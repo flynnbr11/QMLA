@@ -157,6 +157,7 @@ class ModelInstanceForLearning():
         else:
             self.is_true_model = False
         self.true_param_dict = qmla_core_info_dict['true_param_dict']
+        self.true_model_constructor = qmla_core_info_dict['true_model_constructor']
         self.times_to_plot = qmla_core_info_dict['plot_times']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
@@ -177,12 +178,13 @@ class ModelInstanceForLearning():
         )
 
         # Get initial configuration for this model
-        op = qmla.construct_models.Operator(name=model_name)
-        self.model_terms_names = op.constituents_names
+        self.model_constructor = self.exploration_class.model_constructor(name = model_name)
+        op = qmla.construct_models.BaseModel(name=model_name)
+        self.model_terms_names = op.terms_names
         self.model_name_latex = self.exploration_class.latex_name(
             name=self.model_name
         )
-        self.model_terms_matrices = np.asarray(op.constituents_operators)
+        self.model_terms_matrices = np.asarray(op.terms_matrices)
         self.num_parameters = len(self.model_terms_matrices)
         self.model_dimension = qmla.construct_models.get_num_qubits(
             self.model_name)
@@ -221,6 +223,7 @@ class ModelInstanceForLearning():
             true_param_dict=self.true_param_dict,
             truename=self.true_model_name,
             trueparams=self.true_model_params,
+            true_model_constructor=self.true_model_constructor,
             num_probes=self.probe_number,
             probe_dict=self.probes_system,
             sim_probe_dict=self.probes_simulator,
@@ -588,6 +591,7 @@ class ModelInstanceForLearning():
 
         # Compute the Hamiltonian corresponding to the parameter posterior
         # distribution
+
         self.learned_hamiltonian = sum([
             self.qhl_final_param_estimates[term]
             * qmla.construct_models.compute(term)
