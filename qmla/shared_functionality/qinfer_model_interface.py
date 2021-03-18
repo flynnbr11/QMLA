@@ -121,7 +121,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             ])
             raise
 
-        # Required by QInfer: 
+        # Required by QInfer
         self._min_freq = 0 # what does this do?
         self._solver = 'scipy'
 
@@ -129,16 +129,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.iqle_mode = self.exploration_class.iqle_mode 
         self.evaluation_model = evaluation_model
         
-        self.log_print(["\nModel {} needs {} qubits. ".format(
-            self.model_name,  self.model_constructor.num_qubits
-        )])
-
         # TODO get experimental_measurements from exploration_class
         self.experimental_measurements = experimental_measurements
         self.experimental_measurement_times = experimental_measurement_times
-
-        # # Instantiate QInfer Model class.
-        # super(QInferModelQMLA, self).__init__()
 
         try:
             self.probes_system = probes_system
