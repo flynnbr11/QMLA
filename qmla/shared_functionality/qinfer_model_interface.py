@@ -88,12 +88,16 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         debug_mode=False,
         **kwargs
     ):
+
         # Essentials
         self.model_name = model_name
         self.model_constructor = model_constructor
         self.true_model_constructor = true_model_constructor
         self.true_hamiltonian = self.true_model_constructor.fixed_matrix
-        
+
+        # Instantiate QInfer Model class.
+        super(QInferModelQMLA, self).__init__()
+
         # Infrastructure
         self.log_file = log_file
         self.qmla_id = qmla_id
@@ -101,7 +105,50 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.probe_rotation_frequency = 10
         # TODO replace if want to use knowledge of initial signs:
         self.signs_of_inital_params = np.ones(self.n_modelparams) 
+
+        # Exploration strategy
+        try:
+            self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+                exploration_rules=self.exploration_rules,
+                log_file=self.log_file,
+                qmla_id=self.qmla_id, 
+            )
+        except BaseException:
+            self.log_print([
+                "Could not instantiate exploration strategy {}. Terminating".format(
+                    self.exploration_rules
+                )
+            ])
+            raise
+
+        # Required by QInfer: 
+        self._min_freq = 0 # what does this do?
+        self._solver = 'scipy'
+
+        # How to use this model interface
+        self.iqle_mode = self.exploration_class.iqle_mode 
+        self.evaluation_model = evaluation_model
         
+        self.log_print(["\nModel {} needs {} qubits. ".format(
+            self.model_name,  self.model_constructor.num_qubits
+        )])
+
+        # TODO get experimental_measurements from exploration_class
+        self.experimental_measurements = experimental_measurements
+        self.experimental_measurement_times = experimental_measurement_times
+
+        # # Instantiate QInfer Model class.
+        # super(QInferModelQMLA, self).__init__()
+
+        try:
+            self.probes_system = probes_system
+            self.probes_simulator = probes_simulator
+            self.probe_number = num_probes # TODO get from probe dict
+        except:
+            raise ValueError(
+                "Probe dictionaries not passed to Qinfer model"
+            )
+
         # Storage 
         self.store_likelihoods = {
             x : {} for x in ['system', 'simulator_median', 'simulator_mean']
@@ -134,49 +181,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.single_experiment_timings = {
             k : {} for k in ['system', 'simulator']
         }
-        try:
-            self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
-                exploration_rules=self.exploration_rules,
-                log_file=self.log_file,
-                qmla_id=self.qmla_id, 
-            )
-        except BaseException:
-            self.log_print([
-                "Could not instantiate exploration strategy {}. Terminating".foramt(
-                    self.exploration_rules
-                )
-            ])
-            raise
 
 
-        # Required by QInfer: 
-        self._min_freq = 0 # what does this do?
-        self._solver = 'scipy'
-        # This is the solver used for time evolution scipy is faster
-        # QuTip can handle implicit time dependent likelihoods
-
-        self.iqle_mode = self.exploration_class.iqle_mode 
-        self.evaluation_model = evaluation_model
-        self.model_dimension = self.model_constructor.num_qubits
-        self.log_print(["\nModel {} dimension: {}. ".format(
-            self.model_name,  self.model_dimension
-        )])
-
-        # TODO get experimental_measurements from exploration_class
-        self.experimental_measurements = experimental_measurements
-        self.experimental_measurement_times = experimental_measurement_times
-
-        # Instantiate QInfer Model class.
-        super(QInferModelQMLA, self).__init__()
-
-        try:
-            self.probes_system = probes_system
-            self.probes_simulator = probes_simulator
-            self.probe_number = num_probes # TODO get from probe dict
-        except:
-            raise ValueError(
-                "Probe dictionaries not passed to Qinfer model"
-            )
 
     def log_print(
         self, 
@@ -417,7 +423,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             t_init = time.time()
             probe = self.probes_simulator[
                 probe_id,
-                self.model_dimension
+                self.model_constructor.num_qubits
             ]
 
             pr0 = self.get_simulator_pr0_array(
@@ -679,7 +685,8 @@ class QInferInterfaceJordanWigner(QInferModelQMLA):
         if probe_set == 'simulator':
             probe = self.probes_simulator[
                 probe_id,
-                2*self.model_dimension            ]
+                2*self.model_constructor.num_qubits
+            ]
             return probe
 
         elif probe_set == 'system': 

@@ -177,7 +177,6 @@ class ModelInstanceForComparison():
         self.qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
             model_constructor=self.model_constructor, 
-            # oplist=self.model_terms_matrices,
             true_model_constructor=self.true_model_constructor,
             num_probes=self.probe_number,
             probes_system=self.probes_system,
