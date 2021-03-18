@@ -516,21 +516,11 @@ class ExplorationStrategy():
 
         """      
 
-        # get true data from pickled file
-        # try:
-        #     true_config = pickle.load(
-        #         open(
-        #             self.true_params_path, 
-        #             'rb'
-        #         )
-        #     )
-        #     self.true_params_list = true_config['params_list']
-        #     self.true_params_dict = true_config['params_dict']
-        # except:
-        #     self.true_params_list = []
-        #     self.true_params_dict = {}
-        # try:
-        self.log_print(["Getting true parameters. QMLA {} with true_model {}".format(self.qmla_id, self.true_model)])
+        # get true data from pickled file, or generate fresh
+        self.log_print([
+            "Getting true parameters. QMLA {} with true_model {}".format(
+            self.qmla_id, self.true_model)
+        ])
         if self.shared_true_parameters:
             # i.e. load the true parameters from run_info file in run directory
             self.log_print(["Parameters set from shared run file"])
@@ -551,22 +541,16 @@ class ExplorationStrategy():
                 self.log_print(["true_params_info:", true_params_info])
             except:
                 self.log_print(["failed to generate params for unique instance"])
-        # except:
-        #     self.true_params_list = []
-        #     self.true_params_dict = {}
+
         self.log_print([
             "True params dict:", self.true_params_dict
         ])
 
-        true_ham = None
-        for k in list(self.true_params_dict.keys()):
-            param = self.true_params_dict[k]
-            mtx = construct_models.compute(k)
-            if true_ham is not None:
-                true_ham += param * mtx
-            else:
-                true_ham = param * mtx
-        self.true_hamiltonian = true_ham
+        self.true_model_constructor = self.model_constructor(
+            name = self.true_model, 
+            fixed_parameters = self.true_params_list, 
+        )
+        self.true_hamiltonian = self.true_model_constructor.fixed_matrix
 
     def generate_true_parameters(self):
 
@@ -652,26 +636,13 @@ class ExplorationStrategy():
             print("Failed to load true params from path", self.true_params_path)
             raise
 
-        self.true_params_dict = true_info['params_dict']
-        true_ham = None
-        for k in list(self.true_params_dict.keys()):
-            param = self.true_params_dict[k]
-            mtx = construct_models.compute(k)
-            if true_ham is not None:
-                true_ham += param * mtx
-            else:
-                true_ham = param * mtx
-        self.true_hamiltonian = true_ham
-
-        # true_ham_dim = construct_models.get_num_qubits(self.true_model)
-        true_ham_dim = np.log2(np.shape(self.true_hamiltonian)[0])
         plot_probes = pickle.load(
             open(
                 self.plot_probes_path, 
                 'rb'
             )
         )
-        probe = plot_probes[true_ham_dim]
+        probe = plot_probes[self.true_model_constructor.num_qubits]
 
         plot_lower_time = 0
         plot_upper_time = self.max_time_to_consider
@@ -747,9 +718,36 @@ class ExplorationStrategy():
 
         """ 
 
-        return self.expectation_value_subroutine(
-            **kwargs
-        )
+        from rq import timeouts
+
+        try:
+            ev = self.expectation_value_subroutine(
+                **kwargs
+            )
+        except timeouts.JobTimeoutException:
+            self.log_print([
+                "RQ Time exception.",
+            ])
+            sys.exit()
+        except NameError:
+            self.log_print([
+                "Error raised; unphysical expecation value.",
+            ])
+            sys.exit()
+
+        if ev < 0:
+            self.log_print([
+                "Negative likelihood : {}".format(likelihood)
+            ])
+            raise ValueError("Negative likelihood; terminating")
+        elif ev > 1.001:
+            self.log_print([
+                "Likelihood > 1: {}".format(likelihood)
+            ])
+            raise ValueError(">1 likelihood; terminating")
+
+
+        return ev
 
     # Probe states
     def generate_probes(

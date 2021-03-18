@@ -136,7 +136,6 @@ class BaseModel():
     def eigenvectors(self):
         return get_eigenvectors(self.name)
 
-
     @property
     def fixed_matrix(self):
         # TODO does this need to be a property?

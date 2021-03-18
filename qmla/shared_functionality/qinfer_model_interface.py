@@ -56,9 +56,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         used to construct true hamiltonian.
     :param int num_probes: number of probes available in the probe sets, 
         used to loop through probe set
-    :param dict probe_dict: set of probe states to be used during training
+    :param dict probes_system: set of probe states to be used during training
         for the system, indexed by (probe_id, num_qubits). 
-    :param dict sim_probe_dict: set of probe states to be used during training
+    :param dict probes_simulator: set of probe states to be used during training
         for the simulator, indexed by (probe_id, num_qubits). Usually the same as 
         the system probes, but not always. 
     :param str exploration_rule: string corresponding to a unique exploration strategy,
@@ -74,45 +74,38 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     def __init__(
         self,
         model_name,
-        modelparams,
-        oplist,
-        true_oplist,
-        truename,
-        true_param_dict,
+        model_constructor,
         true_model_constructor,
-        trueparams,
         num_probes,
-        probe_dict,
-        sim_probe_dict,
+        probes_system,
+        probes_simulator,
         exploration_rules,
         experimental_measurements,
         experimental_measurement_times,
         log_file,
         qmla_id=-1, 
         evaluation_model=False,
-        estimated_params=None,
-        comparison_model=False, 
         debug_mode=False,
         **kwargs
     ):
+        # Essentials
         self.model_name = model_name
+        self.model_constructor = model_constructor
+        self.true_model_constructor = true_model_constructor
+        self.true_hamiltonian = self.true_model_constructor.fixed_matrix
+        
+        # Infrastructure
         self.log_file = log_file
         self.qmla_id = qmla_id
         self.exploration_rules = exploration_rules
-        self._oplist = oplist
-        self._a = 0
-        self._b = 0
-        self.probe_counter = 0
         self.probe_rotation_frequency = 10
-        self._modelparams = modelparams
-        self.signs_of_inital_params = np.sign(modelparams)
-        self._true_oplist = true_oplist
-        self._trueparams = trueparams
-        self._truename = truename
-        self._true_dim = qmla.construct_models.get_num_qubits(self._truename)
-        self.true_param_dict = true_param_dict 
-        self.true_model_constructor = true_model_constructor
-        self.store_likelihoods = {x : {} for x in ['system', 'simulator_median', 'simulator_mean']}
+        # TODO replace if want to use knowledge of initial signs:
+        self.signs_of_inital_params = np.ones(self.n_modelparams) 
+        
+        # Storage 
+        self.store_likelihoods = {
+            x : {} for x in ['system', 'simulator_median', 'simulator_mean']
+        }
         self.likelihood_calls = {_ : 0 for _ in ['system', 'simulator']}
         self.summarise_likelihoods = {
             x : []
@@ -123,18 +116,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         }
         self.store_p0_diffs = []
         self.debug_mode = debug_mode
-        # get true_hamiltonian from true_param dict
-        self.log_print(["True params dict:", self.true_param_dict])
-        true_ham = None
-        for k in list(self.true_param_dict.keys()):
-            param = self.true_param_dict[k]
-            mtx = qmla.construct_models.compute(k)
-            if true_ham is not None:
-                true_ham += param * mtx
-            else:
-                true_ham = param * mtx
-        self.true_hamiltonian = true_ham
-
         self.timings = {
             'system': {}, 
             'simulator' : {}
@@ -166,35 +147,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 )
             ])
             raise
-        self.experimental_measurements = experimental_measurements
-        self.experimental_measurement_times = experimental_measurement_times
-        self.iqle_mode = self.exploration_class.iqle_mode 
-        self.comparison_model = comparison_model
-        self.evaluation_model = evaluation_model
-        if self.evaluation_model:
-            self.estimated_params = estimated_params
-            self.log_print([
-                "Evaluation qinfer model. Estimated parameters: {}".format(
-                    self.estimated_params
-                )
-            ])
-            estimated_model=None
-            for i in range(len(self.estimated_params)):
-                p = self.estimated_params[i]
-                m = self._oplist[i]
-                if estimated_model is None:
-                    estimated_model = p*m
-                else:
-                    estimated_model += p*m
-            self.estimated_model = estimated_model
-            try:
-                self.log_print([
-                    "Estimated model's difference from true model", 
-                    np.max(np.abs(self.estimated_model - self.true_hamiltonian))
-                ])
-            except:
-                # different dimension candidate from true model; doesn't really matter
-                pass
 
 
         # Required by QInfer: 
@@ -203,37 +155,28 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         # This is the solver used for time evolution scipy is faster
         # QuTip can handle implicit time dependent likelihoods
 
-        # self.model_dimension = qmla.construct_models.get_num_qubits(self.model_name)
-        self.model_dimension = int(np.log2(self._oplist[0].shape[0]))
-        self._true_dim = int(np.log2(self.true_hamiltonian.shape[0]))
+        self.iqle_mode = self.exploration_class.iqle_mode 
+        self.evaluation_model = evaluation_model
+        self.model_dimension = self.model_constructor.num_qubits
         self.log_print(["\nModel {} dimension: {}. ".format(
             self.model_name,  self.model_dimension
         )])
-        if true_oplist is not None and trueparams is None:
-            raise(
-                ValueError(
-                    '\nA system Hamiltonian with unknown \
-                    parameters was requested'
-                )
-            )
-        super(QInferModelQMLA, self).__init__(self._oplist)
-        # self.log_print_debug([
-        #     "true ops:\n", self._true_oplist,
-        #     "\nsim ops:\n", self._oplist
-        # ])
+
+        # TODO get experimental_measurements from exploration_class
+        self.experimental_measurements = experimental_measurements
+        self.experimental_measurement_times = experimental_measurement_times
+
+        # Instantiate QInfer Model class.
+        super(QInferModelQMLA, self).__init__()
 
         try:
-            self.probe_dict = probe_dict
-            self.sim_probe_dict = sim_probe_dict
-            self.probe_number = num_probes
+            self.probes_system = probes_system
+            self.probes_simulator = probes_simulator
+            self.probe_number = num_probes # TODO get from probe dict
         except:
             raise ValueError(
                 "Probe dictionaries not passed to Qinfer model"
             )
-        self.log_print_debug([
-            "_trueparams:", self._trueparams
-        ])
-
 
     def log_print(
         self, 
@@ -270,7 +213,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         typically, in QMLA, we have one parameter per model.
         """
 
-        return len(self._oplist)
+        return self.model_constructor.num_terms
 
     @property
     def modelparam_names(self):
@@ -278,14 +221,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         Returns the names of the various model parameters admitted by this
         model, formatted as LaTeX strings. (Inherited from Qinfer)
         """
-        try:
-            individual_term_names = self.model_name.split('+')
-        except:
-            individual_term_names = ['w0']
-            for modpar in range(self.n_modelparams - 1):
-                individual_term_names.append('w' + str(modpar + 1))
         
-        return individual_term_names
+        return self.model_constructor.terms_names
 
 
     @property
@@ -312,14 +249,8 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             ('t', 'float'),
             ('probe_id', 'int')
         ]
-        try:
-            individual_model_terms = self.model_name.split('+')
-        except:
-            individual_model_terms = [
-                'w_{}'.format(i)
-                for i in range(self.n_modelparams)
-            ]
-        for term in individual_model_terms:
+        
+        for term in self.modelparam_names:
             expnames.append( (term, 'float') )
 
         return expnames
@@ -436,7 +367,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         t_likelihood_start = time.time()
         super(QInferModelQMLA, self).likelihood(
             outcomes, modelparams, expparams
-        )  # just adds to self._call_count (Qinfer abstact model class)
+        )  # internal QInfer book-kepping
 
         # process expparams
         times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
@@ -446,93 +377,78 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         self.log_print_debug([
             "expparams_sampled_particle:", expparams_sampled_particle
         ])
-        self.ham_from_expparams = np.tensordot(
-            expparams_sampled_particle, 
-            self._oplist, 
-            axes=1    
-        )[0]
+        self.ham_from_expparams = self.model_constructor.construct_matrix(
+            expparams_sampled_particle
+        )
 
         num_particles = modelparams.shape[0]
         num_parameters = modelparams.shape[1]
 
-        # assumption is that calls to likelihood are paired: 
+        # We assume that calls to likelihood are paired: 
         # one for system, one for simulator
         # therefore the same probe should be assumed for consecutive calls
-        # probe id is tracked with _a and _b.
-        # i.e. increments each 2nd call, loops back when probe dict exhausted
-
         if num_particles == 1:
-            # TODO better mechanism to determine if self.true_evolution, 
-            # rather than assuming 1 particle => system
-            # call the system, use the true paramaters as a single particle, 
-            # to get the true evolution
+            # 1 particle indicates call to simulate_experiment 
+            # => get system datum
             self.true_evolution = True
-            params = [copy.deepcopy(self._trueparams)]
+            timing_marker = "system"
         else:
             self.true_evolution = False
-            params = modelparams
-
-        self.probe_counter = probe_id
+            timing_marker = "simulator"
 
         self.log_print_debug([
-            "\n\nLikelihood fnc called. Probe counter={}. True system -> {}.".format(self.probe_counter, self.true_evolution)
+            "\n\nLikelihood fnc called. Probe counter={}. True system -> {}.".format(
+                probe_id, self.true_evolution)
         ])
 
-        try:
-            if self.true_evolution:
-                t_init = time.time()
-                # self.log_print(["Getting system pr0"])
-                self.log_print_debug([
-                    "Getting system Pr0 w/ params ", params
-                ])
-                pr0 = self.get_system_pr0_array(
-                    times=times,
-                    particles=params,
-                )
-                timing_marker = 'system'
-                self.timings[timing_marker]['get_pr0'] += time.time() - t_init
-            else:
-                t_init = time.time()
-                # self.log_print(["Getting simulator pr0"])
-                self.log_print_debug([
-                    "Getting simulator Pr0 w/ params ", params
-                ])
-                pr0 = self.get_simulator_pr0_array(
-                    times=times,
-                    particles=params,
-                ) 
-                timing_marker = 'simulator'
-                self.timings[timing_marker]['get_pr0'] += time.time() - t_init
-        except:
-            self.log_print([
-                "Failed to compute pr0. probe id used: {}".format(self.probe_counter)
-            ])
-            # self.log_print(["H_ for IQLE:", self.ham_from_expparams[0]])
-            raise # TODO raise specific error
-            sys.exit()
-        t_init = time.time()
+        # Get pr0, the probability of measuring the datum labelled '0'. 
+        if self.true_evolution:
+            t_init = time.time()
+            probe = self.probes_system[
+                probe_id,
+                self.true_model_constructor.num_qubits,
+            ]
+            pr0 = self.get_system_pr0_array(
+                times=times,
+                probe=probe
+            )
+            self.timings[timing_marker]['get_pr0'] += time.time() - t_init
+        else:
+            t_init = time.time()
+            probe = self.probes_simulator[
+                probe_id,
+                self.model_dimension
+            ]
+
+            pr0 = self.get_simulator_pr0_array(
+                times=times,
+                particles=modelparams,
+                probe=probe,
+            ) 
+            self.timings[timing_marker]['get_pr0'] += time.time() - t_init
+            
+        # Convert pr0 probabilities to likelihoods for QInfer to use in updating distribution
         likelihood_array = (
             qi.FiniteOutcomeModel.pr0_to_likelihood_array(
                 outcomes, pr0
             )
         )
-        self.timings[timing_marker]['likelihood_array'] += time.time() - t_init
-        self.single_experiment_timings[timing_marker]['likelihood'] = time.time() - t_likelihood_start
 
+        # Everything below here in this method is recording, no useful computation 
+        # TODO probably most of it can be removed
+        self.single_experiment_timings[timing_marker]['likelihood'] = time.time() - t_likelihood_start
         self.log_print_debug([
             '\ntrue_evo:', self.true_evolution,
             '\nevolution times:', times,
             '\nlen(outcomes):', len(outcomes),
-            '\n_a = {}, _b={}'.format(self._a, self._b),
-            '\nprobe counter:', self.probe_counter,
+            '\nprobe counter:', probe_id,
             '\nexp:', expparams,
             '\nOutcomes:', outcomes[:3],
-            '\nparticles:', params[:3],
+            '\nparticles:', modelparams[:3],
             "\nPr0: ", pr0[:3], 
             "\nLikelihood: ", likelihood_array[0][:3],
             "\nexpparams_sampled_particle:", expparams_sampled_particle
         ])
-        
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
 
         t_storage_start = time.time()
@@ -572,8 +488,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
     def get_system_pr0_array(
         self, 
         times,
-        particles, 
-        # **kwargs
+        probe
     ):
         r"""
         Compute pr0 array for the system. 
@@ -581,57 +496,55 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
         For user specific data, or method to compute system data, replace this function 
             in exploration_strategy.qinfer_model_subroutine. 
-        Here we pass the true operator list and true parameters to 
-            default_pr0_from_modelparams_times_.
 
         :param list times: times to compute pr0 for; usually single element.
-        :param np.ndarry particles: list of parameter-lists, used to construct
-            Hamiltonians. In this case, there should be a single particle
-            corresponding to the true parameters. 
         
-        :returns np.ndarray pr0: probabilities of measuring specified outcome
+        :returns np.ndarray pr0: probabilities of measuring specified outcome on system
         """
-        timing_marker = 'system'
+        from rq import timeouts
 
-        operator_list = self._true_oplist
-        ham_num_qubits = self._true_dim
-        # format of probe dict keys: (probe_id, qubit_number)
-        # probe_counter controlled in likelihood method
-        # probe = self.get_probe(
-        #     probe_id = self.probe_counter, 
-        #     probe_set = "system"
-        # )
-        probe = self.probe_dict[
-            self.probe_counter,
-            self._true_dim 
-        ]
-        # self.log_print([
-        #     "\nTrue Model {} has dim {} (operator shape {}) using system probe dimension: {}".format(
-        #         self._truename, self._true_dim, np.shape(operator_list[0]), probe.shape),
-        #     # "\nTrue Model  {} has shape {} with dimension {}".format(self._truename, np.shape(operator_list[0]), self._true_dim)
-        # ])
+        hamiltonian = self.true_model_constructor.fixed_matrix
+        t_init = time.time()
 
-        # TODO: could just work with true_hamiltonian, worked out on __init__
-        return self.default_pr0_from_modelparams_times(
-            t_list = times,
-            particles = particles, 
-            oplist = operator_list, 
-            # hamiltonian=self.true_hamiltonian, 
-            probe = probe, 
-            timing_marker=timing_marker
-            # **kwargs
-        )
+        if self.iqle_mode: 
+            # TODO use different fnc for IQLE
+            hamiltonian -= self.ham_from_expparams
+
+        if np.any(np.isnan(hamiltonian)):
+            self.log_print([
+                "NaN detected in Hamiltonian. Ham from expparams:", 
+                self.ham_from_expparams
+            ])
+
+        # compute likelihoods
+        probabilities = []
+        for t in times:
+
+            t_init = time.time()
+            prob_meas_input_state = self.exploration_class.get_expectation_value(
+                ham=hamiltonian,
+                t=t,
+                state=probe,
+                log_file=self.log_file,
+                log_identifier='get pr0 call exp val'
+            )
+            self.timings['system']['expectation_values'] += time.time() - t_init
+            probabilities.append(prob_meas_input_state)
+
+        pr0 = np.array([probabilities])
+        return pr0
 
     def get_simulator_pr0_array(
         self, 
         particles, 
         times,
-        # **kwargs
+        probe
     ):
         r"""
         Compute pr0 array for the simulator. 
 
-        For user specific data, or method to compute simulator data, replace this function 
+        For user specific data, or method to compute simulator data, 
+            replace this function 
             in exploration_strategy.qinfer_model_subroutine. 
         Here we pass the candidate model's operators and particles
             to default_pr0_from_modelparams_times_.
@@ -642,188 +555,35 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         
         :returns np.ndarray pr0: probabilities of measuring specified outcome
         """
-        timing_marker = 'simulator'
-        ham_num_qubits = self.model_dimension
-        # format of probe dict keys: (probe_id, qubit_number)
-        # probe_counter controlled in likelihood method
-        t_init = time.time()
-
-        probe = self.sim_probe_dict[
-            self.probe_counter,
-            self.model_dimension
-        ]
-
-        self.timings[timing_marker]['get_probe'] += time.time() - t_init
-        operator_list = self._oplist
-        if self.evaluation_model:
-            # self.log_print_debug([
-            self.log_print_debug([
-                "\nUsing precomputed Hamiltonian. probe[0] (ID {}):\n{}".format(
-                    self.probe_counter, 
-                    probe[0]
-                )
-            ])
-            hamiltonian = self.estimated_model
-        else:
-            hamiltonian = None
-        
-        t_init = time.time()
-        pr0 = self.default_pr0_from_modelparams_times(
-            t_list = times, 
-            particles = particles, 
-            oplist = operator_list, 
-            probe = probe, 
-            hamiltonian=hamiltonian,
-            timing_marker=timing_marker
-            # **kwargs
-        )
-        return pr0
-
-    def default_pr0_from_modelparams_times(
-        self,
-        t_list,
-        particles,
-        oplist,
-        probe,
-        timing_marker,
-        hamiltonian=None,
-        **kwargs
-    ):
-        r"""
-        Compute probabilities of available outputs as an array.
-
-        :param np.ndarray t_list: 
-            List of times on which to perform experiments
-        :param np.ndarray particles: 
-            values of the model parameters particles 
-            A shape ``(n_particles, n_modelparams)``
-            array of model parameter vectors describing the hypotheses for
-            which the likelihood function is to be calculated.
-        :param list oplist:
-            list of the operators defining the model
-        :param np.ndarray probe: quantum state to evolve
-
-        :returns np.ndarray pr0: list of probabilities (one for each particle).
-            The calculation, meaning and interpretation of these probabilities 
-            depends on the user defined ExplorationStrategy.expectation_value function. 
-            By default, it is the expecation value:
-                | < probe.transpose | e^{-iHt} | probe > |**2,
-                but can be replaced in the ExplorationStrategy_.  
-        """
-
-        from rq import timeouts
-        if np.shape(probe)[0] < 4 : 
-            probe_to_print = probe
-        else:
-            probe_to_print = probe[0]
-
-        self.log_print_debug([
-            "Getting pr0; true system ->", self.true_evolution, 
-            "\n(part of) Probe (dimension {}): \n {}".format(
-                np.shape(probe),
-                probe_to_print,
-            ),
-            "\nTimes: ", t_list
-        ])
-
-        # if hamiltonian is not None: 
-        #     self.log_print([
-        #         "Hamiltonian passed:\n", hamiltonian
-        #     ])
-
+       
         num_particles = len(particles)
-        num_times = len(t_list)
-        output = np.empty([num_particles, num_times])
+        pr0 = np.empty([num_particles, len(times)])
 
-        for evoId in range(num_particles):  
-            try:
-                t_init = time.time()
-                if hamiltonian is None:
-                    ham = np.tensordot(
-                        particles[evoId], oplist, axes=1
-                    )
-                else:                    
-                    ham = hamiltonian
-
-                if self.iqle_mode and self.true_evolution:
-                    # H to compute for IQLE on the system
-                    ham =  self.true_hamiltonian - self.ham_from_expparams
-                elif self.iqle_mode and not self.true_evolution:
-                    # H to compute for IQLE on the simulator
-                    ham = ham - self.ham_from_expparams
-                    if np.any(np.isnan(ham)):
-                        self.log_print(["NaN detected in Hamiltonian. Ham from expparams:", self.ham_from_expparams])
-
-                self.timings[timing_marker]['construct_ham'] += time.time()-t_init
-            except BaseException:
-                self.log_print(
-                    [
-                        "Failed to build Hamiltonian.",
-                        "\nparticles:", particles[evoId],
-                        "\noplist:", oplist
-                    ],
+        for particle_idx in range(num_particles):  
+            # loop over particles
+            if self.evaluation_model:
+                hamiltonian = self.model_constructor.fixed_matrix
+            else:
+                hamiltonian = self.model_constructor.construct_matrix(
+                    particles[particle_idx]
                 )
-                raise
-            # if evoId == 0:
-            #     self.log_print_debug([
-            #         "\nHamiltonian:\n", ham,
-            #         "\ntimes:", t_list,
-            #         "\nH from expparams:", self.ham_from_expparams
-            #     ])
+            self.log_print_debug([
+                "Hamiltonian from model constructor:", 
+                hamiltonian
+            ])
+            time_idx = -1
+            for t in times:
+                time_idx += 1 # TODO cleaner way of indexing pr0 array
+                prob_meas_input_state = self.exploration_class.get_expectation_value(
+                    ham=hamiltonian,
+                    t=t,
+                    state=probe,
+                    log_file=self.log_file,
+                    log_identifier='get pr0 call exp val'
+                )
+                pr0[particle_idx][time_idx] = prob_meas_input_state
 
-            for tId in range(len(t_list)):
-
-                t = t_list[tId]
-                if t > 1e6:  # Try limiting times to use to 1 million
-                    import random
-                    # random large number but still computable without error
-                    t = random.randint(1e6, 3e6)
-                try:
-                    t_init = time.time()
-                    prob_meas_input_state = self.exploration_class.get_expectation_value(
-                        ham=ham,
-                        t=t,
-                        state=probe,
-                        log_file=self.log_file,
-                        log_identifier='get pr0 call exp val'
-                    )
-                    self.timings[timing_marker]['expectation_values'] += time.time() - t_init
-                    t_init = time.time()
-                    output[evoId][tId] = prob_meas_input_state
-                    self.timings[timing_marker]['storing_output'] += time.time() - t_init
-
-                except NameError:
-                    self.log_print([
-                        "Error raised; unphysical expecation value.",
-                        "\nParticle:\n", particles[evoId],
-                        "\nt=", t,
-                    ])
-                    sys.exit()
-                except timeouts.JobTimeoutException:
-                    self.log_print([
-                        "RQ Time exception.",
-                        "\nParticle:\n", particles[evoId],
-                        "\nt=", t,
-                    ])
-                    sys.exit()
-
-                if output[evoId][tId] < 0:
-                    print("NEGATIVE PROB")
-                    self.log_print([
-                        "Negative probability : \
-                        \n probability = ",
-                        output[evoId][tId],
-                        "\nat t=", t_list
-                    ])
-                elif output[evoId][tId] > 1.001:
-                    self.log_print(
-                        [
-                            "[QLE] Probability > 1: \
-                            \t \t probability = ",
-                            output[evoId][tId]
-                        ]
-                    )
-        return output
+        return pr0
 
 
 class QInferNVCentreExperiment(QInferModelQMLA):
@@ -917,7 +677,7 @@ class QInferInterfaceJordanWigner(QInferModelQMLA):
             "Using JW get_probe"
         ])
         if probe_set == 'simulator':
-            probe = self.sim_probe_dict[
+            probe = self.probes_simulator[
                 probe_id,
                 2*self.model_dimension            ]
             return probe
@@ -926,9 +686,9 @@ class QInferInterfaceJordanWigner(QInferModelQMLA):
             # get dimension directly from true model since this can be generated by another ES 
             # and therefore note require the 2-qubit-per-site overhead of Jordan Wigner.
             dimension = np.log2(np.shape(self.true_hamiltonian)[0])
-            probe = self.probe_dict[
+            probe = self.probes_system[
                 probe_id,
-                self._true_dim
+                self.true_model_constructor.num_qubits
             ]
             return probe
         else:

@@ -5,6 +5,45 @@ import os
 
 from qmla.exploration_strategies import exploration_strategy
 
+class TestES(
+    exploration_strategy.ExplorationStrategy
+):
+
+    def __init__(
+        self,
+        exploration_rules,
+        true_model=None,
+        **kwargs
+    ):
+        self.true_model = 'pauliSet_1_x_d1+pauliSet_1_y_d1+pauliSet_1_z_d1'
+        super().__init__(
+            exploration_rules=exploration_rules,
+            true_model=self.true_model,
+            **kwargs
+        )
+
+        self.initial_models = None
+        self.true_model_terms_params = {
+            'pauliSet_1_x_d1' : 3.7,
+            'pauliSet_1_y_d1' : 1.5,
+            'pauliSet_1_z_d1' : 2.5,
+        }
+        self.tree_completed_initially = True
+        self.max_time_to_consider = 5
+        self.min_param = 0
+        self.max_param = 10
+
+    def generate_models(self, **kwargs):
+
+        self.log_print(["Generating models; spawn step {}".format(self.spawn_step)])
+        if self.spawn_step == 0:
+            # chains up to 4 sites
+            new_models = [self.true_model]
+            self.spawn_stage.append('Complete')
+
+        return new_models
+
+
 class ExampleBasic(
     exploration_strategy.ExplorationStrategy
 ):

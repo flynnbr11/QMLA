@@ -111,16 +111,12 @@ def set_shared_parameters(
         open(evaluation_data_path, 'wb')
     )
 
-    # Cosntruct true model
-    true_params_dict = true_params_info['params_dict']
-    true_ham = None
-    for k in list(true_params_dict.keys()):
-        param = true_params_dict[k]
-        mtx = qmla.construct_models.compute(k)
-        if true_ham is not None:
-            true_ham += param * mtx
-        else:
-            true_ham = param * mtx
+    # Construct true model to plot evaluation data
+    true_model_constructor = exploration_class.model_constructor(
+        name = exploration_class.true_model, 
+        fixed_parameters = true_params_info['params_list']
+    )
+    true_ham = true_model_constructor.fixed_matrix
 
     try:
         qmla.utilities.plot_evaluation_dataset(

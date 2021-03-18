@@ -348,6 +348,9 @@ class MultiParticleGuessHeuristic(ExperimentDesignHueristic):
                 idx_iter += 1
 
         if self._model.distance(x, xp) == 0:
+            self.log_print([
+                "x,xp={},{}".format(x,xp)
+            ])
             raise RuntimeError(
                 "PGH did not find distinct particles in \
                 {} iterations.".format(self._maxiters)

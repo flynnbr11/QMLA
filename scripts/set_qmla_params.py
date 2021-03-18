@@ -149,6 +149,7 @@ pickle.dump(
 
 # Get system measurements
 # i.e. compute them only once and share with all instances
+exploration_class.get_true_parameters()
 true_system_measurements = exploration_class.get_measurements_by_time()
 pickle.dump(
     true_system_measurements,

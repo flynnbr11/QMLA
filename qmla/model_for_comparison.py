@@ -102,6 +102,7 @@ class ModelInstanceForComparison():
         self.true_model_params = qmla_core_info_dict['true_model_terms_params']
         self.true_model_name = qmla_core_info_dict['true_name']
         self.true_param_dict = qmla_core_info_dict['true_param_dict']
+        self.true_model_constructor = qmla_core_info_dict['true_model_constructor']
         self.experimental_measurements = qmla_core_info_dict['experimental_measurements']
         self.experimental_measurement_times = qmla_core_info_dict['experimental_measurement_times']
         self.results_directory = qmla_core_info_dict['results_directory']
@@ -168,21 +169,19 @@ class ModelInstanceForComparison():
             log_file=self.log_file,
             qmla_id = self.qmla_id,
         )
+        self.model_constructor = self.exploration_class.model_constructor(name = model_name)
         self.model_name_latex = self.exploration_class.latex_name(self.model_name)
 
         # New instances of model and updater used by QInfer
         self.log_print(["Getting QInfer model"])
         self.qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
-            modelparams=self.model_terms_parameters_final,
-            oplist=self.model_terms_matrices,
-            true_oplist=self.true_model_constituent_operators,
-            truename=self.true_model_name,
-            trueparams=self.true_model_params,
-            true_param_dict=self.true_param_dict,
+            model_constructor=self.model_constructor, 
+            # oplist=self.model_terms_matrices,
+            true_model_constructor=self.true_model_constructor,
             num_probes=self.probe_number,
-            probe_dict=self.probes_system,
-            sim_probe_dict=self.probes_simulator,
+            probes_system=self.probes_system,
+            probes_simulator=self.probes_simulator,
             exploration_rules=self.exploration_strategy_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,

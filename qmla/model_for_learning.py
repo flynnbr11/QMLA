@@ -217,16 +217,13 @@ class ModelInstanceForLearning():
         # Initialise model to infereace with QInfer as specified in ES
         self.qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
-            modelparams=self.model_terms_parameters,
-            oplist=self.model_terms_matrices,
+            model_constructor=self.model_constructor, 
+            # oplist=self.model_terms_matrices,
             true_oplist=self.true_model_constituent_operators,
-            true_param_dict=self.true_param_dict,
-            truename=self.true_model_name,
-            trueparams=self.true_model_params,
             true_model_constructor=self.true_model_constructor,
             num_probes=self.probe_number,
-            probe_dict=self.probes_system,
-            sim_probe_dict=self.probes_simulator,
+            probes_system=self.probes_system,
+            probes_simulator=self.probes_simulator,
             exploration_rules=self.exploration_strategy_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
@@ -547,7 +544,8 @@ class ModelInstanceForLearning():
             "\n Final experiment time:", self.track_experimental_times[-1],
             "\n {} Resample epochs: \n{}".format(
                 len(self.epochs_after_resampling), self.epochs_after_resampling),
-            "\nTimings:\n", self.timings
+            "\nTimings:\n", self.timings,
+            "\nEffective sample size: {}".format(self.qinfer_updater.n_ess)
         ])
 
         # Final results
@@ -589,14 +587,11 @@ class ModelInstanceForLearning():
             self.track_param_estimate_v_epoch[term] = self.track_param_means[:, i]
             self.track_param_uncertainty_v_epoch[term] = self.track_param_uncertainties[:, i]
 
-        # Compute the Hamiltonian corresponding to the parameter posterior
-        # distribution
-
-        self.learned_hamiltonian = sum([
-            self.qhl_final_param_estimates[term]
-            * qmla.construct_models.compute(term)
-            for term in self.qhl_final_param_estimates
-        ])
+        # Compute the Hamiltonian corresponding to the parameter 
+        # posterior distribution
+        self.learned_hamiltonian = self.model_constructor.construct_matrix(
+            parameters = est_params
+        )
         
         # Record parameter estimates
         pe = pd.DataFrame(self.track_param_estimate_v_epoch)
@@ -814,7 +809,6 @@ class ModelInstanceForLearning():
         evaluation_experiments = evaluation_data['experiments']
         self.num_evaluation_points = len(evaluation_experiments)
 
-
         if not self.exploration_class.force_evaluation and self.num_experiments < 20:
             # TODO make optional robustly in ES or pass dev arg to QMLA
             # instance.
@@ -823,7 +817,6 @@ class ModelInstanceForLearning():
             evaluation_experiments = evaluation_experiments[::10]
         if self.exploration_class.exclude_evaluation: 
             evaluation_experiments = evaluation_experiments[::10]
-
 
         self.log_print([
             "Evaluation experiments len {}. First 5 elements:\n{}".format(
@@ -841,20 +834,20 @@ class ModelInstanceForLearning():
             estimated_params = estimated_params, 
             cov_mt = cov_mt, 
         )
+        evaluation_model_constructor = self.exploration_class.model_constructor(
+            name = self.model_name, 
+            fixed_parameters = estimated_params
+        )
 
         # TODO using precise mean of posterior to evaluate model
         # want to sample from it -- add flag to qinfer model 
         evaluation_qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
-            modelparams=self.model_terms_parameters,
-            oplist=self.model_terms_matrices,
-            true_oplist=self.true_model_constituent_operators,
-            truename=self.true_model_name,
-            trueparams=self.true_model_params,
-            true_param_dict=self.true_param_dict,
+            model_constructor=evaluation_model_constructor, 
+            true_model_constructor=self.true_model_constructor,
             num_probes=self.probe_number,
-            probe_dict=evaluation_probe_dict,
-            sim_probe_dict=evaluation_probe_dict,
+            probes_system=evaluation_probe_dict,
+            probes_simulator=evaluation_probe_dict,
             exploration_rules=self.exploration_strategy_of_this_model,
             experimental_measurements=self.experimental_measurements,
             experimental_measurement_times=self.experimental_measurement_times,
@@ -862,13 +855,11 @@ class ModelInstanceForLearning():
             debug_mode=self.debug_mode,
             qmla_id=self.qmla_id, 
             evaluation_model=True,
-            estimated_params=posterior_distribution.mean
         )
 
         evaluation_updater = qi.SMCUpdater(
             model=evaluation_qinfer_model,
             n_particles=min(5, self.num_particles),
-            # n_particles = 25, 
             prior=posterior_distribution,
             # turn off resampling - want to evaluate the learned model, not
             # improved version
