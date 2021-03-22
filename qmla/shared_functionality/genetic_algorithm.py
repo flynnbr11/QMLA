@@ -12,7 +12,7 @@ import sklearn
 sys.path.append("/home/bf16951/QMD")
 import qmla
 
-import qmla.construct_models
+import qmla.model_building_utilities
 
 __all__ = [
     'GeneticAlgorithmQMLA',
@@ -176,7 +176,7 @@ class GeneticAlgorithmQMLA():
         :returns np.array chromosome: array of ones and zeros indicating which genes are active in the model
         """
 
-        terms = qmla.construct_models.get_constituent_names_from_name(model)
+        terms = qmla.model_building_utilities.get_constituent_names_from_name(model)
         assert \
             np.all([ t in self.chromosome_description for t in terms]), \
             "Cannot map some term(s) to any available gene. Terms: {} \n Genes".format(terms, self.chromosome_description)

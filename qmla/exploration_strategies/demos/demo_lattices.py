@@ -8,7 +8,7 @@ from qmla.exploration_strategies import exploration_strategy
 from qmla.exploration_strategies.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
 from qmla.shared_functionality import topology_predefined
-from qmla import construct_models
+from qmla import model_building_utilities
 import qmla.shared_functionality.topology_predefined as topologies
 
 class DemoLattice(
@@ -64,7 +64,7 @@ class DemoLattice(
                 lattice_dimension
             )
             complete_model += '+{}'.format(transverse_term)
-        return construct_models.alph(complete_model)
+        return model_building_utilities.alph(complete_model)
 
 
     def generate_models(
@@ -131,7 +131,7 @@ class DemoIsing(DemoLattice):
             "pauliSet_zJz_1J2_d3+pauliSet_zJz_1J3_d3+pauliSet_zJz_2J3_d3+pauliSet_x_1_d3+pauliSet_x_2_d3+pauliSet_x_3_d3",
             "pauliLikewise_lx_1_2_3_d3+pauliLikewise_lz_1J2_1J3_2J3_d3"
         ]
-        self.qhl_models = [qmla.construct_models.alph(m) for m in self.qhl_models]
+        self.qhl_models = [qmla.model_building_utilities.alph(m) for m in self.qhl_models]
         self.initial_models = self.qhl_models
         self.true_model_terms_params = {
             "pauliLikewise_lx_1_2_3_d3" : 0.2,
@@ -199,6 +199,6 @@ class DemoIsingFullyParameterised(DemoIsing):
                 lattice_dimension
             )
             complete_model += '+{}'.format(transverse_term)
-        return construct_models.alph(complete_model)
+        return model_building_utilities.alph(complete_model)
 
 

@@ -18,7 +18,7 @@ qmla_root = os.path.abspath('/'.join(elements))
 sys.path.append(qmla_root)
 
 import qmla
-from qmla import construct_models
+from qmla import model_building_utilities
 
 from expm import expm
 from scipy.linalg import expm as lexpm
@@ -36,7 +36,7 @@ for i in range(num_iterations):
         'FH-hopping-sum_down_1h2_1h3_2h4_3h4_d4': np.random.uniform(0,1)
     }
     model = sum([
-        model_params[term] * qmla.construct_models.compute(term) for term in model_params
+        model_params[term] * qmla.model_building_utilities.compute(term) for term in model_params
     ])
 
     t = np.random.uniform(0,100)

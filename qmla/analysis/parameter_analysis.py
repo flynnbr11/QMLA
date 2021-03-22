@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import lfig 
 
 import qmla.get_exploration_strategy
-import qmla.construct_models
+import qmla.model_building_utilities
 from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas
 plt.switch_backend('agg')
 
@@ -64,7 +64,7 @@ def average_parameters_across_instances(
     for mod in winning_models:
         params_dict[mod] = {}
         sigmas_dict[mod] = {}
-        params = qmla.construct_models.get_constituent_names_from_name(mod)
+        params = qmla.model_building_utilities.get_constituent_names_from_name(mod)
         for p in params:
             params_dict[mod][p] = []
             sigmas_dict[mod][p] = []
@@ -98,7 +98,7 @@ def average_parameters_across_instances(
         avg_sigmas_dict[mod] = {}
         std_deviations[mod] = {}
         learned_priors[mod] = {}
-        params = qmla.construct_models.get_constituent_names_from_name(mod)
+        params = qmla.model_building_utilities.get_constituent_names_from_name(mod)
         for p in params:
             avg_sigmas_dict[mod][p] = np.median(sigmas_dict[mod][p])
             try:
@@ -216,7 +216,7 @@ def average_parameter_estimates(
 
         parameters_for_this_name = parameter_estimates_from_qmd[name]
         num_wins_for_name = len(parameters_for_this_name)
-        terms = sorted(qmla.construct_models.get_constituent_names_from_name(name))
+        terms = sorted(qmla.model_building_utilities.get_constituent_names_from_name(name))
         num_terms = len(terms)
         lf = lfig.LatexFigure(
             auto_label=False, 
@@ -685,11 +685,11 @@ def replot_expectation_values(
             params_dict[k] for k in sim_ops_names
         ]
         sim_ops = [
-            qmla.construct_models.compute(k) for k in sim_ops_names
+            qmla.model_building_utilities.compute(k) for k in sim_ops_names
         ]
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
 
-        sim_num_qubits = qmla.construct_models.get_num_qubits(sim_ops_names[0])
+        sim_num_qubits = qmla.model_building_utilities.get_num_qubits(sim_ops_names[0])
         # p_str=''
         # for i in range(2):
         #     p_str+='P'
@@ -774,7 +774,7 @@ def plot_parameter_estimates(
             list(qmd.model_name_id_map.values())
         )
         return False
-    terms = construct_models.get_constituent_names_from_name(name)
+    terms = model_building_utilities.get_constituent_names_from_name(name)
     num_terms = len(terms)
 
     term_positions = {}

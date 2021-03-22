@@ -4,7 +4,7 @@ import sys
 import pickle
 
 import qmla.get_exploration_strategy
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 import qmla.logging
 
 __all__ = [
@@ -103,12 +103,13 @@ class ControlsQMLA():
             )
 
         # Attributes about true model
-        self.true_model = construct_models.alph(self.exploration_class.true_model)
-        self.true_model_name = self.true_model # TODO remove redundancy
-        self.true_model_class = construct_models.BaseModel(
-            self.true_model_name
+        self.true_model_constructor = self.exploration_class.model_constructor(
+            self.exploration_class.true_model,
+            fixed_parameters = self.exploration_class.true_params_list
         )
-        self.true_model_terms_matrices = self.true_model_class.terms_matrices
+        self.true_model = self.true_model_constructor.name
+        self.true_model_name = self.true_model_constructor.name
+        self.true_model_terms_matrices = self.true_model_constructor.terms_matrices
         self.run_info_file = arguments.run_info_file
         self.log_print(["Shared true params set for this instance."])
 
@@ -124,7 +125,6 @@ class ControlsQMLA():
         self.plot_level = arguments.plot_level
         self.figure_format = arguments.figure_format
         self.log_print(["Figure format:", self.figure_format])
-
 
         # Redis
         self.host_name = arguments.host_name

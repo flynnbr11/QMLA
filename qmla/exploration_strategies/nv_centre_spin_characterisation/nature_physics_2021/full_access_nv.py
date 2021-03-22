@@ -5,7 +5,7 @@ import random
 
 from qmla.exploration_strategies.exploration_strategy import ExplorationStrategy
 import qmla.shared_functionality.experiment_design_heuristics
-from qmla.construct_models import alph, get_num_qubits
+from qmla.model_building_utilities import alph, get_num_qubits
 
 __all__ = [
     'FullAccessNVCentre'

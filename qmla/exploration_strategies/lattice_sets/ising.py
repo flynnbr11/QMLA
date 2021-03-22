@@ -6,7 +6,7 @@ import os
 from qmla.exploration_strategies.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
 from qmla.shared_functionality import topology_predefined
-from qmla import construct_models
+from qmla import model_building_utilities
 
 class IsingLatticeSet(
     fixed_lattice_set.LatticeSet

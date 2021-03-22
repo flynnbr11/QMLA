@@ -13,7 +13,7 @@ from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy
     Genetic, hamming_distance, GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
 from qmla.exploration_strategies.genetic_algorithms.ising_genetic import IsingGenetic
 import qmla.shared_functionality.probe_set_generation
-import qmla.construct_models
+import qmla.model_building_utilities
 
 
 class ObjectiveFncTestHeisXYZ(

@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 import qmla.logging
-import qmla.construct_models
+import qmla.model_building_utilities
 
 pickle.HIGHEST_PROTOCOL = 4
 plt.switch_backend('agg')
@@ -206,7 +206,7 @@ class ExplorationTree():
             ])
 
         model_list = list(set(model_list))
-        model_list = [qmla.construct_models.alph(mod) for mod in model_list]
+        model_list = [qmla.model_building_utilities.alph(mod) for mod in model_list]
         if isinstance(pairs_to_compare, list):
             pairs_to_compare = [ (min(p), max(p) ) for p in pairs_to_compare ]
         return model_list, pairs_to_compare

@@ -9,7 +9,7 @@ import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.expectation_value_functions
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 __all__ = [
@@ -43,7 +43,7 @@ class NVCentreExperimentalData(
             **kwargs
         )
         self.true_model = 'xTi+yTi+zTi+zTz'
-        self.true_model = qmla.construct_models.alph(self.true_model) 
+        self.true_model = qmla.model_building_utilities.alph(self.true_model) 
 
         # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution_double_time_reverse
         self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.hahn_via_z_pi_gate

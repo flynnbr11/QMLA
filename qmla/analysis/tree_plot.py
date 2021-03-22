@@ -1140,7 +1140,7 @@ def qmdclassTOnxobj(
             is_adj = adjacent_branch_test(qmd, a, b)
             if is_adj or not only_adjacent_branches:
                 if a != b:
-                    unique_pair = construct_models.unique_model_pair_identifier(a, b)
+                    unique_pair = model_building_utilities.unique_model_pair_identifier(a, b)
                     if ((unique_pair not in edges)
                         and (unique_pair in qmd.bayes_factor_pair_computed)
                         ):

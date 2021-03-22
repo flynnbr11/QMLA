@@ -26,7 +26,7 @@ except:
 
 # QMLA functionality
 import qmla.analysis
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 import qmla.get_exploration_strategy as get_exploration_strategy
 import qmla.redis_settings as rds
 import qmla.model_for_storage
@@ -166,25 +166,18 @@ class QuantumModelLearningAgent():
 
     def _true_model_definition(self):
         r""" Information related to true (target) model."""
-
-        self.true_model_name = construct_models.alph(
-            self.qmla_controls.true_model_name)
-        self.true_model_dimension = construct_models.get_num_qubits(
-            self.true_model_name)
-        self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
+        self.true_model_constructor = self.exploration_class.true_model_constructor
+        self.true_model_name = self.true_model_constructor.name
+        self.true_model_dimension = self.true_model_constructor.num_qubits
+        self.true_model_constituent_operators = self.true_model_constructor.terms_matrices
+        self.true_model_num_params = self.true_model_constructor.num_terms
         self.true_model_constituent_terms_latex = [
             self.exploration_class.latex_name(term)
             for term in
-            qmla.construct_models.get_constituent_names_from_name(
-                self.true_model_name)
+            self.true_model_constructor.terms_names
         ]
-        self.true_model_num_params = self.qmla_controls.true_model_class.num_terms
         self.true_param_list = self.exploration_class.true_params_list
         self.true_param_dict = self.exploration_class.true_params_dict
-        self.true_model_constructor = self.exploration_class.model_constructor(
-            name = self.true_model_name, 
-            fixed_parameters = self.true_param_list
-        )
 
         self.true_model_branch = -1  # overwrite if true model is added to database
         self.true_model_considered = False
@@ -209,6 +202,7 @@ class QuantumModelLearningAgent():
                 'branch_id': [],
                 'f_score': [],
                 'model_storage_instance': [],
+                'model_constructor' : [],
                 'branches_present_on' : [], 
                 'terms' : [],
                 'latex_terms' : []
@@ -386,10 +380,10 @@ class QuantumModelLearningAgent():
             base_num_qubits = 3
             base_num_terms = 3
             for op in self.exploration_class.initial_models:
-                if construct_models.get_num_qubits(op) < base_num_qubits:
-                    base_num_qubits = construct_models.get_num_qubits(op)
+                if model_building_utilities.get_num_qubits(op) < base_num_qubits:
+                    base_num_qubits = model_building_utilities.get_num_qubits(op)
                 num_terms = len(
-                    construct_models.get_constituent_names_from_name(op))
+                    model_building_utilities.get_constituent_names_from_name(op))
                 if (
                     num_terms < base_num_terms
                 ):
@@ -700,7 +694,7 @@ class QuantumModelLearningAgent():
             `wait_on_result==True`.
         """
 
-        unique_id = construct_models.unique_model_pair_identifier(
+        unique_id = model_building_utilities.unique_model_pair_identifier(
             model_a_id,
             model_b_id
         )
@@ -765,7 +759,7 @@ class QuantumModelLearningAgent():
                 log_file=self.rq_log_file
             )
         if wait_on_result == True:
-            pair_id = construct_models.unique_model_pair_identifier(
+            pair_id = model_building_utilities.unique_model_pair_identifier(
                 model_a_id,
                 model_b_id
             )
@@ -812,7 +806,7 @@ class QuantumModelLearningAgent():
 
         remote_jobs = []
         for pair in pair_list:
-            unique_id = construct_models.unique_model_pair_identifier(
+            unique_id = model_building_utilities.unique_model_pair_identifier(
                 pair[0], pair[1]
             )
             if (
@@ -897,7 +891,7 @@ class QuantumModelLearningAgent():
         # Compare model pairs
         for a,b in pair_list:
             if a != b:
-                unique_id = construct_models.unique_model_pair_identifier(
+                unique_id = model_building_utilities.unique_model_pair_identifier(
                     a, b
                 )
                 if (
@@ -947,7 +941,7 @@ class QuantumModelLearningAgent():
         elif a is not None and b is not None:
             a = float(a)
             b = float(b)
-            pair = construct_models.unique_model_pair_identifier(a, b)
+            pair = model_building_utilities.unique_model_pair_identifier(a, b)
         else:
             self.log_print([
                 "Must pass either two model ids, or a \
@@ -1570,8 +1564,8 @@ class QuantumModelLearningAgent():
             model_id: unique model ID for the model, whether new or existing
         """
 
-        model_name = construct_models.alph(model)
-        self.log_print(["Trying to add model to DB:", model_name])
+        model_name = model_building_utilities.alph(model)
+        self.log_print(["Trying to add model to DB:", model_name, " with ET ", exploration_tree])
 
         # Add model if not yet considered or told to force create
         if (
@@ -1579,7 +1573,7 @@ class QuantumModelLearningAgent():
             or force_create_model == True
         ):
             # create new model instance
-            model_num_qubits = qmla.construct_models.get_num_qubits(
+            model_num_qubits = qmla.model_building_utilities.get_num_qubits(
                 model_name)
             model_id = self.highest_model_id + 1
             self.model_lists[model_num_qubits].append(model_name)
@@ -1589,14 +1583,14 @@ class QuantumModelLearningAgent():
                     model_name, model_id
                 )
             ])
-            op = qmla.construct_models.BaseModel(
-                name=model_name
-            )
             # Generate model storage instance
+            model_constructor = exploration_tree.exploration_class.model_constructor(
+                name = model_name
+            )
             model_storage_instance = qmla.model_for_storage.ModelInstanceForStorage(
                 model_name=model_name,
                 model_id=int(model_id),
-                model_terms_matrices=op.terms_matrices,
+                # model_terms_matrices=op.terms_matrices,
                 true_oplist=self.true_model_constituent_operators,
                 true_model_terms_params=self.true_param_list,
                 qid=self.qmla_id,
@@ -1613,7 +1607,7 @@ class QuantumModelLearningAgent():
                 model_name=model_name,
                 exploration_class=exploration_tree.exploration_class
             ), 2)
-            terms = qmla.construct_models.get_constituent_names_from_name(model_name)
+            terms = qmla.model_building_utilities.get_constituent_names_from_name(model_name)
 
             running_db_new_row = pd.Series({
                 'model_id': int(model_id),
@@ -1623,6 +1617,7 @@ class QuantumModelLearningAgent():
                 'f_score': f_score,
                 'model_storage_instance': model_storage_instance,
                 'branches_present_on' : [int(branch_id)], 
+                'model_constructor' : model_constructor, 
                 'terms' : terms,
                 'latex_terms' : [exploration_tree.exploration_class.latex_name(t) for t in terms] # need to get latex name by the ES which spawned this model
             })
@@ -1630,8 +1625,8 @@ class QuantumModelLearningAgent():
             self.model_database.loc[num_rows] = running_db_new_row
 
             model_added = True
-            if construct_models.alph(
-                    model) == construct_models.alph(self.true_model_name):
+            if model_building_utilities.alph(
+                    model) == model_building_utilities.alph(self.true_model_name):
                 self.true_model_id = model_id
                 self.true_model_considered = True
                 self.true_model_branch = branch_id
@@ -1793,7 +1788,7 @@ class QuantumModelLearningAgent():
         model_name = mod.model_name
 
         # Get expectation values of this model
-        n_qubits = construct_models.get_num_qubits(model_name)
+        n_qubits = model_building_utilities.get_num_qubits(model_name)
         if n_qubits > 5:
             expec_val_plot_times = self.times_to_plot_reduced_set
         else:
@@ -1816,8 +1811,7 @@ class QuantumModelLearningAgent():
         # Compare this model to the true model (only meaningful for simulated
         # cases)
         correct_model = misfit = underfit = overfit = 0
-        num_params_champ_model = construct_models.BaseModel(
-            model_name).num_terms
+        num_params_champ_model = mod.model_constructor.num_terms
 
         if model_name == self.true_model_name:
             correct_model = 1
@@ -1867,7 +1861,7 @@ class QuantumModelLearningAgent():
             'ConstituentTerms': mod.constituents_terms_latex,
             'LearnedHamiltonian': mod.learned_hamiltonian,
             'ExplorationRule': mod.exploration_strategy_of_this_model,
-            'NameAlphabetical': construct_models.alph(mod.model_name),
+            'NameAlphabetical': model_building_utilities.alph(mod.model_name),
             'LearnedParameters': mod.qhl_final_param_estimates,
             'FinalSigmas': mod.qhl_final_param_uncertainties,
             'ExpectationValues': mod.expectation_values,
@@ -2024,7 +2018,7 @@ class QuantumModelLearningAgent():
                 set(params) - set(to_remove)
             )
             new_mod = '+'.join(new_model_terms)
-            new_mod = construct_models.alph(new_mod)
+            new_mod = model_building_utilities.alph(new_mod)
 
             self.log_print([
                 "Some neglibible parameters found:", removed_params,
@@ -2041,7 +2035,7 @@ class QuantumModelLearningAgent():
             )
 
             reduced_mod_terms = sorted(
-                construct_models.get_constituent_names_from_name(
+                model_building_utilities.get_constituent_names_from_name(
                     new_mod
                 )
             )
@@ -2419,7 +2413,7 @@ class QuantumModelLearningAgent():
         if self.true_model_found:
             self.log_print([
                 "True model found: {}".format(
-                    construct_models.alph(self.true_model_name)
+                    model_building_utilities.alph(self.true_model_name)
                 )
             ])
         self.log_print([
@@ -2483,8 +2477,8 @@ class QuantumModelLearningAgent():
         :param str name: model for consideration
         """
         # Return true indicates it has not been considered and so can be added
-        al_name = qmla.construct_models.alph(model_name)
-        n_qub = qmla.construct_models.get_num_qubits(model_name)
+        al_name = qmla.model_building_utilities.alph(model_name)
+        n_qub = qmla.model_building_utilities.get_num_qubits(model_name)
         if al_name in self.model_lists[n_qub]:
             return 'Previously Considered'  # todo -- make clear if in legacy or running db
         else:
@@ -2694,7 +2688,7 @@ class QuantumModelLearningAgent():
                 term
             )
             for term in
-            construct_models.get_constituent_names_from_name(
+            model_building_utilities.get_constituent_names_from_name(
                 model_name
             )
         ]

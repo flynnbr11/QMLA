@@ -6,7 +6,7 @@ import pickle
 from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centre_large_spin_bath
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
-from qmla import construct_models
+from qmla import model_building_utilities
 
 class NVCentreRevivalsSimulated(
     nv_centre_large_spin_bath.NVLargeSpinBath  # inherit from this
@@ -86,7 +86,7 @@ class NVCentreRevivalsSimulated(
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
-        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.true_model = qmla.model_building_utilities.alph(self.true_model)
 
 
 

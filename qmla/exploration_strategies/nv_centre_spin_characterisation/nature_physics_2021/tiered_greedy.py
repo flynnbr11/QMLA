@@ -4,7 +4,7 @@ import os
 import random
 
 from qmla.exploration_strategies.nv_centre_spin_characterisation.nature_physics_2021 import FullAccessNVCentre
-from qmla.construct_models import alph
+from qmla.model_building_utilities import alph
 
 __all__ = [
     'TieredGreedySearchNVCentre'

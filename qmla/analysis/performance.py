@@ -14,7 +14,7 @@ from matplotlib.gridspec import GridSpec
 import scipy
 import lfig 
 
-import qmla.construct_models
+import qmla.model_building_utilities
 
 __all__ = [
     'bayes_factor_f_score_heatmap',
@@ -539,13 +539,13 @@ def plot_scores(
     batch_correct_models = []
     if batch_nearest_num_params_as_winners == True:
         num_true_params = len(
-            qmla.construct_models.get_constituent_names_from_name(
+            qmla.model_building_utilities.get_constituent_names_from_name(
                 true_model
             )
         )
         for mod in models:
             num_params = len(
-                qmla.construct_models.get_constituent_names_from_name(mod)
+                qmla.model_building_utilities.get_constituent_names_from_name(mod)
             )
 
             # if (

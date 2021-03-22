@@ -11,7 +11,7 @@ import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.expectation_value_functions
 import qmla.shared_functionality.latex_model_names
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 class ExperimentNVCentreNQubits(
@@ -30,7 +30,7 @@ class ExperimentNVCentreNQubits(
         self.true_model = qmla.utilities.n_qubit_nv_gali_model(n_qubits=2, coupling_terms=['z']) 
         self.max_num_qubits = 4
 
-        self.true_model = qmla.construct_models.alph(self.true_model) 
+        self.true_model = qmla.model_building_utilities.alph(self.true_model) 
         self.initial_models = [
             qmla.utilities.n_qubit_nv_gali_model(n, coupling_terms=['z']) 
             for n in range(2, 1+self.max_num_qubits)
@@ -108,8 +108,8 @@ class ExperimentNVCentreNQubits(
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(qmla.construct_models.core_operator_dict.keys()))
-        num_sites = qmla.construct_models.get_num_qubits(name)
+        core_operators = list(sorted(qmla.model_building_utilities.core_operator_dict.keys()))
+        num_sites = qmla.model_building_utilities.get_num_qubits(name)
         p_str = 'P' * num_sites
         p_str = '+'
         separate_terms = name.split(p_str)

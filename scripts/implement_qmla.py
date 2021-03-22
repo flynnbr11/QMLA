@@ -18,7 +18,7 @@ qmla_root = os.path.abspath('/'.join(elements))
 sys.path.append(qmla_root)
 
 import qmla
-from qmla import construct_models
+from qmla import model_building_utilities
 from qmla.quantum_model_learning_agent import QuantumModelLearningAgent  # QMD class in Library
 from qmla import redis_settings as rds
 import qmla.logging

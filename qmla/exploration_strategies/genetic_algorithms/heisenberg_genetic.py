@@ -12,7 +12,7 @@ import sklearn
 from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy \
     import GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
 import qmla.shared_functionality.probe_set_generation
-import qmla.construct_models
+import qmla.model_building_utilities
 
 class HeisenbergGeneticXYZ(
     GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms
@@ -38,7 +38,7 @@ class HeisenbergGeneticXYZ(
                     'x', 'z',
                 ]
             
-            true_model = qmla.construct_models.alph(true_model)
+            true_model = qmla.model_building_utilities.alph(true_model)
         
         super().__init__(
             exploration_rules=exploration_rules,
@@ -63,7 +63,7 @@ class HeisenbergGeneticXYZ(
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
         self.fitness_df = pd.DataFrame()
-        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
+        self.num_sites = qmla.model_building_utilities.get_num_qubits(self.true_model)
 
         self.num_probes = 50
         self.max_num_qubits = 7

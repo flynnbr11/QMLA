@@ -1,5 +1,5 @@
 import qmla
-import qmla.construct_models
+import qmla.model_building_utilities
 
 ##########
 # Section: Generic
@@ -27,8 +27,8 @@ def pauli_set_latex_name(
 
     :param str name: name of model or term to map
     """
-    core_operators = list(sorted(qmla.construct_models.core_operator_dict.keys()))
-    num_sites = qmla.construct_models.get_num_qubits(name)
+    core_operators = list(sorted(qmla.model_building_utilities.core_operator_dict.keys()))
+    num_sites = qmla.model_building_utilities.get_num_qubits(name)
     separate_terms = name.split('+')
 
     site_connections = {}
@@ -90,7 +90,7 @@ def nv_centre_SAT(
     if name == 'x' or name == 'y' or name == 'z':
         return '$' + name + '$'
 
-    num_qubits = qmla.construct_models.get_num_qubits(name)
+    num_qubits = qmla.model_building_utilities.get_num_qubits(name)
     # terms = name.split('PP')
     terms = name.split('+')
     rotations = ['xTi', 'yTi', 'zTi']
@@ -148,7 +148,7 @@ def nv_spin_interaction(
     **kwargs
 ):
     term = name
-    num_qubits = qmla.construct_models.get_num_qubits(term)
+    num_qubits = qmla.model_building_utilities.get_num_qubits(term)
     t_str = 'T' * (num_qubits - 1)
     p_str = 'P' * num_qubits
     separate_terms = term.split(p_str)

@@ -6,7 +6,7 @@ import os
 from qmla.exploration_strategies import connected_lattice, connected_lattice_probabilistic
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 class HeisenbergXYZProbabilistic(
@@ -37,7 +37,7 @@ class HeisenbergXYZProbabilistic(
         self.four_site_xxz = 'pauliSet_1J2_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4'
         
         self.true_model = self.four_site_xxz_chain
-        self.true_model = construct_models.alph(self.true_model)
+        self.true_model = model_building_utilities.alph(self.true_model)
         self.qhl_models = [
             self.true_model,
             'pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4',

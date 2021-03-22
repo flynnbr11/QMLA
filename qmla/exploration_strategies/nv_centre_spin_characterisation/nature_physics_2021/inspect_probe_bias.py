@@ -3,7 +3,7 @@ import sys
 import os
 import random
 
-import qmla.construct_models
+import qmla.model_building_utilities
 from qmla.exploration_strategies.nv_centre_spin_characterisation.nature_physics_2021 import FullAccessNVCentre
 
 __all__ = [

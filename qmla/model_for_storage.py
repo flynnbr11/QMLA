@@ -13,7 +13,7 @@ import qmla.memory_tests
 import qmla.logging
 import qmla.get_exploration_strategy
 import qmla.shared_functionality.experimental_data_processing
-import qmla.construct_models
+import qmla.model_building_utilities
 import qmla.analysis
 import qmla.process_string_to_matrix
 
@@ -48,7 +48,7 @@ class ModelInstanceForStorage():
         self,
         model_name,
         model_id,
-        model_terms_matrices,
+        # model_terms_matrices,
         qid,
         plot_probes=None,
         qmla_core_info_database=None,
@@ -59,10 +59,10 @@ class ModelInstanceForStorage():
     ):
         # Basic info about this QMLA instance and model
         self.qmla_id = qid
-        self.model_name = qmla.construct_models.alph(model_name)
+        self.model_name = model_name 
         self.model_id = model_id
-        self.model_terms_matrices = model_terms_matrices
-        self.num_terms = len(self.model_terms_matrices)
+        # self.model_terms_matrices = model_terms_matrices
+        # self.num_terms = len(self.model_terms_matrices)
         self.log_file = log_file
 
         # Redis database settings
@@ -116,11 +116,6 @@ class ModelInstanceForStorage():
 
         # Parameters used by QMLA manager class
         self.model_bayes_factors = {}
-        # self.model_num_qubits = qmla.construct_models.get_num_qubits(
-        #     self.model_name)
-        # self.probe_num_qubits = self.model_num_qubits
-        self.model_num_qubits = np.log2( np.shape(self.model_terms_matrices[0])[0] )
-        self.probe_num_qubits = self.model_num_qubits
         self.expectation_values = {}
         self.values_updated = False
 
@@ -225,12 +220,19 @@ class ModelInstanceForStorage():
         )
 
         # Compile some attributes
+        self.model_constructor = self.exploration_class.model_constructor(
+            name = self.model_name
+        )
+        self.model_terms_matrices = self.model_constructor.terms_matrices
+        self.num_terms = self.model_constructor.num_terms
+        self.probe_num_qubits = self.model_constructor.num_qubits
+        self.log_print([
+            "Getting latex name from constructor:", self.model_constructor.name_latex
+        ])
         self.model_name_latex = self.exploration_class.latex_name(
             name=self.model_name
         )
-        model_constituent_terms = qmla.construct_models.get_constituent_names_from_name(
-            self.model_name
-        )
+        model_constituent_terms = self.model_constructor.terms_names
         self.constituents_terms_latex = [
             self.exploration_class.latex_name(term)
             for term in model_constituent_terms

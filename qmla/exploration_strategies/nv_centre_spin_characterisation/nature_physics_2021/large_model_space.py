@@ -15,7 +15,7 @@ from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
 import qmla.shared_functionality.expectation_value_functions
-import qmla.construct_models
+import qmla.model_building_utilities
 
 class NVCentreGenticAlgorithmPrelearnedParameters(
     Genetic
@@ -52,7 +52,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
-        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.true_model = qmla.model_building_utilities.alph(self.true_model)
 
         # Add genetic algorithm parameters to kwargs, which the Genetic ES passes to GA class
         kwargs['selection_truncation_rate'] = 1 / self.true_n_qubits
@@ -68,10 +68,10 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         )
 
         self._set_true_params() # call again in case something was over written by parent __init__
-        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
+        self.num_sites = qmla.model_building_utilities.get_num_qubits(self.true_model)
         self.qhl_models = [self.true_model]
         self.qhl_models = [
-            qmla.construct_models.alph(m) for m in self.qhl_models
+            qmla.model_building_utilities.alph(m) for m in self.qhl_models
         ]
 
         # Modular functions
@@ -105,7 +105,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         # Get initial generation's models
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
-            qmla.construct_models.alph(m) for m in self.initial_models
+            qmla.model_building_utilities.alph(m) for m in self.initial_models
         ]
         if self.tree_completed_initially:
             self.initial_models = self.qhl_models               
@@ -145,7 +145,7 @@ class NVCentreGenticAlgorithmPrelearnedParameters(
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
-        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.true_model = qmla.model_building_utilities.alph(self.true_model)
         
         self.max_time_to_consider = 100e-6
         self.plot_time_increment = self.max_time_to_consider / 100
@@ -361,7 +361,7 @@ class NVPrelearnedTest(
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
-        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.true_model = qmla.model_building_utilities.alph(self.true_model)
 
         super().__init__(
             exploration_rules=exploration_rules,
@@ -374,5 +374,5 @@ class NVPrelearnedTest(
 
         self.initial_models = self.genetic_algorithm.random_initial_models(num_models_per_generation)
         self.initial_models = [ 
-            qmla.construct_models.alph(m) for m in self.initial_models
+            qmla.model_building_utilities.alph(m) for m in self.initial_models
         ]

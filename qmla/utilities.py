@@ -13,7 +13,7 @@ import matplotlib.colors
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-import qmla.construct_models
+import qmla.model_building_utilities
 
 class StorageUnit():
     r"""
@@ -163,12 +163,12 @@ def n_qubit_nv_gali_model(
     return '+'.join(terms)
 
 
-def ensure_consisten_num_qubits_pauli_set(initial_model, new_dimension=None):
-    individual_terms = qmla.construct_models.get_constituent_names_from_name(initial_model)
+def ensure_consistent_num_qubits_pauli_set(initial_model, new_dimension=None):
+    individual_terms = qmla.model_building_utilities.get_constituent_names_from_name(initial_model)
     
     if new_dimension is None: 
         max_dimension = max([
-            qmla.construct_models.get_num_qubits(term)
+            qmla.model_building_utilities.get_num_qubits(term)
             for term in individual_terms            
         ])
         new_dimension = max_dimension

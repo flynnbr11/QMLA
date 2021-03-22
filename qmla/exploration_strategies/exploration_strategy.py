@@ -16,7 +16,7 @@ import qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.probe_set_generation as probe_set_generation
 import qmla.shared_functionality.expectation_value_functions
 import qmla.utilities
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 import qmla.shared_functionality.rating_system
 import qmla.shared_functionality.qinfer_model_interface
 from qmla.exploration_strategies.exploration_strategy_decorator import ExplorationStrategyDecorator
@@ -133,7 +133,7 @@ class ExplorationStrategy():
         self.probe_noise_level = 1e-5
 
         # Model class
-        self.model_constructor = qmla.construct_models.BaseModel
+        self.model_constructor = qmla.shared_functionality.model_constructors.BaseModel
 
         # Experiment design
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
@@ -483,9 +483,7 @@ class ExplorationStrategy():
     @property
     def true_model_terms(self):
         r""" Terms (as latex strings) which make up the true model"""
-        true_terms = construct_models.get_constituent_names_from_name(
-            self.true_model
-        )
+        true_terms = self.true_model_constructor.terms_names
 
         latex_true_terms = [
             self.latex_name(term) for term in true_terms
@@ -556,9 +554,12 @@ class ExplorationStrategy():
 
         # Dissect true model into separate terms.
         true_model = self.true_model
-        terms = qmla.construct_models.get_constituent_names_from_name(
-            true_model
+        true_model_constructor = self.model_constructor(
+            # Not a useful object since parameters not set yet
+            # -> just use it to get attributes
+            name = true_model
         )
+        terms = true_model_constructor.terms_names
         latex_terms = [
             self.latex_name(name=term) for term in terms
         ]
@@ -1032,7 +1033,8 @@ class ExplorationStrategy():
         """
 
         keys = list(probe_dict.keys())
-        true_model_num_qubits = qmla.construct_models.get_num_qubits(self.true_model)
+        # true_model_num_qubits = qmla.model_building_utilities.get_num_qubits(self.true_model)
+        true_model_num_qubits = self.true_model_constructor.num_qubits
         probe_ids = [t for t in list(eval_probes.keys()) if t[1] == true_model_num_qubits]
 
         for pid in probe_ids:

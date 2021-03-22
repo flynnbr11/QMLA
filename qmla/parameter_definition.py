@@ -6,7 +6,7 @@ import math
 import scipy
 import matplotlib.pyplot as plt
 
-import qmla.construct_models
+import qmla.model_building_utilities
 import qmla.shared_functionality.prior_distributions
 
 pickle.HIGHEST_PROTOCOL = 4

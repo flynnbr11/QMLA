@@ -3,7 +3,7 @@ import os
 
 from qmla.exploration_strategies.nv_centre_spin_characterisation import SimulatedExperimentNVCentre
 import qmla.shared_functionality.probe_set_generation
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 class ExpAlternativeNV(

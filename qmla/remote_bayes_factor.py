@@ -14,7 +14,7 @@ try:
 except:
     from qmla.shared_functionality.latex_figure import LatexFigure
 
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 import qmla.model_for_comparison
 import qmla.logging
 import qmla.redis_settings as rds
@@ -280,7 +280,7 @@ def remote_bayes_factor_calculation(
     elif bayes_factor > 1e160:
         bayes_factor = 1e160
 
-    pair_id = construct_models.unique_model_pair_identifier(
+    pair_id = model_building_utilities.unique_model_pair_identifier(
         model_a_id, model_b_id
     )
 

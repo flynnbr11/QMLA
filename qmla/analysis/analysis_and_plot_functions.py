@@ -40,7 +40,7 @@ except:
 import qmla.get_exploration_strategy as get_exploration_strategy
 import qmla.shared_functionality.experimental_data_processing
 import qmla.shared_functionality.expectation_value_functions
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 
 frameinfo = getframeinfo(currentframe())
 
@@ -232,7 +232,7 @@ def plot_parameter_estimates(
             list(qmd.model_name_id_map.values())
         )
         return False
-    terms = construct_models.get_constituent_names_from_name(name)
+    terms = model_building_utilities.get_constituent_names_from_name(name)
     num_terms = len(terms)
 
     term_positions = {}
@@ -579,7 +579,7 @@ def plot_learned_models_dynamics(
         if include_param_estimates == True:
             ax = fig.add_subplot(gs[row, col])
             name = reduced.model_name
-            terms = construct_models.get_constituent_names_from_name(name)
+            terms = model_building_utilities.get_constituent_names_from_name(name)
             num_terms = len(terms)
 
             term_positions = {}
@@ -921,7 +921,7 @@ def r_squared_from_epoch_list(
         mod = qmd.get_model_storage_instance_by_id(model_id)
         r_squared_by_epoch = {}
 
-        mod_num_qubits = construct_models.get_num_qubits(mod.model_name)
+        mod_num_qubits = model_building_utilities.get_num_qubits(mod.model_name)
         probe = qmla.shared_functionality.expectation_value_functions.n_qubit_plus_state(mod_num_qubits)
         epochs.extend([0, qmd.num_experiments - 1])
         if len(mod.epochs_after_resampling) > 0:

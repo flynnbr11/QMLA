@@ -7,7 +7,7 @@ import pandas as pd
 from qmla.exploration_strategies import exploration_strategy
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
-from qmla import construct_models
+from qmla import model_building_utilities
 from qmla.shared_functionality import topology_predefined
 
 class LatticeSet(
@@ -133,7 +133,7 @@ class LatticeSet(
                 lattice_dimension
             )
             complete_model += '+{}'.format(transverse_term)
-        return construct_models.alph(complete_model)
+        return model_building_utilities.alph(complete_model)
 
 
     def generate_models(

@@ -3,7 +3,7 @@ import sys
 import os
 import random
 
-import qmla.construct_models
+import qmla.model_building_utilities
 from qmla.exploration_strategies.nv_centre_spin_characterisation.nature_physics_2021 import FullAccessNVCentre, TieredGreedySearchNVCentre
 
 __all__ = [
@@ -42,6 +42,6 @@ class VariableTrueModelNVCentre(
         ]
 
         self.true_model = true_models[self.qmla_id % len(true_models)]
-        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.true_model = qmla.model_building_utilities.alph(self.true_model)
         self._shared_true_parameters = False
         self.log_print(["starting rotational ES; true model is {}".format(self.true_model)])

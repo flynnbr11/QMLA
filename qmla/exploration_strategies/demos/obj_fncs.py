@@ -19,7 +19,7 @@ try:
 except:
     from qmla.shared_functionality.latex_figure import LatexFigure
 
-import qmla.construct_models
+import qmla.model_building_utilities
 
 from qmla.exploration_strategies.genetic_algorithms import Genetic
 
@@ -33,8 +33,8 @@ class DemoObjectiveFunctions(
         **kwargs
     ):
         true_model = 'pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5'
-        self.true_model = qmla.construct_models.alph(true_model)
-        num_sites = qmla.construct_models.get_num_qubits(true_model)
+        self.true_model = qmla.model_building_utilities.alph(true_model)
+        num_sites = qmla.model_building_utilities.get_num_qubits(true_model)
         terms = []
         for i in range(1, 1 + num_sites):
             for j in range(i + 1, 1 + num_sites):
@@ -64,7 +64,7 @@ class DemoObjectiveFunctions(
         ]
 
         self.initial_models = [
-            qmla.construct_models.alph(m) for m in self.initial_models
+            qmla.model_building_utilities.alph(m) for m in self.initial_models
         ]
         self.initial_num_models = len(self.initial_models)
         self.fitness_method = 'f_score'

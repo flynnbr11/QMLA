@@ -13,7 +13,7 @@ import qmla.shared_functionality.experimental_data_processing
 import qmla.get_exploration_strategy
 import qmla.memory_tests
 import qmla.shared_functionality.probe_set_generation
-import qmla.construct_models
+import qmla.model_building_utilities
 import qmla.logging 
 
 global_print_loc = False

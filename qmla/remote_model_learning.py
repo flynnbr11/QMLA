@@ -129,14 +129,14 @@ def remote_learn_model_parameters(
 
     except NameError:
         log_print([
-            "Model learning failed. QHL failed for model id {}. Setting job failure construct_models.".format(
+            "Model learning failed. QHL failed for model id {}. Setting job failure model_building_utilities.".format(
                 model_id)
         ])
         any_job_failed_db.set('Status', 1)
         raise
     except BaseException:
         log_print([
-            "Model learning failed. QHL failed for model id {}. Setting job failure construct_models.".format(
+            "Model learning failed. QHL failed for model id {}. Setting job failure model_building_utilities.".format(
                 model_id)
         ])
         any_job_failed_db.set('Status', 1)

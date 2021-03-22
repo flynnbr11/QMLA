@@ -12,7 +12,7 @@ import pickle
 import qmla.redis_settings
 import qmla.logging
 import qmla.get_exploration_strategy
-import qmla.construct_models
+import qmla.model_building_utilities
 
 pickle.HIGHEST_PROTOCOL = 4
 
@@ -154,15 +154,14 @@ class ModelInstanceForComparison():
         self.track_experiment_parameters = learned_model_info['track_experiment_parameters']
         self.log_print(["Track exp params eg:", self.track_experiment_parameters[0]])
 
-
         # Process data from learned info
         if self.model_name == self.true_model_name:
             self.is_true_model = True
             self.log_print(["This is the true model for comparison."])
         else:
             self.is_true_model = False
-        op = qmla.construct_models.BaseModel(self.model_name)
-        self.model_terms_matrices = op.terms_matrices
+        
+        self.model_terms_matrices = self.model_constructor.terms_matrices
         self.model_terms_parameters_final = np.array(self.final_learned_params)
         self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
             exploration_rules=self.exploration_strategy_of_this_model,
@@ -329,8 +328,7 @@ class ModelInstanceForComparison():
         times_not_yet_computed = list(
             set(times) - set(self.expectation_values.keys())
         )
-        # n_qubits = qmla.construct_models.get_num_qubits(self.model_name)
-        n_qubits = np.log2( np.shape(self.learned_hamiltonian)[0]) # TODO get model num qubits from learned_info
+        n_qubits = self.model_constructor.num_qubits
         plot_probe = self.plot_probes[n_qubits]
 
         for t in times_not_yet_computed:

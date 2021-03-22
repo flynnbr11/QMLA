@@ -20,7 +20,7 @@ except:
     from qmla.shared_functionality.latex_figure import LatexFigure
 from qmla.exploration_strategies import exploration_strategy
 import qmla.shared_functionality.probe_set_generation
-import qmla.construct_models
+import qmla.model_building_utilities
 
 import qmla.shared_functionality.genetic_algorithm
 
@@ -73,7 +73,7 @@ class Genetic(
         self.prune_complete = True
         self.fitness_by_f_score = pd.DataFrame()
         self.fitness_df = pd.DataFrame()
-        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
+        self.num_sites = qmla.model_building_utilities.get_num_qubits(self.true_model)
         self.num_probes = 50
         self.max_num_qubits = 7
         self.hypothetical_final_generation  = False
@@ -448,14 +448,14 @@ class Genetic(
 
         true_set = set(
             self.latex_name(mod) for mod in
-            qmla.construct_models.get_constituent_names_from_name(target_model)
+            qmla.model_building_utilities.get_constituent_names_from_name(target_model)
         )
         terms = [
             self.latex_name(
                 term
             )
             for term in
-            qmla.construct_models.get_constituent_names_from_name(
+            qmla.model_building_utilities.get_constituent_names_from_name(
                 test_model
             )
         ]
@@ -1166,8 +1166,8 @@ class GeneticTest(
         **kwargs
     ):
         true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4'
-        self.true_model = qmla.construct_models.alph(true_model)
-        num_sites = qmla.construct_models.get_num_qubits(true_model)
+        self.true_model = qmla.model_building_utilities.alph(true_model)
+        num_sites = qmla.model_building_utilities.get_num_qubits(true_model)
         terms = []
         for i in range(1, 1 + num_sites):
             for j in range(i + 1, 1 + num_sites):
@@ -1216,7 +1216,7 @@ class GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms(
         **kwargs
     ):
         if num_sites is None: 
-            num_sites = qmla.construct_models.get_num_qubits(true_model)
+            num_sites = qmla.model_building_utilities.get_num_qubits(true_model)
         terms = []
         for i in range(1, 1 + num_sites):
             for j in range(i + 1, 1 + num_sites):

@@ -25,7 +25,7 @@ import random
 from scipy.linalg import expm
 
 import qmla.utilities
-import qmla.construct_models
+import qmla.model_building_utilities
 
 __all__ = [
     "separable_probe_dict", 
@@ -408,7 +408,7 @@ def eigenbasis_of_first_qubit(
     bases_to_learn = ['x', 'y', 'z']
     for N in range(1, max_num_qubits+1):
         bases = ['pauliSet_1_{}_d{}'.format(b, N) for b in bases_to_learn ]
-        base_matrices = [qmla.construct_models.compute(b) for b in bases]
+        base_matrices = [qmla.model_building_utilities.compute(b) for b in bases]
         eig_vectors_list = qmla.utilities.flatten([np.linalg.eig(b)[1] for b in base_matrices])
         eig_vectors = itertools.cycle(eig_vectors_list)
 

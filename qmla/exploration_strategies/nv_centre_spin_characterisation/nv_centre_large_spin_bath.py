@@ -5,7 +5,7 @@ from qmla.exploration_strategies.nv_centre_spin_characterisation import nv_centr
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.expectation_value_functions
 import qmla.shared_functionality.latex_model_names
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 class NVLargeSpinBath(
@@ -43,7 +43,7 @@ class NVLargeSpinBath(
             # self.true_model,
             'nv_spin_x_d2PPnv_spin_y_d2PPnv_spin_z_d2PPnv_interaction_x_d2PPnv_interaction_y_d2PPnv_interaction_z_d2'
         ]
-        self.num_qubits_current_model = qmla.construct_models.get_num_qubits(
+        self.num_qubits_current_model = qmla.model_building_utilities.get_num_qubits(
             self.initial_models[0]
         )
         self.qhl_models = [
@@ -155,10 +155,10 @@ class NVLargeSpinBath(
     ):
 
         max_num_qubits = max(
-            [construct_models.get_num_qubits(mod) for mod in model_list]
+            [model_building_utilities.get_num_qubits(mod) for mod in model_list]
         )       
         new_gali_model = gali_model_nv_centre_spin(max_num_qubits + 1)
-        self.num_qubits_current_model = qmla.construct_models.get_num_qubits(
+        self.num_qubits_current_model = qmla.model_building_utilities.get_num_qubits(
             new_gali_model
         )
         return [new_gali_model]

@@ -7,7 +7,7 @@ from qmla.exploration_strategies.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
 from qmla.shared_functionality import topology_predefined
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 __all__ = [
@@ -82,7 +82,7 @@ class FermiHubbardLatticeSet(
         # TODO plot probe dict with meaningful probes wrt FH model 
         self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
 
-        self.num_sites_true = construct_models.get_num_qubits(self.true_model)
+        self.num_sites_true = model_building_utilities.get_num_qubits(self.true_model)
         self.num_qubits_true = 2*self.num_sites_true # FH uses 2 qubits per sites (up and down spin) 
         self.num_probes = 25
 
@@ -131,7 +131,7 @@ class FermiHubbardLatticeSet(
             individual_operators.append(onsite_sum)
 
         complete_model = '+'.join(individual_operators)
-        complete_model = qmla.construct_models.alph(complete_model)
+        complete_model = qmla.model_building_utilities.alph(complete_model)
         return complete_model
 
 

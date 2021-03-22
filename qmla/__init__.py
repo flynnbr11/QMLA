@@ -5,7 +5,7 @@ from qmla.quantum_model_learning_agent import *
 
 # Logistics
 from qmla.get_exploration_strategy import *
-from qmla.construct_models import *  # TODO fix __all__
+from qmla.model_building_utilities import *  # TODO fix __all__
 from qmla.controls_qmla import *
 from qmla.logging import *
 from qmla.redis_settings import *

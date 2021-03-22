@@ -306,7 +306,7 @@ def n_qubit_hahn_evolution(
     """
 
     import numpy as np
-    import qmla.construct_models
+    import qmla.model_building_utilities
     from scipy import linalg
     num_qubits = int(np.log2(np.shape(ham)[0]))
 

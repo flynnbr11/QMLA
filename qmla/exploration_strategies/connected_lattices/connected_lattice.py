@@ -7,7 +7,7 @@ from qmla.exploration_strategies import exploration_strategy
 import qmla.shared_functionality.topology
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
-from qmla import construct_models
+from qmla import model_building_utilities
 
 __all__ = [
     'ConnectedLattice'
@@ -43,7 +43,7 @@ class ConnectedLattice(
         self.max_param = 1.0
 
         self.true_model = 'pauliSet_xJx_1J2_d2PPpauliSet_yJy_1J2_d2'
-        self.true_model = construct_models.alph(self.true_model)
+        self.true_model = model_building_utilities.alph(self.true_model)
         self.qhl_models = [self.true_model]
         self.base_terms = [
             'x',
@@ -88,7 +88,7 @@ class ConnectedLattice(
         )
         self.initially_connected_sites = self.topology.get_connected_site_list()
 
-        self.true_model = construct_models.alph(self.true_model)
+        self.true_model = model_building_utilities.alph(self.true_model)
         self.model_fitness = {}
         self.models_rejected = {
             self.generation_DAG: []
@@ -181,7 +181,7 @@ class ConnectedLattice(
                 )
 
         new_models = [
-            construct_models.alph(mod)
+            model_building_utilities.alph(mod)
             for mod in new_models
             # Final check whether this model is allowed
             if self.check_model_validity(mod)
@@ -194,7 +194,7 @@ class ConnectedLattice(
                 latex_model_name = self.latex_name(model)
                 branch_id = (
                     self.generation_DAG
-                    + len(construct_models.get_constituent_names_from_name(model))
+                    + len(model_building_utilities.get_constituent_names_from_name(model))
                 )
                 self.model_branches[latex_model_name] = branch_id
 
@@ -260,7 +260,7 @@ class ConnectedLattice(
             models_by_parent[mod_id] = 0
             mod_name = self.match_dimension(
                 mod_name, self.topology.num_sites())
-            present_terms = construct_models.get_constituent_names_from_name(mod_name)
+            present_terms = model_building_utilities.get_constituent_names_from_name(mod_name)
             terms_to_add = list(
                 set(available_terms)
                 - set(present_terms)
@@ -346,8 +346,8 @@ class ConnectedLattice(
         **kwargs
     ):
         # print("[latex name fnc] name:", name)
-        core_operators = list(sorted(construct_models.core_operator_dict.keys()))
-        num_sites = construct_models.get_num_qubits(name)
+        core_operators = list(sorted(model_building_utilities.core_operator_dict.keys()))
+        num_sites = model_building_utilities.get_num_qubits(name)
         try:
             p_str = 'P' * num_sites
             separate_terms = name.split(p_str)
@@ -583,7 +583,7 @@ def possible_pauli_combinations(base_terms, num_sites):
 
 
 def increase_dimension_pauli_set(initial_model, new_dimension=None):
-    individual_terms = construct_models.get_constituent_names_from_name(initial_model)
+    individual_terms = model_building_utilities.get_constituent_names_from_name(initial_model)
     separate_terms = []
 
     for model in individual_terms:

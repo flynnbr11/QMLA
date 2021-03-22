@@ -23,7 +23,7 @@ import qmla.redis_settings
 import qmla.logging
 import qmla.get_exploration_strategy
 import qmla.shared_functionality.prior_distributions
-import qmla.construct_models
+import qmla.model_building_utilities
 import qmla.analysis
 import qmla.utilities
 
@@ -179,15 +179,13 @@ class ModelInstanceForLearning():
 
         # Get initial configuration for this model
         self.model_constructor = self.exploration_class.model_constructor(name = model_name)
-        op = qmla.construct_models.BaseModel(name=model_name)
-        self.model_terms_names = op.terms_names
+        self.model_terms_names = self.model_constructor.terms_names
         self.model_name_latex = self.exploration_class.latex_name(
             name=self.model_name
         )
-        self.model_terms_matrices = np.asarray(op.terms_matrices)
+        self.model_terms_matrices = np.asarray(self.model_constructor.terms_matrices)
         self.num_parameters = len(self.model_terms_matrices)
-        self.model_dimension = qmla.construct_models.get_num_qubits(
-            self.model_name)
+        self.model_dimension = self.model_constructor.num_qubits
         self.log_print(["Getting num qubits"])
         self.model_num_qubits = int(np.log2(np.shape(self.model_terms_matrices[0])[0]))
         self.log_print(["model num qubits:", self.model_num_qubits])
@@ -218,7 +216,6 @@ class ModelInstanceForLearning():
         self.qinfer_model = self.exploration_class.get_qinfer_model(
             model_name=self.model_name,
             model_constructor=self.model_constructor, 
-            # oplist=self.model_terms_matrices,
             true_oplist=self.true_model_constituent_operators,
             true_model_constructor=self.true_model_constructor,
             num_probes=self.probe_number,
@@ -1504,7 +1501,6 @@ class ModelInstanceForLearning():
 
         times = self.experimental_measurement_times
         self.log_print(["Getting expectation values for times:", times])
-        # model_num_qubits = qmla.construct_models.get_num_qubits(self.model_name)
         if self.model_num_qubits > 5:
             # TODO compute U=e^{-iH} once then it doesn't really matter how many times computed here
             times = times[::10] # reduce times to compute 
@@ -1597,12 +1593,8 @@ class ModelInstanceForLearning():
 
         if self.exploration_class.reallocate_resources:
             base_resources = qmla_core_info_dict['base_resources']
-            this_model_num_qubits = qmla.construct_models.get_num_qubits(
-                self.model_name)
-            this_model_num_terms = len(
-                qmla.construct_models.get_constituent_names_from_name(
-                    self.model_name)
-            )
+            this_model_num_qubits = self.model_dimension
+            this_model_num_terms = self.model_constructor.num_terms
             max_num_params = self.exploration_class.max_num_parameter_estimate
 
             new_resources = qmla.utilities.resource_allocation(
@@ -1648,9 +1640,7 @@ class ModelInstanceForLearning():
             '.png'
         )
 
-        individual_terms_in_name = qmla.construct_models.get_constituent_names_from_name(
-            self.model_name
-        )
+        individual_terms_in_name = self.model_constructor.terms_names
         latex_terms = []
         for term in individual_terms_in_name:
             lt = self.exploration_class.latex_name(

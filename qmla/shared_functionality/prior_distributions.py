@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 import qmla.logging
 
 __all__ = [
@@ -68,7 +68,7 @@ def gaussian_prior(
         log_file,
         log_identifier
     )
-    individual_terms = construct_models.get_constituent_names_from_name(
+    individual_terms = model_building_utilities.get_constituent_names_from_name(
         model_name
     )
     num_terms = len(individual_terms)
@@ -118,7 +118,7 @@ def uniform_prior(
     **kwargs
 ):
 
-    individual_terms = construct_models.get_constituent_names_from_name(
+    individual_terms = model_building_utilities.get_constituent_names_from_name(
         model_name
     )
     num_terms = len(individual_terms)
@@ -144,7 +144,7 @@ def prelearned_true_parameters_prior(
     **kwargs
 ):
 
-    individual_terms = qmla.construct_models.get_constituent_names_from_name(
+    individual_terms = qmla.model_building_utilities.get_constituent_names_from_name(
         model_name
     )
     num_terms = len(individual_terms)

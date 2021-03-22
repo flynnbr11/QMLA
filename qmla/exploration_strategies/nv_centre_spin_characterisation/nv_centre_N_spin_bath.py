@@ -6,7 +6,7 @@ import itertools
 from qmla.exploration_strategies.exploration_strategy import ExplorationStrategy
 import qmla.shared_functionality.experiment_design_heuristics
 import qmla.utilities
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 __all__ = [
@@ -162,7 +162,7 @@ class NVCentreNQubitBath(
         self.true_model = '+'.join(
             (self.true_model_terms_params.keys())
         )
-        self.true_model = qmla.construct_models.alph(self.true_model)
+        self.true_model = qmla.model_building_utilities.alph(self.true_model)
         self.availalbe_pauli_terms  = ['x', 'y', 'z']
 
         self.max_time_to_consider = 100e-6
@@ -211,7 +211,7 @@ class NVCentreNQubitBath(
 
         ]
         self.initial_models = [
-            qmla.construct_models.alph(m) for m in self.initial_models
+            qmla.model_building_utilities.alph(m) for m in self.initial_models
         ]
         self.tree_completed_initially = True
         if self.tree_completed_initially:
@@ -309,7 +309,7 @@ class NVCentreNQubitBath(
         self.log_print(["Designed new models:", new_models])
 
         new_models = [
-            qmla.utilities.ensure_consisten_num_qubits_pauli_set(
+            qmla.utilities.ensure_consistent_num_qubits_pauli_set(
                 model
             ) for model in new_models
         ]
@@ -331,7 +331,7 @@ class NVCentreNQubitBath(
     def generate_models(self, model_list, **kwargs):
         try:
             top_model = model_list[0]
-            num_qubits = qmla.construct_models.get_num_qubits(top_model)
+            num_qubits = qmla.model_building_utilities.get_num_qubits(top_model)
         except:
             top_model = None
             num_qubits = 1
@@ -461,6 +461,6 @@ def secular_approximation(num_qubits):
         available_terms.extend(rotation_terms)
 
     secular_approx = '+'.join(available_terms)
-    secular_approx = qmla.construct_models.alph(secular_approx)
+    secular_approx = qmla.model_building_utilities.alph(secular_approx)
     return secular_approx
 

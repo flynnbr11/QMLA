@@ -5,7 +5,7 @@ import os
 
 from qmla.exploration_strategies import exploration_strategy
 import qmla.shared_functionality.probe_set_generation
-from qmla import construct_models
+from qmla import model_building_utilities
 
 class Lindbladian(
     exploration_strategy.ExplorationStrategy

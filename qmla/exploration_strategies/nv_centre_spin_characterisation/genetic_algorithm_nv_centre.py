@@ -15,7 +15,7 @@ from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
 import qmla.shared_functionality.expectation_value_functions
-import qmla.construct_models
+import qmla.model_building_utilities
 
 
 class NVCentreSimulatedShortDynamicsGenticAlgorithm(
@@ -30,7 +30,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         # Fundamental set up
         if true_model is None:
             true_model = 'xTi+yTi+zTi+zTz'
-        true_model = qmla.construct_models.alph(true_model)
+        true_model = qmla.model_building_utilities.alph(true_model)
         available_terms = [
             'xTi', 'yTi', 'zTi', 
             'xTx', 'yTy', 'zTz',
@@ -60,7 +60,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = False
-        self.num_sites = qmla.construct_models.get_num_qubits(self.true_model)
+        self.num_sites = qmla.model_building_utilities.get_num_qubits(self.true_model)
         self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.n_qubit_hahn_evolution
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
 
@@ -77,7 +77,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         #     'xTi+yTi+zTi+xTx+yTy+zTz+xTy+xTz+yTz', 
         # ]
         self.initial_models = [ 
-            qmla.construct_models.alph(m) for m in self.initial_models
+            qmla.model_building_utilities.alph(m) for m in self.initial_models
         ]
         self.max_spawn_depth = 14
 

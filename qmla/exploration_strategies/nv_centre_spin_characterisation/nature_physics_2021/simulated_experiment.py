@@ -9,7 +9,7 @@ import qmla.shared_functionality.qinfer_model_interface
 import qmla.shared_functionality.probe_set_generation
 import  qmla.shared_functionality.experiment_design_heuristics
 import qmla.shared_functionality.expectation_value_functions
-from qmla import construct_models
+from qmla import model_building_utilities
 
 
 __all__ = [

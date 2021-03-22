@@ -19,7 +19,7 @@ try:
 except:
     from qmla.shared_functionality.latex_figure import LatexFigure
 
-import qmla.construct_models
+import qmla.model_building_utilities
 
 from qmla.exploration_strategies.genetic_algorithms import Genetic
 
@@ -33,8 +33,8 @@ class DemoGeneticAlgorithm(
         **kwargs
     ):
         true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4'
-        self.true_model = qmla.construct_models.alph(true_model)
-        num_sites = qmla.construct_models.get_num_qubits(true_model)
+        self.true_model = qmla.model_building_utilities.alph(true_model)
+        num_sites = qmla.model_building_utilities.get_num_qubits(true_model)
         terms = []
         for i in range(1, 1 + num_sites):
             for j in range(i + 1, 1 + num_sites):
@@ -80,7 +80,7 @@ class ParamSweepGeneticAlgorithm(
     ):
         
         # Generate terms for all possible connections between sites
-        # num_sites = qmla.construct_models.get_num_qubits(true_model)
+        # num_sites = qmla.model_building_utilities.get_num_qubits(true_model)
         terms = []
         for i in range(1, 1 + num_sites):
             for j in range(i + 1, 1 + num_sites):
@@ -95,7 +95,7 @@ class ParamSweepGeneticAlgorithm(
         # true_model = 'pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4'
         random_subset_of_terms = np.random.choice(np.array(terms), int(len(terms)/2))
         true_model = "+".join(random_subset_of_terms)
-        self.true_model = qmla.construct_models.alph(true_model)
+        self.true_model = qmla.model_building_utilities.alph(true_model)
 
         super().__init__(
             exploration_rules = exploration_rules,
