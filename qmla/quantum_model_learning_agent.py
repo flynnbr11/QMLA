@@ -1590,7 +1590,6 @@ class QuantumModelLearningAgent():
             model_storage_instance = qmla.model_for_storage.ModelInstanceForStorage(
                 model_name=model_name,
                 model_id=int(model_id),
-                # model_terms_matrices=op.terms_matrices,
                 true_oplist=self.true_model_constituent_operators,
                 true_model_terms_params=self.true_param_list,
                 qid=self.qmla_id,

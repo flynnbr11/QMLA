@@ -104,7 +104,7 @@ class ControlsQMLA():
 
         # Attributes about true model
         self.true_model_constructor = self.exploration_class.model_constructor(
-            self.exploration_class.true_model,
+            name = self.exploration_class.true_model,
             fixed_parameters = self.exploration_class.true_params_list
         )
         self.true_model = self.true_model_constructor.name

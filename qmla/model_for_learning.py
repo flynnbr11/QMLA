@@ -268,7 +268,7 @@ class ModelInstanceForLearning():
 
         self.prior_marginal = [
             self.qinfer_updater.posterior_marginal(idx_param=i)
-            for i in range(self.qinfer_model.n_modelparams)
+            for i in range(self.model_constructor.num_terms)
         ]
 
     def _initialise_tracking_infrastructure(
@@ -354,7 +354,7 @@ class ModelInstanceForLearning():
 
             # Design exeriment
             new_experiment = self.model_heuristic(
-                num_params=len(self.model_terms_names),
+                num_params=self.model_constructor.num_terms,
                 epoch_id=update_step,
                 current_params=self.track_param_means[-1],
                 current_volume=self.volume_by_epoch[-1]
@@ -418,7 +418,6 @@ class ModelInstanceForLearning():
             if (
                 self.exploration_class.terminate_learning_at_volume_convergence
                 and volume_by_epoch[-1] < self.exploration_class.volume_convergence_threshold
-
             ):  # can be reinstated to stop learning when volume converges
                 self._finalise_learning()
                 break
@@ -549,7 +548,7 @@ class ModelInstanceForLearning():
         self.model_log_total_likelihood = self.qinfer_updater.log_total_likelihood
         self.posterior_marginal = [
             self.qinfer_updater.posterior_marginal(idx_param=i)
-            for i in range(self.qinfer_model.n_modelparams)
+            for i in range(self.model_constructor.num_terms)
         ]
         self.track_param_means = np.array(self.track_param_means)
         self.track_param_uncertainties = np.array(
@@ -560,7 +559,7 @@ class ModelInstanceForLearning():
         cov_mat = self.qinfer_updater.est_covariance_mtx()
         est_params = self.qinfer_updater.est_mean()
         self.log_print(["model_terms_names:", self.model_terms_names])
-        for i in range(self.qinfer_model.n_modelparams):
+        for i in range(self.model_constructor.num_terms):
             # Store learned parameters
             # TODO get rid of uses of final_learned_params, use
             # qhl_final_param_estimates instead
@@ -574,7 +573,7 @@ class ModelInstanceForLearning():
             self.qhl_final_param_uncertainties[term] = np.sqrt(cov_mat[i][i])
             self.log_print([
                 "Final parameters estimates and uncertainties (term {}): {} +/- {}".format(
-                    self.model_terms_names[i],
+                    term,
                     self.qhl_final_param_estimates[term],
                     self.qhl_final_param_uncertainties[term]
                 )
@@ -1033,10 +1032,10 @@ class ModelInstanceForLearning():
         )
         bf_posterior_marginal = [
             bf_posterior_updater.posterior_marginal(idx_param=i)
-            for i in range(self.qinfer_model.n_modelparams)
+            for i in range(self.model_constructor.num_terms)
         ]
 
-        num_terms = self.qinfer_model.n_modelparams
+        num_terms = self.model_constructor.num_terms
         lf = LatexFigure(auto_gridspec=num_terms)
 
         for param_idx in range(num_terms):
@@ -1405,7 +1404,7 @@ class ModelInstanceForLearning():
         )
         selected_cmap = plt.cm.Paired
 
-        n_param = self.qinfer_model.n_modelparams
+        n_param = self.model_constructor.num_terms
         nrows = ncols = n_param
         gs = GridSpec(
             nrows + 1, ncols,

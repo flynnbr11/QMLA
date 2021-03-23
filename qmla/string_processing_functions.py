@@ -73,7 +73,6 @@ def full_model_string(operations):
     for i in range(num_qubits - 1):
         p_str += 'P'
 
-    # full_model = p_str.join(all_terms)
     full_model = '+'.join(all_terms)
     full_model = alph(full_model)
     return full_model
@@ -146,6 +145,7 @@ def process_multipauli_term(term):
     # b is operator on site k
     # N is total number of sites
     # e.g. pauliSet_xJy_1J3_d4
+    print("PROCESSING MULTIPAULI")
 
     components = term.split('_')
     components.remove('pauliSet')

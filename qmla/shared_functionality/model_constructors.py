@@ -8,11 +8,9 @@ from qmla.model_building_utilities import \
     core_operator_dict, get_num_qubits, alph, \
     get_constituent_names_from_name,  \
     unique_model_pair_identifier, compute
+from qmla.process_string_to_matrix import process_basic_operator
+from qmla.string_processing_functions import process_multipauli_term
 import qmla.logging
-
-__all__ = [
-    'BaseModel',
-]
 
 ##########
 # Section: BaseModel object
@@ -20,7 +18,7 @@ __all__ = [
 
 class BaseModel():
     r"""
-    Operator objects for Hamiltonian models.
+    BaseModel objects for Hamiltonian models.
 
     Translates a model name (string) into:
         * terms_names: strings specifying constituents
@@ -41,10 +39,15 @@ class BaseModel():
         self, 
         name,
         fixed_parameters=None, 
+        **kwargs
     ):
         self.name = alph(name)
-        self.latex_name_method = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.fixed_parameters = fixed_parameters
+        print("BASE MODEL fixed_parameters : ", fixed_parameters)
+
+        # Modular functionality
+        self.latex_name_method = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        self.basic_string_processer = process_multipauli_term        
             
     @property
     def terms_names(self):
@@ -53,6 +56,11 @@ class BaseModel():
         """
 
         return get_constituent_names_from_name(self.name)
+
+    @property
+    def parameters_names(self):
+        # in general may not be the same
+        return self.terms_names
 
     @property
     def num_qubits(self):
@@ -66,10 +74,16 @@ class BaseModel():
         """
         List of matrices of constituents.
         """
-        ops = []
-        for i in self.terms_names:
-            ops.append(compute(i))
-        return ops
+
+        operators = [
+            self.model_specific_basic_operator(term)
+            for term in self.terms_names
+        ]
+        return operators
+    
+    @property
+    def num_parameters(self):
+        return len(self.parameters_names)
 
     @property
     def num_terms(self):
@@ -121,6 +135,11 @@ class BaseModel():
 
     def construct_matrix(self, parameters):
         r""" 
+        Enables custom logic to compute a matrix based on a list of parameters.
+
+        For instance, QInfer-generated particles are passed as an ordered list
+        for use within the likelihood function. 
+    
         Default: 
             sum(p[i] * operators[i])
         """
@@ -131,3 +150,18 @@ class BaseModel():
         )
         return mtx 
 
+    def model_specific_basic_operator(self, term):
+        # process a basic term in the formalism of this model
+        
+        # return process_basic_operator(term)
+        return self.basic_string_processer(term)
+
+class SharedParametersModel(BaseModel):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def 
+
+
+
+        
