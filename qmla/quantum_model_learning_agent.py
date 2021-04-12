@@ -171,11 +171,12 @@ class QuantumModelLearningAgent():
         self.true_model_dimension = self.true_model_constructor.num_qubits
         self.true_model_constituent_operators = self.true_model_constructor.terms_matrices
         self.true_model_num_params = self.true_model_constructor.num_terms
-        self.true_model_constituent_terms_latex = [
-            self.exploration_class.latex_name(term)
-            for term in
-            self.true_model_constructor.terms_names
-        ]
+        # self.true_model_constituent_terms_latex = [
+        #     self.exploration_class.latex_name(term)
+        #     for term in
+        #     self.true_model_constructor.terms_names
+        # ]
+        self.true_model_constituent_terms_latex = self.true_model_constructor.terms_names_latex
         self.true_param_list = self.exploration_class.true_params_list
         self.true_param_dict = self.exploration_class.true_params_dict
 
@@ -1604,6 +1605,7 @@ class QuantumModelLearningAgent():
             f_score = np.round(self.compute_model_f_score(
                 model_id=model_id,
                 model_name=model_name,
+                model_constructor=model_constructor,
                 exploration_class=exploration_tree.exploration_class
             ), 2)
             terms = qmla.model_building_utilities.get_constituent_names_from_name(model_name)
@@ -1611,14 +1613,14 @@ class QuantumModelLearningAgent():
             running_db_new_row = pd.Series({
                 'model_id': int(model_id),
                 'model_name': model_name,
-                'latex_name': exploration_tree.exploration_class.latex_name(model_name),
+                'latex_name': model_constructor.name_latex,
                 'branch_id': int(branch_id),
                 'f_score': f_score,
                 'model_storage_instance': model_storage_instance,
                 'branches_present_on' : [int(branch_id)], 
                 'model_constructor' : model_constructor, 
                 'terms' : terms,
-                'latex_terms' : [exploration_tree.exploration_class.latex_name(t) for t in terms] # need to get latex name by the ES which spawned this model
+                'latex_terms' : model_constructor.terms_names_latex
             })
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
@@ -2663,6 +2665,7 @@ class QuantumModelLearningAgent():
         self,
         model_id,
         model_name=None,
+        model_constructor=None,
         exploration_class=None,
         beta=1  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
@@ -2678,19 +2681,22 @@ class QuantumModelLearningAgent():
         # TODO set precision, f-score etc as model instance attributes and
         # return those in champion_results
         true_set = self.exploration_class.true_model_terms
+        self.log_print(["Getting F score for model {}".format(model_id)])
         if exploration_class is None:
-            exploration_class = self.get_model_storage_instance_by_id(
-                model_id).exploration_class
             model_name = self.model_name_id_map[model_id]
-        terms = [
-            exploration_class.latex_name(
-                term
-            )
-            for term in
-            model_building_utilities.get_constituent_names_from_name(
-                model_name
-            )
-        ]
+            stored_model = self.get_model_storage_instance_by_id(
+                model_id)
+            exploration_class = stored_model.exploration_class
+        # terms = [
+        #     exploration_class.latex_name(
+        #         term
+        #     )
+        #     for term in
+        #     model_building_utilities.get_constituent_names_from_name(
+        #         model_name
+        #     )
+        # ]
+        terms = model_constructor.terms_names_latex
         learned_set = set(sorted(terms))
 
         total_positives = len(true_set)

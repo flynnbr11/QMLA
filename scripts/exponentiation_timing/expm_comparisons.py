@@ -40,9 +40,6 @@ for i in range(num_iterations):
     ])
 
     t = np.random.uniform(0,100)
-
-
-
     start_expm = time.time()
     u = expm(-1j*model*t)
     t_expm += time.time() - start_expm

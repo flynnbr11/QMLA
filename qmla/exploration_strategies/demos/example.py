@@ -4,7 +4,7 @@ import sys
 import os
 
 from qmla.exploration_strategies import exploration_strategy
-from qmla.shared_functionality.model_constructors import RepeatedTermModel
+from qmla.shared_functionality.model_constructors import SharedParametersModel
 
 class TestES(
     exploration_strategy.ExplorationStrategy
@@ -22,7 +22,7 @@ class TestES(
             true_model=self.true_model,
             **kwargs
         )
-        self.model_constructor = RepeatedTermModel
+        self.model_constructor = SharedParametersModel
 
         self.initial_models = None
         self.true_model_terms_params = {

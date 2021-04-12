@@ -4,6 +4,9 @@ from qmla import model_building_utilities
 import qmla.string_processing_functions
 import qmla.logging
 
+# TODO significant refactoring so process_basic_operator is not a bottleneck
+# construct matrices through BaseModel.model_specific_basic_operator()
+
 __all__ = [
     'string_processing_functions',
     'process_basic_operator'
@@ -50,7 +53,7 @@ def process_basic_operator(basic_operator):
     :param str basic_operator: term to generate matrix from.
     :return np.ndarray mtx: matrix corresponding to the input term.
     """
-    print("CALLING process_basic_operator")
+    print("CALLING process_basic_operator on ", basic_operator)
 
     indicator = basic_operator.split('_')[0]
     if indicator in string_processing_functions:

@@ -7,6 +7,7 @@ from qmla.exploration_strategies.lattice_sets import fixed_lattice_set
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
 from qmla.shared_functionality import topology_predefined
+import qmla.shared_functionality.model_constructors
 from qmla import model_building_utilities
 
 
@@ -29,7 +30,8 @@ class FermiHubbardLatticeSet(
             exploration_rules=exploration_rules,
             # true_model = self.true_model,
             **kwargs
-        )        
+        )
+        self.model_constructor = qmla.shared_functionality.model_constructors.FermilibModel
 
         self._lattice_names = [
             '_2_site_chain', 

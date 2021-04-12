@@ -180,6 +180,7 @@ def process_likewise_pauli_sum(term):
     returned as a single matrix
 
     """
+    print("process_likewise_pauli_sum on ", term)
     components = term.split('_')
     components.remove('pauliLikewise')
 

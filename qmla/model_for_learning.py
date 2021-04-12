@@ -180,9 +180,10 @@ class ModelInstanceForLearning():
         # Get initial configuration for this model
         self.model_constructor = self.exploration_class.model_constructor(name = model_name)
         self.model_terms_names = self.model_constructor.terms_names
-        self.model_name_latex = self.exploration_class.latex_name(
-            name=self.model_name
-        )
+        # self.model_name_latex = self.exploration_class.latex_name(
+        #     name=self.model_name
+        # )
+        self.model_name_latex = self.model_constructor.name_latex
         self.model_terms_matrices = np.asarray(self.model_constructor.terms_matrices)
         self.num_parameters = len(self.model_terms_matrices)
         self.model_dimension = self.model_constructor.num_qubits
@@ -1095,7 +1096,8 @@ class ModelInstanceForLearning():
             # ax.semilogx()
             # ax.semilogy()
             # ax.minorticks_off()
-            latex_name = self.exploration_class.latex_name(term)
+            # latex_name = self.exploration_class.latex_name(term)
+            latex_name = self.model_constructor.latex_name_method(term)
             self.log_print(["Latex name:", latex_name])
             ax.set_title(r"{}".format(latex_name))
 
@@ -1203,7 +1205,8 @@ class ModelInstanceForLearning():
                 ax.axhline(true_param, color='red', ls='--', label='True')
 
             try:
-                term_latex = self.exploration_class.latex_name(term)
+                # term_latex = self.exploration_class.latex_name(term)
+                term_latex = self.model_constructor.latex_name_method(term)
                 ax.set_title(term_latex)
                 # ax.set_ylabel(term_latex)
             except BaseException:
@@ -1446,12 +1449,14 @@ class ModelInstanceForLearning():
                 x_term = self.qinfer_model.modelparam_names[j]
                 if ax.is_first_col():
                     ax.set_ylabel(
-                        self.exploration_class.latex_name(y_term),
+                        # self.exploration_class.latex_name(y_term),
+                        self.model_constructor.latex_name_method(y_term),
                         rotation=0
                     )
                 if ax.is_first_row():
                     ax.set_title(
-                        self.exploration_class.latex_name(x_term)
+                        # self.exploration_class.latex_name(x_term)
+                        self.model_constructor.latex_name_method(x_term)
                     )
                 if (i, j) in pairs_of_params:
                     ax.contourf(
@@ -1642,9 +1647,10 @@ class ModelInstanceForLearning():
         individual_terms_in_name = self.model_constructor.terms_names
         latex_terms = []
         for term in individual_terms_in_name:
-            lt = self.exploration_class.latex_name(
-                name=term
-            )
+            # lt = self.exploration_class.latex_name(
+            #     name=term
+            # )
+            lt = self.model_constructor.latex_name_method(term)
             latex_terms.append(lt)
 
         try:

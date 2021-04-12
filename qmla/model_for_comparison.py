@@ -169,7 +169,8 @@ class ModelInstanceForComparison():
             qmla_id = self.qmla_id,
         )
         self.model_constructor = self.exploration_class.model_constructor(name = model_name)
-        self.model_name_latex = self.exploration_class.latex_name(self.model_name)
+        self.model_name_latex = self.model_constructor.name_latex
+        # self.model_name_latex = self.exploration_class.latex_name(self.model_name)
 
         # New instances of model and updater used by QInfer
         self.log_print(["Getting QInfer model"])

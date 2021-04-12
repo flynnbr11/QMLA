@@ -5,6 +5,7 @@ import os
 import pandas as pd
 
 from qmla.exploration_strategies import exploration_strategy
+import qmla.shared_functionality.model_constructors
 import qmla.shared_functionality.probe_set_generation
 import qmla.shared_functionality.latex_model_names
 from qmla import model_building_utilities
@@ -42,7 +43,7 @@ class LatticeSet(
             true_model=true_model,
             **kwargs
         )
-
+        self.model_constructor = qmla.shared_functionality.model_constructors.PauliLikewiseModel
         self.tree_completed_initially = True # fixed lattice set considered
         self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_grouped_pauli
         self.initial_models = None # so that QMLA will call generate_models first

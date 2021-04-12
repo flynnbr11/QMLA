@@ -229,12 +229,14 @@ class ModelInstanceForStorage():
         self.log_print([
             "Getting latex name from constructor:", self.model_constructor.name_latex
         ])
-        self.model_name_latex = self.exploration_class.latex_name(
-            name=self.model_name
-        )
+        # self.model_name_latex = self.exploration_class.latex_name(
+        #     name=self.model_name
+        # )
+        self.model_name_latex = self.model_constructor.name_latex
         model_constituent_terms = self.model_constructor.terms_names
         self.constituents_terms_latex = [
-            self.exploration_class.latex_name(term)
+            # self.exploration_class.latex_name(term)
+            self.model_constructor.latex_name_method(term)
             for term in model_constituent_terms
         ]
         self.track_parameter_estimates = self.track_param_estimate_v_epoch

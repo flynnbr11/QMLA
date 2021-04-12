@@ -17,6 +17,7 @@ from qmla.process_string_to_matrix import *
 from qmla.model_for_comparison import *
 from qmla.model_for_learning import *
 from qmla.model_for_storage import *
+from qmla.model_building_utilities import *
 
 # Learning/comparisons
 from qmla.remote_bayes_factor import *

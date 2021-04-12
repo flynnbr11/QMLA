@@ -8,17 +8,15 @@ from qmla.model_building_utilities import \
     core_operator_dict, get_num_qubits, alph, \
     get_constituent_names_from_name,  \
     unique_model_pair_identifier, compute
-from qmla.shared_functionality import latex_model_names
 from qmla.process_string_to_matrix import process_basic_operator
-from qmla.string_processing_functions import \
-    process_multipauli_term, process_likewise_pauli_sum, process_fermi_hubbard_term
+from qmla.string_processing_functions import process_multipauli_term
 import qmla.logging
 
 ##########
 # Section: BaseModel object
 ##########
 
-class BaseModel():
+class Operator():
     r"""
     BaseModel objects for Hamiltonian models.
 
@@ -58,10 +56,6 @@ class BaseModel():
         """
 
         return get_constituent_names_from_name(self.name)
-    
-    @property
-    def terms_names_latex(self):
-        return [self.latex_name_method(t) for t in self.terms_names]
 
     @property
     def parameters_names(self):
@@ -158,34 +152,8 @@ class BaseModel():
 
     def model_specific_basic_operator(self, term):
         # process a basic term in the formalism of this model
-        # this can use a prebuilt fnc, or build one from scratch without relying on compute() etc. 
-        # if using a prebuilt, set self.basic_string_processer
         
+        # return process_basic_operator(term)
         return self.basic_string_processer(term)
-
-class PauliLikewiseModel(BaseModel):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.basic_string_processer = process_likewise_pauli_sum
-    
-class FermilibModel(BaseModel):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.basic_string_processer = process_fermi_hubbard_term
-        self.latex_name_method = latex_model_names.lattice_set_fermi_hubbard
-    
-    @property
-    def num_qubits(self):
-        """
-        Number of qubits this operator acts on.
-        """
-        return 2*get_num_qubits(self.name)
-
-
-class SharedParametersModel(BaseModel):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-
 
         
