@@ -145,7 +145,7 @@ class ExplorationStrategy():
         self.prior_distribution_subroutine = qmla.shared_functionality.prior_distributions.gaussian_prior
 
         # Map model name strings to latex representation
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
 
 
     def _setup_true_model(self):
@@ -537,8 +537,9 @@ class ExplorationStrategy():
                 self.true_params_dict = true_params_info['params_dict']
                 self.true_params_list = true_params_info['params_list']
                 self.log_print(["true_params_info:", true_params_info])
-            except:
-                self.log_print(["failed to generate params for unique instance"])
+            except Exception as e:
+                self.log_print(["failed to generate params for unique instance. Error:\n", e])
+                raise
 
         self.log_print([
             "True params dict:", self.true_params_dict
@@ -561,9 +562,10 @@ class ExplorationStrategy():
         )
         terms = true_model_constructor.terms_names
         latex_terms = [
-            self.latex_name(name=term) for term in terms
+            true_model_constructor.latex_name_method(name=term) 
+            for term in terms
         ]
-        true_model_latex = self.latex_name(
+        true_model_latex = true_model_constructor.latex_name_method(
             name=true_model,
         )
         num_terms = len(terms)
@@ -1068,7 +1070,8 @@ class ExplorationStrategy():
         :param str name: name of model to map.
         :return str latex_name: representation of input model as LaTeX string. 
         """
-        latex_name = self.latex_string_map_subroutine(name, **kwargs)
+        # latex_name = self.latex_string_map_subroutine(name, **kwargs)
+        latex_name = self.true_model_constructor.latex_name_method(name, **kwargs)
         return latex_name
 
     # Assign branch to model for visual representation of ES as tree

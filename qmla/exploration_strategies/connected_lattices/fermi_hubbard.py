@@ -31,7 +31,7 @@ class FermiHubbardBase(
         self.initial_models = [
             self.true_model
         ]
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.fermi_hubbard_latex
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.fermi_hubbard_latex
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.separable_fermi_hubbard_half_filled
         # unless specifically different set of probes required
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine

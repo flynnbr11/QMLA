@@ -91,7 +91,7 @@ class FermiHubbardLatticeSet(
         self.max_time_to_consider = 25
         self.max_num_qubits = 8
         self.max_num_probe_qubits = self.max_num_qubits
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_fermi_hubbard
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_fermi_hubbard
         # self.timing_insurance_factor = 0.8
         self.min_param = 0.25
         self.max_param = 0.75

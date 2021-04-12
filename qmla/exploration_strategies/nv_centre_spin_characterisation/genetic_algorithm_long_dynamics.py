@@ -60,7 +60,7 @@ class NVCentreSimulatedLongDynamicsGenticAlgorithm(
         self._set_true_params() # again in case over written by parent __init__
 
         # Modular functions
-        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
+        # # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
         self.shared_probes = True

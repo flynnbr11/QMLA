@@ -50,7 +50,7 @@ class ExperimentNVCentreNQubits(
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.VolumeAdaptiveParticleGuessHeuristic
         self.qinfer_model_subroutine =  qmla.shared_functionality.qinfer_model_interface.QInferNVCentreExperiment
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.max_time_to_consider = 4.24
 
         # Tree

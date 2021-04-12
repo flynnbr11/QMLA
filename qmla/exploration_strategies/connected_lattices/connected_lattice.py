@@ -52,7 +52,7 @@ class ConnectedLattice(
         ]
 
         # fitness calculation parameters. fitness calculation inherited.
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.num_top_models_to_build_on = 2
         self.model_generation_strictness = 0  # 1 #-1
         self.fitness_win_ratio_exponent = 3

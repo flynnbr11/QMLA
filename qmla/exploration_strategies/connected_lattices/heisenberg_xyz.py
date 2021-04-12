@@ -237,7 +237,7 @@ class HeisenbergSharedField(
             self.initial_models.append(self.true_model)
         self.qhl_models = self.initial_models
         self.tree_completed_initially = True
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.grouped_pauli_terms
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.grouped_pauli_terms
         self.num_processes_to_parallelise_over = len(self.initial_models)
         # self.setup_exploration_class()
 

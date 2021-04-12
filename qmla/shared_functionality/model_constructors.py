@@ -167,6 +167,7 @@ class PauliLikewiseModel(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.basic_string_processer = process_likewise_pauli_sum
+        self.latex_name_method = latex_model_names.lattice_set_grouped_pauli
     
 class FermilibModel(BaseModel):
     def __init__(self, **kwargs):

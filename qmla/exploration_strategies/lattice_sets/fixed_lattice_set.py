@@ -45,7 +45,7 @@ class LatticeSet(
         )
         self.model_constructor = qmla.shared_functionality.model_constructors.PauliLikewiseModel
         self.tree_completed_initially = True # fixed lattice set considered
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_grouped_pauli
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.lattice_set_grouped_pauli
         self.initial_models = None # so that QMLA will call generate_models first
         self.max_time_to_consider = 45
         self.check_champion_reducibility = False

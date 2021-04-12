@@ -55,7 +55,7 @@ class NVCentreSimulatedShortDynamicsGenticAlgorithm(
         self.max_param = 10
 
         # Modular functions
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.nv_centre_SAT
         self.expectation_value_subroutine = qmla.shared_functionality.n_qubit_hahn_evolution_double_time_reverse
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_plus_with_phase_difference
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine

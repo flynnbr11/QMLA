@@ -125,7 +125,7 @@ class SimulatedNVCentre(
         self.track_quadratic_loss = True
         # self.expectation_value_subroutine = qmla.shared_functionality.expectation_value_functions.default_expectation_value
         self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MultiParticleGuessHeuristic
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
         # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampleOrderMagnitude
         # self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.SampledUncertaintyWithConvergenceThreshold

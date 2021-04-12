@@ -27,7 +27,7 @@ class NVCentreRevivalsSimulated(
         # self.plot_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.plus_probes_dict
         self.system_probes_generation_subroutine = qmla.shared_functionality.probe_set_generation.tomographic_basis
         self.simulator_probes_generation_subroutine = self.system_probes_generation_subroutine
-        self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        # self.latex_string_map_subroutine = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
         self.shared_probes = False
         self.probe_noise_level = 0 
         
