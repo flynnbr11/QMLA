@@ -163,6 +163,11 @@ class BaseModel():
         
         return self.basic_string_processer(term)
 
+    def model_prior(self):
+        # TODO move prior definition here and all calls to get_prior go via exploration_strategy
+        # to pick up means/widths, then through here 
+        return
+
 class PauliLikewiseModel(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -187,6 +192,29 @@ class SharedParametersModel(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def construct_matrix(self, parameters):
+        r""" 
+        combine terms in matrix, e.g. 
+        a * (t0 + t1) + b *t2
+        """
+        print("Constucting model. parameters={}".format(parameters))
+        print("params have type {}".format(type(parameters)))
+        try:
+            mtx = parameters[0] * (self.terms_matrices[0] + self.terms_matrices[1])
+            mtx += parameters[1] * self.terms_matrices[2]
+        except:
+            print("can't construct mtx from parameters = {} and terms \n {}".format(parameters, self.terms_matrices))
+            raise
+        return mtx
 
+    @property
+    def num_parameters(self):
+        return len(self.parameters_names) - 1
 
-        
+    @property 
+    def terms_names_latex(self):
+        return [r"$\alpha$", r"$\beta$"]
+
+    def model_prior(self):
+        # TODO restructure where prior gets called, so it produces fewer parameters here than the name 
+        return

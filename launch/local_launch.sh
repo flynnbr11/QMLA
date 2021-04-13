@@ -15,7 +15,7 @@ plot_level=1
 # Choose an exploration strategy 
 # This will determine how QMLA proceeds. 
 ##### -------------------------------------------------- #####
-exploration_strategy="HeisenbergReducedLatticeSet"
+exploration_strategy="ExampleSharedParamModel"
 
 
 ##### -------------------------------------------------- #####

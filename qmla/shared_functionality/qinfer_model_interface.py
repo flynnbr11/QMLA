@@ -369,16 +369,17 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         )  # internal QInfer book-kepping
 
         # process expparams
-        times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
         probe_id = expparams['probe_id'][0]
-        expparams_sampled_particle = np.array(
-            [expparams.item(0)[2:]]) # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS               
-        self.log_print_debug([
-            "expparams_sampled_particle:", expparams_sampled_particle
-        ])
-        self.ham_from_expparams = self.model_constructor.construct_matrix(
-            expparams_sampled_particle
-        )
+        times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
+        if self.iqle_mode:
+            expparams_sampled_particle = np.array(
+                [expparams.item(0)[2:]]) # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS               
+            self.log_print_debug([
+                "expparams_sampled_particle:", expparams_sampled_particle
+            ])
+            self.ham_from_expparams = self.model_constructor.construct_matrix(
+                expparams_sampled_particle
+            )
 
         num_particles = modelparams.shape[0]
         num_parameters = modelparams.shape[1]
@@ -446,7 +447,7 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             '\nparticles:', modelparams[:3],
             "\nPr0: ", pr0[:3], 
             "\nLikelihood: ", likelihood_array[0][:3],
-            "\nexpparams_sampled_particle:", expparams_sampled_particle
+            # "\nexpparams_sampled_particle:", expparams_sampled_particle
         ])
         self.timings[timing_marker]['likelihood'] += time.time() - t_likelihood_start
 
@@ -509,11 +510,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
             # TODO use different fnc for IQLE
             hamiltonian -= self.ham_from_expparams
 
-        if np.any(np.isnan(hamiltonian)):
-            self.log_print([
-                "NaN detected in Hamiltonian. Ham from expparams:", 
-                self.ham_from_expparams
-            ])
+            if np.any(np.isnan(hamiltonian)):
+                self.log_print([
+                    "NaN detected in Hamiltonian. Ham from expparams:", 
+                    self.ham_from_expparams
+                ])
 
         # compute likelihoods
         probabilities = []
