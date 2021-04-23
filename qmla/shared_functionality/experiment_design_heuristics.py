@@ -371,7 +371,6 @@ class MultiParticleGuessHeuristic(ExperimentDesignHueristic):
             p = particle[0][i]            
             corresponding_expparam = self._model.modelparam_names[i]
             eps[corresponding_expparam] = p
-
         return eps
 
 class MixedMultiParticleLinspaceHeuristic(ExperimentDesignHueristic):

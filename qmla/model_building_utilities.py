@@ -42,6 +42,14 @@ core_operator_dict = {
     's': np.array([  # Subtract
         [0 + 0.j, 0 + 0.j],
         [1 + 0.j, 0 + 0.j]
+    ]),
+    'b': np.array([  # Subtract
+        [1 + 0.j, 0 + 0.j],
+        [0 + 0.j, 0 + 0.j]
+    ]),
+    'd': np.array([  # Subtract
+        [0 + 0.j, 0 + 0.j],
+        [0 + 0.j, 1 + 0.j]
     ])
 }
 

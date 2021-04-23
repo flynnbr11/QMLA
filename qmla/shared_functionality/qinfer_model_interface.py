@@ -367,7 +367,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         super(QInferModelQMLA, self).likelihood(
             outcomes, modelparams, expparams
         )  # internal QInfer book-kepping
-
         # process expparams
         probe_id = expparams['probe_id'][0]
         times = expparams['t'] # times to compute likelihood for. typicall only per experiment. 
@@ -419,7 +418,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 probe_id,
                 self.model_constructor.num_qubits
             ]
-
             pr0 = self.get_simulator_pr0_array(
                 times=times,
                 particles=modelparams,
@@ -555,7 +553,6 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         
         :returns np.ndarray pr0: probabilities of measuring specified outcome
         """
-       
         num_particles = len(particles)
         pr0 = np.empty([num_particles, len(times)])
 

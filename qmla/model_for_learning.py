@@ -185,7 +185,7 @@ class ModelInstanceForLearning():
         # )
         self.model_name_latex = self.model_constructor.name_latex
         self.model_terms_matrices = np.asarray(self.model_constructor.terms_matrices)
-        self.num_parameters = len(self.model_terms_matrices)
+        self.num_parameters = self.model_constructor.num_parameters
         self.model_dimension = self.model_constructor.num_qubits
         self.log_print(["Getting num qubits"])
         self.model_num_qubits = int(np.log2(np.shape(self.model_terms_matrices[0])[0]))
@@ -291,7 +291,7 @@ class ModelInstanceForLearning():
         self.final_learned_params = np.empty(
             # TODO remove final_leared_params and references to it,
             # use dictionaries defined here instead.
-            [len(self.model_terms_matrices), 2])
+            [self.num_parameters, 2])
         self.qhl_final_param_estimates = {}
         self.qhl_final_param_uncertainties = {}
 
@@ -355,7 +355,7 @@ class ModelInstanceForLearning():
 
             # Design exeriment
             new_experiment = self.model_heuristic(
-                num_params=self.model_constructor.num_terms,
+                num_params=self.model_constructor.num_parameters,
                 epoch_id=update_step,
                 current_params=self.track_param_means[-1],
                 current_volume=self.volume_by_epoch[-1]
@@ -375,8 +375,8 @@ class ModelInstanceForLearning():
                 new_experiment,
                 repeat=1
             )
-            self.log_print_debug(["Datum:", datum_from_experiment])
-
+            self.log_print(["Datum:", datum_from_experiment])
+            self.log_print(["Exp:", new_experiment])
             # Call updater to update distribution based on datum
             try:
                 update_start = time.time()
@@ -558,9 +558,11 @@ class ModelInstanceForLearning():
         self.track_param_uncertainty_v_epoch = {}
 
         cov_mat = self.qinfer_updater.est_covariance_mtx()
+        
         est_params = self.qinfer_updater.est_mean()
         self.log_print(["model_terms_names:", self.model_terms_names])
         for i in range(self.model_constructor.num_terms):
+            
             # Store learned parameters
             # TODO get rid of uses of final_learned_params, use
             # qhl_final_param_estimates instead
@@ -1144,7 +1146,6 @@ class ModelInstanceForLearning():
 
         terms = self.track_param_estimate_v_epoch.keys()
         num_terms = len(terms)
-
         extra_plots = [
             'volume', 
             # 'quad_loss',  'residuals', 'likelihoods'
@@ -1214,7 +1215,6 @@ class ModelInstanceForLearning():
                 raise
             # ax.set_ylabel('Parameter')
             ax.set_xlabel('Epoch')
-
             if ax.row == 0 and ax.col == lf.gridspec_layout[1]-1:
                 ax.legend(
                     bbox_to_anchor=(1.1, 1.1)

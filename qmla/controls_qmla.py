@@ -68,6 +68,7 @@ class ControlsQMLA():
         except BaseException:
             raise
         self.exploration_class.get_true_parameters() # either retrieve or assign true parameters
+        
         self.log_print([
             "ES set by controls has ID {} has true model {}".format(
                 arguments.qmla_id, self.exploration_class.true_model)
@@ -100,6 +101,7 @@ class ControlsQMLA():
                     arguments.run_info_file,
                     'rb'
                 )
+                
             )
 
         # Attributes about true model

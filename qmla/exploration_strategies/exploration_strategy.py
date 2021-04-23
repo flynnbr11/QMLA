@@ -4,6 +4,7 @@ import os
 import pickle
 import numpy as np
 import itertools
+import qinfer 
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -499,7 +500,7 @@ class ExplorationStrategy():
 
     def get_true_parameters(
         self,
-    ):  
+    ): 
         r"""
         Retrieve parameters of the true model and use them to construct the true Hamiltonian. 
 
@@ -512,8 +513,7 @@ class ExplorationStrategy():
         :class:`~qmla.QuantumModelLearningAgent` instance and its subsidiary models and methods. 
         It then uses the true parameters to construct ``true_hamiltonian`` for the ES.   
 
-        """      
-
+        """     
         # get true data from pickled file, or generate fresh
         self.log_print([
             "Getting true parameters. QMLA {} with true_model {}".format(
@@ -551,8 +551,9 @@ class ExplorationStrategy():
         )
         self.true_hamiltonian = self.true_model_constructor.fixed_matrix
 
-    def generate_true_parameters(self):
 
+    def generate_true_parameters(self):         
+        print(self)
         # Dissect true model into separate terms.
         true_model = self.true_model
         true_model_constructor = self.model_constructor(
@@ -593,14 +594,17 @@ class ExplorationStrategy():
                 # if this term is set in exploration strategy true_model_terms_params,
                 # use that value
                 true_param = self.true_model_terms_params[term]
+                true_model_terms_params.append(true_param)
+                true_params_dict[terms[i]] = true_param
+                true_params_dict_latex_names[latex_terms[i]] = true_param
             except BaseException:
                 # otherwise, use value sampled from true prior
                 true_param = sampled_list[0][i]
+                true_model_terms_params.append(true_param)
+                true_params_dict[terms[i]] = true_param
+                true_params_dict_latex_names[latex_terms[i]] = true_param
+            
 
-            true_model_terms_params.append(true_param)
-            true_params_dict[terms[i]] = true_param
-            true_params_dict_latex_names[latex_terms[i]] = true_param
-        
         true_param_info = {
             'true_model' : true_model,
             'params_list' : true_model_terms_params, 
@@ -933,15 +937,82 @@ class ExplorationStrategy():
             distribution for learning model parameters. 
         """
 
-        self.prior = self.prior_distribution_subroutine(
-            model_name=model_name,
-            prior_specific_terms=self.gaussian_prior_means_and_widths,
-            param_minimum=self.min_param,
-            param_maximum=self.max_param,
-            random_mean=self.prior_random_mean,
-            **kwargs
+        
+        return self.gaussian_prior(model_name,**kwargs)
+
+    def gaussian_prior(
+    self,
+    model_name,
+    default_sigma=None,
+    **kwargs
+    ):
+        """
+        Genearates a QInfer Gaussian distribution .
+
+        Given a model_name, deteremines the number of terms in the model, N.
+        Generates a multivariate distribution with N dimensions. 
+        This is then used as the initial prior, which QHL uses to learn the 
+        model parameters. 
+        By default, each parameter's mean is the average of param_min and param_max, 
+        with sigma = mean/4. This can be changed by specifying prior_specific_terms: 
+            individual parameter's means/sigmas can be given. 
+
+        :param str model_name: Unique string representing a model.
+        :param float param_minimum: Lower bound for distribution.
+        :param float param_maximum: Upper bound for distribution.
+        :param float default_sigma: Width of distribution desired. If None, 
+            defaults to 0.25 * (param_max - param_min).
+        :param dict prior_specific_terms: Individual parameter mean and sigma
+            to enforce in the distribution. 
+        :param str log_file: Path of the log file for logging errors.
+        :param str log_identifier: Unique identifying sting for logging.
+        :return QInfer.Distribution dist: distribution to be used as prior for parameter learning 
+            of the named model.
+        """
+        prior_specific_terms=self.gaussian_prior_means_and_widths
+        param_minimum=self.min_param
+        param_maximum=self.max_param
+        random_mean=self.prior_random_mean
+        constructor = self.model_constructor(name = model_name)
+        self.log_print(
+            [
+                "Getting prior for model:", model_name,
+                "Specific terms:", prior_specific_terms,
+            ]
         )
-        return self.prior
+        individual_terms = constructor.parameters_names
+        num_terms = len(individual_terms)
+        available_specific_terms = list(prior_specific_terms.keys())
+        means = []
+        sigmas = []
+        default_mean = np.mean([param_minimum, param_maximum])
+        # TODO reconsider how default sigma is generated
+        # default_sigma = default_mean/2 # TODO is this safe?
+        if default_sigma is None:
+            default_sigma = (param_maximum - param_minimum) / 4
+        for term in individual_terms:
+            if term in available_specific_terms:
+                means.append(prior_specific_terms[term][0])
+                sigmas.append(prior_specific_terms[term][1])
+            else:
+                if random_mean:
+                    rand_mean = random.uniform(
+                        param_minimum,
+                        param_maximum
+                    )
+                    means.append(rand_mean)
+                else:
+                    means.append(default_mean)
+                sigmas.append(default_sigma)
+
+        means = np.array(means)
+        sigmas = np.array(sigmas)
+        cov_mtx = np.diag(sigmas**2)
+        dist = qinfer.MultivariateNormalDistribution(
+            means,
+            cov_mtx
+        )
+        return dist
 
     # Generate evaluation data
     def generate_evaluation_data(

@@ -130,7 +130,6 @@ def uniform_prior(
     return dist
 
 
-
 def prelearned_true_parameters_prior(
     model_name, 
     true_parameters, 
