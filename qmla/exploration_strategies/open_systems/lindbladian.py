@@ -67,7 +67,7 @@ def liouvillian_evolve_expectation(
             #log_file=log_file, log_identifier=log_identifier
         )
         raise
-       
+
     N = int(np.sqrt(len(state)))
    
     rho1 = np.zeros((N,N),complex)
@@ -94,11 +94,14 @@ def liouvillian_evolve_expectation(
         print('rho2 is bad rho2,rho2,ham,t: ', rho2, rho1, ham, t)
            
     #Population -- Operator
-    op = tensor_expansion(np.identity(int(np.log2(len(rho2)))), np.array([[0,1],[1,0]]))
-    expectation_value_Op = 0.5*(1+np.trace(np.dot(rho2,op)))
+    #op = tensor_expansion(np.identity(int(np.log2(len(rho2)))), np.array([[1,0],[0,-1]]))
+    #expectation_value_op = 0.5*(1+np.trace(np.dot(rho2,op)))
+    #Fidelity -- Between p(0) and p(t)
+    expectation_value_fid = np.square(np.trace(linalg.sqrtm(np.dot(linalg.sqrtm(rho2),np.dot(rho1,linalg.sqrtm(rho2))))))
+    #Trace Distance -- Between p(0) and p(t)
+    #expectation_value_dist = 0.5*(np.trace(linalg.sqrtm(np.square(rho1-rho2))))
     #Expectation Value Choice
-    expectation_value = expectation_value_Op
-
+    expectation_value = expectation_value_fid
     return expectation_value
 
 def plot_probe(
@@ -110,8 +113,10 @@ def plot_probe(
         for i in range(num_probes):
             for l in range(1, 1 + max_num_qubits):
                 vector_size = np.zeros(l**2)
-                vector_size[0] = 1
+                vector_size[-1] = 1
+
                 probe_dict[(i,l)] = vector_size
+        
         return probe_dict
 
 def random_qubit():
@@ -197,15 +202,15 @@ class Lindbladian(
             exploration_rules=exploration_rules,
             **kwargs
         )
-        self.model_heuristic_function = qmla.shared_functionality.experiment_design_heuristics.MixedMultiParticleLinspaceHeuristic
+        #self.model_heuristic_subroutine = qmla.shared_functionality.experiment_design_heuristics.FixedNineEighthsToPowerK
         self.model_constructor = qmla.shared_functionality.model_constructors.LiouvillianModel
-        self.true_model = 'HamLiouvillian_lx_1_d1+DissLiouvillian_2A_lz_1_~_2B_ls_1_d1+DissLiouvillian_1A_lx_1_d1'
-        self.initial_models = ['HamLiouvillian_lx_1_d1+DissLiouvillian_2A_lz_1_~_2B_ls_1_d1+DissLiouvillian_1A_lx_1_d1']
+        self.true_model = 'HamLiouvillian_lx_1_d1+DissLiouvillian_1A_lz_1_~_1B_ls_1_d1+DissLiouvillian_2A_lx_1_d1'
+        self.initial_models = ['HamLiouvillian_lx_1_d1+DissLiouvillian_1A_lz_1_~_1B_ls_1_d1+DissLiouvillian_2A_lx_1_d1']
         self.true_model_terms_params = {
-            'HamLiouvillian_lx_1_d1' : 1.66672309902311377,
-            'DissLiouvillian_1A_lx_1': 0.93478825511939002,      
-            'DissLiouvillian_2B_ls_1': 0.31421356237309503,
-            'DissLiouvillian_2A_lz_1': 0.22778364789912003
+            'HamLiouvillian_lx_1_d1' : 0.66672309902311377,
+            'DissLiouvillian_1A_lz_1': 0.12332223344316784,
+            'DissLiouvillian_1B_ls_1': 0.03458255527192342,
+            'DissLiouvillian_2A_lx_1': 0.25234093640910046     
         }
         #self.gaussian_prior_means_and_widths = {
         #    'HamLiouvillian_lx_1_d1' : (0.3,1),
