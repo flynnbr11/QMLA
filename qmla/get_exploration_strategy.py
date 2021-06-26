@@ -3,18 +3,13 @@ import inspect
 
 import qmla.exploration_strategies as ES
 
-__all__ = [
-    'exploration_classes',
-    'get_exploration_class'
-]
+__all__ = ["exploration_classes", "get_exploration_class"]
 
 # Get a dict of all the available exploration strategies
 exploration_classes = dict(inspect.getmembers(ES, inspect.isclass))
 
-def get_exploration_class(
-    exploration_rules,
-    **kwargs
-):
+
+def get_exploration_class(exploration_rules, **kwargs):
     r"""
     Get an instance of the class specified by the user which implements an exploration Strategy.
 
@@ -34,13 +29,10 @@ def get_exploration_class(
 
     try:
         gr = exploration_classes[exploration_rules](
-            exploration_rules=exploration_rules,
-            **kwargs
+            exploration_rules=exploration_rules, **kwargs
         )
     except BaseException:
-        print(
-            "Cannot find exploration strategy in available rules:",
-            exploration_rules)
+        print("Cannot find exploration strategy in available rules:", exploration_rules)
         raise
 
     return gr

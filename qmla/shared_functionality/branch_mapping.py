@@ -11,13 +11,14 @@ import numpy as np
 
 import qmla.model_building_utilities
 
+
 def branch_is_num_params(latex_mapping_file, **kwargs):
     r"""
-    Number of parameters in the models correspond to branch. 
+    Number of parameters in the models correspond to branch.
 
     :param str latex_mapping_file: path to file containing
-        tuples of model strings and their corresponding 
-        latex representations, for all models considered in the run. 
+        tuples of model strings and their corresponding
+        latex representations, for all models considered in the run.
     """
 
     with open(latex_mapping_file) as f:
@@ -39,7 +40,9 @@ def branch_is_num_params(latex_mapping_file, **kwargs):
     model_branches = {}
 
     for mod in model_names:
-        num_params = len(qmla.model_building_utilities.get_constituent_names_from_name(mod))
+        num_params = len(
+            qmla.model_building_utilities.get_constituent_names_from_name(mod)
+        )
         num_params_by_mod[mod] = num_params
         latex_name = latex_name_map[mod]
         model_branches[latex_name] = num_params
@@ -74,10 +77,7 @@ def branch_is_num_dims(latex_mapping_file, **kwargs):
     return model_branches
 
 
-def branch_is_num_params_and_qubits(
-    latex_mapping_file,
-    **kwargs
-):
+def branch_is_num_params_and_qubits(latex_mapping_file, **kwargs):
     with open(latex_mapping_file) as f:
         content = f.readlines()
     # remove whitespace characters like `\n` at the end of each line
@@ -109,10 +109,7 @@ def branch_is_num_params_and_qubits(
     return model_branches
 
 
-def branch_computed_from_qubit_and_param_count(
-    latex_mapping_file,
-    **kwargs
-):
+def branch_computed_from_qubit_and_param_count(latex_mapping_file, **kwargs):
     with open(latex_mapping_file) as f:
         content = f.readlines()
     # remove whitespace characters like `\n` at the end of each line
@@ -144,10 +141,11 @@ def branch_computed_from_qubit_and_param_count(
         base_branch = highest_branch
         models = models_by_num_qubits[num_qubits]
         for model in models:
-            num_params = len(qmla.model_building_utilities.get_constituent_names_from_name(model))
+            num_params = len(
+                qmla.model_building_utilities.get_constituent_names_from_name(model)
+            )
             branch_idx = base_branch + num_params
             if branch_idx > highest_branch:
                 highest_branch = branch_idx
             model_branches[model] = branch_idx
     return model_branches
-

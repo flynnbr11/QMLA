@@ -4,10 +4,14 @@ import numpy as np
 import copy
 import pandas as pd
 
-from qmla.model_building_utilities import \
-    core_operator_dict, get_num_qubits, alph, \
-    get_constituent_names_from_name,  \
-    unique_model_pair_identifier, compute
+from qmla.model_building_utilities import (
+    core_operator_dict,
+    get_num_qubits,
+    alph,
+    get_constituent_names_from_name,
+    unique_model_pair_identifier,
+    compute,
+)
 from qmla.process_string_to_matrix import process_basic_operator
 from qmla.string_processing_functions import process_multipauli_term
 import qmla.logging
@@ -16,7 +20,8 @@ import qmla.logging
 # Section: BaseModel object
 ##########
 
-class Operator():
+
+class Operator:
     r"""
     BaseModel objects for Hamiltonian models.
 
@@ -35,20 +40,17 @@ class Operator():
 
     """
 
-    def __init__(
-        self, 
-        name,
-        fixed_parameters=None, 
-        **kwargs
-    ):
+    def __init__(self, name, fixed_parameters=None, **kwargs):
         self.name = alph(name)
         self.fixed_parameters = fixed_parameters
         print("BASE MODEL fixed_parameters : ", fixed_parameters)
 
         # Modular functionality
-        self.latex_name_method = qmla.shared_functionality.latex_model_names.pauli_set_latex_name
-        self.basic_string_processer = process_multipauli_term        
-            
+        self.latex_name_method = (
+            qmla.shared_functionality.latex_model_names.pauli_set_latex_name
+        )
+        self.basic_string_processer = process_multipauli_term
+
     @property
     def terms_names(self):
         """
@@ -76,11 +78,10 @@ class Operator():
         """
 
         operators = [
-            self.model_specific_basic_operator(term)
-            for term in self.terms_names
+            self.model_specific_basic_operator(term) for term in self.terms_names
         ]
         return operators
-    
+
     @property
     def num_parameters(self):
         return len(self.parameters_names)
@@ -127,33 +128,25 @@ class Operator():
     def fixed_matrix(self):
         # TODO does this need to be a property?
         if self.fixed_parameters is not None:
-            return self.construct_matrix(
-                self.fixed_parameters
-            )
+            return self.construct_matrix(self.fixed_parameters)
         else:
             return None
 
     def construct_matrix(self, parameters):
-        r""" 
+        r"""
         Enables custom logic to compute a matrix based on a list of parameters.
 
         For instance, QInfer-generated particles are passed as an ordered list
-        for use within the likelihood function. 
-    
-        Default: 
+        for use within the likelihood function.
+
+        Default:
             sum(p[i] * operators[i])
         """
-        mtx = np.tensordot(
-            np.array(parameters), 
-            np.array(self.terms_matrices), 
-            axes=1
-        )
-        return mtx 
+        mtx = np.tensordot(np.array(parameters), np.array(self.terms_matrices), axes=1)
+        return mtx
 
     def model_specific_basic_operator(self, term):
         # process a basic term in the formalism of this model
-        
+
         # return process_basic_operator(term)
         return self.basic_string_processer(term)
-
-        

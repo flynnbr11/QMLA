@@ -23,5 +23,5 @@ from qmla.model_building_utilities import *
 from qmla.remote_bayes_factor import *
 from qmla.remote_model_learning import *
 
-# Results loader 
+# Results loader
 from qmla.load_results import load_results

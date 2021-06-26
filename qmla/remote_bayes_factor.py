@@ -21,13 +21,10 @@ import qmla.redis_settings as rds
 import redis
 
 pickle.HIGHEST_PROTOCOL = 4
-plt.switch_backend('agg')
+plt.switch_backend("agg")
 
 
-__all__ = [
-    'remote_bayes_factor_calculation',
-    'plot_dynamics_from_models'
-]
+__all__ = ["remote_bayes_factor_calculation", "plot_dynamics_from_models"]
 
 
 def remote_bayes_factor_calculation(
@@ -36,13 +33,13 @@ def remote_bayes_factor_calculation(
     branch_id=None,
     # num_times_to_use='all', # TODO remove
     bf_data_folder=None,
-    times_record='BayesFactorsTimes.txt',
+    times_record="BayesFactorsTimes.txt",
     check_db=False,
     bayes_threshold=1,
-    host_name='localhost',
+    host_name="localhost",
     port_number=6379,
     qid=0,
-    log_file='rq_output.log'
+    log_file="rq_output.log",
 ):
     r"""
     Standalone function to compute Bayes factors.
@@ -91,45 +88,54 @@ def remote_bayes_factor_calculation(
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=log_file,
-            log_identifier='BF ({}/{})'.format(int(model_a_id), int(model_b_id))
+            log_identifier="BF ({}/{})".format(int(model_a_id), int(model_b_id)),
         )
+
     log_print(["BF start on branch", branch_id])
-    num_redis_retries = 5 # TODO this is a hideous hack to get around redis database temporary failures
+    num_redis_retries = (
+        5  # TODO this is a hideous hack to get around redis database temporary failures
+    )
     time_start = time.time()
 
     # Access databases
     for k in range(num_redis_retries):
         try:
             redis_databases = rds.get_redis_databases_by_qmla_id(
-                host_name, port_number, qid)
-            qmla_core_info_database = redis_databases['qmla_core_info_database']
-            learned_models_info_db = redis_databases['learned_models_info_db']
-            learned_models_ids = redis_databases['learned_models_ids']
-            bayes_factors_db = redis_databases['bayes_factors_db']
-            bayes_factors_winners_db = redis_databases['bayes_factors_winners_db']
-            active_branches_learning_models = redis_databases['active_branches_learning_models']
-            active_branches_bayes = redis_databases['active_branches_bayes']
-            active_interbranch_bayes = redis_databases['active_interbranch_bayes']
-            any_job_failed_db = redis_databases['any_job_failed']
+                host_name, port_number, qid
+            )
+            qmla_core_info_database = redis_databases["qmla_core_info_database"]
+            learned_models_info_db = redis_databases["learned_models_info_db"]
+            learned_models_ids = redis_databases["learned_models_ids"]
+            bayes_factors_db = redis_databases["bayes_factors_db"]
+            bayes_factors_winners_db = redis_databases["bayes_factors_winners_db"]
+            active_branches_learning_models = redis_databases[
+                "active_branches_learning_models"
+            ]
+            active_branches_bayes = redis_databases["active_branches_bayes"]
+            active_interbranch_bayes = redis_databases["active_interbranch_bayes"]
+            any_job_failed_db = redis_databases["any_job_failed"]
 
             # Retrieve data from databases
             qmla_core_info_dict = pickle.loads(
-                redis_databases['qmla_core_info_database']['qmla_settings'])
+                redis_databases["qmla_core_info_database"]["qmla_settings"]
+            )
             break
         except Exception as e:
-            if k == num_redis_retries-1:
-                log_print([
-                    "BF Failed (branch {}) to retrieve redis databases. Error: {}".format(
-                        branch_id, e
-                    )
-                ])
-                any_job_failed_db.set('Status', 1)
+            if k == num_redis_retries - 1:
+                log_print(
+                    [
+                        "BF Failed (branch {}) to retrieve redis databases. Error: {}".format(
+                            branch_id, e
+                        )
+                    ]
+                )
+                any_job_failed_db.set("Status", 1)
                 raise
 
     # Whether to build plots
     save_plots_of_posteriors = False
-    plot_level = qmla_core_info_dict['plot_level']
-    figure_format = qmla_core_info_dict['figure_format']
+    plot_level = qmla_core_info_dict["plot_level"]
+    figure_format = qmla_core_info_dict["figure_format"]
 
     # Get model instances
     for k in range(num_redis_retries):
@@ -137,18 +143,22 @@ def remote_bayes_factor_calculation(
             model_a = qmla.model_for_comparison.ModelInstanceForComparison(
                 model_id=model_a_id,
                 qid=qid,
-                opponent=model_b_id, 
+                opponent=model_b_id,
                 log_file=log_file,
                 host_name=host_name,
                 port_number=port_number,
             )
             break
         except Exception as e:
-            if k == num_redis_retries -1:
-                log_print([
-                    "BF Failed to instantiate model {}. Error: {}".format(model_a_id, e)
-                ])
-                any_job_failed_db.set('Status', 1)
+            if k == num_redis_retries - 1:
+                log_print(
+                    [
+                        "BF Failed to instantiate model {}. Error: {}".format(
+                            model_a_id, e
+                        )
+                    ]
+                )
+                any_job_failed_db.set("Status", 1)
                 raise
 
     for k in range(num_redis_retries):
@@ -156,23 +166,25 @@ def remote_bayes_factor_calculation(
             model_b = qmla.model_for_comparison.ModelInstanceForComparison(
                 model_id=model_b_id,
                 qid=qid,
-                opponent=model_a_id, 
+                opponent=model_a_id,
                 log_file=log_file,
                 host_name=host_name,
                 port_number=port_number,
             )
             break
         except Exception as e:
-            if k == num_redis_retries -1:
-                log_print([
-                    "BF Failed to instantiate model {}. Error: {}".format(model_b_id, e)
-                ])
-                any_job_failed_db.set('Status', 1)
+            if k == num_redis_retries - 1:
+                log_print(
+                    [
+                        "BF Failed to instantiate model {}. Error: {}".format(
+                            model_b_id, e
+                        )
+                    ]
+                )
+                any_job_failed_db.set("Status", 1)
                 raise
 
-    log_print([
-        "Both models instantiated on branch {}.".format(branch_id)
-    ])
+    log_print(["Both models instantiated on branch {}.".format(branch_id)])
 
     # Take a copy of each updater before updates (for plotting later)
     for k in range(num_redis_retries):
@@ -181,54 +193,53 @@ def remote_bayes_factor_calculation(
             updater_b_copy = copy.deepcopy(model_b.qinfer_updater)
             break
         except Exception as e:
-            if k == num_redis_retries-1:
-                log_print([
-                    "BF Failed to copy updaters. Error: {}".format(e)
-                ])
-                any_job_failed_db.set('Status', 1)
+            if k == num_redis_retries - 1:
+                log_print(["BF Failed to copy updaters. Error: {}".format(e)])
+                any_job_failed_db.set("Status", 1)
                 raise
-        
+
     # Update the models with the times trained by the other model.
     for k in range(num_redis_retries):
         try:
             log_l_a = model_a.update_log_likelihood(
-                new_times = model_b.times_learned_over,
-                new_experimental_params = model_b.track_experiment_parameters
+                new_times=model_b.times_learned_over,
+                new_experimental_params=model_b.track_experiment_parameters,
             )
             break
         except Exception as e:
             if k == num_redis_retries - 1:
-                log_print([
-                    "BF Failed to compute log likelihood for {}. Error: {}".format(
-                        model_a_id, e
-                    )
-                ])
-                any_job_failed_db.set('Status', 1)
+                log_print(
+                    [
+                        "BF Failed to compute log likelihood for {}. Error: {}".format(
+                            model_a_id, e
+                        )
+                    ]
+                )
+                any_job_failed_db.set("Status", 1)
                 raise
     for k in range(num_redis_retries):
         try:
             log_l_b = model_b.update_log_likelihood(
-                new_times = model_a.times_learned_over,
-                new_experimental_params = model_a.track_experiment_parameters
+                new_times=model_a.times_learned_over,
+                new_experimental_params=model_a.track_experiment_parameters,
             )
             break
         except Exception as e:
             if k == num_redis_retries - 1:
-                log_print([
-                    "BF Failed to compute log likelihood for {}. Error: {}".format(
-                        model_b_id, k
-                    )
-                ])
-                any_job_failed_db.set('Status', 1)
+                log_print(
+                    [
+                        "BF Failed to compute log likelihood for {}. Error: {}".format(
+                            model_b_id, k
+                        )
+                    ]
+                )
+                any_job_failed_db.set("Status", 1)
                 raise
 
-    bayes_factor = np.exp( log_l_a - log_l_b )
+    bayes_factor = np.exp(log_l_a - log_l_b)
 
     # Plot the posterior of the true model only
-    if (
-        save_plots_of_posteriors
-        and (model_a.is_true_model or model_b.is_true_model)
-    ):
+    if save_plots_of_posteriors and (model_a.is_true_model or model_b.is_true_model):
         if model_a.is_true_model:
             true_model = model_a
             updater_copy = updater_a_copy
@@ -241,7 +252,7 @@ def remote_bayes_factor_calculation(
                 model=true_model,
                 qmla_id=qid,
                 initial_updater_copy=updater_copy,
-                save_directory=bf_data_folder
+                save_directory=bf_data_folder,
             )
             log_print(["Plotting posterior marginal of true model succeeded."])
         except BaseException:
@@ -250,31 +261,26 @@ def remote_bayes_factor_calculation(
 
     # Plot dynamics on which models were compared
     if plot_level >= 4:
-        log_print([
-            "Plotting dynamics of models involved."
-        ])
+        log_print(["Plotting dynamics of models involved."])
         plot_dynamics_from_models(
-            models = [model_a, model_b], 
-            exp_msmts = qmla_core_info_dict['experimental_measurements'],
-            bayes_factor = bayes_factor,
-            bf_times = model_a.bf_times, # same as model_b.bf_times
+            models=[model_a, model_b],
+            exp_msmts=qmla_core_info_dict["experimental_measurements"],
+            bayes_factor=bayes_factor,
+            bf_times=model_a.bf_times,  # same as model_b.bf_times
             save_directory=bf_data_folder,
-            figure_format = figure_format
+            figure_format=figure_format,
         )
     else:
-        log_print([
-            "NOT Plotting dynamics of models involved."
-        ])
+        log_print(["NOT Plotting dynamics of models involved."])
 
     # Present result
-    log_print([
-        "BF computed on branch {}: A:{}; B:{}; log10 BF={}".format(
-            branch_id, 
-            model_a_id,
-            model_b_id,
-            np.round(np.log10(bayes_factor), 2)
-        )
-    ])
+    log_print(
+        [
+            "BF computed on branch {}: A:{}; B:{}; log10 BF={}".format(
+                branch_id, model_a_id, model_b_id, np.round(np.log10(bayes_factor), 2)
+            )
+        ]
+    )
     if bayes_factor < 1e-160:
         bayes_factor = 1e-160
     elif bayes_factor > 1e160:
@@ -293,34 +299,35 @@ def remote_bayes_factor_calculation(
                 bayes_factors_db.set(pair_id, (1.0 / bayes_factor))
             break
         except Exception as e:
-            if k == num_redis_retries-1:
-                log_print([
-                    "BF Failed to set bf on redis bf db. Error: ", e
-                ])
-                any_job_failed_db.set('Status', 1)
+            if k == num_redis_retries - 1:
+                log_print(["BF Failed to set bf on redis bf db. Error: ", e])
+                any_job_failed_db.set("Status", 1)
                 raise
 
     # Record winner if BF > threshold
     for k in range(num_redis_retries):
         try:
             if bayes_factor > bayes_threshold:
-                bayes_factors_winners_db.set(pair_id, 'a')
+                bayes_factors_winners_db.set(pair_id, "a")
             elif bayes_factor < (1.0 / bayes_threshold):
-                bayes_factors_winners_db.set(pair_id, 'b')
+                bayes_factors_winners_db.set(pair_id, "b")
             else:
                 log_print(["Neither model much better."])
-                log_print([
-                    "Renorm record A: \n {}".format(model_a.qinfer_updater._normalization_record),
-                    "\nRenorm record B: \n {}".format(model_b.qinfer_updater._normalization_record)
-
-                ])
+                log_print(
+                    [
+                        "Renorm record A: \n {}".format(
+                            model_a.qinfer_updater._normalization_record
+                        ),
+                        "\nRenorm record B: \n {}".format(
+                            model_b.qinfer_updater._normalization_record
+                        ),
+                    ]
+                )
             break
         except Exception as e:
-            if k == num_redis_retries-1:
-                log_print([
-                    "BF Failed to set bf on redis winner db. Error: ", e
-                ])
-                any_job_failed_db.set('Status', 1)
+            if k == num_redis_retries - 1:
+                log_print(["BF Failed to set bf on redis winner db. Error: ", e])
+                any_job_failed_db.set("Status", 1)
                 raise
 
     # Record this result to the branch
@@ -333,36 +340,32 @@ def remote_bayes_factor_calculation(
             break
         except Exception as e:
             if k == num_redis_retries - 1:
-                log_print([
-                    "BF Failed to compute log likelihoods. Error: ", e
-                ])
-                any_job_failed_db.set('Status', 1)
+                log_print(["BF Failed to compute log likelihoods. Error: ", e])
+                any_job_failed_db.set("Status", 1)
                 raise
 
-    log_print([
-        "BF finished on branch {}. rq time: {}".format(
-            branch_id, 
-            str(time.time() - time_start),
-        )
-    ])
+    log_print(
+        [
+            "BF finished on branch {}. rq time: {}".format(
+                branch_id,
+                str(time.time() - time_start),
+            )
+        ]
+    )
 
     del model_a, model_b
     return bayes_factor
+
 
 #########
 # Utilities
 #########
 
-def log_print(
-    to_print_list,
-    log_file,
-    log_identifier
-):
+
+def log_print(to_print_list, log_file, log_identifier):
     r"""Wrapper for :func:`~qmla.print_to_log`"""
     qmla.logging.print_to_log(
-        to_print_list=to_print_list,
-        log_file=log_file,
-        log_identifier=log_identifier
+        to_print_list=to_print_list, log_file=log_file, log_identifier=log_identifier
     )
 
 
@@ -370,19 +373,15 @@ def log_print(
 # Plotting
 #########
 
+
 def plot_dynamics_from_models(
-    models, 
-    exp_msmts, 
-    bf_times, 
-    bayes_factor, 
-    save_directory,
-    figure_format="png"
+    models, exp_msmts, bf_times, bayes_factor, save_directory, figure_format="png"
 ):
-    """Plot the dynamics of the pair of models considered in a Bayes factor comparison. 
+    """Plot the dynamics of the pair of models considered in a Bayes factor comparison.
 
     :param models: list of 2 models which were compared during this calculation, [model_a, model_b].
     :type models: :class:`~qmla.ModelInstanceForLearning`
-    :param exp_msmts: times and expectation values for the system. 
+    :param exp_msmts: times and expectation values for the system.
     :type exp_msmts: dict
     :param bf_times: Times used for the BF calculation
     :type bf_times: list
@@ -393,33 +392,22 @@ def plot_dynamics_from_models(
     """
 
     times = list(sorted(exp_msmts.keys()))
-    lf = LatexFigure(
-        fraction=0.45, 
-        auto_label=False
-    )
+    lf = LatexFigure(fraction=0.45, auto_label=False)
     ax1 = lf.new_axis()
     lines = []
 
     for model in models:
-        l = model.plot_dynamics(
-            ax = ax1, 
-            times = times
-        )
+        l = model.plot_dynamics(ax=ax1, times=times)
         lines.extend(l)
     ax1.set_xlim((min(times), max(times)))
 
     # Plot system measurements
     l = ax1.scatter(
-        times,
-        [exp_msmts[t] for t in times],
-        label=r"$Q$",
-        color='red',
-        alpha=0.6,
-        s=5
+        times, [exp_msmts[t] for t in times], label=r"$Q$", color="red", alpha=0.6, s=5
     )
     lines.append(l)
- 
-    # Overlay times 
+
+    # Overlay times
     try:
         # in background, show how often that time was considered
         ax2 = ax1.twinx()
@@ -429,15 +417,15 @@ def plot_dynamics_from_models(
             bins=num_times,
             # TODO put on separate plot to see when higher times compared on
             range=(min(times), max(times)),
-            histtype='stepfilled',
+            histtype="stepfilled",
             fill=False,
             label=r"$t$",
-            alpha=0.25
+            alpha=0.25,
         )
-        ax2.set_ylabel('Frequency')
+        ax2.set_ylabel("Frequency")
         max_freq = max(l[0])
-        ax2.set_ylim(0, 1.6*max_freq)
-        ax2.set_yticks([0, int(max_freq/2), max_freq])
+        ax2.set_ylim(0, 1.6 * max_freq)
+        ax2.set_yticks([0, int(max_freq / 2), max_freq])
 
         lines.append(l[-1][0])
     except BaseException:
@@ -448,22 +436,14 @@ def plot_dynamics_from_models(
     labels = [l.get_label() for l in lines]
     ax1.set_ylim(0, 1.6)
     ax1.set_yticks([0, 0.5, 1])
-    ax1.set_ylabel('Expectation Value')
+    ax1.set_ylabel("Expectation Value")
     ax1.set_xlabel("Time")
 
-    ax1.legend(
-        lines, 
-        labels, 
-        ncol=2,
-        loc = "upper center"
-    )
+    ax1.legend(lines, labels, ncol=2, loc="upper center")
 
     plot_path = os.path.join(
         save_directory,
-        'BF_{}_{}'.format(
-            str(models[0].model_id),
-            str(models[1].model_id)
-        )
+        "BF_{}_{}".format(str(models[0].model_id), str(models[1].model_id)),
     )
     # plt.savefig(plot_path)
     lf.save(plot_path, file_format=figure_format)
@@ -481,32 +461,19 @@ def plot_models_dynamics(
     save_directory=None,
 ):
     times = list(sorted(exp_msmts.keys()))
-    experimental_exp_vals = [
-        exp_msmts[t] for t in times
-    ]
+    experimental_exp_vals = [exp_msmts[t] for t in times]
     fig, ax1 = plt.subplots()
 
     # Plot true measurements
     ax1.scatter(
-        times,
-        experimental_exp_vals,
-        label='Exp data',
-        color='red',
-        alpha=0.6,
-        s=5
+        times, experimental_exp_vals, label="Exp data", color="red", alpha=0.6, s=5
     )
-    ax1.set_ylabel('Exp Val')
-    plot_probes = pickle.load(
-        open(plot_probes_path, 'rb')
-    )
+    ax1.set_ylabel("Exp Val")
+    plot_probes = pickle.load(open(plot_probes_path, "rb"))
 
     for mod in [model_a, model_b]:
         final_params = mod.qinfer_updater.est_mean()
-        final_ham = np.tensordot(
-            final_params,
-            mod.model_terms_matrices,
-            axes=1
-        )
+        final_ham = np.tensordot(final_params, mod.model_terms_matrices, axes=1)
         dim = int(np.log2(np.shape(final_ham)[0]))
         plot_probe = plot_probes[dim]
 
@@ -516,14 +483,14 @@ def plot_models_dynamics(
                 t=t,
                 state=plot_probe,
                 log_file=log_file,
-                log_identifier='[remote_bayes_factor: plotting]'
+                log_identifier="[remote_bayes_factor: plotting]",
             )
             for t in times
         ]
         ax1.plot(
             times,
             mod_exp_vals,
-            label=str("({}) {}".format(mod.model_id, mod.model_name_latex ))
+            label=str("({}) {}".format(mod.model_id, mod.model_name_latex)),
         )
     try:
         # in background, show how often that time was considered
@@ -535,28 +502,23 @@ def plot_models_dynamics(
             bins=num_times,
             # TODO put on separate plot to see when higher times compared on
             range=(min(times), max(times)),
-            histtype='stepfilled',
+            histtype="stepfilled",
             fill=False,
             label=str("{} times total".format(len(bf_times))),
-            alpha=0.1
+            alpha=0.1,
         )
-        ax2.set_ylabel('Frequency time was during comparison')
+        ax2.set_ylabel("Frequency time was during comparison")
     except BaseException:
         raise
         # pass
 
     bf = np.log10(bayes_factor)
-    plt.title(
-        "[$log_{10}$ Bayes Factor]: " + str(np.round(bf, 2))
-    )
+    plt.title("[$log_{10}$ Bayes Factor]: " + str(np.round(bf, 2)))
     plt.figlegend()
 
     plot_path = os.path.join(
         save_directory,
-        'BF_{}_{}.png'.format(
-            str(model_a.model_id),
-            str(model_b.model_id)
-        )
+        "BF_{}_{}.png".format(str(model_a.model_id), str(model_b.model_id)),
     )
     plt.savefig(plot_path)
 
@@ -580,22 +542,16 @@ def plot_posterior_marginals(
     num_terms = model.qinfer_model.n_modelparams
 
     before_updates = [
-        initial_updater_copy.posterior_marginal(idx_param=i)
-        for i in range(num_terms)
+        initial_updater_copy.posterior_marginal(idx_param=i) for i in range(num_terms)
     ]
 
     after_updates = [
-        model.qinfer_updater.posterior_marginal(idx_param=i)
-        for i in range(num_terms)
+        model.qinfer_updater.posterior_marginal(idx_param=i) for i in range(num_terms)
     ]
 
     ncols = int(np.ceil(np.sqrt(num_terms)))
     nrows = int(np.ceil(num_terms / ncols))
-    fig, axes = plt.subplots(
-        figsize=(10, 7),
-        nrows=nrows,
-        ncols=ncols
-    )
+    fig, axes = plt.subplots(figsize=(10, 7), nrows=nrows, ncols=ncols)
 
     gs = GridSpec(
         nrows=nrows,
@@ -610,16 +566,16 @@ def plot_posterior_marginals(
         ax.plot(
             before_updates[param][0],
             before_updates[param][1],
-            color='blue',
-            ls='-',
-            label='Before'
+            color="blue",
+            ls="-",
+            label="Before",
         )
         ax.plot(
             after_updates[param][0],
             after_updates[param][1],
-            color='red',
-            ls=':',
-            label='After'
+            color="red",
+            ls=":",
+            label="After",
         )
         if row == 0 and col == ncols - 1:
             ax.legend()
@@ -630,9 +586,6 @@ def plot_posterior_marginals(
             row += 1
 
     save_path = os.path.join(
-        save_directory,
-        'bf_posteriors_qmla_{}_model_{}'.format(
-            qmla_id, model.model_id
-        )
+        save_directory, "bf_posteriors_qmla_{}_model_{}".format(qmla_id, model.model_id)
     )
     plt.savefig(save_path)

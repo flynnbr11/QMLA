@@ -7,21 +7,13 @@ from scipy.stats import norm
 import qmla.model_building_utilities as model_building_utilities
 import qmla.logging
 
-__all__ = [
-    'gaussian_prior',
-    'prelearned_true_parameters_prior'
-]
+__all__ = ["gaussian_prior", "prelearned_true_parameters_prior"]
 
-def log_print(
-    to_print_list,
-    log_file, 
-    log_identifier='Distributions'
-):
+
+def log_print(to_print_list, log_file, log_identifier="Distributions"):
     r"""Writng to unique QMLA instance log."""
     qmla.logging.print_to_log(
-        to_print_list = to_print_list, 
-        log_file = log_file, 
-        log_identifier = log_identifier
+        to_print_list=to_print_list, log_file=log_file, log_identifier=log_identifier
     )
 
 
@@ -32,7 +24,7 @@ def gaussian_prior(
     default_sigma=None,
     random_mean=False,  # if set to true, chooses a random mean between given uniform min/max
     prior_specific_terms={},
-    log_file='qmd.log',
+    log_file="qmd.log",
     log_identifier=None,
     **kwargs
 ):
@@ -40,33 +32,35 @@ def gaussian_prior(
     Genearates a QInfer Gaussian distribution .
 
     Given a model_name, deteremines the number of terms in the model, N.
-    Generates a multivariate distribution with N dimensions. 
-    This is then used as the initial prior, which QHL uses to learn the 
-    model parameters. 
-    By default, each parameter's mean is the average of param_min and param_max, 
-    with sigma = mean/4. This can be changed by specifying prior_specific_terms: 
-        individual parameter's means/sigmas can be given. 
+    Generates a multivariate distribution with N dimensions.
+    This is then used as the initial prior, which QHL uses to learn the
+    model parameters.
+    By default, each parameter's mean is the average of param_min and param_max,
+    with sigma = mean/4. This can be changed by specifying prior_specific_terms:
+        individual parameter's means/sigmas can be given.
 
     :param str model_name: Unique string representing a model.
     :param float param_minimum: Lower bound for distribution.
     :param float param_maximum: Upper bound for distribution.
-    :param float default_sigma: Width of distribution desired. If None, 
+    :param float default_sigma: Width of distribution desired. If None,
         defaults to 0.25 * (param_max - param_min).
     :param dict prior_specific_terms: Individual parameter mean and sigma
-        to enforce in the distribution. 
+        to enforce in the distribution.
     :param str log_file: Path of the log file for logging errors.
     :param str log_identifier: Unique identifying sting for logging.
-    :return QInfer.Distribution dist: distribution to be used as prior for parameter learning 
+    :return QInfer.Distribution dist: distribution to be used as prior for parameter learning
         of the named model.
     """
 
     log_print(
         [
-            "Getting prior for model:", model_name,
-            "Specific terms:", prior_specific_terms,
+            "Getting prior for model:",
+            model_name,
+            "Specific terms:",
+            prior_specific_terms,
         ],
         log_file,
-        log_identifier
+        log_identifier,
     )
     individual_terms = model_building_utilities.get_constituent_names_from_name(
         model_name
@@ -86,10 +80,7 @@ def gaussian_prior(
             sigmas.append(prior_specific_terms[term][1])
         else:
             if random_mean:
-                rand_mean = random.uniform(
-                    param_minimum,
-                    param_maximum
-                )
+                rand_mean = random.uniform(param_minimum, param_maximum)
                 means.append(rand_mean)
             else:
                 means.append(default_mean)
@@ -97,11 +88,8 @@ def gaussian_prior(
 
     means = np.array(means)
     sigmas = np.array(sigmas)
-    cov_mtx = np.diag(sigmas**2)
-    dist = qinfer.MultivariateNormalDistribution(
-        means,
-        cov_mtx
-    )
+    cov_mtx = np.diag(sigmas ** 2)
+    dist = qinfer.MultivariateNormalDistribution(means, cov_mtx)
 
     return dist
 
@@ -113,7 +101,7 @@ def uniform_prior(
     default_sigma=None,
     random_mean=False,  # if set to true, chooses a random mean between given uniform min/max
     prior_specific_terms={},
-    log_file='qmd.log',
+    log_file="qmd.log",
     log_identifier=None,
     **kwargs
 ):
@@ -124,22 +112,22 @@ def uniform_prior(
     num_terms = len(individual_terms)
     available_specific_terms = list(prior_specific_terms.keys())
 
-    u = [[param_minimum, param_maximum]]*num_terms
+    u = [[param_minimum, param_maximum]] * num_terms
     u = np.array(u)
     dist = qinfer.UniformDistribution(u)
     return dist
 
 
 def prelearned_true_parameters_prior(
-    model_name, 
-    true_parameters, 
+    model_name,
+    true_parameters,
     prior_specific_terms,
-    default_parameter=0, 
-    default_width = 0.05, 
+    default_parameter=0,
+    default_width=0.05,
     fraction_true_parameter_width=1e-7,
     fraction_true_param_found_within=1e-4,
-    log_file = 'qmla.log', 
-    log_identifier= 'PrelearnedPrior',
+    log_file="qmla.log",
+    log_identifier="PrelearnedPrior",
     **kwargs
 ):
 
@@ -154,8 +142,8 @@ def prelearned_true_parameters_prior(
     for term in individual_terms:
         if term in true_parameters:
             true_param = true_parameters[term]
-            minp = (1 - fraction_true_param_found_within)*true_param
-            maxp = (1 + fraction_true_param_found_within)*true_param
+            minp = (1 - fraction_true_param_found_within) * true_param
+            maxp = (1 + fraction_true_param_found_within) * true_param
             # param = true_parameters[term]
             param = np.random.uniform(minp, maxp)
             width = fraction_true_parameter_width * param
@@ -169,14 +157,11 @@ def prelearned_true_parameters_prior(
 
         means.append(param)
         sigmas.append(width)
-    
+
     means = np.array(means)
     sigmas = np.array(sigmas)
-    cov_mtx = np.diag(sigmas**2)
-    dist = qinfer.MultivariateNormalDistribution(
-        means,
-        cov_mtx
-    )
+    cov_mtx = np.diag(sigmas ** 2)
+    dist = qinfer.MultivariateNormalDistribution(means, cov_mtx)
     return dist
 
 
@@ -190,9 +175,9 @@ def plot_prior(
     r"""
     Plots the given distribution to the given file path.
 
-    :param model_name: 
+    :param model_name:
     :type model_name: str
-    :param model_name_individual_terms: List of latex terms for 
+    :param model_name_individual_terms: List of latex terms for
         all terms in the model.
     :type model_name_individual_terms: list
     :param prior: distribution to plot
@@ -203,9 +188,10 @@ def plot_prior(
         to include in plot
     :type true_model_terms_params: dict
     """
-    
+
     from itertools import cycle
     from matplotlib import cm
+
     lines = ["-", "--", "-.", ":"]
     linecycler = cycle(lines)
 
@@ -243,10 +229,9 @@ def plot_prior(
         this_param_colour = colours[i % len(colours)]
         latex_term = model_name_individual_terms[i]
         param_label = str(
-            latex_term +
-            '\n( {} $\pm$ {} )'.format(
-                np.round(this_param_mean, 2),
-                np.round(this_param_dev, 2)
+            latex_term
+            + "\n( {} $\pm$ {} )".format(
+                np.round(this_param_mean, 2), np.round(this_param_dev, 2)
             )
         )
         spacing = np.linspace(min(this_param_samples), max(this_param_samples))
@@ -255,11 +240,11 @@ def plot_prior(
         try:
             ax.hist(
                 this_param_samples,
-                histtype='step',
+                histtype="step",
                 fill=False,
                 density=True,
                 # label=param_label,
-                color=this_param_colour
+                color=this_param_colour,
             )
         except:
             raise
@@ -270,7 +255,7 @@ def plot_prior(
                     true_param,
                     color=this_param_colour,
                     alpha=1,
-                    label='True'
+                    label="True"
                     # linestyle = ls
                 )
                 include_legend = True
@@ -281,12 +266,12 @@ def plot_prior(
             ax.legend()
 
     # plt.legend()
-    fig.suptitle('Initial prior for true model')
+    fig.suptitle("Initial prior for true model")
     fig.subplots_adjust(
         # top = 0.99,
         # bottom=0.01,
         hspace=0.3,
-        wspace=0.4
+        wspace=0.4,
     )
     try:
         fig.savefig(plot_file)

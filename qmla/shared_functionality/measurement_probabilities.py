@@ -31,32 +31,23 @@ from scipy import linalg
 import qmla.logging
 
 
-def log_print(
-    to_print_list, 
-    log_file, 
-    log_identifier='ExpectationValue'
-):
+def log_print(to_print_list, log_file, log_identifier="ExpectationValue"):
     qmla.logging.print_to_log(
-        to_print_list = to_print_list, 
-        log_file = log_file, 
-        log_identifier = log_identifier
+        to_print_list=to_print_list, log_file=log_file, log_identifier=log_identifier
     )
 
 
 # Default expectation value calculations
 
+
 def default_measurement_probability(
-    ham,
-    t,
-    state,
-    log_file='qmla_log.log',
-    log_identifier='Expecation Value'
+    ham, t, state, log_file="qmla_log.log", log_identifier="Expecation Value"
 ):
     """
     Default probability calculation: | <state.transpose | e^{-iHt} | state> |**2
 
     Returns the expectation value computed by evolving the input state with
-        the provided Hamiltonian operator. 
+        the provided Hamiltonian operator.
 
     :param np.array ham: Hamiltonian needed for the time-evolution
     :param float t: Evolution time
@@ -68,29 +59,28 @@ def default_measurement_probability(
     """
 
     probe_bra = state.conj().T
-    u = expm(-1j*ham*t)
+    u = expm(-1j * ham * t)
     # h = hexp.LinalgUnitaryEvolvingMatrix(
-    #     ham, 
+    #     ham,
     #     evolution_time = t,
     # )
     # u = h.expm()
-    
+
     # h = hexp.UnitaryEvolvingMatrix(
-    #     ham, 
+    #     ham,
     #     evolution_time = t,
     # )
     # u = h.expm()
 
     u_psi = np.dot(u, state)
-    expectation_value = np.dot(probe_bra, u_psi) # in general a complex number
-    prob_of_measuring_input_state = np.abs(expectation_value)**2
+    expectation_value = np.dot(probe_bra, u_psi)  # in general a complex number
+    prob_of_measuring_input_state = np.abs(expectation_value) ** 2
 
     # check that probability is reasonable (0 <= P <= 1)
     ex_val_tol = 1e-9
-    if (
-        prob_of_measuring_input_state > (1 + ex_val_tol)
-        or prob_of_measuring_input_state < (0 - ex_val_tol)
-    ):
+    if prob_of_measuring_input_state > (
+        1 + ex_val_tol
+    ) or prob_of_measuring_input_state < (0 - ex_val_tol):
         log_print(
             [
                 "prob_of_measuring_input_state > 1 or < 0 (={}) at t={}\n Probe={}".format(
@@ -98,25 +88,19 @@ def default_measurement_probability(
                 )
             ],
             log_file=log_file,
-            log_identifier=log_identifier
+            log_identifier=log_identifier,
         )
         raise NameError("Unphysical expectation value")
     return prob_of_measuring_input_state
 
+
 # Expectation value function using Hahn inversion gate:
-def hahn_evolution(
-    ham,
-    t,
-    state,
-    precision=1e-10,
-    log_file=None,
-    log_identifier=None
-):
+def hahn_evolution(ham, t, state, precision=1e-10, log_file=None, log_identifier=None):
     r"""
     Hahn echo evolution and expectation value.
 
     Returns the expectation value computed by evolving the input state with
-    the Hamiltonian corresponding to the Hahn eco evolution. NB: In this case, the assumption is that the 
+    the Hamiltonian corresponding to the Hahn eco evolution. NB: In this case, the assumption is that the
     value measured is 1 and the expectation value corresponds to the probability of
     obtaining 1.
 
@@ -131,17 +115,20 @@ def hahn_evolution(
     :return: expectation value of the evolved state
 
     """
-    
+
     # NOTE this is always projecting onto |+>
     # okay for experimental data with spins in NV centre
     import numpy as np
     from scipy import linalg
     from qmla.shared_functionality.probe_set_generation import random_probe
-    inversion_gate = np.array([
-        [0. - 1.j, 0. + 0.j, 0. + 0.j, 0. + 0.j],
-        [0. + 0.j, 0. - 1.j, 0. + 0.j, 0. + 0.j],
-        [0. + 0.j, 0. + 0.j, 0. + 1.j, 0. + 0.j],
-        [0. + 0.j, 0. + 0.j, 0. + 0.j, 0. + 1.j]]
+
+    inversion_gate = np.array(
+        [
+            [0.0 - 1.0j, 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+            [0.0 + 0.0j, 0.0 - 1.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+            [0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 1.0j, 0.0 + 0.0j],
+            [0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 1.0j],
+        ]
     )
 
     # TODO Hahn gate here does not include pi/2 term
@@ -154,14 +141,12 @@ def hahn_evolution(
         #     t,
         #     precision=precision
         # )
-        unitary_time_evolution = qutip.Qobj(-1j * ham * t).expm().full() # TODO deprecated
+        unitary_time_evolution = (
+            qutip.Qobj(-1j * ham * t).expm().full()
+        )  # TODO deprecated
 
         total_evolution = np.dot(
-            unitary_time_evolution,
-            np.dot(
-                inversion_gate,
-                unitary_time_evolution
-            )
+            unitary_time_evolution, np.dot(inversion_gate, unitary_time_evolution)
         )
     else:
         first_unitary_time_evolution = expm(-1j * ham * t)
@@ -171,13 +156,10 @@ def hahn_evolution(
 
         total_evolution = np.dot(
             second_unitary_time_evolution,
-            np.dot(inversion_gate,
-                   first_unitary_time_evolution
-                   )
+            np.dot(inversion_gate, first_unitary_time_evolution),
         )
 
-
-#    print("total ev:\n", total_evolution)
+    #    print("total ev:\n", total_evolution)
     ev_state = np.dot(total_evolution, state)
 
     nm = np.linalg.norm(ev_state)
@@ -187,15 +169,12 @@ def hahn_evolution(
 
     density_matrix = np.kron(ev_state, (ev_state.T).conj())
     density_matrix = np.reshape(density_matrix, [4, 4])
-    reduced_matrix = partial_trace_out_second_qubit(
-        density_matrix,
-        qubits_to_trace=[1]
-    )
+    reduced_matrix = partial_trace_out_second_qubit(density_matrix, qubits_to_trace=[1])
 
     plus_state = np.array([1, 1]) / np.sqrt(2)
     # from 1000 counts - Poissonian noise = 1/sqrt(1000) # should be ~0.03
     noise_level = 0.00
-    
+
     random_noise = noise_level * random_probe(1)
     noisy_plus = plus_state + random_noise
     norm_factor = np.linalg.norm(noisy_plus)
@@ -204,9 +183,11 @@ def hahn_evolution(
 
     rho_state = np.dot(reduced_matrix, noisy_plus)
     expect_value = np.abs(np.dot(bra, rho_state))
-#    print("Hahn. Time=",t, "\t ex = ", expect_value)
+    #    print("Hahn. Time=",t, "\t ex = ", expect_value)
     # print("[Hahn evolution] projecting onto:", repr(bra))
-    return 1 - expect_value # because we actually project onto |-> in experiment
+    return 1 - expect_value  # because we actually project onto |-> in experiment
+
+
 #    return expect_value
 
 
@@ -219,15 +200,10 @@ def make_inversion_gate_rotate_y(num_qubits):
     :output : inversion gate
     """
     from scipy import linalg
-    sigma_y = np.array([
-        [0 + 0.j, 0 - 1.j], 
-        [0 + 1.j, 0 + 0.j]
-    ])
+
+    sigma_y = np.array([[0 + 0.0j, 0 - 1.0j], [0 + 1.0j, 0 + 0.0j]])
     hahn_angle = np.pi / 2
-    hahn_gate = np.kron(
-        hahn_angle * sigma_y,
-        np.eye(2**(num_qubits - 1))
-    )
+    hahn_gate = np.kron(hahn_angle * sigma_y, np.eye(2 ** (num_qubits - 1)))
     # inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
     inversion_gate = expm(-1j * hahn_gate)
 
@@ -243,48 +219,37 @@ def make_inversion_gate(num_qubits):
     :output : inversion gate
     """
     from scipy import linalg
-    sigma_z = np.array([[1 + 0.j, 0 + 0.j], [0 + 0.j, -1 + 0.j]])
+
+    sigma_z = np.array([[1 + 0.0j, 0 + 0.0j], [0 + 0.0j, -1 + 0.0j]])
     hahn_angle = np.pi / 2
-    hahn_gate = np.kron(
-        hahn_angle * sigma_z,
-        np.eye(2**(num_qubits - 1))
-    )
+    hahn_gate = np.kron(hahn_angle * sigma_z, np.eye(2 ** (num_qubits - 1)))
     # inversion_gate = qutip.Qobj(-1.0j * hahn_gate).expm().full()
     inversion_gate = expm(-1j * hahn_gate)
 
     return inversion_gate
 
-def hahn_via_z_pi_gate(
-    **kwargs
-):
+
+def hahn_via_z_pi_gate(**kwargs):
     return n_qubit_hahn_evolution(
-        pi_rotation='z', 
-        second_time_evolution_factor=2,
-        **kwargs
+        pi_rotation="z", second_time_evolution_factor=2, **kwargs
     )
 
 
-
-def n_qubit_hahn_evolution_double_time_reverse(
-    ham, t, state,
-    **kwargs
-):
+def n_qubit_hahn_evolution_double_time_reverse(ham, t, state, **kwargs):
     return n_qubit_hahn_evolution(
-        ham = ham,
-        t = t, 
-        state = state, 
-        second_time_evolution_factor=2, 
-        **kwargs
+        ham=ham, t=t, state=state, second_time_evolution_factor=2, **kwargs
     )
 
 
 def n_qubit_hahn_evolution(
-    ham, t, state,
+    ham,
+    t,
+    state,
     second_time_evolution_factor=1,
-    pi_rotation='y', 
+    pi_rotation="y",
     precision=1e-10,
     log_file=None,
-    log_identifier=None
+    log_identifier=None,
 ):
     r"""
     n qubits time evolution for Hahn-echo measurement returning measurement probability for input state
@@ -298,9 +263,9 @@ def n_qubit_hahn_evolution(
     :param precision: (optional) chosen precision for expectation value, default 1e-10
     :type precision: float()
     :param log_file: (optional) path of the log file for logging errors
-    :type log_file: str() 
+    :type log_file: str()
     :param log_identifier: (optional) identifier for the log
-    :type log_identifier: str()    
+    :type log_identifier: str()
 
     :output: probability of measuring input state after time t
     """
@@ -308,41 +273,49 @@ def n_qubit_hahn_evolution(
     import numpy as np
     import qmla.model_building_utilities
     from scipy import linalg
+
     num_qubits = int(np.log2(np.shape(ham)[0]))
 
-    if pi_rotation == 'y':
-        from qmla.shared_functionality.hahn_y_gates import precomputed_hahn_y_inversion_gates
-        inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
-    elif pi_rotation == 'z':
-        from qmla.shared_functionality.hahn_inversion_gates import precomputed_hahn_z_inversion_gates
-        inversion_gate = precomputed_hahn_z_inversion_gates[num_qubits]
+    if pi_rotation == "y":
+        from qmla.shared_functionality.hahn_y_gates import (
+            precomputed_hahn_y_inversion_gates,
+        )
 
+        inversion_gate = precomputed_hahn_y_inversion_gates[num_qubits]
+    elif pi_rotation == "z":
+        from qmla.shared_functionality.hahn_inversion_gates import (
+            precomputed_hahn_z_inversion_gates,
+        )
+
+        inversion_gate = precomputed_hahn_z_inversion_gates[num_qubits]
 
     # inversion_gate = make_inversion_gate_rotate_y(num_qubits)
 
-    # want to evolve for t, then apply Hahn inversion gate, 
+    # want to evolve for t, then apply Hahn inversion gate,
     # then again evolution for (S * t)
-    # where S = 2 in standard Hahn evolution, 
+    # where S = 2 in standard Hahn evolution,
     # S = 1 for long time dynamics study
     first_unitary_time_evolution = expm(-1j * ham * t)
     second_unitary_time_evolution = np.linalg.matrix_power(
-        first_unitary_time_evolution,
-        second_time_evolution_factor 
+        first_unitary_time_evolution, second_time_evolution_factor
     )
 
     total_evolution = np.dot(
         second_unitary_time_evolution,
-        np.dot(
-            inversion_gate,
-            first_unitary_time_evolution
-        )
+        np.dot(inversion_gate, first_unitary_time_evolution),
     )
 
     ev_state = np.dot(total_evolution, state)
     nm = np.linalg.norm(ev_state)
     if np.abs(1 - nm) > 1e-5:
-        print("\n\n[n qubit Hahn]\n norm ev state:",
-              nm, "\nt=", t, "\nprobe=", repr(state))
+        print(
+            "\n\n[n qubit Hahn]\n norm ev state:",
+            nm,
+            "\nt=",
+            t,
+            "\nprobe=",
+            repr(state),
+        )
         print("\nev state:\n", repr(ev_state))
         print("\nham:\n", repr(ham))
         print("\nHam element[0,2]:\n", ham[0][2])
@@ -351,15 +324,9 @@ def n_qubit_hahn_evolution(
         print("\nsecond unitary:\n", second_unitary_time_evolution)
         print("\ninversion_gate:\n", inversion_gate)
 
-    density_matrix = np.kron(
-        ev_state,
-        (ev_state.T).conj()
-    )
-    dim_hilbert_space = 2**num_qubits
-    density_matrix = np.reshape(
-        density_matrix,
-        [dim_hilbert_space, dim_hilbert_space]
-    )
+    density_matrix = np.kron(ev_state, (ev_state.T).conj())
+    dim_hilbert_space = 2 ** num_qubits
+    density_matrix = np.reshape(density_matrix, [dim_hilbert_space, dim_hilbert_space])
 
     # qdm = qutip.Qobj(density_matrix, dims=[[2],[2]])
     # reduced_matrix_qutip = qdm.ptrace(0).full()
@@ -368,33 +335,20 @@ def n_qubit_hahn_evolution(
     # reduced_matrix = qdm.ptrace(0).full()
 
     to_trace = list(range(num_qubits - 1))
-    reduced_matrix = partial_trace(
-        density_matrix,
-        to_trace
-    )
+    reduced_matrix = partial_trace(density_matrix, to_trace)
 
-    density_mtx_initial_state = np.kron(
-        state,
-        state.conj()
-    )
+    density_mtx_initial_state = np.kron(state, state.conj())
 
     density_mtx_initial_state = np.reshape(
-        density_mtx_initial_state,
-        [dim_hilbert_space, dim_hilbert_space]
+        density_mtx_initial_state, [dim_hilbert_space, dim_hilbert_space]
     )
     reduced_density_mtx_initial_state = partial_trace(
-        density_mtx_initial_state,
-        to_trace
+        density_mtx_initial_state, to_trace
     )
     projection_onto_initial_den_mtx = np.dot(
-        reduced_density_mtx_initial_state,
-        reduced_matrix
+        reduced_density_mtx_initial_state, reduced_matrix
     )
-    expect_value = np.abs(
-        np.trace(
-            projection_onto_initial_den_mtx
-        )
-    )
+    expect_value = np.abs(np.trace(projection_onto_initial_den_mtx))
 
     # expect_value is projection onto |+>
     # for this case Pr(0) refers to projection onto |->
@@ -408,20 +362,15 @@ def n_qubit_hahn_evolution(
     # return expect_value
 
 
-def partial_trace(
-    mat,
-    trace_systems,
-    dimensions=None,
-    reverse=True
-):
+def partial_trace(mat, trace_systems, dimensions=None, reverse=True):
     """
     Returns the partial trace of mat over subsystems of multi-partite matrix.
-    
+
 
     loghish description:
     This function has been taken from https://github.com/Qiskit/qiskit-terra/blob/master/qiskit/tools/qi/qi.py#L177
     Note that subsystems are ordered as rho012 = rho0(x)rho1(x)rho2.
-    
+
     :param mat: a matrix NxN.
     :type mat: np.array()
     :param trace_systems: a list of subsystems (starting from 0) to trace over.
@@ -432,7 +381,7 @@ def partial_trace(
     :param reverse: (optional) If True reverses the ordering of systems in operator. Default=True.
     If True system-0 is the right most system in tensor product.
     If False system-0 is the left most system in tensor product.
-    :type reverse: bool 
+    :type reverse: bool
 
     :output:  A density matrix with the appropriate subsystems traced over as ndarray.
     """
@@ -441,8 +390,9 @@ def partial_trace(
         num_qubits = int(np.log2(length))
         dimensions = [2 for _ in range(num_qubits)]
         if length != 2 ** num_qubits:
-            raise Exception("Input is not a multi-qubit state, "
-                            "specify input state dims")
+            raise Exception(
+                "Input is not a multi-qubit state, " "specify input state dims"
+            )
     else:
         dimensions = list(dimensions)
 
@@ -451,12 +401,12 @@ def partial_trace(
         # Partition subsystem dimensions
         dimension_trace = int(dimensions[j])  # traced out system
         if reverse:
-            left_dimensions = dimensions[j + 1:]
+            left_dimensions = dimensions[j + 1 :]
             right_dimensions = dimensions[:j]
             dimensions = right_dimensions + left_dimensions
         else:
             left_dimensions = dimensions[:j]
-            right_dimensions = dimensions[j + 1:]
+            right_dimensions = dimensions[j + 1 :]
             dimensions = left_dimensions + right_dimensions
         # Contract remaining dimensions
         dimension_left = int(np.prod(left_dimensions))
@@ -464,19 +414,24 @@ def partial_trace(
 
         # Reshape input array into tri-partite system with system to be
         # traced as the middle index
-        mat = mat.reshape([dimension_left, dimension_trace, dimension_right,
-                           dimension_left, dimension_trace, dimension_right])
+        mat = mat.reshape(
+            [
+                dimension_left,
+                dimension_trace,
+                dimension_right,
+                dimension_left,
+                dimension_trace,
+                dimension_right,
+            ]
+        )
         # trace out the middle system and reshape back to a matrix
         mat = mat.trace(axis1=1, axis2=4).reshape(
-            dimension_left * dimension_right,
-            dimension_left * dimension_right)
+            dimension_left * dimension_right, dimension_left * dimension_right
+        )
     return mat
 
 
-def partial_trace_out_second_qubit(
-    global_rho,
-    qubits_to_trace=[1]
-):
+def partial_trace_out_second_qubit(global_rho, qubits_to_trace=[1]):
 
     """
     2 qubit version of the partial trace function.
@@ -510,9 +465,7 @@ def partial_trace_out_second_qubit(
                 # pick even positions in the original matrix
                 even_positions = global_rho[p + 1][1::2]
 
-                output_matrix.append(
-                    odd_positions + even_positions
-                )
+                output_matrix.append(odd_positions + even_positions)
     output_matrix = np.array(output_matrix)
     return output_matrix
 
@@ -522,7 +475,7 @@ def n_qubit_plus_state(num_qubits):
     """
     Returns the num_qubits pure quantum states where each of the qubits is in plus state as a np.array()
 
-    :parameter num_qubits: number of qubits 
+    :parameter num_qubits: number of qubits
     :type num_qubits: int()
 
     :output: pure quantum state of num_qubits in plus state.

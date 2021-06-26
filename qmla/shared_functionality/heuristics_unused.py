@@ -5,7 +5,7 @@ Store unused heuristics in case we want to revive them.
 import qinfer as qi
 import numpy as np
 import scipy as sp
-import random 
+import random
 import math
 
 import matplotlib.pyplot as plt
@@ -16,13 +16,10 @@ import qmla.logging
 
 
 class TimeHeurstic(qi.Heuristic):
+    def identity(arg):
+        return arg
 
-    def identity(arg): return arg
-
-    def __init__(self, updater, t_field='t',
-                 t_func=identity,
-                 maxiters=10
-                 ):
+    def __init__(self, updater, t_field="t", t_func=identity, maxiters=10):
         super(TimeHeurstic, self).__init__(updater)
         self._t = t_field
         self._t_func = t_func
@@ -39,9 +36,12 @@ class TimeHeurstic(qi.Heuristic):
                 idx_iter += 1
 
         if self._updater.model.distance(x, xp) == 0:
-            raise RuntimeError("PGH did not find distinct particles in {} \
-                iterations.".format(self._maxiters)
-                               )
+            raise RuntimeError(
+                "PGH did not find distinct particles in {} \
+                iterations.".format(
+                    self._maxiters
+                )
+            )
 
         eps = np.empty((1,), dtype=self._updater.model.expparams_dtype)
         eps[self._t] = self._t_func(1 / self._updater.model.distance(x, xp))
@@ -50,16 +50,15 @@ class TimeHeurstic(qi.Heuristic):
 
 
 class TimeFromListHeuristic(qi.Heuristic):
-
     def __init__(
         self,
         updater,
         oplist=None,
         pgh_exponent=1,
         increase_time=False,
-        norm='Frobenius',
-        inv_field='x_',
-        t_field='t',
+        norm="Frobenius",
+        inv_field="x_",
+        t_field="t",
         inv_func=identity,
         t_func=identity,
         maxiters=10,
@@ -83,16 +82,12 @@ class TimeFromListHeuristic(qi.Heuristic):
         self._len_time_list = len(self._time_list)
 
         try:
-            self._num_experiments = kwargs.get('num_experiments')
+            self._num_experiments = kwargs.get("num_experiments")
             print("self.num_experiments:", self._num_experiments)
         except BaseException:
             print("Can't find num_experiments in kwargs")
 
-    def __call__(
-        self,
-        epoch_id=0,
-        **kwargs
-    ):
+    def __call__(self, epoch_id=0, **kwargs):
 
         idx_iter = 0
         while idx_iter < self._maxiters:
@@ -106,12 +101,11 @@ class TimeFromListHeuristic(qi.Heuristic):
         if self._updater.model.distance(x, xp) == 0:
             raise RuntimeError(
                 "PGH did not find distinct particles in \
-                {} iterations.".format(self._maxiters)
+                {} iterations.".format(
+                    self._maxiters
+                )
             )
-        eps = np.empty(
-            (1,),
-            dtype=self._updater.model.expparams_dtype
-        )
+        eps = np.empty((1,), dtype=self._updater.model.expparams_dtype)
         idx_iter = 0  # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
@@ -123,17 +117,17 @@ class TimeFromListHeuristic(qi.Heuristic):
 
         return eps
 
-class InverseEigenvalueHeuristic(qi.Heuristic):
 
+class InverseEigenvalueHeuristic(qi.Heuristic):
     def __init__(
         self,
         updater,
         oplist=None,
         pgh_exponent=1,
         increase_time=False,
-        norm='Frobenius',
-        inv_field='x_',
-        t_field='t',
+        norm="Frobenius",
+        inv_field="x_",
+        t_field="t",
         inv_func=identity,
         t_func=identity,
         maxiters=10,
@@ -152,21 +146,14 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
         self._other_fields = other_fields if other_fields is not None else {}
         self._pgh_exponent = pgh_exponent
         self._increase_time = increase_time
-        self._num_experiments = kwargs.get('num_experiments', 200)
+        self._num_experiments = kwargs.get("num_experiments", 200)
         self._time_list = time_list
         self._len_time_list = len(self._time_list)
         self.num_epochs_for_first_phase = self._num_experiments / 2
 
-    def __call__(
-        self,
-        epoch_id=0,
-        **kwargs
-    ):
-        print(
-            "[Heuristic - InverseEigenvalueHeuristic]",
-            "kwargs:", kwargs
-        )
-        current_params = kwargs['current_params']
+    def __call__(self, epoch_id=0, **kwargs):
+        print("[Heuristic - InverseEigenvalueHeuristic]", "kwargs:", kwargs)
+        current_params = kwargs["current_params"]
         idx_iter = 0
         while idx_iter < self._maxiters:
 
@@ -179,12 +166,11 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
         if self._updater.model.distance(x, xp) == 0:
             raise RuntimeError(
                 "PGH did not find distinct particles in \
-                {} iterations.".format(self._maxiters)
+                {} iterations.".format(
+                    self._maxiters
+                )
             )
-        eps = np.empty(
-            (1,),
-            dtype=self._updater.model.expparams_dtype
-        )
+        eps = np.empty((1,), dtype=self._updater.model.expparams_dtype)
         idx_iter = 0  # modified in order to cycle through particle parameters with different names
         for field_i in self._x_:
             eps[field_i] = self._inv_func(x)[0][idx_iter]
@@ -192,27 +178,18 @@ class InverseEigenvalueHeuristic(qi.Heuristic):
 
         if epoch_id < self.num_epochs_for_first_phase:
             sigma = self._updater.model.distance(x, xp)
-            new_time = self._t_func(
-                1 / sigma**self._pgh_exponent
-            )
+            new_time = self._t_func(1 / sigma ** self._pgh_exponent)
         else:
             new_time = new_time_based_on_eigvals(
-                params=current_params,
-                raw_ops=self._oplist
+                params=current_params, raw_ops=self._oplist
             )
 
         eps[self._t] = new_time
         return eps
 
 
-def new_time_based_on_eigvals(
-    params,
-    raw_ops,
-    time_scale=1
-):
-    param_ops = [
-        (params[i] * raw_ops[i]) for i in range(len(params))
-    ]
+def new_time_based_on_eigvals(params, raw_ops, time_scale=1):
+    param_ops = [(params[i] * raw_ops[i]) for i in range(len(params))]
     max_eigvals = []
     for i in range(len(params)):
         param_eigvals = sp.linalg.eigh(param_ops[i])[0]
