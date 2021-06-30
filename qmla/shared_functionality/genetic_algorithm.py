@@ -7,8 +7,7 @@ import copy
 import scipy
 import time
 import pandas as pd
-import sklearn
-
+import sklearn as skl
 sys.path.append("/home/bf16951/QMD")
 import qmla
 
@@ -214,7 +213,7 @@ class GeneticAlgorithmQMLA:
         if not isinstance(chromosome, np.ndarray):
             chromosome = np.array([int(a) for a in list(chromosome)])
 
-        return sklearn.metrics.f1_score(chromosome, self.true_chromosome)
+        return skl.metrics.f1_score(chromosome, self.true_chromosome)
 
     def log_print(self, to_print_list):
         r"""Wrapper for :func:`~qmla.print_to_log`"""
@@ -300,7 +299,7 @@ class GeneticAlgorithmQMLA:
 
         b = bin(r)[2:].zfill(self.num_terms)
         b_array = np.array([int(i) for i in list(b)])
-        f = sklearn.metrics.f1_score(b_array, self.true_chromosome)
+        f = skl.metrics.f1_score(b_array, self.true_chromosome)
         return f, b_array
 
     def random_models_sorted_by_f_score(

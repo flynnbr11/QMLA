@@ -8,7 +8,9 @@ import scipy
 import time
 
 import pandas as pd
-import sklearn
+import sklearn as skl
+
+
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -495,7 +497,7 @@ class Genetic(exploration_strategy.ExplorationStrategy):
         mod = np.array([int(a) for a in list(chromosome)])
 
         try:
-            f = sklearn.metrics.f1_score(mod, self.true_chromosome)
+            f = skl.metrics.f1_score(mod, self.true_chromosome)
             return f
         except:
             self.log_print(

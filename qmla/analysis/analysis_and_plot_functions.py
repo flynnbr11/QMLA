@@ -28,7 +28,6 @@ from matplotlib.spines import Spine
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
 from inspect import currentframe, getframeinfo
-import sklearn
 import seaborn as sns
 
 try:

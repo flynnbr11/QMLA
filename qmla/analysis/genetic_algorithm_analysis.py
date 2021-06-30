@@ -8,8 +8,7 @@ import random
 import copy
 import scipy
 import time
-
-import sklearn
+import sklearn as skl
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from matplotlib.gridspec import GridSpec
@@ -142,7 +141,7 @@ def hamming_distance(str1, str2):
 def f_score_from_chromosome_string(chromosome, target_chromosome):
     mod = np.array([int(a) for a in list(chromosome)])
     target_chromosome = np.array([int(a) for a in list(target_chromosome)])
-    return sklearn.metrics.f1_score(mod, target_chromosome)
+    return skl.metrics.f1_score(mod, target_chromosome)
 
 
 def colour_by_hamming_dist(h, cmap):

@@ -7,7 +7,6 @@ import itertools
 import copy
 
 import seaborn as sns
-import sklearn
 import matplotlib.pyplot as plt
 import qinfer as qi
 from scipy import linalg

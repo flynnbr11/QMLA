@@ -10,7 +10,6 @@ import math
 import pandas as pd
 import seaborn as sns
 import random
-import sklearn
 import networkx as nx
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D

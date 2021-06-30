@@ -6,8 +6,8 @@
 num_instances=1 # number of instances in run
 run_qhl=1 # perform QHL on known (true) model
 run_qhl_multi_model=0 # perform QHL for defined list of models
-experiments=1000
-particles=500
+experiments=100
+particles=50
 plot_level=6
 
 

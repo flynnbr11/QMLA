@@ -7,7 +7,6 @@ import copy
 import scipy
 import time
 import pandas as pd
-import sklearn
 
 from qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy import (
     Genetic,

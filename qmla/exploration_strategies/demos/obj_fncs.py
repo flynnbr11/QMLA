@@ -8,7 +8,6 @@ import scipy
 import time
 
 import pandas as pd
-import sklearn
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec

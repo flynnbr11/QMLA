@@ -7,7 +7,6 @@ import copy
 import scipy
 import time
 import pandas as pd
-import sklearn
 import pickle
 
 import qmla.exploration_strategies.genetic_algorithms.genetic_exploration_strategy
