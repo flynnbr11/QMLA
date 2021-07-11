@@ -356,9 +356,9 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
         if self.iqle_mode:
             expparams_sampled_particle = np.array(
                 [expparams.item(0)[2:]]
-            )  # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS
+            )[0]  # TODO THIS IS DANGEROUS - DONT DO IT OUTSIDE OF TESTS
             self.log_print_debug(
-                ["expparams_sampled_particle:", expparams_sampled_particle]
+                ["expparams_sampled_particle:", repr(expparams_sampled_particle)]
             )
             self.ham_from_expparams = self.model_constructor.construct_matrix(
                 expparams_sampled_particle
@@ -510,6 +510,10 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
 
         if self.iqle_mode:
             # TODO use different fnc for IQLE
+            self.log_print_debug([
+                "hamiltonian shape:", hamiltonian.shape, 
+                "\nham_from_expparams:", self.ham_from_expparams.shape
+            ])
             hamiltonian -= self.ham_from_expparams
 
             if np.any(np.isnan(hamiltonian)):
@@ -565,6 +569,11 @@ class QInferModelQMLA(qi.FiniteOutcomeModel):
                 hamiltonian = self.model_constructor.construct_matrix(
                     particles[particle_idx]
                 )
+
+            if self.iqle_mode:
+                # TODO use different fnc for IQLE
+                hamiltonian -= self.ham_from_expparams
+            
             self.log_print_debug(["Hamiltonian from model constructor:", hamiltonian])
             time_idx = -1
             for t in times:

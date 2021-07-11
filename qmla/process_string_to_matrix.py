@@ -50,7 +50,8 @@ def process_basic_operator(basic_operator):
     :param str basic_operator: term to generate matrix from.
     :return np.ndarray mtx: matrix corresponding to the input term.
     """
-    print("CALLING process_basic_operator on ", basic_operator)
+
+    # print("CALLING process_basic_operator on ", basic_operator)
 
     indicator = basic_operator.split("_")[0]
     if indicator in string_processing_functions:

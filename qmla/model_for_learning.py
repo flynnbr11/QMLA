@@ -373,8 +373,8 @@ class ModelInstanceForLearning:
                 new_experiment,
                 repeat=1,
             )
-            self.log_print(["Datum:", datum_from_experiment])
-            self.log_print(["Exp:", new_experiment])
+            self.log_print_debug(["Datum:", datum_from_experiment])
+            self.log_print_debug(["Exp:", new_experiment])
             # Call updater to update distribution based on datum
             try:
                 update_start = time.time()

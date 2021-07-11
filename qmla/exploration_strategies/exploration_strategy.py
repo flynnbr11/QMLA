@@ -550,6 +550,7 @@ class ExplorationStrategy:
             name=self.true_model,
             fixed_parameters=self.true_params_list,
         )
+        self.log_print(["True model constructur:", self.true_model_constructor])
         self.true_hamiltonian = self.true_model_constructor.fixed_matrix
 
     def generate_true_parameters(self):
