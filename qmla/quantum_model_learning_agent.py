@@ -26,7 +26,7 @@ except:
 
 # QMLA functionality
 import qmla.analysis
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 import qmla.get_exploration_strategy as get_exploration_strategy
 import qmla.redis_settings as rds
 import qmla.model_for_storage
@@ -36,14 +36,12 @@ import qmla.exploration_tree
 import qmla.utilities
 
 pickle.HIGHEST_PROTOCOL = 4
-plt.switch_backend('agg')
+plt.switch_backend("agg")
 
-__all__ = [
-    'QuantumModelLearningAgent'
-]
+__all__ = ["QuantumModelLearningAgent"]
 
 
-class QuantumModelLearningAgent():
+class QuantumModelLearningAgent:
     r"""
     QMLA manager class.
 
@@ -76,24 +74,22 @@ class QuantumModelLearningAgent():
 
     """
 
-    def __init__(self,
-                 qmla_controls=None,
-                 model_priors=None,
-                 experimental_measurements=None,
-                 **kwargs
-                 ):
+    def __init__(
+        self,
+        qmla_controls=None,
+        model_priors=None,
+        experimental_measurements=None,
+        **kwargs
+    ):
 
         self._start_time = time.time()  # to measure run-time
 
         # Configure this QMLA instance
         if qmla_controls is None:
-            self.qmla_controls = qmla.controls_qmla.parse_cmd_line_args(
-                args={}
-            )
+            self.qmla_controls = qmla.controls_qmla.parse_cmd_line_args(args={})
         else:
             self.qmla_controls = qmla_controls
         self.exploration_class = self.qmla_controls.exploration_class
-        
 
         # Basic settings, path definitions etc
         self._fundamental_settings()
@@ -127,14 +123,20 @@ class QuantumModelLearningAgent():
     ##########
 
     def _fundamental_settings(self):
-        r""" Basic settings, path definitions etc."""
+        r"""Basic settings, path definitions etc."""
 
         # Extract info from Controls
         self.qmla_id = self.qmla_controls.qmla_id
         self.redis_host_name = self.qmla_controls.host_name
         self.redis_port_number = self.qmla_controls.port_number
         self.log_file = self.qmla_controls.log_file
-        self.log_print(["\nwithin QMLA, ES's qmla id is {}. True model={}".format(self.exploration_class.qmla_id, self.exploration_class.true_model)])
+        self.log_print(
+            [
+                "\nwithin QMLA, ES's qmla id is {}. True model={}".format(
+                    self.exploration_class.qmla_id, self.exploration_class.true_model
+                )
+            ]
+        )
         self.qhl_mode = self.qmla_controls.qhl_mode
         self.qhl_mode_multiple_models = self.qmla_controls.qhl_mode_multiple_models
         self.latex_name_map_file_path = self.qmla_controls.latex_mapping_file
@@ -148,65 +150,67 @@ class QuantumModelLearningAgent():
             self.redis_port_number,
             self.qmla_id,
         )
-        self.redis_databases['any_job_failed'].set('Status', 0)
+        self.redis_databases["any_job_failed"].set("Status", 0)
 
         # Logistics
         self.models_learned = []
         self.timings = {
             # track times spent in some subroutines
-            'inspect_job_crashes': 0,
-            'jobs_finished': 0
+            "inspect_job_crashes": 0,
+            "jobs_finished": 0,
         }
         self.call_counter = {
             # track number of calls to some subroutines
-            'job_crashes': 0,
-            'jobs_finished': 0,
+            "job_crashes": 0,
+            "jobs_finished": 0,
         }
         self.sleep_duration = 2
 
     def _true_model_definition(self):
-        r""" Information related to true (target) model."""
-
-        self.true_model_name = construct_models.alph(
-            self.qmla_controls.true_model_name)
-        self.true_model_dimension = construct_models.get_num_qubits(
-            self.true_model_name)
-        self.true_model_constituent_operators = self.qmla_controls.true_model_terms_matrices
-        self.true_model_constituent_terms_latex = [
-            self.exploration_class.latex_name(term)
-            for term in
-            qmla.construct_models.get_constituent_names_from_name(
-                self.true_model_name)
-        ]
-        self.true_model_num_params = self.qmla_controls.true_model_class.num_constituents
+        r"""Information related to true (target) model."""
+        self.true_model_constructor = self.exploration_class.true_model_constructor
+        self.true_model_name = self.true_model_constructor.name
+        self.true_model_dimension = self.true_model_constructor.num_qubits
+        self.true_model_constituent_operators = (
+            self.true_model_constructor.terms_matrices
+        )
+        self.true_model_num_params = self.true_model_constructor.num_terms
+        # self.true_model_constituent_terms_latex = [
+        #     self.exploration_class.latex_name(term)
+        #     for term in
+        #     self.true_model_constructor.terms_names
+        # ]
+        self.true_model_constituent_terms_latex = (
+            self.true_model_constructor.terms_names_latex
+        )
         self.true_param_list = self.exploration_class.true_params_list
         self.true_param_dict = self.exploration_class.true_params_dict
+
         self.true_model_branch = -1  # overwrite if true model is added to database
         self.true_model_considered = False
         self.true_model_found = False
         self.true_model_id = -1
         self.true_model_on_branhces = []
         self.true_model_hamiltonian = self.exploration_class.true_hamiltonian
-        self.log_print([
-            "True model:", self.true_model_name
-        ])
+        self.log_print(["True model:", self.true_model_name])
 
     def _setup_tree_and_exploration_strategies(
         self,
     ):
-        r""" Set up infrastructure."""
+        r"""Set up infrastructure."""
 
         self.model_database = pd.DataFrame(
             {
-                'model_id': [],
-                'model_name': [],
-                'latex_name': [],
-                'branch_id': [],
-                'f_score': [],
-                'model_storage_instance': [],
-                'branches_present_on' : [], 
-                'terms' : [],
-                'latex_terms' : []
+                "model_id": [],
+                "model_name": [],
+                "latex_name": [],
+                "branch_id": [],
+                "f_score": [],
+                "model_storage_instance": [],
+                "model_constructor": [],
+                "branches_present_on": [],
+                "terms": [],
+                "latex_terms": [],
             }
         )
         self.model_lists = {
@@ -221,7 +225,9 @@ class QuantumModelLearningAgent():
 
         # Exploration Strategy setup
         self.exploration_strategy_of_true_model = self.qmla_controls.exploration_rules
-        self.unique_exploration_strategy_instances = self.qmla_controls.unique_exploration_strategy_instances
+        self.unique_exploration_strategy_instances = (
+            self.qmla_controls.unique_exploration_strategy_instances
+        )
 
         # Keep track of models/branches
         self.model_count = 0
@@ -249,7 +255,7 @@ class QuantumModelLearningAgent():
         model_priors,
         experimental_measurements,
     ):
-        r""" Parameters related to learning/comparing models."""
+        r"""Parameters related to learning/comparing models."""
 
         # Miscellaneous
         self.model_priors = model_priors
@@ -258,12 +264,10 @@ class QuantumModelLearningAgent():
         self.num_particles = self.qmla_controls.num_particles
         self.num_experiments = self.qmla_controls.num_experiments
         # self.fraction_experiments_for_bf = self.exploration_class.fraction_experiments_for_bf
-        self.num_experiments_for_bayes_updates = self.num_experiments # TODO remove
-
+        self.num_experiments_for_bayes_updates = self.num_experiments  # TODO remove
 
         self.bayes_threshold_lower = 1
-        self.bayes_threshold_upper = 100 # TODO get from ES
-
+        self.bayes_threshold_upper = 100  # TODO get from ES
 
         # Analysis infrastructure
         self.model_f_scores = {}
@@ -276,20 +280,29 @@ class QuantumModelLearningAgent():
             # noise_level=self.exploration_class.probe_noise_level,
             # minimum_tolerable_noise=0.0,
             # tell it the max number of qubits required by any ES under consideration
-            probe_maximum_number_qubits = max(
-                [gr.max_num_probe_qubits for gr in self.qmla_controls.unique_exploration_strategy_instances.values()]
+            probe_maximum_number_qubits=max(
+                [
+                    gr.max_num_probe_qubits
+                    for gr in self.qmla_controls.unique_exploration_strategy_instances.values()
+                ]
             )
         )
         self.probes_system = self.exploration_class.probes_system
         self.probes_simulator = self.exploration_class.probes_simulator
         self.probe_number = self.exploration_class.num_probes
         sim_probe_keys = list(self.probes_simulator.keys())
-        self.log_print(["Simulator probe keys (len {}):{}".format(len(sim_probe_keys), sim_probe_keys) ])
+        self.log_print(
+            [
+                "Simulator probe keys (len {}):{}".format(
+                    len(sim_probe_keys), sim_probe_keys
+                )
+            ]
+        )
 
         # Measurements of true model
         self.experimental_measurements = experimental_measurements
-        self.experimental_measurement_times = (
-            sorted(list(self.experimental_measurements.keys()))
+        self.experimental_measurement_times = sorted(
+            list(self.experimental_measurements.keys())
         )
 
         # Used for consistent plotting
@@ -297,15 +310,11 @@ class QuantumModelLearningAgent():
         self.times_to_plot_reduced_set = self.times_to_plot[0::10]
         self.probes_plot_file = self.qmla_controls.probes_plot_file
         try:
-            self.probes_for_plots = pickle.load(
-                open(self.probes_plot_file, 'rb')
-            )
+            self.probes_for_plots = pickle.load(open(self.probes_plot_file, "rb"))
         except BaseException:
-            self.log_print([
-                "Could not load plot probes from {}".format(
-                    self.probes_plot_file
-                )
-            ])
+            self.log_print(
+                ["Could not load plot probes from {}".format(self.probes_plot_file)]
+            )
 
     def _potentially_redundant_setup(
         self,
@@ -328,8 +337,7 @@ class QuantumModelLearningAgent():
 
         # Plotting data about pairwise comparisons
         self.instance_learning_and_comparisons_path = os.path.join(
-            self.qmla_controls.plots_directory,
-            'comparisons'
+            self.qmla_controls.plots_directory, "comparisons"
         )
         if not os.path.exists(self.instance_learning_and_comparisons_path):
             try:
@@ -339,24 +347,23 @@ class QuantumModelLearningAgent():
                 pass
         self.bayes_factors_store_times_file = str(
             self.instance_learning_and_comparisons_path
-            + 'BayesFactorsPairsTimes_'
+            + "BayesFactorsPairsTimes_"
             + str(self.qmla_controls.long_id)
-            + '.txt'
+            + ".txt"
         )
 
     def _setup_parallel_requirements(self):
-        r""" Infrastructure for use when QMLA run in parallel. """
+        r"""Infrastructure for use when QMLA run in parallel."""
 
         self.use_rq = self.qmla_controls.use_rq
         self.rq_timeout = self.qmla_controls.rq_timeout
         self.rq_log_file = self.log_file
         # writeable file object to use for logging:
-        self.write_log_file = open(self.log_file, 'a')
+        self.write_log_file = open(self.log_file, "a")
 
         try:
             self.redis_conn = redis.Redis(
-                host=self.redis_host_name,
-                port=self.redis_port_number
+                host=self.redis_host_name, port=self.redis_port_number
             )
             parallel_enabled = True
         except BaseException:
@@ -381,30 +388,23 @@ class QuantumModelLearningAgent():
             base_num_qubits = 3
             base_num_terms = 3
             for op in self.exploration_class.initial_models:
-                if construct_models.get_num_qubits(op) < base_num_qubits:
-                    base_num_qubits = construct_models.get_num_qubits(op)
+                if model_building_utilities.get_num_qubits(op) < base_num_qubits:
+                    base_num_qubits = model_building_utilities.get_num_qubits(op)
                 num_terms = len(
-                    construct_models.get_constituent_names_from_name(op))
-                if (
-                    num_terms < base_num_terms
-                ):
+                    model_building_utilities.get_constituent_names_from_name(op)
+                )
+                if num_terms < base_num_terms:
                     base_num_terms = num_terms
 
             self.base_resources = {
-                'num_qubits': base_num_qubits,
-                'num_terms': base_num_terms,
-                'reallocate': True
+                "num_qubits": base_num_qubits,
+                "num_terms": base_num_terms,
+                "reallocate": True,
             }
         else:
-            self.base_resources = {
-                'num_qubits': 1,
-                'num_terms': 1,
-                'reallocate': False
-            }
+            self.base_resources = {"num_qubits": 1, "num_terms": 1, "reallocate": False}
 
-    def _compile_and_store_qmla_info_summary(
-        self
-    ):
+    def _compile_and_store_qmla_info_summary(self):
         r"""
         Gather info needed to run QMLA tasks and store remotely.
 
@@ -418,77 +418,78 @@ class QuantumModelLearningAgent():
 
         """
 
-        number_hamiltonians_to_exponentiate = (
-            self.num_particles *
-            (2*self.num_experiments)
+        number_hamiltonians_to_exponentiate = self.num_particles * (
+            2 * self.num_experiments
         )
         self.latex_config = str(
-            '$P_{' + str(self.num_particles) +
-            '}E_{' + str(self.num_experiments) +
+            "$P_{"
+            + str(self.num_particles)
+            + "}E_{"
+            + str(self.num_experiments)
+            +
             # '}B_{' + str(self.num_experiments_for_bayes_updates) +
-            '}H_{' + str(number_hamiltonians_to_exponentiate) +
-            r'}|\psi>_{' + str(self.probe_number) +
-            '}PN_{' + str(self.exploration_class.probe_noise_level) +
-            '}$'
+            "}H_{"
+            + str(number_hamiltonians_to_exponentiate)
+            + r"}|\psi>_{"
+            + str(self.probe_number)
+            + "}PN_{"
+            + str(self.exploration_class.probe_noise_level)
+            + "}$"
         )
 
         self.qmla_settings = {
-            'probes_plot_file': self.probes_plot_file,
-            'plot_times': self.times_to_plot,
-            'true_name': self.true_model_name,
-            'true_oplist': self.true_model_constituent_operators,
-            'true_model_terms_params': self.true_param_list,
-            'true_param_dict': self.true_param_dict,
-            'num_particles': self.num_particles,
-            'num_experiments': self.num_experiments,
-            'results_directory': self.results_directory,
-            'plots_directory': self.qmla_controls.plots_directory,
-            'debug_mode' : self.debug_mode, 
-            'plot_level' : self.plot_level, 
-            'figure_format' : self.qmla_controls.figure_format, 
-            'long_id': self.qmla_controls.long_id,
-            'model_priors': self.model_priors,  # could be path to unpickle within model?
-            'experimental_measurements': self.experimental_measurements,
-            'base_resources': self.base_resources,
-            'store_particles_weights': False,  # TODO from exploration strategy or unneeded
-            'qhl_plots': False,  # TODO get from exploration strategy
-            'experimental_measurement_times': self.experimental_measurement_times,
-            'num_probes': self.probe_number,  # from exploration strategy or unneeded,
-            'run_info_file': self.qmla_controls.run_info_file,
+            "probes_plot_file": self.probes_plot_file,
+            "plot_times": self.times_to_plot,
+            "true_name": self.true_model_name,
+            "true_oplist": self.true_model_constituent_operators,
+            "true_model_terms_params": self.true_param_list,
+            "true_param_dict": self.true_param_dict,
+            "true_model_constructor": self.true_model_constructor,
+            "num_particles": self.num_particles,
+            "num_experiments": self.num_experiments,
+            "results_directory": self.results_directory,
+            "plots_directory": self.qmla_controls.plots_directory,
+            "debug_mode": self.debug_mode,
+            "plot_level": self.plot_level,
+            "figure_format": self.qmla_controls.figure_format,
+            "long_id": self.qmla_controls.long_id,
+            "model_priors": self.model_priors,  # could be path to unpickle within model?
+            "experimental_measurements": self.experimental_measurements,
+            "base_resources": self.base_resources,
+            "store_particles_weights": False,  # TODO from exploration strategy or unneeded
+            "qhl_plots": False,  # TODO get from exploration strategy
+            "experimental_measurement_times": self.experimental_measurement_times,
+            "num_probes": self.probe_number,  # from exploration strategy or unneeded,
+            "run_info_file": self.qmla_controls.run_info_file,
         }
-        self.log_print(["QMLA settings figure_format:", self.qmla_settings['figure_format']])
+        self.log_print(
+            ["QMLA settings figure_format:", self.qmla_settings["figure_format"]]
+        )
 
         # Store qmla_settings and probe dictionaries on the redis database,
         # accessible by all workers.
         # These are retrieved by workers to set
         # parameters to use when learning/comparing models.
-        compressed_qmla_core_info = pickle.dumps(
-            self.qmla_settings, protocol=4)
+        compressed_qmla_core_info = pickle.dumps(self.qmla_settings, protocol=4)
         compressed_probe_dict = pickle.dumps(self.probes_system, protocol=4)
-        compressed_sim_probe_dict = pickle.dumps(
-            self.probes_simulator, protocol=4)
-        qmla_core_info_database = self.redis_databases['qmla_core_info_database']
-        qmla_core_info_database.set('qmla_settings', compressed_qmla_core_info)
-        qmla_core_info_database.set('probes_system', compressed_probe_dict)
-        qmla_core_info_database.set('probes_simulator', compressed_sim_probe_dict)
+        compressed_sim_probe_dict = pickle.dumps(self.probes_simulator, protocol=4)
+        qmla_core_info_database = self.redis_databases["qmla_core_info_database"]
+        qmla_core_info_database.set("qmla_settings", compressed_qmla_core_info)
+        qmla_core_info_database.set("probes_system", compressed_probe_dict)
+        qmla_core_info_database.set("probes_simulator", compressed_sim_probe_dict)
 
         self.qmla_core_info_database = {
-            'qmla_settings': self.qmla_settings,
-            'probes_system': self.probes_system,
-            'probes_simulator': self.probes_simulator
+            "qmla_settings": self.qmla_settings,
+            "probes_system": self.probes_system,
+            "probes_simulator": self.probes_simulator,
         }
-        self.log_print(
-            ["Saved QMLA instance info to ", qmla_core_info_database])
+        self.log_print(["Saved QMLA instance info to ", qmla_core_info_database])
 
     ##########
     # Section: Calculation of models parameters and Bayes factors
     ##########
 
-    def learn_models_on_given_branch(
-        self,
-        branch_id,
-        blocking=False
-    ):
+    def learn_models_on_given_branch(self, branch_id, blocking=False):
         r"""
         Launches jobs to learn all models on the specified branch.
 
@@ -512,43 +513,37 @@ class QuantumModelLearningAgent():
         """
 
         model_list = self.branches[branch_id].resident_models
-        num_models_already_set_this_branch = self.branches[branch_id].num_precomputed_models
+        num_models_already_set_this_branch = self.branches[
+            branch_id
+        ].num_precomputed_models
         unlearned_models_this_branch = self.branches[branch_id].unlearned_models
 
         # Update redis database
-        active_branches_learning_models = (
-            self.redis_databases['active_branches_learning_models']
-        )
+        active_branches_learning_models = self.redis_databases[
+            "active_branches_learning_models"
+        ]
         active_branches_learning_models.set(
-            int(branch_id),
-            num_models_already_set_this_branch
+            int(branch_id), num_models_already_set_this_branch
         )
 
         # Learn models
-        self.log_print([
-            "Branch {} has models: \nprecomputed: {} \nunlearned: {}".format(
-                branch_id,
-                self.branches[branch_id].precomputed_models,
-                unlearned_models_this_branch
-            )
-        ])
+        self.log_print(
+            [
+                "Branch {} has models: \nprecomputed: {} \nunlearned: {}".format(
+                    branch_id,
+                    self.branches[branch_id].precomputed_models,
+                    unlearned_models_this_branch,
+                )
+            ]
+        )
 
         for model_name in unlearned_models_this_branch:
             self.learn_model(
-                model_name=model_name,
-                branch_id=branch_id,
-                blocking=blocking
+                model_name=model_name, branch_id=branch_id, blocking=blocking
             )
-        self.log_print([
-            'Learning models from branch {} finished.'.format(branch_id)
-        ])
+        self.log_print(["Learning models from branch {} finished.".format(branch_id)])
 
-    def learn_model(
-        self,
-        model_name,
-        branch_id,
-        blocking=False
-    ):
+    def learn_model(self, model_name, branch_id, blocking=False):
         r"""
         Learn a given model by calling the standalone model learning functionality.
 
@@ -574,15 +569,11 @@ class QuantumModelLearningAgent():
         )
 
         if not model_already_exists:
-            self.log_print([
-                "Model {} not yet in database: can not be learned.".format(
-                    model_name
-                )
-            ])
-        else:
-            model_id = self._get_model_id_from_name(
-                model_name=model_name
+            self.log_print(
+                ["Model {} not yet in database: can not be learned.".format(model_name)]
             )
+        else:
+            model_id = self._get_model_id_from_name(model_name=model_name)
             if model_id not in self.models_learned:
                 self.models_learned.append(model_id)
 
@@ -592,15 +583,21 @@ class QuantumModelLearningAgent():
                     self.qmla_id,
                     connection=self.redis_conn,
                     is_async=self.use_rq,
-                    default_timeout=self.rq_timeout
+                    default_timeout=self.rq_timeout,
                 )
-                self.log_print(["Redis queue object:", queue,
-                                "has job waiting IDs:", queue.job_ids])
+                self.log_print(
+                    [
+                        "Redis queue object:",
+                        queue,
+                        "has job waiting IDs:",
+                        queue.job_ids,
+                    ]
+                )
                 # send model-learning, as task to job queue
                 queued_model = queue.enqueue(
                     remote_learn_model_parameters,
                     result_ttl=-1,
-                    # ttl = -1, 
+                    # ttl = -1,
                     job_timeout=self.rq_timeout,
                     name=model_name,
                     model_id=model_id,
@@ -612,41 +609,43 @@ class QuantumModelLearningAgent():
                     qid=self.qmla_id,
                     log_file=self.rq_log_file,
                 )
-                self.log_print(
-                    ["Model {} on rq job {}".format(model_id, queued_model)])
+                self.log_print(["Model {} on rq job {}".format(model_id, queued_model)])
                 if blocking:
                     # wait for result when called.
-                    self.log_print([
-                        "Blocking: waiting for {} to finish on redis queue".format(
-                            model_name
-                        )
-                    ])
+                    self.log_print(
+                        [
+                            "Blocking: waiting for {} to finish on redis queue".format(
+                                model_name
+                            )
+                        ]
+                    )
                     while not queued_model.is_finished:
                         t_init = time.time()
                         some_job_failed = queued_model.is_failed
-                        self.timings['jobs_finished'] += time.time() - t_init
-                        self.call_counter['jobs_finished'] += 1
+                        self.timings["jobs_finished"] += time.time() - t_init
+                        self.call_counter["jobs_finished"] += 1
                         if some_job_failed:
-                            self.log_print([
-                                "Model", model_name,
-                                "has failed on remote worker."
-                            ])
+                            self.log_print(
+                                ["Model", model_name, "has failed on remote worker."]
+                            )
                             raise NameError("Remote QML failure")
                             break
                         time.sleep(self.sleep_duration)
-                    self.log_print(
-                        ['Blocking RQ - model learned:', model_name]
-                    )
+                    self.log_print(["Blocking RQ - model learned:", model_name])
             else:
                 # run model learning fnc locally
-                self.log_print([
-                    "Locally calling learn model function.",
-                    "model:", model_name,
-                    " ID:", model_id
-                ])
+                self.log_print(
+                    [
+                        "Locally calling learn model function.",
+                        "model:",
+                        model_name,
+                        " ID:",
+                        model_id,
+                    ]
+                )
                 # pass probes directly instead of unpickling from redis
                 # database
-                self.qmla_settings['probe_dict'] = self.probes_system
+                self.qmla_settings["probe_dict"] = self.probes_system
 
                 remote_learn_model_parameters(
                     name=model_name,
@@ -658,7 +657,7 @@ class QuantumModelLearningAgent():
                     host_name=self.redis_host_name,
                     port_number=self.redis_port_number,
                     qid=self.qmla_id,
-                    log_file=self.rq_log_file
+                    log_file=self.rq_log_file,
                 )
 
     def compare_model_pair(
@@ -668,7 +667,7 @@ class QuantumModelLearningAgent():
         return_job=False,
         branch_id=None,
         remote=True,
-        wait_on_result=False
+        wait_on_result=False,
     ):
         r"""
         Launch the comparison between two models.
@@ -694,30 +693,29 @@ class QuantumModelLearningAgent():
             `wait_on_result==True`.
         """
 
-        unique_id = construct_models.unique_model_pair_identifier(
-            model_a_id,
-            model_b_id
+        unique_id = model_building_utilities.unique_model_pair_identifier(
+            model_a_id, model_b_id
         )
-        if (
-            unique_id not in self.bayes_factor_pair_computed
-        ):
-            self.bayes_factor_pair_computed.append(
-                unique_id
-            )
+        if unique_id not in self.bayes_factor_pair_computed:
+            self.bayes_factor_pair_computed.append(unique_id)
 
         # Launch comparison, either remotely or locally
         if self.use_rq:
             # launch remotely
             from rq import Connection, Queue, Worker
-            queue = Queue(self.qmla_id, connection=self.redis_conn,
-                          is_async=self.use_rq, default_timeout=self.rq_timeout
-                          )
+
+            queue = Queue(
+                self.qmla_id,
+                connection=self.redis_conn,
+                is_async=self.use_rq,
+                default_timeout=self.rq_timeout,
+            )
 
             # the function object is the first argument to RQ enqueue function
             job = queue.enqueue(
                 remote_bayes_factor_calculation,
                 result_ttl=-1,
-                # ttl = -1, 
+                # ttl = -1,
                 job_timeout=self.rq_timeout,
                 model_a_id=model_a_id,
                 model_b_id=model_b_id,
@@ -731,15 +729,17 @@ class QuantumModelLearningAgent():
                 qid=self.qmla_id,
                 log_file=self.rq_log_file,
             )
-            self.log_print([
-                "Bayes factor calculation queued. Models {}/{}".format(
-                    model_a_id, model_b_id
-                )
-            ])
+            self.log_print(
+                [
+                    "Bayes factor calculation queued. Models {}/{}".format(
+                        model_a_id, model_b_id
+                    )
+                ]
+            )
             if wait_on_result == True:
                 while not job.is_finished:
                     if job.is_failed:
-                        raise("Remote BF failure")
+                        raise ("Remote BF failure")
                     sleep(self.sleep_duration)
             elif return_job == True:
                 return job
@@ -756,14 +756,13 @@ class QuantumModelLearningAgent():
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number,
                 qid=self.qmla_id,
-                log_file=self.rq_log_file
+                log_file=self.rq_log_file,
             )
         if wait_on_result == True:
-            pair_id = construct_models.unique_model_pair_identifier(
-                model_a_id,
-                model_b_id
+            pair_id = model_building_utilities.unique_model_pair_identifier(
+                model_a_id, model_b_id
             )
-            bf_from_db = self.redis_databases['bayes_factors_db'].get(pair_id)
+            bf_from_db = self.redis_databases["bayes_factors_db"].get(pair_id)
             bayes_factor = float(bf_from_db)
             return bayes_factor
 
@@ -796,23 +795,15 @@ class QuantumModelLearningAgent():
         """
 
         if pair_list is None:
-            pair_list = list(itertools.combinations(
-                model_id_list, 2
-            ))
-        self.log_print([
-            "compare_model_set with BF pair list:",
-            pair_list
-        ])
+            pair_list = list(itertools.combinations(model_id_list, 2))
+        self.log_print(["compare_model_set with BF pair list:", pair_list])
 
         remote_jobs = []
         for pair in pair_list:
-            unique_id = construct_models.unique_model_pair_identifier(
+            unique_id = model_building_utilities.unique_model_pair_identifier(
                 pair[0], pair[1]
             )
-            if (
-                unique_id not in self.bayes_factor_pair_computed
-                or recompute == True
-            ):
+            if unique_id not in self.bayes_factor_pair_computed or recompute == True:
                 # ie not yet considered
                 remote_jobs.append(
                     self.compare_model_pair(
@@ -824,35 +815,32 @@ class QuantumModelLearningAgent():
                 )
 
         if wait_on_result and self.use_rq:
-            self.log_print([
-                "Waiting on result of ",
-                "Bayes comparisons from given model list:",
-                model_id_list,
-                "\n pair list:", pair_list
-            ])
+            self.log_print(
+                [
+                    "Waiting on result of ",
+                    "Bayes comparisons from given model list:",
+                    model_id_list,
+                    "\n pair list:",
+                    pair_list,
+                ]
+            )
             for job in remote_jobs:
-                self.log_print([
-                    "Monitoring job {}".format(job)
-                ])
+                self.log_print(["Monitoring job {}".format(job)])
                 while not job.is_finished:
                     if job.is_failed:
-                        self.log_print([
-                            "Model comparison job failed:", job
-                        ])
+                        self.log_print(["Model comparison job failed:", job])
                         raise NameError("Remote job failure")
                     time.sleep(self.sleep_duration)
         else:
-            self.log_print([
-                "Not waiting on results of BF calculations",
-                "since we're not using RQ workers here."
-            ])
+            self.log_print(
+                [
+                    "Not waiting on results of BF calculations",
+                    "since we're not using RQ workers here.",
+                ]
+            )
 
     def compare_models_within_branch(
-        self,
-        branch_id,
-        pair_list=None,
-        remote=True,
-        recompute=False
+        self, branch_id, pair_list=None, remote=True, recompute=False
     ):
         r"""
         Launch pairwise model comparison for all models on a branch.
@@ -876,24 +864,22 @@ class QuantumModelLearningAgent():
 
         if pair_list is None:
             pair_list = self.branches[branch_id].pairs_to_compare
-        self.log_print([
-            'compare_models_within_branch for branch {} has {} pairs: {}'.format(
-                branch_id,
-                len(pair_list),
-                pair_list
-            )
-        ])
-        
-        # Set branch as active on redis db
-        active_branches_bayes = self.redis_databases['active_branches_bayes']
-        active_branches_bayes.set(int(branch_id), 0) 
-        
-        # Compare model pairs
-        for a,b in pair_list:
-            if a != b:
-                unique_id = construct_models.unique_model_pair_identifier(
-                    a, b
+        self.log_print(
+            [
+                "compare_models_within_branch for branch {} has {} pairs: {}".format(
+                    branch_id, len(pair_list), pair_list
                 )
+            ]
+        )
+
+        # Set branch as active on redis db
+        active_branches_bayes = self.redis_databases["active_branches_bayes"]
+        active_branches_bayes.set(int(branch_id), 0)
+
+        # Compare model pairs
+        for a, b in pair_list:
+            if a != b:
+                unique_id = model_building_utilities.unique_model_pair_identifier(a, b)
                 if (
                     unique_id not in self.bayes_factor_pair_computed
                     or recompute == True
@@ -908,10 +894,7 @@ class QuantumModelLearningAgent():
                 elif unique_id in self.bayes_factor_pair_computed:
                     # if this is already computed,
                     # tell this branch not to wait on it.
-                    active_branches_bayes.incr(
-                        int(branch_id),
-                        1
-                    )
+                    active_branches_bayes.incr(int(branch_id), 1)
 
     def process_model_pair_comparison(
         self,
@@ -933,31 +916,32 @@ class QuantumModelLearningAgent():
             from this pair
         """
 
-        bayes_factors_db = self.redis_databases['bayes_factors_db']
+        bayes_factors_db = self.redis_databases["bayes_factors_db"]
         if pair is not None:
-            model_ids = pair.split(',')
-            a = (float(model_ids[0]))
-            b = (float(model_ids[1]))
+            model_ids = pair.split(",")
+            a = float(model_ids[0])
+            b = float(model_ids[1])
         elif a is not None and b is not None:
             a = float(a)
             b = float(b)
-            pair = construct_models.unique_model_pair_identifier(a, b)
+            pair = model_building_utilities.unique_model_pair_identifier(a, b)
         else:
-            self.log_print([
-                "Must pass either two model ids, or a \
+            self.log_print(
+                [
+                    "Must pass either two model ids, or a \
                 pair name string, to process Bayes factors."
-            ])
-        try:
-            bayes_factor = float(
-                bayes_factors_db.get(pair)
+                ]
             )
+        try:
+            bayes_factor = float(bayes_factors_db.get(pair))
         except TypeError:
-            self.log_print([
-                "On bayes_factors_db for pair {} = {}".format(
-                    pair,
-                    bayes_factors_db.get(pair)
-                )
-            ])
+            self.log_print(
+                [
+                    "On bayes_factors_db for pair {} = {}".format(
+                        pair, bayes_factors_db.get(pair)
+                    )
+                ]
+            )
 
         # bayes_factor refers to calculation BF(pair), where pair
         # is always defined (lower, higher) for consistency
@@ -983,11 +967,13 @@ class QuantumModelLearningAgent():
             champ = mod_high.model_id
         else:
             champ = None
-            self.log_print([
-                "Neither model sufficiently better to earn point between {}/{}. BF={}".format(
-                    mod_low.model_id, mod_high.model_id, bayes_factor
-                )
-            ])
+            self.log_print(
+                [
+                    "Neither model sufficiently better to earn point between {}/{}. BF={}".format(
+                        mod_low.model_id, mod_high.model_id, bayes_factor
+                    )
+                ]
+            )
 
         return champ
 
@@ -1018,47 +1004,47 @@ class QuantumModelLearningAgent():
         """
 
         # Establish pairs to check comparisons between
-        pair_list = list(itertools.combinations(
-            model_list, 2
-        ))
+        pair_list = list(itertools.combinations(model_list, 2))
 
         # Process result for each pair
-        models_points = {
-            mod: 0
-            for mod in model_list
-        }
+        models_points = {mod: 0 for mod in model_list}
         for pair in pair_list:
             mod1, mod2 = pair
             if mod1 != mod2:
                 res = self.process_model_pair_comparison(a=mod1, b=mod2)
-                if res is not None: 
+                if res is not None:
                     models_points[res] += 1
-                self.log_print([
-                    "[process_model_set_comparisons]",
-                    "Point to", res,
-                    "(comparison {}/{})".format(mod1, mod2)
-                ])
+                self.log_print(
+                    [
+                        "[process_model_set_comparisons]",
+                        "Point to",
+                        res,
+                        "(comparison {}/{})".format(mod1, mod2),
+                    ]
+                )
 
         # Analyse pairwise competition
-        self.log_print([
-            "Models points: \n{}".format(models_points)
-        ])
+        self.log_print(["Models points: \n{}".format(models_points)])
         max_points = max(models_points.values())
-        models_with_max_points = [key for key, val in models_points.items()
-                                  if val == max_points]
+        models_with_max_points = [
+            key for key, val in models_points.items() if val == max_points
+        ]
         if len(models_with_max_points) > 1:
-            self.log_print([
-                "Multiple models \
+            self.log_print(
+                [
+                    "Multiple models \
                 have same number of points in process_model_set_comparisons:",
-                models_with_max_points,
-                "\n Model points:\n", models_points
-            ])
+                    models_with_max_points,
+                    "\n Model points:\n",
+                    models_points,
+                ]
+            )
             self.log_print(["After re-comparison, points:\n", models_points])
             self.compare_model_set(
                 model_id_list=models_with_max_points,
                 remote=True,
                 recompute=True,  # recompute here b/c deadlock last time
-                wait_on_result=True
+                wait_on_result=True,
             )
             champ_id = self.process_model_set_comparisons(
                 models_with_max_points,
@@ -1069,11 +1055,7 @@ class QuantumModelLearningAgent():
 
         return champ_id
 
-    def process_comparisons_within_branch(
-        self,
-        branch_id,
-        pair_list=None
-    ):
+    def process_comparisons_within_branch(self, branch_id, pair_list=None):
         r"""
         Process comparisons between models on the same branch.
 
@@ -1106,67 +1088,55 @@ class QuantumModelLearningAgent():
         # Establish pairs to check comparisons between
         if pair_list is None:
             pair_list = branch.pairs_to_compare
-            self.log_print([
-                "Pair list not given for branch {}, generated:{}".format(
-                    branch_id,
-                    pair_list
-                ),
-            ])
+            self.log_print(
+                [
+                    "Pair list not given for branch {}, generated:{}".format(
+                        branch_id, pair_list
+                    ),
+                ]
+            )
         else:
-            self.log_print([
-                "pair list given to branch processing:", pair_list
-            ])
+            self.log_print(["pair list given to branch processing:", pair_list])
 
         # Process result for each pair
-        models_points = {
-            k: 0
-            for k in active_models_in_branch
-        }
+        models_points = {k: 0 for k in active_models_in_branch}
         for mod1, mod2 in pair_list:
             if mod1 != mod2:
-                res = self.process_model_pair_comparison(
-                    a=mod1, b=mod2
-                )
-                if res is not None: 
+                res = self.process_model_pair_comparison(a=mod1, b=mod2)
+                if res is not None:
                     try:
                         models_points[res] += 1
                     except BaseException:
                         models_points[res] = 1
-                self.log_print([
-                    "[branch {} comparison {}/{}] ".format(
-                        branch_id, mod1, mod2
-                    ),
-                    "Point to", res,
-                ])
+                self.log_print(
+                    [
+                        "[branch {} comparison {}/{}] ".format(branch_id, mod1, mod2),
+                        "Point to",
+                        res,
+                    ]
+                )
         self.log_print(["Comparisons complete on branch {}".format(branch_id)])
 
         # Update branch with these results to determine branch champion
-        branch.update_branch(
-            pair_list=pair_list, 
-            models_points=models_points
-        )
+        branch.update_branch(pair_list=pair_list, models_points=models_points)
 
         # If the given results are not sufficient for the ES to determine a branch champion,
         # reconsider a subset of models
         while not branch.is_branch_champion_set:
             reduced_model_set = branch.joint_branch_champions
-            self.log_print([
-                "Branch champion not determined.",
-                "Reconsidering:", reduced_model_set
-            ])
+            self.log_print(
+                ["Branch champion not determined.", "Reconsidering:", reduced_model_set]
+            )
             self.compare_model_set(
                 model_id_list=reduced_model_set,
                 remote=True,
                 recompute=False,
-                wait_on_result=True
+                wait_on_result=True,
             )
             # Pass result of compare_model_set to branch to decide if sufficient to choose champion
-            models_to_recompare = list(itertools.combinations(
-                reduced_model_set, 2
-            ))
+            models_to_recompare = list(itertools.combinations(reduced_model_set, 2))
             self.process_comparisons_within_branch(
-                branch_id=branch_id,
-                pair_list=models_to_recompare
+                branch_id=branch_id, pair_list=models_to_recompare
             )
 
         return branch.champion_id
@@ -1204,10 +1174,10 @@ class QuantumModelLearningAgent():
         """
 
         # Get redis databases
-        active_branches_learning_models = (
-            self.redis_databases['active_branches_learning_models']
-        )
-        active_branches_bayes = self.redis_databases['active_branches_bayes']
+        active_branches_learning_models = self.redis_databases[
+            "active_branches_learning_models"
+        ]
+        active_branches_bayes = self.redis_databases["active_branches_bayes"]
 
         # Launch learning on initial branches
         for b in self.branches:
@@ -1215,24 +1185,17 @@ class QuantumModelLearningAgent():
                 b,
                 blocking=False,
             )
-        self.log_print([
-            "Starting learning for initial branches:",
-            list(self.branches.keys())
-        ])
+        self.log_print(
+            ["Starting learning for initial branches:", list(self.branches.keys())]
+        )
 
         # Iteratively learn/compare/spawn until all trees declare completion
-        self.log_print([
-            "Entering while loop: learning/comparing/spawning models."
-        ])
+        self.log_print(["Entering while loop: learning/comparing/spawning models."])
         ctr = 0
         while self.tree_count_completed < self.tree_count:
             # get most recent branches on redis database
-            branch_ids_on_db = list(
-                active_branches_learning_models.keys()
-            )
-            branch_ids_on_db = [
-                int(b) for b in branch_ids_on_db
-            ]
+            branch_ids_on_db = list(active_branches_learning_models.keys())
+            branch_ids_on_db = [int(b) for b in branch_ids_on_db]
 
             # check if any job has crashed
             if self.run_in_parallel:
@@ -1248,12 +1211,12 @@ class QuantumModelLearningAgent():
                 )
                 if (
                     not self.branches[branch_id].model_learning_complete
-                    and
-                    num_models_learned_on_branch == self.branches[branch_id].num_models
+                    and num_models_learned_on_branch
+                    == self.branches[branch_id].num_models
                 ):
-                    self.log_print([
-                        "All models on branch {} learned".format(branch_id)
-                    ])
+                    self.log_print(
+                        ["All models on branch {} learned".format(branch_id)]
+                    )
                     self.branches[branch_id].model_learning_complete = True
                     for mod_id in self.branches[branch_id].resident_model_ids:
                         mod = self.get_model_storage_instance_by_id(mod_id)
@@ -1261,67 +1224,70 @@ class QuantumModelLearningAgent():
                     # launch comparisons
                     self.compare_models_within_branch(branch_id)
                 elif ctr % 100 == 0:
-                    self.log_print([
-                        "Ctr {} branch {} has {} of {} models learned; model_learning_complete: {}".format(
-                        ctr, 
-                        branch_id,
-                        int(num_models_learned_on_branch),
-                        self.branches[branch_id].num_models,
-                        self.branches[branch_id].model_learning_complete
-                    )])
+                    self.log_print(
+                        [
+                            "Ctr {} branch {} has {} of {} models learned; model_learning_complete: {}".format(
+                                ctr,
+                                branch_id,
+                                int(num_models_learned_on_branch),
+                                self.branches[branch_id].num_models,
+                                self.branches[branch_id].model_learning_complete,
+                            )
+                        ]
+                    )
 
             for branchID_bytes in active_branches_bayes.keys():
                 branch_id = int(branchID_bytes)
                 num_comparisons_complete_on_branch = active_branches_bayes.get(
                     branchID_bytes
                 )
-                if (
-                    not self.branches[branch_id].comparisons_complete
-                    and (
-                        int( num_comparisons_complete_on_branch) 
-                        == self.branches[branch_id].num_model_pairs
-                    )
+                if not self.branches[branch_id].comparisons_complete and (
+                    int(num_comparisons_complete_on_branch)
+                    == self.branches[branch_id].num_model_pairs
                 ):
                     self.branches[branch_id].comparisons_complete = True
                     # analyse resulting bayes factors
-                    self.log_print([
-                        "Branch {} comparisons starting".format(branch_id)
-                    ])
+                    self.log_print(["Branch {} comparisons starting".format(branch_id)])
                     self.process_comparisons_within_branch(branch_id)
-                    self.log_print([
-                        "Branch {} comparisons complete".format(branch_id)
-                    ])
+                    self.log_print(["Branch {} comparisons complete".format(branch_id)])
 
                     # check if tree is complete
                     if self.branches[branch_id].tree.is_tree_complete():
                         self.tree_count_completed += 1
-                        self.log_print([
-                            "Tree complete:",
-                            self.branches[branch_id].exploration_strategy,
-                            "Number of trees now completed:",
-                            self.tree_count_completed,
-                        ])
+                        self.log_print(
+                            [
+                                "Tree complete:",
+                                self.branches[branch_id].exploration_strategy,
+                                "Number of trees now completed:",
+                                self.tree_count_completed,
+                            ]
+                        )
                     else:
                         # tree not complete -> launch next set of models
                         self.spawn_from_branch(
                             branch_id=branch_id,
                         )
                 elif ctr % 100 == 0:
-                    self.log_print([
-                        "Ctr {} branch {} has {} out of {} comparisons complete; comparisons_complete: {}".format(
-                        ctr,
-                        branch_id, 
-                        int(num_comparisons_complete_on_branch),
-                        self.branches[branch_id].num_model_pairs,
-                        self.branches[branch_id].comparisons_complete
-                    )])
+                    self.log_print(
+                        [
+                            "Ctr {} branch {} has {} out of {} comparisons complete; comparisons_complete: {}".format(
+                                ctr,
+                                branch_id,
+                                int(num_comparisons_complete_on_branch),
+                                self.branches[branch_id].num_model_pairs,
+                                self.branches[branch_id].comparisons_complete,
+                            )
+                        ]
+                    )
             ctr += 1
 
-        self.log_print([
-            "{} trees have completed. Waiting on final comparisons".format(
-                self.tree_count_completed
-            )
-        ])
+        self.log_print(
+            [
+                "{} trees have completed. Waiting on final comparisons".format(
+                    self.tree_count_completed
+                )
+            ]
+        )
 
         # Allow any branches which have just started to finish
         still_learning = True
@@ -1330,13 +1296,9 @@ class QuantumModelLearningAgent():
             for branchID_bytes in branch_ids_on_db:
                 branch_id = int(branchID_bytes)
                 if (
-                    (
-                        int(active_branches_learning_models.get(branch_id))
-                        == self.branches[branch_id].num_models
-                    )
-                    and
-                    self.branches[branch_id].model_learning_complete == False
-                ):
+                    int(active_branches_learning_models.get(branch_id))
+                    == self.branches[branch_id].num_models
+                ) and self.branches[branch_id].model_learning_complete == False:
                     self.branches[branch_id].model_learning_complete = True
                     self.compare_models_within_branch(branch_id)
                     for mod_id in self.branches[branch_id].resident_model_ids:
@@ -1344,30 +1306,22 @@ class QuantumModelLearningAgent():
                         mod.model_update_learned_values()
 
                 if branchID_bytes in active_branches_bayes:
-                    num_comparisons_complete_on_branch = (
-                        active_branches_bayes.get(branchID_bytes)
+                    num_comparisons_complete_on_branch = active_branches_bayes.get(
+                        branchID_bytes
                     )
                     if (
-                        (
-                            int(num_comparisons_complete_on_branch)
-                            == self.branches[branch_id].num_model_pairs
-                        )
-                        and
-                        (
-                            self.branches[branch_id].comparisons_complete == False
-                        )
-                    ):
+                        int(num_comparisons_complete_on_branch)
+                        == self.branches[branch_id].num_model_pairs
+                    ) and (self.branches[branch_id].comparisons_complete == False):
                         self.branches[branch_id].comparisons_complete = True
                         self.process_comparisons_within_branch(branch_id)
 
-            if (
-                np.all(np.array([
-                    self.branches[b].model_learning_complete for b in self.branches
-                ]))
-                and
-                np.all(np.array([
-                    self.branches[b].comparisons_complete for b in self.branches
-                ]))
+            if np.all(
+                np.array(
+                    [self.branches[b].model_learning_complete for b in self.branches]
+                )
+            ) and np.all(
+                np.array([self.branches[b].comparisons_complete for b in self.branches])
             ):
                 # break out of this while loop
                 still_learning = False
@@ -1406,10 +1360,7 @@ class QuantumModelLearningAgent():
         """
 
         model_list = self.branches[branch_id].ranked_models
-        model_names = [
-            self.model_name_id_map[mod_id]
-            for mod_id in model_list
-        ]
+        model_names = [self.model_name_id_map[mod_id] for mod_id in model_list]
 
         new_models, models_to_compare = self.branches[branch_id].tree.next_layer(
             model_list=model_names,
@@ -1417,15 +1368,20 @@ class QuantumModelLearningAgent():
             model_names_ids=self.model_name_id_map,
             called_by_branch=branch_id,
             branch_model_points=self.branches[branch_id].bayes_points,
-            evaluation_log_likelihoods=self.branches[branch_id].evaluation_log_likelihoods,
+            evaluation_log_likelihoods=self.branches[
+                branch_id
+            ].evaluation_log_likelihoods,
             model_dict=self.model_lists,  # only used by FullAccessNVCentre TODO remove properly and don't pass
         )
 
-        self.log_print([
-            "After model generation for ES",
-            self.branches[branch_id].exploration_strategy,
-            "\nnew models:", new_models,
-        ])
+        self.log_print(
+            [
+                "After model generation for ES",
+                self.branches[branch_id].exploration_strategy,
+                "\nnew models:",
+                new_models,
+            ]
+        )
 
         # Generate new QMLA level branch
         new_branch_id = self.new_branch(
@@ -1444,7 +1400,7 @@ class QuantumModelLearningAgent():
     def new_branch(
         self,
         model_list,
-        pairs_to_compare='all',
+        pairs_to_compare="all",
         pairs_to_compare_by_names=None,
         exploration_strategy=None,
         spawning_branch=0,
@@ -1488,21 +1444,23 @@ class QuantumModelLearningAgent():
                 branch_id=branch_id,
                 exploration_tree=exploration_tree,
             )
-            already_computed = not(
-                add_model_info['is_new_model']
-            )
-            model_id = add_model_info['model_id']
+            already_computed = not (add_model_info["is_new_model"])
+            model_id = add_model_info["model_id"]
             this_branch_models[model_id] = model
             model_id_list.append(model_id)
 
             # register if new model
             if already_computed:
                 pre_computed_models.append(model)
-            self.log_print([
-                'Model {} computed already: {} -> ID {}'.format(
-                    model, already_computed, model_id,
-                ),
-            ])
+            self.log_print(
+                [
+                    "Model {} computed already: {} -> ID {}".format(
+                        model,
+                        already_computed,
+                        model_id,
+                    ),
+                ]
+            )
 
         model_storage_instances = {
             m: self.get_model_storage_instance_by_id(m)
@@ -1512,20 +1470,30 @@ class QuantumModelLearningAgent():
         # Start new branch on corresponding exploration strategy tree
 
         if pairs_to_compare_by_names is not None:
-            if pairs_to_compare_by_names == 'all':
-                pairs_to_compare = 'all'
+            if pairs_to_compare_by_names == "all":
+                pairs_to_compare = "all"
             else:
                 self.log_print(["Getting model IDs to set comparison subset"])
                 try:
-                    pairs_to_compare = [(
-                        self.model_database[self.model_database.model_name == m1].model_id.item(),
-                        self.model_database[self.model_database.model_name == m2].model_id.item()
-                        ) for m1, m2 in pairs_to_compare_by_names 
+                    pairs_to_compare = [
+                        (
+                            self.model_database[
+                                self.model_database.model_name == m1
+                            ].model_id.item(),
+                            self.model_database[
+                                self.model_database.model_name == m2
+                            ].model_id.item(),
+                        )
+                        for m1, m2 in pairs_to_compare_by_names
                     ]
                     self.log_print(["IDs:", pairs_to_compare])
                 except BaseException:
                     self.log_print(
-                        ["Failed to unpack pairs_to_compare_by_names:\n", pairs_to_compare_by_names])
+                        [
+                            "Failed to unpack pairs_to_compare_by_names:\n",
+                            pairs_to_compare_by_names,
+                        ]
+                    )
                     raise
 
         self.branches[branch_id] = exploration_tree.new_branch_on_tree(
@@ -1540,11 +1508,7 @@ class QuantumModelLearningAgent():
         return branch_id
 
     def add_model_to_database(
-        self,
-        model,
-        exploration_tree,
-        branch_id=-1,
-        force_create_model=False
+        self, model, exploration_tree, branch_id=-1, force_create_model=False
     ):
         r"""
         Considers adding a model to QMLA's database of models.
@@ -1564,33 +1528,32 @@ class QuantumModelLearningAgent():
             model_id: unique model ID for the model, whether new or existing
         """
 
-        model_name = construct_models.alph(model)
-        self.log_print(["Trying to add model to DB:", model_name])
+        model_name = model_building_utilities.alph(model)
+        self.log_print(
+            ["Trying to add model to DB:", model_name, " with ET ", exploration_tree]
+        )
 
         # Add model if not yet considered or told to force create
-        if (
-            self._consider_new_model(model_name) == 'New'
-            or force_create_model == True
-        ):
+        if self._consider_new_model(model_name) == "New" or force_create_model == True:
             # create new model instance
-            model_num_qubits = qmla.construct_models.get_num_qubits(
-                model_name)
+            model_num_qubits = qmla.model_building_utilities.get_num_qubits(model_name)
             model_id = self.highest_model_id + 1
             self.model_lists[model_num_qubits].append(model_name)
 
-            self.log_print([
-                "Model {} not previously considered -- adding with ID {}".format(
-                    model_name, model_id
-                )
-            ])
-            op = qmla.construct_models.Operator(
-                name=model_name
+            self.log_print(
+                [
+                    "Model {} not previously considered -- adding with ID {}".format(
+                        model_name, model_id
+                    )
+                ]
             )
             # Generate model storage instance
+            model_constructor = exploration_tree.exploration_class.model_constructor(
+                name=model_name
+            )
             model_storage_instance = qmla.model_for_storage.ModelInstanceForStorage(
                 model_name=model_name,
                 model_id=int(model_id),
-                model_terms_matrices=op.constituents_operators,
                 true_oplist=self.true_model_constituent_operators,
                 true_model_terms_params=self.true_param_list,
                 qid=self.qmla_id,
@@ -1598,34 +1561,44 @@ class QuantumModelLearningAgent():
                 plot_probes=self.probes_for_plots,
                 host_name=self.redis_host_name,
                 port_number=self.redis_port_number,
-                log_file=self.log_file
+                log_file=self.log_file,
             )
 
             # Add to the model database
-            f_score = np.round(self.compute_model_f_score(
-                model_id=model_id,
-                model_name=model_name,
-                exploration_class=exploration_tree.exploration_class
-            ), 2)
-            terms = qmla.construct_models.get_constituent_names_from_name(model_name)
+            f_score = np.round(
+                self.compute_model_f_score(
+                    model_id=model_id,
+                    model_name=model_name,
+                    model_constructor=model_constructor,
+                    exploration_class=exploration_tree.exploration_class,
+                ),
+                2,
+            )
+            terms = qmla.model_building_utilities.get_constituent_names_from_name(
+                model_name
+            )
 
-            running_db_new_row = pd.Series({
-                'model_id': int(model_id),
-                'model_name': model_name,
-                'latex_name': exploration_tree.exploration_class.latex_name(model_name),
-                'branch_id': int(branch_id),
-                'f_score': f_score,
-                'model_storage_instance': model_storage_instance,
-                'branches_present_on' : [int(branch_id)], 
-                'terms' : terms,
-                'latex_terms' : [exploration_tree.exploration_class.latex_name(t) for t in terms] # need to get latex name by the ES which spawned this model
-            })
+            running_db_new_row = pd.Series(
+                {
+                    "model_id": int(model_id),
+                    "model_name": model_name,
+                    "latex_name": model_constructor.name_latex,
+                    "branch_id": int(branch_id),
+                    "f_score": f_score,
+                    "model_storage_instance": model_storage_instance,
+                    "branches_present_on": [int(branch_id)],
+                    "model_constructor": model_constructor,
+                    "terms": terms,
+                    "latex_terms": model_constructor.terms_names_latex,
+                }
+            )
             num_rows = len(self.model_database)
             self.model_database.loc[num_rows] = running_db_new_row
 
             model_added = True
-            if construct_models.alph(
-                    model) == construct_models.alph(self.true_model_name):
+            if model_building_utilities.alph(model) == model_building_utilities.alph(
+                self.true_model_name
+            ):
                 self.true_model_id = model_id
                 self.true_model_considered = True
                 self.true_model_branch = branch_id
@@ -1638,33 +1611,30 @@ class QuantumModelLearningAgent():
         else:
             # do not create new model instance
             model_added = False
-            self.log_print([
-                "Model not added: {}".format(model_name)
-            ])
+            self.log_print(["Model not added: {}".format(model_name)])
             try:
-                model_id = self._get_model_id_from_name(
-                    model_name=model_name
-                )
-                self.log_print([
-                    "Previously considered as model ID ", model_id
-                ])
-                self.model_database[ 
-                    self.model_database.model_id == model_id 
+                model_id = self._get_model_id_from_name(model_name=model_name)
+                self.log_print(["Previously considered as model ID ", model_id])
+                self.model_database[
+                    self.model_database.model_id == model_id
                 ].branches_present_on.item().append(int(branch_id))
-                
+
                 if model_id == self.true_model_id:
                     self.true_model_on_branhces.append(model_id)
             except BaseException:
-                self.log_print([
-                    "Couldn't find model id for model:", model_name,
-                    "model_names_ids:",
-                    self.model_name_id_map
-                ])
+                self.log_print(
+                    [
+                        "Couldn't find model id for model:",
+                        model_name,
+                        "model_names_ids:",
+                        self.model_name_id_map,
+                    ]
+                )
                 raise
 
         add_model_output = {
-            'is_new_model': model_added,
-            'model_id': model_id,
+            "is_new_model": model_added,
+            "model_id": model_id,
         }
         return add_model_output
 
@@ -1685,31 +1655,24 @@ class QuantumModelLearningAgent():
 
         """
 
-        champ_model = self.get_model_storage_instance_by_id(
-            self.champion_model_id)
+        champ_model = self.get_model_storage_instance_by_id(self.champion_model_id)
 
         # compute full dynamics for branch champions
         champ_model.compute_expectation_values(
             times=self.times_to_plot,
         )
-        self.branch_champions = [
-            self.branches[b].champion_id for b in self.branches
-        ]
-        self.log_print([
-            "Branch champions:", self.branch_champions 
-        ])
+        self.branch_champions = [self.branches[b].champion_id for b in self.branches]
+        self.log_print(["Branch champions:", self.branch_champions])
         for bc in self.branch_champions:
             bc_mod = self.get_model_storage_instance_by_id(bc)
-            bc_mod.compute_expectation_values(
-                times = self.times_to_plot
-            )
+            bc_mod.compute_expectation_values(times=self.times_to_plot)
 
         # Get metrics for all models tested
         for i in self.models_learned:
             # dict of all Bayes factors for each model considered.
-            self.all_bayes_factors[i] = (
-                self.get_model_storage_instance_by_id(i).model_bayes_factors
-            )
+            self.all_bayes_factors[i] = self.get_model_storage_instance_by_id(
+                i
+            ).model_bayes_factors
 
         self.bayes_factors_data()
 
@@ -1722,20 +1685,29 @@ class QuantumModelLearningAgent():
         # Store model IDs and names
         model_data = self.model_database[
             # subset of columns to store
-            ['model_id', 'model_name', 'latex_name', 'branch_id', 'f_score',] # TODO add log_likelihood here
+            [
+                "model_id",
+                "model_name",
+                "latex_name",
+                "branch_id",
+                "f_score",
+            ]  # TODO add log_likelihood here
         ]
         model_data.to_csv(
-            os.path.join(
-                self.qmla_controls.plots_directory,
-                'model_directory.csv')
+            os.path.join(self.qmla_controls.plots_directory, "model_directory.csv")
         )
 
     def bayes_factors_data(self):
         self.bayes_factors_df = pd.DataFrame(
             columns=[
-                'model_a', 'id_a', 'f_score_a',
-                'model_b', 'id_b', 'f_score_b',
-                'bayes_factor', 'log10_bayes_factor'
+                "model_a",
+                "id_a",
+                "f_score_a",
+                "model_b",
+                "id_b",
+                "f_score_b",
+                "bayes_factor",
+                "log10_bayes_factor",
             ]
         )
 
@@ -1744,34 +1716,34 @@ class QuantumModelLearningAgent():
             mod_name_a = mod.model_name
             mod_id_a = int(mod.model_id)
             f_score_a = qmla.utilities.round_nearest(
-                self.model_f_scores[mod_id_a], 0.05)
+                self.model_f_scores[mod_id_a], 0.05
+            )
 
             bayes_factors = mod.model_bayes_factors
             for b in bayes_factors:
                 mod_name_b = self.model_name_id_map[b]
                 mod_id_b = int(b)
                 f_score_b = qmla.utilities.round_nearest(
-                    self.model_f_scores[mod_id_b], 0.05)
+                    self.model_f_scores[mod_id_b], 0.05
+                )
 
                 for bf in bayes_factors[b]:
-                    d = pd.Series({
-                        'model_a': mod_name_a,
-                        'id_a': mod_id_a,
-                        'f_score_a': f_score_a,
-                        'model_b': mod_name_b,
-                        'id_b': mod_id_b,
-                        'f_score_b': f_score_b,
-                        'bayes_factor': bf,
-                        'log10_bayes_factor': np.round(np.log10(bf), 1)
-                    })
+                    d = pd.Series(
+                        {
+                            "model_a": mod_name_a,
+                            "id_a": mod_id_a,
+                            "f_score_a": f_score_a,
+                            "model_b": mod_name_b,
+                            "id_b": mod_id_b,
+                            "f_score_b": f_score_b,
+                            "bayes_factor": bf,
+                            "log10_bayes_factor": np.round(np.log10(bf), 1),
+                        }
+                    )
                     new_idx = len(self.bayes_factors_df)
                     self.bayes_factors_df.loc[new_idx] = d
-        
 
-    def get_results_dict(
-        self,
-        model_id=None
-    ):
+    def get_results_dict(self, model_id=None):
         r"""
         Store the useful information of a given model, usually the champion.
 
@@ -1787,7 +1759,7 @@ class QuantumModelLearningAgent():
         model_name = mod.model_name
 
         # Get expectation values of this model
-        n_qubits = construct_models.get_num_qubits(model_name)
+        n_qubits = model_building_utilities.get_num_qubits(model_name)
         if n_qubits > 5:
             expec_val_plot_times = self.times_to_plot_reduced_set
         else:
@@ -1799,26 +1771,28 @@ class QuantumModelLearningAgent():
 
         # Evaluations of all models in this instance
         model_evaluation_log_likelihoods = {
-            mod_id: self.get_model_storage_instance_by_id(mod_id).evaluation_log_likelihood
+            mod_id: self.get_model_storage_instance_by_id(
+                mod_id
+            ).evaluation_log_likelihood
             for mod_id in self.models_learned
         }
         model_evaluation_median_likelihoods = {
-            mod_id: self.get_model_storage_instance_by_id(mod_id).evaluation_median_likelihood
+            mod_id: self.get_model_storage_instance_by_id(
+                mod_id
+            ).evaluation_median_likelihood
             for mod_id in self.models_learned
         }
 
         # Compare this model to the true model (only meaningful for simulated
         # cases)
         correct_model = misfit = underfit = overfit = 0
-        num_params_champ_model = construct_models.Operator(
-            model_name).num_constituents
+        num_params_champ_model = mod.model_constructor.num_terms
 
         if model_name == self.true_model_name:
             correct_model = 1
         elif (
             num_params_champ_model == self.true_model_num_params
-            and
-            model_name != self.true_model_name
+            and model_name != self.true_model_name
         ):
             misfit = 1
         elif num_params_champ_model > self.true_model_num_params:
@@ -1827,70 +1801,71 @@ class QuantumModelLearningAgent():
             underfit = 1
         num_params_difference = self.true_model_num_params - num_params_champ_model
         true_model_family_found = (
-            self.exploration_strategy_of_true_model == mod.exploration_strategy_of_this_model
+            self.exploration_strategy_of_true_model
+            == mod.exploration_strategy_of_this_model
         )
 
         # Summarise the results of this model and instance in a dictionary
         # Note this is used to feed offline analysis including outdated methods
-        # new analysis should use the pandas databases within instances and combined 
-        # at the run level. 
+        # new analysis should use the pandas databases within instances and combined
+        # at the run level.
         time_taken = time.time() - self._start_time
         results_dict = {
             # Details about QMLA instance:
-            'QID': self.qmla_id,
-            'NumParticles': self.num_particles,
-            'NumExperiments': mod.num_experiments,
-            'ConfigLatex': self.latex_config,
-            'Heuristic': mod.model_heuristic_class,
-            'Time': time_taken,
-            'Host': self.redis_host_name,
-            'Port': self.redis_port_number,
-            'ResampleThreshold': self.exploration_class.qinfer_resampler_threshold,
-            'ResamplerA': self.exploration_class.qinfer_resampler_a,
+            "QID": self.qmla_id,
+            "NumParticles": self.num_particles,
+            "NumExperiments": mod.num_experiments,
+            "ConfigLatex": self.latex_config,
+            "Heuristic": mod.model_heuristic_class,
+            "Time": time_taken,
+            "Host": self.redis_host_name,
+            "Port": self.redis_port_number,
+            "ResampleThreshold": self.exploration_class.qinfer_resampler_threshold,
+            "ResamplerA": self.exploration_class.qinfer_resampler_a,
             # Details about true model:
-            'TrueModel': self.true_model_name,
-            'TrueModelConsidered': self.true_model_considered,
-            'TrueModelFound': self.true_model_found,
-            'TrueModelBranch': self.true_model_branch,
-            'Truemodel_id': self.true_model_id,
-            'TrueModelConstituentTerms': self.true_model_constituent_terms_latex,
-            'TrueExplorationStrategy' : self.exploration_strategy_of_true_model,
+            "TrueModel": self.true_model_name,
+            "TrueModelConsidered": self.true_model_considered,
+            "TrueModelFound": self.true_model_found,
+            "TrueModelBranch": self.true_model_branch,
+            "Truemodel_id": self.true_model_id,
+            "TrueModelConstituentTerms": self.true_model_constituent_terms_latex,
+            "TrueExplorationStrategy": self.exploration_strategy_of_true_model,
             # Details about this model
-            'ChampID': model_id,
-            'ChampLatex': mod.model_name_latex,
-            'ConstituentTerms': mod.constituents_terms_latex,
-            'LearnedHamiltonian': mod.learned_hamiltonian,
-            'ExplorationRule': mod.exploration_strategy_of_this_model,
-            'NameAlphabetical': construct_models.alph(mod.model_name),
-            'LearnedParameters': mod.qhl_final_param_estimates,
-            'FinalSigmas': mod.qhl_final_param_uncertainties,
-            'ExpectationValues': mod.expectation_values,
-            'Trackplot_parameter_estimates': mod.track_parameter_estimates,
-            'TrackVolume': mod.volume_by_epoch,
-            'TrackTimesLearned': mod.times_learned_over,
-            'QuadraticLosses': mod.quadratic_losses_record,
-            'FinalRSquared': mod.r_squared(
+            "ChampID": model_id,
+            "ChampLatex": mod.model_name_latex,
+            "ConstituentTerms": mod.constituents_terms_latex,
+            "LearnedHamiltonian": mod.learned_hamiltonian,
+            "ExplorationRule": mod.exploration_strategy_of_this_model,
+            "NameAlphabetical": model_building_utilities.alph(mod.model_name),
+            "LearnedParameters": mod.qhl_final_param_estimates,
+            "FinalSigmas": mod.qhl_final_param_uncertainties,
+            "ExpectationValues": mod.expectation_values,
+            "Trackplot_parameter_estimates": mod.track_parameter_estimates,
+            "TrackVolume": mod.volume_by_epoch,
+            "TrackTimesLearned": mod.times_learned_over,
+            "QuadraticLosses": mod.quadratic_losses_record,
+            "FinalRSquared": mod.r_squared(
                 times=expec_val_plot_times,
             ),
-            'Fscore': self.model_f_scores[model_id],
-            'Precision': self.model_precisions[model_id],
-            'Sensitivity': self.model_sensitivities[model_id],
-            'PValue': mod.p_value,
+            "Fscore": self.model_f_scores[model_id],
+            "Precision": self.model_precisions[model_id],
+            "Sensitivity": self.model_sensitivities[model_id],
+            "PValue": mod.p_value,
             # Comparison to true model (for simulated cases)
-            'NumParamDifference': num_params_difference,
-            'Underfit': underfit,
-            'Overfit': overfit,
-            'Misfit': misfit,
-            'CorrectModel': correct_model,
-            'TrueFamilyFound' : true_model_family_found, 
+            "NumParamDifference": num_params_difference,
+            "Underfit": underfit,
+            "Overfit": overfit,
+            "Misfit": misfit,
+            "CorrectModel": correct_model,
+            "TrueFamilyFound": true_model_family_found,
             # About QMLA's learning procedure:
-            'NumModels': len(self.models_learned),
-            'StatisticalMetrics': self.generational_statistical_metrics,
-            'GenerationalFscore': self.generational_f_score,
-            'GenerationalLogLikelihoods': self.generational_log_likelihoods,
-            'ModelEvaluationLogLikelihoods': model_evaluation_log_likelihoods,
-            'ModelEvaluationMedianLikelihoods': model_evaluation_median_likelihoods,
-            'AllModelFScores': self.model_f_scores,
+            "NumModels": len(self.models_learned),
+            "StatisticalMetrics": self.generational_statistical_metrics,
+            "GenerationalFscore": self.generational_f_score,
+            "GenerationalLogLikelihoods": self.generational_log_likelihoods,
+            "ModelEvaluationLogLikelihoods": model_evaluation_log_likelihoods,
+            "ModelEvaluationMedianLikelihoods": model_evaluation_median_likelihoods,
+            "AllModelFScores": self.model_f_scores,
         }
 
         self.storage = qmla.utilities.StorageUnit()
@@ -1901,41 +1876,39 @@ class QuantumModelLearningAgent():
 
         # store expectation values of all models
 
-        df_cols = ['time', 'exp_val', 'model_id', 'qmla_id']
+        df_cols = ["time", "exp_val", "model_id", "qmla_id"]
         expectation_values_df = pd.DataFrame(columns=df_cols)
 
         for m in self.models_learned:
             mod = self.get_model_storage_instance_by_id(m)
             times = list(sorted(mod.expectation_values.keys()))
-            ev = [mod.expectation_values[t] for t in times]    
+            ev = [mod.expectation_values[t] for t in times]
             d = pd.DataFrame(
-                columns = df_cols,
+                columns=df_cols,
             )
-            d['time'] = times
-            d['exp_val'] = ev
-            d['model_id'] = m
-            d['qmla_id'] = self.qmla_id
-            
+            d["time"] = times
+            d["exp_val"] = ev
+            d["model_id"] = m
+            d["qmla_id"] = self.qmla_id
+
             expectation_values_df = expectation_values_df.append(d)
-        
-        self.storage.expectation_values = expectation_values_df            
+
+        self.storage.expectation_values = expectation_values_df
         try:
             # TODO this fails for QHL mode since champion not assigned -- fix
             self.storage.branch_champions = {
-                b : self.branches[b].champion_id
-                for b in self.branches
+                b: self.branches[b].champion_id for b in self.branches
             }
         except:
             pass
 
         models_generated = self.model_database[
-            ['model_name', 'model_id', 'latex_name', 'f_score', 'terms']
+            ["model_name", "model_id", "latex_name", "f_score", "terms"]
         ]
 
-        models_generated['champion'] = False
+        models_generated["champion"] = False
         models_generated.loc[
-            (models_generated.model_id == self.champion_model_id), 
-            'champion'
+            (models_generated.model_id == self.champion_model_id), "champion"
         ] = True
         self.storage.models_generated = models_generated
 
@@ -1969,16 +1942,16 @@ class QuantumModelLearningAgent():
         """
         import qinfer
 
-        champ_mod = self.get_model_storage_instance_by_id(
-            self.global_champion_id
-        )
+        champ_mod = self.get_model_storage_instance_by_id(self.global_champion_id)
 
         self.log_print(
             [
                 "Checking reducibility of champ model:",
                 self.global_champion_name,
-                "\nParams:\n", champ_mod.qhl_final_param_estimates,
-                "\nSigmas:\n", champ_mod.qhl_final_param_uncertainties
+                "\nParams:\n",
+                champ_mod.qhl_final_param_estimates,
+                "\nSigmas:\n",
+                champ_mod.qhl_final_param_uncertainties,
             ]
         )
 
@@ -1999,51 +1972,49 @@ class QuantumModelLearningAgent():
                 < self.exploration_class.learned_param_limit_for_negligibility
             ):
                 to_remove.append(p)
-                removed_params[p] = np.round(
-                    champ_mod.qhl_final_param_estimates[p], 2
-                )
+                removed_params[p] = np.round(champ_mod.qhl_final_param_estimates[p], 2)
 
         if len(to_remove) >= len(params):
-            self.log_print([
-                "Attempted champion reduction failed due to",
-                "all parameters found as neglibible.",
-                "Check method of determining negligibility.",
-                "(By default, parameter removed if sigma of that",
-                "parameters final posterior > parameter.",
-                "i.e. 0 within 1 sigma of distriubtion"
-            ])
+            self.log_print(
+                [
+                    "Attempted champion reduction failed due to",
+                    "all parameters found as neglibible.",
+                    "Check method of determining negligibility.",
+                    "(By default, parameter removed if sigma of that",
+                    "parameters final posterior > parameter.",
+                    "i.e. 0 within 1 sigma of distriubtion",
+                ]
+            )
             return
         if len(to_remove) > 0:
-            new_model_terms = list(
-                set(params) - set(to_remove)
-            )
-            new_mod = '+'.join(new_model_terms)
-            new_mod = construct_models.alph(new_mod)
+            new_model_terms = list(set(params) - set(to_remove))
+            new_mod = "+".join(new_model_terms)
+            new_mod = model_building_utilities.alph(new_mod)
 
-            self.log_print([
-                "Some neglibible parameters found:", removed_params,
-                "\nReduced champion model suggested:", new_mod
-            ])
+            self.log_print(
+                [
+                    "Some neglibible parameters found:",
+                    removed_params,
+                    "\nReduced champion model suggested:",
+                    new_mod,
+                ]
+            )
 
             reduced_mod_info = self.add_model_to_database(
-                model=new_mod,
-                force_create_model=True
+                model=new_mod, force_create_model=True
             )
-            reduced_mod_id = reduced_mod_info['model_id']
-            reduced_mod_instance = self.get_model_storage_instance_by_id(
-                reduced_mod_id
-            )
+            reduced_mod_id = reduced_mod_info["model_id"]
+            reduced_mod_instance = self.get_model_storage_instance_by_id(reduced_mod_id)
 
             reduced_mod_terms = sorted(
-                construct_models.get_constituent_names_from_name(
-                    new_mod
-                )
+                model_building_utilities.get_constituent_names_from_name(new_mod)
             )
 
             # get champion leared info
             reduced_champion_info = pickle.loads(
-                self.redis_databases['learned_models_info_db'].get(
-                    str(self.champion_model_id))
+                self.redis_databases["learned_models_info_db"].get(
+                    str(self.champion_model_id)
+                )
             )
 
             reduced_params = {}
@@ -2056,34 +2027,30 @@ class QuantumModelLearningAgent():
             sigmas = np.array([reduced_sigmas[t] for t in reduced_mod_terms])
             final_params = np.array(list(zip(learned_params, sigmas)))
 
-            new_cov_mat = np.diag(
-                sigmas**2
-            )
+            new_cov_mat = np.diag(sigmas ** 2)
 
             new_prior = qinfer.MultivariateNormalDistribution(
-                learned_params,
-                new_cov_mat
+                learned_params, new_cov_mat
             )
 
             # reduce learned info where appropriate
-            reduced_champion_info['name'] = new_mod
-            reduced_champion_info['model_terms_names'] = reduced_mod_terms
-            reduced_champion_info['final_cov_mat'] = new_cov_mat
-            reduced_champion_info['final_params'] = final_params
-            reduced_champion_info['learned_parameters'] = reduced_params
-            reduced_champion_info['model_id'] = reduced_mod_id
-            reduced_champion_info['final_prior'] = new_prior
-            reduced_champion_info['est_mean'] = np.array(learned_params)
-            reduced_champion_info['final_sigmas'] = reduced_sigmas
-            reduced_champion_info['initial_params'] = reduced_sigmas
+            reduced_champion_info["name"] = new_mod
+            reduced_champion_info["model_terms_names"] = reduced_mod_terms
+            reduced_champion_info["final_cov_mat"] = new_cov_mat
+            reduced_champion_info["final_params"] = final_params
+            reduced_champion_info["learned_parameters"] = reduced_params
+            reduced_champion_info["model_id"] = reduced_mod_id
+            reduced_champion_info["final_prior"] = new_prior
+            reduced_champion_info["est_mean"] = np.array(learned_params)
+            reduced_champion_info["final_sigmas"] = reduced_sigmas
+            reduced_champion_info["initial_params"] = reduced_sigmas
             # do not inherit normalization_record and times from original
             # champion
-            reduced_champion_info['normalization_record'] = []
-            reduced_champion_info['times'] = []
+            reduced_champion_info["normalization_record"] = []
+            reduced_champion_info["times"] = []
 
             compressed_reduced_champ_info = pickle.dumps(
-                reduced_champion_info,
-                protocol=4
+                reduced_champion_info, protocol=4
             )
 
             # TODO generate new model for champion
@@ -2091,38 +2058,35 @@ class QuantumModelLearningAgent():
             # - learn according to MPGH for both champion
             #   and suggested reduced champion,
             #   then take BF based on that
-            self.redis_databases['learned_models_info_db'].set(
-                str(float(reduced_mod_id)),
-                compressed_reduced_champ_info
+            self.redis_databases["learned_models_info_db"].set(
+                str(float(reduced_mod_id)), compressed_reduced_champ_info
             )
 
             self.get_model_storage_instance_by_id(
-                reduced_mod_id).model_update_learned_values()
+                reduced_mod_id
+            ).model_update_learned_values()
 
             bayes_factor = self.compare_model_pair(
                 model_a_id=int(self.champion_model_id),
                 model_b_id=int(reduced_mod_id),
-                wait_on_result=True
+                wait_on_result=True,
             )
-            self.log_print([
-                "BF b/w champ and reduced champ models:", bayes_factor
-            ])
+            self.log_print(["BF b/w champ and reduced champ models:", bayes_factor])
 
-            if (
-                bayes_factor
-                < (1.0 / self.exploration_class.reduce_champ_bayes_factor_threshold)
+            if bayes_factor < (
+                1.0 / self.exploration_class.reduce_champ_bayes_factor_threshold
             ):
                 # overwrite champ id etc
-                self.log_print([
-                    "Replacing champion model ({}) with reduced champion model ({} - {})".format(
-                        self.champion_model_id,
-                        reduced_mod_id,
-                        new_mod
-                    ),
-                    "\n i.e. removing negligible parameter terms:\n{}".format(
-                        removed_params
-                    )
-                ])
+                self.log_print(
+                    [
+                        "Replacing champion model ({}) with reduced champion model ({} - {})".format(
+                            self.champion_model_id, reduced_mod_id, new_mod
+                        ),
+                        "\n i.e. removing negligible parameter terms:\n{}".format(
+                            removed_params
+                        ),
+                    ]
+                )
                 original_champ_id = self.champion_model_id
                 self.champion_model_id = reduced_mod_id
                 self.global_champion = new_mod
@@ -2131,17 +2095,14 @@ class QuantumModelLearningAgent():
                 new_champ = self.get_model_storage_instance_by_id(
                     self.champion_model_id
                 )
-                new_champ.model_bayes_factors = (
-                    self.get_model_storage_instance_by_id(
-                        original_champ_id).model_bayes_factors
-                )
+                new_champ.model_bayes_factors = self.get_model_storage_instance_by_id(
+                    original_champ_id
+                ).model_bayes_factors
                 new_champ.times_learned_over = champ_mod.times_learned_over
                 self.models_learned.append(reduced_mod_id)
 
         else:
-            self.log_print([
-                "Parameters non-negligible; not replacing champion model."
-            ])
+            self.log_print(["Parameters non-negligible; not replacing champion model."])
 
     def compare_nominated_champions(self):
         r"""
@@ -2160,12 +2121,8 @@ class QuantumModelLearningAgent():
             tree_champions.extend(tree.nominate_champions())
 
         # Place tree champions on new QMLA branch, not tied to an exploration strategy
-        global_champ_branch_id = self.new_branch(
-            model_list=tree_champions
-        )
-        global_champ_branch = self.branches[
-            global_champ_branch_id
-        ]
+        global_champ_branch_id = self.new_branch(model_list=tree_champions)
+        global_champ_branch = self.branches[global_champ_branch_id]
 
         # Compare models (using this fnc so we can wait_on_result)
         # self.compare_model_set(
@@ -2178,20 +2135,27 @@ class QuantumModelLearningAgent():
         )
 
         # TODO wait until all BF computed on final branch
-        active_branches_bayes = self.redis_databases['active_branches_bayes']
+        active_branches_bayes = self.redis_databases["active_branches_bayes"]
         num_comparisons_complete_on_branch = active_branches_bayes.get(
             int(global_champ_branch_id)
         )
-        self.log_print([
-            "Starting to wait on comparisons between branch champions.",
-            "Initially completed:", num_comparisons_complete_on_branch,
-            "num pairs on branch:", global_champ_branch.num_model_pairs
-        ])
+        self.log_print(
+            [
+                "Starting to wait on comparisons between branch champions.",
+                "Initially completed:",
+                num_comparisons_complete_on_branch,
+                "num pairs on branch:",
+                global_champ_branch.num_model_pairs,
+            ]
+        )
         while not global_champ_branch.comparisons_complete:
-            num_comparisons_complete_on_branch = int(active_branches_bayes.get(
-                int(global_champ_branch_id)
-            ))
-            if num_comparisons_complete_on_branch == global_champ_branch.num_model_pairs:
+            num_comparisons_complete_on_branch = int(
+                active_branches_bayes.get(int(global_champ_branch_id))
+            )
+            if (
+                num_comparisons_complete_on_branch
+                == global_champ_branch.num_model_pairs
+            ):
                 global_champ_branch.comparisons_complete = True
         self.log_print(["Comparisons between branch champions complete."])
 
@@ -2205,11 +2169,16 @@ class QuantumModelLearningAgent():
             self.global_champion_id
         )
         self.global_champion_name = self.global_champion_model.model_name
-        self.log_print([
-            "Global champion branch points:", global_champ_branch.bayes_points,
-            "\nGlobal champion ID:", champ_id,
-            "\nGlobal champion:", self.global_champion_name
-        ])
+        self.log_print(
+            [
+                "Global champion branch points:",
+                global_champ_branch.bayes_points,
+                "\nGlobal champion ID:",
+                champ_id,
+                "\nGlobal champion:",
+                self.global_champion_name,
+            ]
+        )
 
     ##########
     # Section: Run available algorithms (QMLA, QHL or QHL with multiple models)
@@ -2228,22 +2197,19 @@ class QuantumModelLearningAgent():
 
         qhl_branch = self.new_branch(
             exploration_strategy=self.exploration_strategy_of_true_model,
-            model_list=[self.true_model_name]
+            model_list=[self.true_model_name],
         )
 
         mod_to_learn = self.true_model_name
-        self.log_print([
-            "QHL for true model:", mod_to_learn,
-        ])
+        self.log_print(
+            [
+                "QHL for true model:",
+                mod_to_learn,
+            ]
+        )
 
-        self.learn_model(
-            model_name=mod_to_learn,
-            branch_id=qhl_branch,
-            blocking=True
-        )
-        mod_id = self._get_model_id_from_name(
-            model_name=mod_to_learn
-        )
+        self.learn_model(model_name=mod_to_learn, branch_id=qhl_branch, blocking=True)
+        mod_id = self._get_model_id_from_name(model_name=mod_to_learn)
 
         # These don't really matter for QHL,
         # but are used in plots etc:
@@ -2251,21 +2217,13 @@ class QuantumModelLearningAgent():
         self.champion_model_id = mod_id
         self.true_model_found = True
         self.true_model_considered = True
-        self.log_print([
-            "Learned model {}: {}".format(
-                mod_id,
-                mod_to_learn
-            )
-        ])
+        self.log_print(["Learned model {}: {}".format(mod_id, mod_to_learn)])
         self._update_database_model_info()
         self.exploration_class.exploration_strategy_finalise()
         self.finalise_instance()
         # self._plot_statistical_metrics()
 
-    def run_quantum_hamiltonian_learning_multiple_models(
-        self,
-        model_names=None
-    ):
+    def run_quantum_hamiltonian_learning_multiple_models(self, model_names=None):
         r"""
         Run Quantum Hamiltonian Learning algorithm with multiple simulated models.
 
@@ -2284,38 +2242,35 @@ class QuantumModelLearningAgent():
         # Place models on a branch
         branch_id = self.new_branch(
             exploration_strategy=self.exploration_strategy_of_true_model,
-            model_list=model_names
+            model_list=model_names,
         )
         self.qhl_mode_multiple_models = True
-        self.champion_model_id = -1,  # TODO just so not to crash during dynamics plot
+        self.champion_model_id = (-1,)  # TODO just so not to crash during dynamics plot
         self.qhl_mode_multiple_models_model_ids = [
-            self._get_model_id_from_name(
-                model_name=mod_name
-            ) for mod_name in model_names
+            self._get_model_id_from_name(model_name=mod_name)
+            for mod_name in model_names
         ]
-        self.log_print([
-            'QHL for multiple models:', model_names,
-        ])
-        learned_models_ids = self.redis_databases['learned_models_ids']
+        self.log_print(
+            [
+                "QHL for multiple models:",
+                model_names,
+            ]
+        )
+        learned_models_ids = self.redis_databases["learned_models_ids"]
 
         # learn models
         for mod_name in model_names:
-            mod_id = self._get_model_id_from_name(
-                model_name=mod_name
-            )
-            learned_models_ids.set(
-                str(mod_id), 0
-            )
-            self.learn_model(
-                model_name=mod_name,
-                branch_id=branch_id,
-                blocking=False
-            )
+            mod_id = self._get_model_id_from_name(model_name=mod_name)
+            learned_models_ids.set(str(mod_id), 0)
+            self.learn_model(model_name=mod_name, branch_id=branch_id, blocking=False)
 
         running_models = learned_models_ids.keys()
-        self.log_print([
-            'Running Models:', running_models,
-        ])
+        self.log_print(
+            [
+                "Running Models:",
+                running_models,
+            ]
+        )
         for k in running_models:
             # waiting on all models to finish,
             while int(learned_models_ids.get(k)) != 1:
@@ -2323,15 +2278,16 @@ class QuantumModelLearningAgent():
                 self._inspect_remote_job_crashes()
 
         # Learning finished
-        self.log_print([
-            'Finished learning for all:', running_models,
-        ])
+        self.log_print(
+            [
+                "Finished learning for all:",
+                running_models,
+            ]
+        )
 
         # Tidy up: store learned info, analyse, etc.
         for mod_name in model_names:
-            mod_id = self._get_model_id_from_name(
-                model_name=mod_name
-            )
+            mod_id = self._get_model_id_from_name(model_name=mod_name)
             mod = self.get_model_storage_instance_by_id(mod_id)
             mod.model_update_learned_values()
 
@@ -2341,9 +2297,9 @@ class QuantumModelLearningAgent():
             v = self.model_name_id_map[k]
             self.model_id_to_name_map[v] = k
         for k in self.timings:
-            self.log_print([
-                "QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))
-            ])
+            self.log_print(
+                ["QMLA Timing - {}: {}".format(k, np.round(self.timings[k], 2))]
+            )
         self.finalise_instance()
 
     def run_complete_qmla(
@@ -2371,35 +2327,33 @@ class QuantumModelLearningAgent():
         for tree in list(self.trees.values()):
             starting_models, models_to_compare = tree.get_initial_models()
             # TODO genetic alg giving some non-unique initial model sets
-            self.log_print([
-                "First branch for {} has ( {}/{} unique ) starting models: {}".format(
-                    tree.exploration_strategy, 
-                    len(set(starting_models)), 
-                    len(starting_models),
-                    starting_models
-                ),
-                # "models_to_compare:", models_to_compare
-            ])
+            self.log_print(
+                [
+                    "First branch for {} has ( {}/{} unique ) starting models: {}".format(
+                        tree.exploration_strategy,
+                        len(set(starting_models)),
+                        len(starting_models),
+                        starting_models,
+                    ),
+                    # "models_to_compare:", models_to_compare
+                ]
+            )
             self.new_branch(
                 model_list=starting_models,
                 exploration_strategy=tree.exploration_strategy,
-                pairs_to_compare_by_names=models_to_compare
+                pairs_to_compare_by_names=models_to_compare,
             )
 
         # Iteratively learn models, compute bayes factors, spawn new models
         self.learn_models_until_trees_complete()
-        self.log_print([
-            "Exploration Strategy trees completed."
-        ])
+        self.log_print(["Exploration Strategy trees completed."])
 
         # Choose champion by comparing nominated champions of all trees.
         self.compare_nominated_champions()
         self.champion_model_id = self._get_model_data_by_field(
-            name=self.global_champion_name,
-            field='model_id'
+            name=self.global_champion_name, field="model_id"
         )
-        self.log_print(
-            ["Champion selected. ID={}".format(self.champion_model_id)])
+        self.log_print(["Champion selected. ID={}".format(self.champion_model_id)])
 
         # Internal analysis
         try:
@@ -2411,17 +2365,20 @@ class QuantumModelLearningAgent():
             self.true_model_found = False
         self._update_database_model_info()
         if self.true_model_found:
-            self.log_print([
-                "True model found: {}".format(
-                    construct_models.alph(self.true_model_name)
-                )
-            ])
-        self.log_print([
-            "True model considered: {}. on branch {}.".format(
-                self.true_model_considered,
-                self.true_model_branch
+            self.log_print(
+                [
+                    "True model found: {}".format(
+                        model_building_utilities.alph(self.true_model_name)
+                    )
+                ]
             )
-        ])
+        self.log_print(
+            [
+                "True model considered: {}. on branch {}.".format(
+                    self.true_model_considered, self.true_model_branch
+                )
+            ]
+        )
 
         # Consider reducing champion if negligible parameters found
         if self.exploration_class.check_champion_reducibility:
@@ -2430,14 +2387,16 @@ class QuantumModelLearningAgent():
         # Tidy up and finish QMLA.
         self.finalise_instance()
 
-        self.log_print([
-            "\nFinal winner:", self.global_champion_name,
-            "(ID {}) has F-score {}".format(
-                self.champion_model_id, 
-                np.round(
-                    self.model_f_scores[self.champion_model_id], 2)
-                )
-        ])
+        self.log_print(
+            [
+                "\nFinal winner:",
+                self.global_champion_name,
+                "(ID {}) has F-score {}".format(
+                    self.champion_model_id,
+                    np.round(self.model_f_scores[self.champion_model_id], 2),
+                ),
+            ]
+        )
 
     ##########
     # Section: Database interface
@@ -2451,14 +2410,11 @@ class QuantumModelLearningAgent():
         :param str field: field name to get data corresponding to model
         """
 
-        d = self.model_database[self.model_database['model_name'] == name][field].item()
+        d = self.model_database[self.model_database["model_name"] == name][field].item()
         return d
 
     def _get_model_id_from_name(self, model_name):
-        model_id = self._get_model_data_by_field(
-            name=model_name,
-            field='model_id'
-        )
+        model_id = self._get_model_data_by_field(name=model_name, field="model_id")
         return model_id
 
     def _consider_new_model(self, model_name):
@@ -2477,18 +2433,20 @@ class QuantumModelLearningAgent():
         :param str name: model for consideration
         """
         # Return true indicates it has not been considered and so can be added
-        al_name = qmla.construct_models.alph(model_name)
-        n_qub = qmla.construct_models.get_num_qubits(model_name)
+        al_name = qmla.model_building_utilities.alph(model_name)
+        n_qub = qmla.model_building_utilities.get_num_qubits(model_name)
         if al_name in self.model_lists[n_qub]:
-            return 'Previously Considered'  # todo -- make clear if in legacy or running db
+            return (
+                "Previously Considered"  # todo -- make clear if in legacy or running db
+            )
         else:
-            return 'New'
+            return "New"
 
     def _check_model_exists(self, model_name):
         r"""
         True if model already exists; False if not.
         """
-        if self._consider_new_model(model_name) == 'New':
+        if self._consider_new_model(model_name) == "New":
             return False
         else:
             return True
@@ -2502,8 +2460,7 @@ class QuantumModelLearningAgent():
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=self.log_file,
-            log_identifier='QMLA {}'.format(self.qmla_id)
-
+            log_identifier="QMLA {}".format(self.qmla_id),
         )
 
     def get_model_storage_instance_by_id(self, model_id):
@@ -2515,8 +2472,9 @@ class QuantumModelLearningAgent():
         :rtype: :class:`~qmla.ModelInstanceForLearning`
 
         """
-        idx = self.model_database.loc[self.model_database['model_id']
-                                      == model_id].index[0]
+        idx = self.model_database.loc[
+            self.model_database["model_id"] == model_id
+        ].index[0]
         model_instance = self.model_database.loc[idx]["model_storage_instance"]
         return model_instance
 
@@ -2525,9 +2483,7 @@ class QuantumModelLearningAgent():
         Calls :meth:`~qmla.ModelForStorage.model_update_learned_values` for all models learned in this instance.
         """
 
-        self.log_print([
-            "Updating info for all learned models"
-        ])
+        self.log_print(["Updating info for all learned models"])
         for mod_id in self.models_learned:
             try:
                 mod = self.get_model_storage_instance_by_id(mod_id)
@@ -2537,15 +2493,13 @@ class QuantumModelLearningAgent():
 
     def _inspect_remote_job_crashes(self):
         r"""Check if any job on redis queue has failed."""
-        self.call_counter['job_crashes'] += 1
+        self.call_counter["job_crashes"] += 1
         t_init = time.time()
-        if self.redis_databases['any_job_failed']['Status'] == b'1':
+        if self.redis_databases["any_job_failed"]["Status"] == b"1":
             # TODO better way to detect errors?
-            self.log_print([
-                "Failure on remote job. Terminating QMLA."
-            ])
-            raise NameError('Remote model learning failure')
-        self.timings['inspect_job_crashes'] += time.time() - t_init
+            self.log_print(["Failure on remote job. Terminating QMLA."])
+            raise NameError("Remote model learning failure")
+        self.timings["inspect_job_crashes"] += time.time() - t_init
 
     def _delete_unpicklable_attributes(self):
         r"""Remove elements of QMLA which cannot be pickled, which cause errors if retained."""
@@ -2559,30 +2513,30 @@ class QuantumModelLearningAgent():
     ##########
 
     def analyse_instance(self):
-        r""" Basic analysis of this instance"""
-        
+        r"""Basic analysis of this instance"""
+
         pickle.dump(
             self.get_results_dict(),
             open(self.qmla_controls.results_file, "wb"),
-            protocol=4
+            protocol=4,
         )
         storage_location = os.path.join(
-            self.qmla_controls.results_directory, 
-            'storage_{}.p'.format(self.qmla_controls.long_id), 
+            self.qmla_controls.results_directory,
+            "storage_{}.p".format(self.qmla_controls.long_id),
         )
         pickle.dump(
-            self.storage, 
-            open(storage_location, 'wb'),
-            protocol = 4, 
+            self.storage,
+            open(storage_location, "wb"),
+            protocol=4,
         )
 
-        if self.qhl_mode: 
+        if self.qhl_mode:
             self._analyse_qhl()
 
         elif self.qhl_mode_multiple_models:
             self._analyse_multiple_model_qhl()
-        
-        else: 
+
+        else:
             self._analyse_qmla()
 
     def _analyse_qhl(self):
@@ -2590,29 +2544,26 @@ class QuantumModelLearningAgent():
 
     def _analyse_multiple_model_qhl(self):
         model_ids = [
-            self._get_model_id_from_name(
-                model_name=mod
-            ) for mod in self.exploration_class.qhl_models
+            self._get_model_id_from_name(model_name=mod)
+            for mod in self.exploration_class.qhl_models
         ]
-        
+
         for mid in model_ids:
             mod = self.get_model_storage_instance_by_id(mid)
             name = mod.model_name
             results_file = str(
-                self.qmla_controls.results_directory +
-                output_prefix +
-                'results_' +
-                str("m{}_q{}.p".format(
-                    int(mid), self.qmla_controls.long_id)
-                )
+                self.qmla_controls.results_directory
+                + output_prefix
+                + "results_"
+                + str("m{}_q{}.p".format(int(mid), self.qmla_controls.long_id))
             )
 
             pickle.dump(
-                self.get_results_dict(model_id = mid),
+                self.get_results_dict(model_id=mid),
                 open(results_file, "wb"),
-                protocol=4
+                protocol=4,
             )
-    
+
     def _analyse_qmla(self):
         expec_value_mods_to_plot = []
         try:
@@ -2621,28 +2572,24 @@ class QuantumModelLearningAgent():
             pass
 
         expec_value_mods_to_plot.append(self.champion_model_id)
-        champ_mod = self.get_model_storage_instance_by_id(
-            self.champion_model_id
-        )
+        champ_mod = self.get_model_storage_instance_by_id(self.champion_model_id)
 
         try:
             self.store_bayes_factors_to_csv(
                 save_to_file=str(
-                    self.qmla_controls.results_directory +
-                    'bayes_factors_' + str(self.qmla_controls.long_id) + '.csv'
+                    self.qmla_controls.results_directory
+                    + "bayes_factors_"
+                    + str(self.qmla_controls.long_id)
+                    + ".csv"
                 ),
-                names_ids='latex'
+                names_ids="latex",
             )
         except Exception as e:
-            self.log_print([
-                "failed to store_bayes_factors_to_csv with error {}".format(e)
-            ])
+            self.log_print(
+                ["failed to store_bayes_factors_to_csv with error {}".format(e)]
+            )
 
-    def store_bayes_factors_to_csv(
-        self, 
-        save_to_file, 
-        names_ids='latex'
-    ):
+    def store_bayes_factors_to_csv(self, save_to_file, names_ids="latex"):
         r"""
         *deprecated* Store the pairwise comparisons computed during this instance.
         :func:`~qmla.analysis.model_bayes_factorsCSV` removed and is needed
@@ -2650,22 +2597,24 @@ class QuantumModelLearningAgent():
 
         Wrapper for :func:`~qmla.analysis.model_bayes_factorsCSV`.
         """
-        qmla.analysis.model_bayes_factorsCSV(
-            self, save_to_file, names_ids=names_ids)
+        qmla.analysis.model_bayes_factorsCSV(self, save_to_file, names_ids=names_ids)
 
     def store_bayes_factors_to_shared_csv(self, bayes_csv):
         r"""
         Store the pairwise comparisons computed during this instance in a CSV shared by all concurrent instances.
         """
         # TODO this doesn't get used anywhere useful any more; remove
-        qmla.analysis.update_shared_bayes_factor_csv(self, self.qmla_controls.cumulative_csv)
+        qmla.analysis.update_shared_bayes_factor_csv(
+            self, self.qmla_controls.cumulative_csv
+        )
 
     def compute_model_f_score(
         self,
         model_id,
         model_name=None,
+        model_constructor=None,
         exploration_class=None,
-        beta=1  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
+        beta=1,  # beta=1 for F1-score. Beta is relative importance of sensitivity to precision
     ):
         r"""
         Compte and store f-score of given model.
@@ -2679,34 +2628,32 @@ class QuantumModelLearningAgent():
         # TODO set precision, f-score etc as model instance attributes and
         # return those in champion_results
         true_set = self.exploration_class.true_model_terms
+        self.log_print(["Getting F score for model {}".format(model_id)])
         if exploration_class is None:
-            exploration_class = self.get_model_storage_instance_by_id(
-                model_id).exploration_class
             model_name = self.model_name_id_map[model_id]
-        terms = [
-            exploration_class.latex_name(
-                term
-            )
-            for term in
-            construct_models.get_constituent_names_from_name(
-                model_name
-            )
-        ]
+            stored_model = self.get_model_storage_instance_by_id(model_id)
+            exploration_class = stored_model.exploration_class
+        # terms = [
+        #     exploration_class.latex_name(
+        #         term
+        #     )
+        #     for term in
+        #     model_building_utilities.get_constituent_names_from_name(
+        #         model_name
+        #     )
+        # ]
+        terms = model_constructor.terms_names_latex
         learned_set = set(sorted(terms))
 
         total_positives = len(true_set)
         true_positives = len(true_set.intersection(learned_set))
         false_positives = len(learned_set - true_set)
         false_negatives = len(true_set - learned_set)
-        precision = true_positives / \
-            (true_positives + false_positives)
+        precision = true_positives / (true_positives + false_positives)
         sensitivity = true_positives / total_positives
         try:
-            f_score = (
-                (1 + beta**2) * (
-                    (precision * sensitivity)
-                    / (beta**2 * precision + sensitivity)
-                )
+            f_score = (1 + beta ** 2) * (
+                (precision * sensitivity) / (beta ** 2 * precision + sensitivity)
             )
         except BaseException:
             # both precision and sensitivity=0 as true_positives=0
@@ -2718,35 +2665,33 @@ class QuantumModelLearningAgent():
         return f_score
 
     def plot_instance_outcomes(
-        self, 
+        self,
     ):
         r"""
-        Generate plots corresponding to this instance. 
+        Generate plots corresponding to this instance.
 
-        A number of plotting routines are called, depending on the plot_level 
-        set by the user at launch. 
+        A number of plotting routines are called, depending on the plot_level
+        set by the user at launch.
         """
-        self.log_print([
-            "Plotting instance outcomes"
-        ])
+        self.log_print(["Plotting instance outcomes"])
 
         plot_methods_by_level = {
-            1 : [
+            1: [
                 self._plot_model_terms,
             ],
             2: [
-                self._plot_one_qubit_probes_bloch_sphere, 
+                self._plot_one_qubit_probes_bloch_sphere,
             ],
-            3 : [
+            3: [
                 self._plot_dynamics_all_models_on_branches,
                 self._plot_bayes_factors,
                 self._plot_branch_champs_quadratic_losses,
             ],
-            4 : [
+            4: [
                 self._plot_exploration_tree,
                 self._plot_r_squared_by_epoch_for_model_list,
-                self._plot_statistical_metrics
-            ]
+                self._plot_statistical_metrics,
+            ],
         }
 
         for pl in range(self.plot_level + 1):
@@ -2756,30 +2701,30 @@ class QuantumModelLearningAgent():
                     try:
                         method()
                     except Exception as e:
-                        self.log_print([
-                            "plot failed {} with exception: {}".format(method.__name__, e)
-                        ])
+                        self.log_print(
+                            [
+                                "plot failed {} with exception: {}".format(
+                                    method.__name__, e
+                                )
+                            ]
+                        )
 
-        if self.plot_level >=3:
+        if self.plot_level >= 3:
             try:
                 self.branch_graphs = qmla.analysis.branch_graphs.plot_qmla_branches(
-                    q=self, 
-                    show_fscore_cmap=True,
-                    return_graphs=False
+                    q=self, show_fscore_cmap=True, return_graphs=False
                 )
             except:
                 self.log_print(["Failed to plot branch graphs."])
 
-        self.log_print([
-            "Plotting exploration strategy analysis"
-        ])
+        self.log_print(["Plotting exploration strategy analysis"])
         self.exploration_class.exploration_strategy_specific_plots(
-            save_directory = self.qmla_controls.plots_directory,
-            qmla_id = self.qmla_controls.long_id,
-            true_model_id = self.true_model_id, 
-            champion_model_id = self.champion_model_id, 
-            plot_level = self.plot_level,
-            figure_format = self.qmla_controls.figure_format
+            save_directory=self.qmla_controls.plots_directory,
+            qmla_id=self.qmla_controls.long_id,
+            true_model_id=self.true_model_id,
+            champion_model_id=self.champion_model_id,
+            plot_level=self.plot_level,
+            figure_format=self.qmla_controls.figure_format,
         )
 
     def compute_statistical_metrics_by_generation(self):
@@ -2789,101 +2734,91 @@ class QuantumModelLearningAgent():
         :param str save_to_file: path to save the resultant figure in.
         """
         generations = sorted(set(self.branches.keys()))
-        self.log_print([
-            "[compute_statistical_metrics_by_generation]",
-            "generations: ", generations
-        ])
+        self.log_print(
+            [
+                "[compute_statistical_metrics_by_generation]",
+                "generations: ",
+                generations,
+            ]
+        )
 
-        generational_sensitivity = {
-            b: []
-            for b in generations
-        }
-        generational_f_score = {
-            b: []
-            for b in generations
-        }
-        generational_precision = {
-            b: []
-            for b in generations
-        }
-        self.generational_log_likelihoods = {
-            b: []
-            for b in generations
-        }
+        generational_sensitivity = {b: [] for b in generations}
+        generational_f_score = {b: [] for b in generations}
+        generational_precision = {b: [] for b in generations}
+        self.generational_log_likelihoods = {b: [] for b in generations}
 
         for b in generations:
             models_this_branch = sorted(self.branches[b].resident_model_ids)
-            self.log_print([
-                "Adding models to generational measures for Generation {}:{}".format(
-                    b,
-                    models_this_branch
-                )
-            ])
+            self.log_print(
+                [
+                    "Adding models to generational measures for Generation {}:{}".format(
+                        b, models_this_branch
+                    )
+                ]
+            )
             for m in models_this_branch:
                 generational_sensitivity[b].append(self.model_sensitivities[m])
                 generational_precision[b].append(self.model_precisions[m])
                 generational_f_score[b].append(self.model_f_scores[m])
                 self.generational_log_likelihoods[b].append(
-                    self.get_model_storage_instance_by_id(
-                        m).evaluation_log_likelihood
+                    self.get_model_storage_instance_by_id(m).evaluation_log_likelihood
                 )
         self.generational_f_score = generational_f_score
         self.generational_sensitivity = generational_sensitivity
         self.generational_precision = generational_precision
 
         self.stat_data = [
-            {'name': 'F-score', 'data': self.generational_f_score, 'colour': 'red'},
-            {'name': 'Precision', 'data': self.generational_precision, 'colour': 'blue'},
-            {'name': 'Sensitivity',
-             'data': self.generational_sensitivity,
-             'colour': 'green'},
+            {"name": "F-score", "data": self.generational_f_score, "colour": "red"},
+            {
+                "name": "Precision",
+                "data": self.generational_precision,
+                "colour": "blue",
+            },
+            {
+                "name": "Sensitivity",
+                "data": self.generational_sensitivity,
+                "colour": "green",
+            },
         ]
         self.generational_statistical_metrics = {
-            k['name']: k['data']
-            for k in self.stat_data
+            k["name"]: k["data"] for k in self.stat_data
         }
 
-    
-    def _plot_statistical_metrics(
-        self,
-        save_to_file=None
-    ):
+    def _plot_statistical_metrics(self, save_to_file=None):
         generations = sorted(set(self.branches.keys()))
         self.alt_generational_statistical_metrics = {
             b: {
-                'Precision': self.generational_precision[b],
-                'Sensitivity': self.generational_sensitivity[b],
-                'F-score': self.generational_f_score[b]
+                "Precision": self.generational_precision[b],
+                "Sensitivity": self.generational_sensitivity[b],
+                "F-score": self.generational_f_score[b],
             }
             for b in generations
         }
         include_plots = self.stat_data
-        lf = LatexFigure(
-            gridspec_layout=(1, len(include_plots))
-        )
-        
+        lf = LatexFigure(gridspec_layout=(1, len(include_plots)))
+
         plot_col = 0
         for plotting_data in include_plots:
 
             # ax = fig.add_subplot(gs[0, plot_col])
             ax = lf.new_axis()
-            data = plotting_data['data']
+            data = plotting_data["data"]
             ax.plot(
                 generations,
                 [np.median(data[b]) for b in generations],
-                label="{} median".format(plotting_data['name']),
-                color=plotting_data['colour'],
-                marker='o'
+                label="{} median".format(plotting_data["name"]),
+                color=plotting_data["colour"],
+                marker="o",
             )
             ax.fill_between(
                 generations,
                 [np.min(data[b]) for b in generations],
                 [np.max(data[b]) for b in generations],
                 alpha=0.2,
-                label="{} min/max".format(plotting_data['name']),
-                color=plotting_data['colour']
+                label="{} min/max".format(plotting_data["name"]),
+                color=plotting_data["colour"],
             )
-            ax.set_ylabel("{}".format(plotting_data['name']))
+            ax.set_ylabel("{}".format(plotting_data["name"]))
             ax.set_xlabel("Generation")
             ax.legend()
             ax.set_ylim(0, 1)
@@ -2903,44 +2838,42 @@ class QuantumModelLearningAgent():
         # Plot Bayes factors of this instance
         bayes_factor_by_id = pd.pivot_table(
             self.bayes_factors_df,
-            values='log10_bayes_factor',
-            index=['id_a'],
-            columns=['id_b'],
-            aggfunc=np.median
+            values="log10_bayes_factor",
+            index=["id_a"],
+            columns=["id_b"],
+            aggfunc=np.median,
         )
         mask = np.tri(bayes_factor_by_id.shape[0], k=-1).T
-        
-        lf = LatexFigure(
-            auto_label=False
-        )
+
+        lf = LatexFigure(auto_label=False)
         ax = lf.new_axis()
         sns.heatmap(
             bayes_factor_by_id,
-            cmap=self.exploration_class.bf_cmap, 
+            cmap=self.exploration_class.bf_cmap,
             mask=mask,
-            ax=ax, 
+            ax=ax,
             annot=False,
             cbar_kws={
                 "orientation": "vertical",
-                "label" : r"$\log_{10}\left(B_{i,j}\right)$"
-            }
+                "label": r"$\log_{10}\left(B_{i,j}\right)$",
+            },
         )
         ax.set_ylabel(r"ID $\hat{H}_i$")
         ax.set_xlabel(r"ID $\hat{H}_j$")
         lf.save(
             os.path.join(
                 self.qmla_controls.plots_directory,
-                'bayes_factors'.format(self.qmla_controls.long_id)
+                "bayes_factors".format(self.qmla_controls.long_id),
             ),
-            file_format=self.qmla_controls.figure_format
+            file_format=self.qmla_controls.figure_format,
         )
 
         # Heat map BF against F(A)/F(B)
         qmla.analysis.bayes_factor_f_score_heatmap(
             bayes_factors_df=self.bayes_factors_df,
-            save_to_file = os.path.join(
+            save_to_file=os.path.join(
                 self.qmla_controls.plots_directory, "bayes_factors_by_f_score"
-            )
+            ),
         )
 
     def _plot_branch_champs_quadratic_losses(
@@ -2949,19 +2882,18 @@ class QuantumModelLearningAgent():
         r"""Wrapper for :func:`~qmla.analysis.plot_quadratic_loss`."""
         qmla.analysis.plot_quadratic_loss(
             qmd=self,
-            champs_or_all='champs',
+            champs_or_all="champs",
             save_to_file=os.path.join(
-                self.qmla_controls.plots_directory,
-                "quadratic_losses_branch_champs.pdf"
-            )
+                self.qmla_controls.plots_directory, "quadratic_losses_branch_champs.pdf"
+            ),
         )
 
     def _plot_branch_champs_volumes(
-        self, 
-        model_id_list=None, 
+        self,
+        model_id_list=None,
         branch_champions=True,
-        branch_id=None, 
-        save_to_file=None
+        branch_id=None,
+        save_to_file=None,
     ):
         r"""
         Plot the volume of each branch champion within this instance.
@@ -2975,51 +2907,61 @@ class QuantumModelLearningAgent():
         """
 
         plt.clf()
-        plot_descriptor = '\n(' + str(self.num_particles) + 'particles; ' + \
-            str(self.num_experiments) + 'experiments).'
+        plot_descriptor = (
+            "\n("
+            + str(self.num_particles)
+            + "particles; "
+            + str(self.num_experiments)
+            + "experiments)."
+        )
 
         if branch_champions:
             # only plot for branch champions
             model_id_list = list(self.branch_champions.values())
-            plot_descriptor += '[Branch champions]'
+            plot_descriptor += "[Branch champions]"
 
         elif branch_id is not None:
             model_id_list = list(
-                self.model_database[
-                    self.model_database['branch_id'] == branch_id]['model_id']
+                self.model_database[self.model_database["branch_id"] == branch_id][
+                    "model_id"
+                ]
             )
-            plot_descriptor += '[Branch' + str(branch_id) + ']'
+            plot_descriptor += "[Branch" + str(branch_id) + "]"
 
         elif model_id_list is None:
             self.log_print(["Plotting volumes for all models by default."])
 
             model_id_list = range(self.highest_model_id)
-            plot_descriptor += '[All models]'
+            plot_descriptor += "[All models]"
 
-        plt.title('Volume evolution through QMD ' + plot_descriptor)
-        plt.xlabel('Epoch')
-        plt.ylabel('Volume')
+        plt.title("Volume evolution through QMD " + plot_descriptor)
+        plt.xlabel("Epoch")
+        plt.ylabel("Volume")
 
         for i in model_id_list:
             vols = self.get_model_storage_instance_by_id(i).volume_by_epoch
-            plt.semilogy(vols, label=str('ID:' + str(i)))
+            plt.semilogy(vols, label=str("ID:" + str(i)))
         ax = plt.subplot(111)
 
         # Shrink current axis's height by 10% on the bottom
         box = ax.get_position()
-        ax.set_position([box.x0, box.y0 + box.height * 0.1,
-                         box.width, box.height * 0.9])
+        ax.set_position(
+            [box.x0, box.y0 + box.height * 0.1, box.width, box.height * 0.9]
+        )
 
         # Put a legend below current axis
-        lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15),
-                        fancybox=True, shadow=True, ncol=4)
+        lgd = ax.legend(
+            loc="upper center",
+            bbox_to_anchor=(0.5, -0.15),
+            fancybox=True,
+            shadow=True,
+            ncol=4,
+        )
 
         if save_to_file is None:
             plt.show()
         else:
-            plt.savefig(
-                save_to_file, bbox_extra_artists=(
-                    lgd,), bbox_inches='tight')
+            plt.savefig(save_to_file, bbox_extra_artists=(lgd,), bbox_inches="tight")
 
     def _plot_parameter_learning_champion(
         self,
@@ -3036,9 +2978,8 @@ class QuantumModelLearningAgent():
             qmd=self,
             model_id=self.champion_model_id,
             save_to_file=os.path.join(
-                self.qmla_controls.plots_directory, 
-                "champion_parameters.png"
-            )
+                self.qmla_controls.plots_directory, "champion_parameters.png"
+            ),
         )
 
     def _plot_parameter_learning_true(
@@ -3052,22 +2993,18 @@ class QuantumModelLearningAgent():
             model's parameter estimeates
         """
         if self.true_model_id == -1:
-            return 
+            return
 
         qmla.analysis.plot_parameter_estimates(
             qmd=self,
             model_id=self.true_model_id,
             save_to_file=os.path.join(
-                self.qmla_controls.plots_directory, 
-                "champion_parameters.png"
-            )
+                self.qmla_controls.plots_directory, "champion_parameters.png"
+            ),
         )
 
     def _plot_parameter_learning_single_model(
-        self,
-        model_id=0,
-        true_model=False,
-        save_to_file=None
+        self, model_id=0, true_model=False, save_to_file=None
     ):
         r"""
         Plot parameter estimates vs experiment number for a single model.
@@ -3079,10 +3016,9 @@ class QuantumModelLearningAgent():
         if true_model:
             model_id = self._get_model_id_from_name(name=self.true_model_name)
 
-        qmla.analysis.plot_parameter_estimates(qmd=self,
-                                               model_id=model_id,
-                                               save_to_file=save_to_file
-                                               )
+        qmla.analysis.plot_parameter_estimates(
+            qmd=self, model_id=model_id, save_to_file=save_to_file
+        )
 
     def _plot_branch_champions_dynamics(
         self,
@@ -3111,18 +3047,10 @@ class QuantumModelLearningAgent():
             include_bayes_factors = True
             include_params = True
         elif model_ids is None:
-            model_ids = [
-                self.branches[b].champion_id
-                for b in self.branches
-            ]
+            model_ids = [self.branches[b].champion_id for b in self.branches]
             include_bayes_factors = True
-        self.log_print([
-            "Plotting dynamics of models:",
-            model_ids
-        ])
-        path_to_save = os.path.join(
-            self.qmla_controls.plots_directory,
-            'dynamics.png')
+        self.log_print(["Plotting dynamics of models:", model_ids])
+        path_to_save = os.path.join(self.qmla_controls.plots_directory, "dynamics.png")
         try:
             include_times_learned = False
             include_params = False
@@ -3138,12 +3066,9 @@ class QuantumModelLearningAgent():
             self.log_print(["Failed to plot dynamics"])
             # raise
 
-    def _plot_volume_after_qhl(self,
-                              model_id=None,
-                              true_model=True,
-                              show_resamplings=True,
-                              save_to_file=None
-                              ):
+    def _plot_volume_after_qhl(
+        self, model_id=None, true_model=True, show_resamplings=True, save_to_file=None
+    ):
         r"""
         Plot volume vs experiment number of a single model.
         Wrapper for :func:`~qmla.analysis.plot_volume_after_qhl`
@@ -3153,27 +3078,23 @@ class QuantumModelLearningAgent():
             model_id=model_id,
             true_model=true_model,
             show_resamplings=show_resamplings,
-            save_to_file=save_to_file
+            save_to_file=save_to_file,
         )
 
     def _plot_exploration_tree(
-        self,
-        modlist=None,
-        only_adjacent_branches=True,
-        save_to_file=None
+        self, modlist=None, only_adjacent_branches=True, save_to_file=None
     ):
         r"""Wrapper for :func:`~qmla.analysis.plot_qmla_single_instance_tree`"""
-        if save_to_file is None: 
+        if save_to_file is None:
             save_to_file = os.path.join(
-                self.qmla_controls.plots_directory, 
-                "exploration_tree.png"
+                self.qmla_controls.plots_directory, "exploration_tree.png"
             )
 
         qmla.analysis.plot_qmla_single_instance_tree(
             self,
             modlist=modlist,
             only_adjacent_branches=only_adjacent_branches,
-            save_to_file=save_to_file
+            save_to_file=save_to_file,
         )
 
     def _plot_qmla_radar_scores(self, modlist=None, save_to_file=None):
@@ -3182,17 +3103,10 @@ class QuantumModelLearningAgent():
         if modlist is None:
             modlist = list(self.branch_champions.values())
         qmla.analysis.plotRadar(
-            self,
-            modlist,
-            save_to_file=save_to_file,
-            plot_title=plot_title
+            self, modlist, save_to_file=save_to_file, plot_title=plot_title
         )
 
-    def _plot_r_squared_by_epoch_for_model_list(
-        self,
-        modlist=None,
-        save_to_file=None
-    ):
+    def _plot_r_squared_by_epoch_for_model_list(self, modlist=None, save_to_file=None):
         r"""
         Plot $R^2$ vs experiment number for given model list.
         """
@@ -3206,153 +3120,145 @@ class QuantumModelLearningAgent():
                 modlist.append(self.true_model_id)
             except BaseException:
                 pass
-        
-        if save_to_file is None: 
+
+        if save_to_file is None:
             save_to_file = os.path.join(
-                self.qmla_controls.plots_directory, 
-                "r_squareds.png"
+                self.qmla_controls.plots_directory, "r_squareds.png"
             )
 
         qmla.analysis.r_squared_from_epoch_list(
-            qmd=self,
-            model_ids=modlist,
-            save_to_file=save_to_file
+            qmd=self, model_ids=modlist, save_to_file=save_to_file
         )
 
-    def _plot_one_qubit_probes_bloch_sphere(
-        self, 
-        save=False
-    ):
+    def _plot_one_qubit_probes_bloch_sphere(self, save=False):
         r"""Show all one qubit probes on Bloch sphere."""
 
         qmla.utilities.plot_probes_on_bloch_sphere(
-            probe_dict = self.probes_system, 
-            num_probes = self.probe_number, 
+            probe_dict=self.probes_system,
+            num_probes=self.probe_number,
             save_to_file=os.path.join(
                 self.qmla_controls.plots_directory,
-                'probes_bloch_sphere.{}'.format(self.qmla_controls.figure_format)
-            )
+                "probes_bloch_sphere.{}".format(self.qmla_controls.figure_format),
+            ),
         )
 
-    def _plot_model_terms(self, colour_by='binary'):
+    def _plot_model_terms(self, colour_by="binary"):
         """
-        Plot the terms of each model by model ID. 
+        Plot the terms of each model by model ID.
 
         :param colour_by: defaults to 'binary' for black/white; alternatively colour by f_score of model
         :type colour_by: str, optional
-        """        
-        plt.rcParams.update({"text.usetex" : False})
+        """
+        plt.rcParams.update({"text.usetex": False})
         if self.plot_level < 1:
             return
-        
+
         # Prepare dataframes
-        unique_terms = list(set(qmla.utilities.flatten(list(self.model_database.latex_terms))))
-
-        unique_branches = list(set(qmla.utilities.flatten(list(self.model_database.branches_present_on))))
-        unique_branches = [
-            "branch_{}".format(int(b)) for b in unique_branches
-        ]
-
-        database_columns = ['model_id', 'f_score'] + unique_terms
-        model_reference_database = pd.DataFrame(
-            columns = database_columns
+        unique_terms = list(
+            set(qmla.utilities.flatten(list(self.model_database.latex_terms)))
         )
 
-        branch_cols = ['model_id', 'f_score'] + unique_branches
+        unique_branches = list(
+            set(qmla.utilities.flatten(list(self.model_database.branches_present_on)))
+        )
+        unique_branches = ["branch_{}".format(int(b)) for b in unique_branches]
+
+        database_columns = ["model_id", "f_score"] + unique_terms
+        model_reference_database = pd.DataFrame(columns=database_columns)
+
+        branch_cols = ["model_id", "f_score"] + unique_branches
         models_branches = pd.DataFrame(columns=branch_cols)
 
         for model_id in self.model_database.model_id:
 
-            model_data = self.model_database[
-                 self.model_database.model_id == model_id]
+            model_data = self.model_database[self.model_database.model_id == model_id]
             model_id = int(model_id)
-            f_score = model_data['f_score'].item()
+            f_score = model_data["f_score"].item()
 
-            if colour_by == 'binary':
+            if colour_by == "binary":
                 terms_in_model = {
-                    term : int(1) # for binary representation
+                    term: int(1)  # for binary representation
                     for term in model_data.latex_terms.item()
                 }
-            elif colour_by == 'f_score' : 
+            elif colour_by == "f_score":
                 terms_in_model = {
-                    term : f_score # to colour by f_score
+                    term: f_score  # to colour by f_score
                     for term in model_data.latex_terms.item()
                 }
-                
-            terms_in_model['model_id'] = int(model_id)
-            terms_in_model['f_score'] = model_data.f_score.item()
-            model_reference_database.loc[ len(model_reference_database) ] = pd.Series(terms_in_model)
+
+            terms_in_model["model_id"] = int(model_id)
+            terms_in_model["f_score"] = model_data.f_score.item()
+            model_reference_database.loc[len(model_reference_database)] = pd.Series(
+                terms_in_model
+            )
 
             branches = {
-                "branch_{}".format(int(b)) : 1
+                "branch_{}".format(int(b)): 1
                 for b in model_data.branches_present_on.item()
             }
-            branches['model_id'] = int(model_id)
+            branches["model_id"] = int(model_id)
 
             models_branches.loc[len(models_branches)] = pd.Series(branches)
 
-        if colour_by == 'binary':
+        if colour_by == "binary":
             models_branches.fillna(0, inplace=True)
             model_reference_database.fillna(0, inplace=True)
 
-        piv_table = pd.pivot_table(    
-            columns = ['model_id'], 
-            values = unique_terms, 
-            data = model_reference_database    
+        piv_table = pd.pivot_table(
+            columns=["model_id"], values=unique_terms, data=model_reference_database
         ).transpose()
 
         # Plot as heatmap
         lf = LatexFigure(
             auto_label=False,
-            font_scale=2, 
-        ) # TODO make figure size depend on num terms. 
+            font_scale=2,
+        )  # TODO make figure size depend on num terms.
         ax = lf.new_axis()
 
-        if colour_by == 'f_score':
+        if colour_by == "f_score":
             sns.heatmap(
                 piv_table,
-                cmap=self.exploration_class.f_score_cmap, 
-                ax = ax,
-                cbar_kws={'label': 'F-score', }
+                cmap=self.exploration_class.f_score_cmap,
+                ax=ax,
+                cbar_kws={
+                    "label": "F-score",
+                },
             )
-        elif colour_by == 'binary':
+        elif colour_by == "binary":
             sns.heatmap(
                 piv_table,
-                linewidths=.5,
-                cmap='binary',
+                linewidths=0.5,
+                cmap="binary",
                 cbar=False,
-                ax = ax,
+                ax=ax,
             )
 
-        ax.tick_params(which='y', rotation=0)
+        ax.tick_params(which="y", rotation=0)
         # fontsize = 20
         ax.tick_params(
-            top=True, 
+            top=True,
             bottom=False,
             labeltop=True,
             labelbottom=False,
             labelrotation=0,
             # labelsize=fontsize
         )
-        ax.set_ylabel('Model ID')
-        ax.set_xlabel('Term')
+        ax.set_ylabel("Model ID")
+        ax.set_xlabel("Term")
 
         lf.save(
-            os.path.join(
-                self.qmla_controls.plots_directory, "composition_of_models"
-            ),
-            file_format=self.qmla_controls.figure_format
+            os.path.join(self.qmla_controls.plots_directory, "composition_of_models"),
+            file_format=self.qmla_controls.figure_format,
         )
 
     def _plot_dynamics_all_models_on_branches(self, branches=None):
         """Plot the dynamics of all models on given branches.
 
-        :param branches: list of branches to draw dynamics for, defaults to None, in which case all branches are drawn. 
+        :param branches: list of branches to draw dynamics for, defaults to None, in which case all branches are drawn.
         :type branches: list, optional
-        """        
+        """
         self.branch_results_dir = os.path.join(
-            self.qmla_controls.plots_directory, 
-            'branches'
+            self.qmla_controls.plots_directory, "branches"
         )
         try:
             os.makedirs(self.branch_results_dir)
@@ -3363,130 +3269,123 @@ class QuantumModelLearningAgent():
             branches = sorted(list(self.branches.keys()))
 
         colours = itertools.cycle(
-            ['blue', 'orange', 'green', 'cyan', 'purple', 'olive', 'grey']
+            ["blue", "orange", "green", "cyan", "purple", "olive", "grey"]
         )
-        linestyles = itertools.cycle(
-            ['solid','dashed', 'dotted', 'dashdot']
-        )
+        linestyles = itertools.cycle(["solid", "dashed", "dotted", "dashdot"])
         max_models_per_subplot = 5
 
         for branch_id in branches:
             models = self.branches[branch_id].resident_model_ids
             times = sorted(self.experimental_measurements.keys())
-            num_rows = math.ceil( len(models) / max_models_per_subplot )
+            num_rows = math.ceil(len(models) / max_models_per_subplot)
 
-            lf  = LatexFigure(
-                fraction=0.45, 
-                gridspec_layout = (num_rows, 1),
-                auto_label=False
+            lf = LatexFigure(
+                fraction=0.45, gridspec_layout=(num_rows, 1), auto_label=False
             )
 
-            self.log_print([
-                "plotting branch dynamics. On branch {} there are {} rows".format(
-                    branch_id, num_rows
-                )
-            ])
+            self.log_print(
+                [
+                    "plotting branch dynamics. On branch {} there are {} rows".format(
+                        branch_id, num_rows
+                    )
+                ]
+            )
 
             n_models_this_row = 0
             ax = lf.new_axis()
 
             for m in models:
-                
+
                 mod = self.get_model_storage_instance_by_id(m)
                 computed_expec_val_times = sorted(mod.expectation_values.keys())
                 try:
                     exp_vals = [
-                        mod.expectation_values[t] 
-                        for t in computed_expec_val_times
+                        mod.expectation_values[t] for t in computed_expec_val_times
                     ]
                 except:
-                    self.log_print([
-                        "Failed to get expectation values for model id {}".format(m)
-                    ])
+                    self.log_print(
+                        ["Failed to get expectation values for model id {}".format(m)]
+                    )
                     raise
                 ax.plot(
-                    computed_expec_val_times, 
-                    exp_vals, 
-                    label = r"${}$".format(m), 
+                    computed_expec_val_times,
+                    exp_vals,
+                    label=r"${}$".format(m),
                     # label="{} (ID={}, $LL$={})".format(mod.model_name_latex, m, mod.evaluation_log_likelihood),
-                    color=next(colours), 
-                    ls=next(linestyles)
+                    color=next(colours),
+                    ls=next(linestyles),
                 )
 
                 n_models_this_row += 1
-                if (
-                    n_models_this_row == max_models_per_subplot
-                ):
-                    n_models_this_row = 0 
+                if n_models_this_row == max_models_per_subplot:
+                    n_models_this_row = 0
                     ax = lf.new_axis()
-                    
+
             for row in range(num_rows):
                 # Add system dynamics to each subplot
                 ax = lf.gridspec_axes[(row, 0)]
 
                 ax.scatter(
-                    times, 
+                    times,
                     [self.experimental_measurements[t] for t in times],
-                    c = 'red',
-                    label = r"$Q$",
-                    s = 5, 
+                    c="red",
+                    label=r"$Q$",
+                    s=5,
                 )
 
                 ax.set_xlim(0, max(times))
                 ax.set_ylim(0, 1.05)
                 ax.set_yticks([0, 0.5, 1])
-                ax.set_ylabel('Expectation Value')
-                ax.set_xlabel('Time')
+                ax.set_ylabel("Expectation Value")
+                ax.set_xlabel("Time")
                 ax.legend(
-                    bbox_to_anchor = (1, 0.8)
+                    bbox_to_anchor=(1, 0.8)
                     # loc = "upper center",
                     # ncol=2
                 )
 
             path = os.path.join(
-                self.branch_results_dir, 
-                'dynamics_branch_{}'.format(branch_id)
+                self.branch_results_dir, "dynamics_branch_{}".format(branch_id)
             )
             lf.save(path, file_format=self.qmla_controls.figure_format)
 
-
     def _plot_evaluation_normalisation_records(self):
-        """Plot the normalisation record of all models grouped by the branch they are on.
-        """        
-        if self.plot_level < 3 : 
+        """Plot the normalisation record of all models grouped by the branch they are on."""
+        if self.plot_level < 3:
             return
 
         for branch_id in list(self.branches.keys()):
 
-            fig, ax = plt.subplots(
-                figsize=(15, 10),
-                tight_layout=True
-            )
+            fig, ax = plt.subplots(figsize=(15, 10), tight_layout=True)
             for m in self.branches[branch_id].resident_model_ids:
                 mod = self.get_model_storage_instance_by_id(m)
-                
+
                 ax.hist(
                     qmla.utilities.flatten(mod.evaluation_normalization_record),
-                    bins = np.arange(0, 1, 0.05), 
-                    label = "{} ($LL={}$)".format(
+                    bins=np.arange(0, 1, 0.05),
+                    label="{} ($LL={}$)".format(
                         mod.model_name_latex,
                         # TODO use ES of branch to get latex name
-                        mod.evaluation_log_likelihood
+                        mod.evaluation_log_likelihood,
                     ),
-                    histtype='step'
+                    histtype="step",
                 )
             ax.legend(
                 bbox_to_anchor=(1.1, 1.05),
-                fontsize=12, 
+                fontsize=12,
             )
 
-            ax.set_ylabel('Frequency')
-            ax.set_xlabel('Likelihood')
-            ax.set_title('Normalisation record for evaluating models on branch {}'.format(branch_id))
+            ax.set_ylabel("Frequency")
+            ax.set_xlabel("Likelihood")
+            ax.set_title(
+                "Normalisation record for evaluating models on branch {}".format(
+                    branch_id
+                )
+            )
 
             fig.savefig(
                 os.path.join(
-                    self.branch_results_dir, 
-                    'normalisation_record_branch_{}.png'.format(branch_id)
+                    self.branch_results_dir,
+                    "normalisation_record_branch_{}.png".format(branch_id),
                 )
             )

@@ -5,28 +5,29 @@ import sys as sys
 
 import matplotlib.pyplot as plt
 
-class GridTopology():
+
+class GridTopology:
     r"""
     Control the layout/connectivity of the lattice the models are based on.
 
-    This can be used as a parent class for other topologies. 
-    Here sites are assigned unique indices, 
+    This can be used as a parent class for other topologies.
+    Here sites are assigned unique indices,
         and we use Cartesian coordinates for site positions.
 
     :param int dimension: dimension of system
     :param int num_sites: initial number of sites in the system
-    :param int maximum_connection_distance: upper limit of 
-        absolute distance between sites of nearest neighbours 
-        to be considered "connected". 
-    :param bool linear_connections_only: 
+    :param int maximum_connection_distance: upper limit of
+        absolute distance between sites of nearest neighbours
+        to be considered "connected".
+    :param bool linear_connections_only:
         True: only allow connectivity if sites share an axis
         False: allow connectivity if absolute distance between sites
         less than maximum_connection_distance
-    :param bool all_sites_connected: 
+    :param bool all_sites_connected:
         True: all sites connected
         False: connectivity based on above criteria
     """
-    
+
     def __init__(
         self,
         dimension=2,
@@ -34,30 +35,17 @@ class GridTopology():
         maximum_connection_distance=1,
         # to count as connected, i.e. 1 is nearest neighbours
         linear_connections_only=True,
-        all_sites_connected=False
+        all_sites_connected=False,
     ):
         self.dimension = dimension
         self.maximum_connection_distance = maximum_connection_distance
         self.only_linearly_connections = linear_connections_only
         self.connect_all_sites = all_sites_connected
 
-        self.occupation = {
-            'rows': {
-                1: [1]
-            },
-            'cols': {
-                1: [1]
-            }
-        }
-        self.coordinates = {
-            1: [1, 1]
-        }
-        self.nearest_neighbours = {
-            1: []
-        }
-        self.site_connections = {
-            1: []
-        }
+        self.occupation = {"rows": {1: [1]}, "cols": {1: [1]}}
+        self.coordinates = {1: [1, 1]}
+        self.nearest_neighbours = {1: []}
+        self.site_connections = {1: []}
 
         self.new_connections = []
         self.new_site_indices = []
@@ -67,10 +55,10 @@ class GridTopology():
 
     def add_site(self):
         r"""
-        Add site to current state of topology. 
+        Add site to current state of topology.
 
         In multiple dimensions, sites are addedto minimise total area of the lattice.
-        Connectivities are updated. 
+        Connectivities are updated.
         """
         if self.dimension == 1:
             new_site_idx = self.add_site_1d_grid()
@@ -82,15 +70,11 @@ class GridTopology():
         new_coordinate = self.coordinates[new_site_idx]
         self.nearest_neighbours[new_site_idx] = []
         self.site_connections[new_site_idx] = []
-        other_sites = list(
-            set(self.site_indices)
-            - set([new_site_idx])
-        )
+        other_sites = list(set(self.site_indices) - set([new_site_idx]))
         for i in other_sites:
             other_coords = self.coordinates[i]
             nearest_neighbour = self.check_nearest_neighbour_sites(
-                site_1=new_coordinate,
-                site_2=other_coords
+                site_1=new_coordinate, site_2=other_coords
             )
 
             if nearest_neighbour is True:
@@ -106,22 +90,12 @@ class GridTopology():
                         self.nearest_neighbours[i] = [new_site_idx]
 
             connected_sites, shared_axis = self.check_sites_connection(
-                site_1_idx=i,
-                site_2_idx=new_site_idx
+                site_1_idx=i, site_2_idx=new_site_idx
             )
 
-            if (
-                self.connect_all_sites == True
-                or
-                (
-                    connected_sites == True
-                    and
-                    (
-                        shared_axis == True
-                        or
-                        self.only_linearly_connections == False
-                    )
-                )
+            if self.connect_all_sites == True or (
+                connected_sites == True
+                and (shared_axis == True or self.only_linearly_connections == False)
             ):
                 conn = tuple(sorted([i, new_site_idx]))
                 this_site_new_connections.append(conn)
@@ -140,7 +114,7 @@ class GridTopology():
 
     @property
     def site_indices(self):
-        r"""Unique site indices list. """
+        r"""Unique site indices list."""
         return list(self.coordinates.keys())
 
     def num_sites(self):
@@ -162,9 +136,11 @@ class GridTopology():
         if len(site_1) != len(site_2):
             print(
                 "Site distance calculation: both sites must have same number of dimensions.",
-                "Given:", site_1, site_2
+                "Given:",
+                site_1,
+                site_2,
             )
-            raise NameError('Unequal site dimensions.')
+            raise NameError("Unequal site dimensions.")
 
         dim = len(site_1)
         dist = 0
@@ -185,30 +161,25 @@ class GridTopology():
             print(
                 "Site distance calculation: both sites must ",
                 "have same number of dimensions.",
-                "Given:", site_1, site_2
+                "Given:",
+                site_1,
+                site_2,
             )
-            raise NameError('[Topology] Unequal site dimensions.')
+            raise NameError("[Topology] Unequal site dimensions.")
 
         dim = len(site_1)
         dist = 0
         shared_axis = False
         for d in range(dim):
-            dist += np.abs(site_1[d] - site_2[d])**2
+            dist += np.abs(site_1[d] - site_2[d]) ** 2
             if site_1[d] == site_2[d]:
                 shared_axis = True
         dist = np.sqrt(dist)
         return dist, shared_axis
 
-    def check_sites_connection(
-        self,
-        site_1_idx,
-        site_2_idx
-    ):
+    def check_sites_connection(self, site_1_idx, site_2_idx):
         r"""Checks whether two site indices are considered connected."""
-        dist, shared_axis = self.get_distance_between_sites(
-            site_1_idx,
-            site_2_idx
-        )
+        dist, shared_axis = self.get_distance_between_sites(site_1_idx, site_2_idx)
 
         if dist <= self.maximum_connection_distance:
             connected = True
@@ -228,21 +199,11 @@ class GridTopology():
             for j in range(i + 1, len(site_indices)):
                 idx_2 = site_indices[j]
                 connected, shared_axis = self.check_sites_connection(
-                    site_1_idx=idx_1,
-                    site_2_idx=idx_2
+                    site_1_idx=idx_1, site_2_idx=idx_2
                 )
-                if (
-                    self.connect_all_sites == True
-                    or
-                    (
-                        connected == True
-                        and
-                        (
-                            shared_axis == True
-                            or
-                            self.only_linearly_connections == False
-                        )
-                    )
+                if self.connect_all_sites == True or (
+                    connected == True
+                    and (shared_axis == True or self.only_linearly_connections == False)
                 ):
                     connected_sites.append((idx_1, idx_2))
 
@@ -279,8 +240,8 @@ class GridTopology():
     def add_site_2d_grid(self):
         r"""Add site to topology if it is a 2D system."""
         # grows in a manner which minimises area of the topology
-        rows = self.occupation['rows']
-        cols = self.occupation['cols']
+        rows = self.occupation["rows"]
+        cols = self.occupation["cols"]
 
         row_values = rows.keys()
         col_values = cols.keys()
@@ -289,21 +250,13 @@ class GridTopology():
 
         for row_idx in rows:
             span = max(rows[row_idx]) - min(rows[row_idx])
-            if (
-                min_span_row is None
-                or
-                span < min_span_row
-            ):
+            if min_span_row is None or span < min_span_row:
                 min_span_row = span
                 min_span_row_idx = row_idx
 
         for col_idx in cols:
             span = max(cols[col_idx]) - min(cols[col_idx])
-            if (
-                min_span_col is None
-                or
-                span < min_span_col
-            ):
+            if min_span_col is None or span < min_span_col:
                 min_span_col = span
                 min_span_col_idx = col_idx
 
@@ -319,14 +272,14 @@ class GridTopology():
         new_coordinate = [new_row, new_col]
 
         try:
-            self.occupation['rows'][new_row].append(new_col)
+            self.occupation["rows"][new_row].append(new_col)
         except BaseException:
-            self.occupation['rows'][new_row] = [new_col]
+            self.occupation["rows"][new_row] = [new_col]
 
         try:
-            self.occupation['cols'][new_col].append(new_row)
+            self.occupation["cols"][new_col].append(new_row)
         except BaseException:
-            self.occupation['cols'][new_col] = [new_row]
+            self.occupation["cols"][new_col] = [new_row]
 
         max_site_idx = max(list(self.coordinates.keys()))
         new_site_idx = max_site_idx + 1
@@ -335,8 +288,8 @@ class GridTopology():
         return new_site_idx
 
     def add_sites_until_closed_topology(self):
-        r""""
-        Continuosly add sites until topology is closed 
+        r""" "
+        Continuosly add sites until topology is closed
             (here, all sites have at least two nearest neighbours).
         """
         # Add sites in such a way that all sites have at least two nearest neighbours
@@ -356,22 +309,22 @@ class GridTopology():
     def draw_topology(self, include_labels=True, save_to_file=None):
         r"""Plot the current topology. For use in interactive sessions."""
         import networkx as nx
+
         plt.clf()
         Graph = nx.Graph()
 
         print("site indices:", self.site_indices)
         for c in self.site_indices:
             Graph.add_node(c)
-            Graph.nodes[c]['neighbours'] = self.nearest_neighbours[c]
-            Graph.nodes[c]['position'] = tuple(self.coordinates[c])
-            Graph.nodes[c]['label'] = str(c)
+            Graph.nodes[c]["neighbours"] = self.nearest_neighbours[c]
+            Graph.nodes[c]["position"] = tuple(self.coordinates[c])
+            Graph.nodes[c]["label"] = str(c)
 
         # Get positions and labels
         positions = dict(
             zip(
                 Graph.nodes(),
-                tuple([prop['position']
-                       for (n, prop) in Graph.nodes(data=True)])
+                tuple([prop["position"] for (n, prop) in Graph.nodes(data=True)]),
             )
         )
         label_positions = []
@@ -379,22 +332,15 @@ class GridTopology():
         labels = dict(
             zip(
                 Graph.nodes(),
-                tuple([prop['label'] for (n, prop) in Graph.nodes(data=True)])
+                tuple([prop["label"] for (n, prop) in Graph.nodes(data=True)]),
             )
         )
         for key in positions.keys():
             label_positions.append(
-                tuple(
-                    np.array(positions[key]) - np.array([0., label_padding])
-                )
+                tuple(np.array(positions[key]) - np.array([0.0, label_padding]))
             )
 
-        label_positions = dict(
-            zip(
-                positions.keys(),
-                tuple(label_positions)
-            )
-        )
+        label_positions = dict(zip(positions.keys(), tuple(label_positions)))
 
         # which nodes to connect (nearest neighbours)
         edges = []
@@ -413,30 +359,25 @@ class GridTopology():
             with_labels=True,  # labels=labels,
             pos=positions,
             node_size=600,
-            node_color='blue',
-            alpha=0.2
+            node_color="blue",
+            alpha=0.2,
         )
         if include_labels:
             nx.draw_networkx_labels(
-                Graph,
-                label_positions,
-                labels,
-                font_color='black',
-                font_weight='bold'
+                Graph, label_positions, labels, font_color="black", font_weight="bold"
             )
 
         nx.draw_networkx_edges(
             Graph,
             pos=self.coordinates,
             edgelist=edges,
-            edge_color='grey',
+            edge_color="grey",
             alpha=0.8,
-            style='dashed',
-            label='Nearest neighbours'
+            style="dashed",
+            label="Nearest neighbours",
         )
 
         self.Graph = Graph
 
         if save_to_file is not None:
             plt.savefig(save_to_file)
-

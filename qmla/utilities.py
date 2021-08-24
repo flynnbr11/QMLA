@@ -13,9 +13,10 @@ import matplotlib.colors
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-import qmla.construct_models
+import qmla.model_building_utilities
 
-class StorageUnit():
+
+class StorageUnit:
     r"""
     Generic object to which results can be pickled for later use/analysis.
     """
@@ -23,9 +24,7 @@ class StorageUnit():
     def __init__(self, data_to_store=None):
         if data_to_store is not None:
             for k in data_to_store:
-                self.__setattr__(
-                    k, data_to_store[k]
-                )
+                self.__setattr__(k, data_to_store[k])
 
 
 def round_nearest(x, a):
@@ -43,7 +42,7 @@ def resource_allocation(
     this_model_terms,
     num_experiments,
     num_particles,
-    given_resource_as_cap=True
+    given_resource_as_cap=True,
 ):
     r"""
     Given a set of resources, work out the proportional resources that
@@ -55,26 +54,17 @@ def resource_allocation(
     new_resources = {}
     if given_resource_as_cap == True:
         # i.e. reduce number particles for models with fewer params
-        proportion_of_particles_to_receive = (
-            this_model_terms / max_num_params
-        )
-        print(
-            "Model gets proportion of particles:",
-            proportion_of_particles_to_receive
-        )
+        proportion_of_particles_to_receive = this_model_terms / max_num_params
+        print("Model gets proportion of particles:", proportion_of_particles_to_receive)
 
         if proportion_of_particles_to_receive < 1:
-            new_resources['num_experiments'] = num_experiments
-            new_resources['num_particles'] = max(
-                int(
-                    proportion_of_particles_to_receive
-                    * num_particles
-                ),
-                10
+            new_resources["num_experiments"] = num_experiments
+            new_resources["num_particles"] = max(
+                int(proportion_of_particles_to_receive * num_particles), 10
             )
         else:
-            new_resources['num_experiments'] = num_experiments
-            new_resources['num_particles'] = num_particles
+            new_resources["num_experiments"] = num_experiments
+            new_resources["num_particles"] = num_particles
 
     else:
         # increase proportional to number params/qubits
@@ -84,11 +74,11 @@ def resource_allocation(
         overall_factor = int(qubit_factor * terms_factor)
 
         if overall_factor > 1:
-            new_resources['num_experiments'] = overall_factor * num_experiments
-            new_resources['num_particles'] = overall_factor * num_particles
+            new_resources["num_experiments"] = overall_factor * num_experiments
+            new_resources["num_particles"] = overall_factor * num_particles
         else:
-            new_resources['num_experiments'] = num_experiments
-            new_resources['num_particles'] = num_particles
+            new_resources["num_experiments"] = num_experiments
+            new_resources["num_particles"] = num_particles
 
     print("New resources:", new_resources)
     return new_resources
@@ -103,11 +93,8 @@ def format_experiment(
     r"""
     Format a given set of data as an experiment that can be interpreted by the QInfer model.
     """
-    exp = np.empty(
-        len(time),
-        dtype=qinfer_model.expparams_dtype
-    )
-    exp['t'] = time
+    exp = np.empty(len(time), dtype=qinfer_model.expparams_dtype)
+    exp["t"] = time
     try:
         for dtype in qinfer_model.expparams_dtype:
             term = dtype[0]
@@ -130,15 +117,16 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     Cuf of the ends of a given colour map.
     """
     new_cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
-        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-        cmap(np.linspace(minval, maxval, n)))
+        "trunc({n},{a:.2f},{b:.2f})".format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)),
+    )
     return new_cmap
 
 
 def n_qubit_nv_gali_model(
     n_qubits,
-    rotation_terms=['x', 'y', 'z'],
-    coupling_terms=['x', 'y', 'z'],
+    rotation_terms=["x", "y", "z"],
+    coupling_terms=["x", "y", "z"],
 ):
     r"""
     Compose a model string for an NV system according to Gali model.
@@ -150,50 +138,54 @@ def n_qubit_nv_gali_model(
     """
 
     terms = [
-        'pauliSet_1_{o}_d{N}'.format(o=operator, N=n_qubits)
+        "pauliSet_1_{o}_d{N}".format(o=operator, N=n_qubits)
         for operator in rotation_terms
     ]
     for k in range(2, n_qubits + 1):
         new_terms = [
-            'pauliSet_1J{k}_{o}J{o}_d{N}'.format(k=k, o=operator, N=n_qubits)
+            "pauliSet_1J{k}_{o}J{o}_d{N}".format(k=k, o=operator, N=n_qubits)
             for operator in coupling_terms
         ]
         terms.extend(new_terms)
     terms = sorted(terms)
-    return '+'.join(terms)
+    return "+".join(terms)
 
 
-def ensure_consisten_num_qubits_pauli_set(initial_model, new_dimension=None):
-    individual_terms = qmla.construct_models.get_constituent_names_from_name(initial_model)
-    
-    if new_dimension is None: 
-        max_dimension = max([
-            qmla.construct_models.get_num_qubits(term)
-            for term in individual_terms            
-        ])
+def ensure_consistent_num_qubits_pauli_set(initial_model, new_dimension=None):
+    individual_terms = qmla.model_building_utilities.get_constituent_names_from_name(
+        initial_model
+    )
+
+    if new_dimension is None:
+        max_dimension = max(
+            [
+                qmla.model_building_utilities.get_num_qubits(term)
+                for term in individual_terms
+            ]
+        )
         new_dimension = max_dimension
 
     separate_terms = []
     for model in individual_terms:
-        components = model.split('_')
+        components = model.split("_")
 
         for c in components:
-            if c[0] == 'd':
+            if c[0] == "d":
                 # remove the dimension indicator from model
                 components.remove(c)
 
         new_component = "d{}".format(new_dimension)
         components.append(new_component)
-        new_mod = '_'.join(components)
+        new_mod = "_".join(components)
         separate_terms.append(new_mod)
 
-    full_model = '+'.join(separate_terms)
+    full_model = "+".join(separate_terms)
     return full_model
 
 
 def plot_probes_on_bloch_sphere(
-    probe_dict, 
-    # num_probes, 
+    probe_dict,
+    # num_probes,
     save_to_file=None,
     **kwargs
 ):
@@ -214,7 +206,7 @@ def plot_probes_on_bloch_sphere(
         b = state[1]
         A = a * qt.basis(2, 0)
         B = b * qt.basis(2, 1)
-        vec = (A + B)
+        vec = A + B
         bloch.add_states(vec)
 
     if save_to_file is not None:
@@ -225,32 +217,32 @@ def plot_probes_on_bloch_sphere(
 
 def plot_subset_eval_probes(
     true_hamiltonian,
-    probe_dict, 
-    subset_probes, 
-    measurement_probability_function, 
-    times, 
-    fig, 
-    dynamics_ax, 
-    bloch_ax, 
+    probe_dict,
+    subset_probes,
+    measurement_probability_function,
+    times,
+    fig,
+    dynamics_ax,
+    bloch_ax,
 ):
     r"""
     Retained separately in case we later want to plot all eval probes instead of just a sample
-    """ 
+    """
     try:
         import qutip as qt
     except:
         print("Qutip not installed")
         raise
 
-    colours = ['red', 'green', 'cyan', 'orange', 'brown', 'blue', 'pink']
-    linestyles=['dashed', 'dotted', 'dashdot']
+    colours = ["red", "green", "cyan", "orange", "brown", "blue", "pink"]
+    linestyles = ["dashed", "dotted", "dashdot"]
     linestyles = itertools.cycle(linestyles)
     iter_colours = itertools.cycle(colours)
     num_probes_per_subplot = len(colours)
 
-    bloch = qt.Bloch(fig=fig, axes = bloch_ax)
+    bloch = qt.Bloch(fig=fig, axes=bloch_ax)
     try:
-        bloch_ax.axis('square') # to get a nice circular plot
+        bloch_ax.axis("square")  # to get a nice circular plot
     except:
         pass
 
@@ -258,50 +250,46 @@ def plot_subset_eval_probes(
         probe = probe_dict[pid]
 
         ev = [
-            measurement_probability_function(
-                ham = true_hamiltonian, 
-                t = t, 
-                state = probe
-            )
+            measurement_probability_function(ham=true_hamiltonian, t=t, state=probe)
             for t in times
         ]
 
         dynamics_ax.plot(
-            times, 
-            ev, 
+            times,
+            ev,
             c=next(iter_colours),
             ls=next(linestyles),
-            lw = 3,
-            label="{}".format(pid[0])
+            lw=3,
+            label="{}".format(pid[0]),
         )
 
-        corresponding_single_qubit_probe = probe_dict[(pid[0], 1)]   
+        corresponding_single_qubit_probe = probe_dict[(pid[0], 1)]
         A = corresponding_single_qubit_probe[0] * qt.basis(2, 0)
         B = corresponding_single_qubit_probe[1] * qt.basis(2, 1)
-        vec = (A + B)
+        vec = A + B
         bloch.add_states(vec)
 
     bloch.vector_color = colours
-    bloch.render(fig=fig, axes=bloch_ax) # render to the correct subplot 
-    dynamics_ax.set_ylabel('Expectation Value')
-    dynamics_ax.set_xlabel('Time')
+    bloch.render(fig=fig, axes=bloch_ax)  # render to the correct subplot
+    dynamics_ax.set_ylabel("Expectation Value")
+    dynamics_ax.set_xlabel("Time")
     dynamics_ax.legend()
 
 
-
-
 def plot_evaluation_dataset(
-    evaluation_data, 
+    evaluation_data,
     true_hamiltonian,
     measurement_probability_function,
-    num_probes_to_plot=6, 
-    save_to_file=None
+    num_probes_to_plot=6,
+    save_to_file=None,
 ):
-    times = sorted(np.array(evaluation_data['experiments'])['t'])
-    probe_dict = evaluation_data['probes']
+    times = sorted(np.array(evaluation_data["experiments"])["t"])
+    probe_dict = evaluation_data["probes"]
     keys = list(probe_dict.keys())
-    true_model_num_qubits = np.log2( np.shape(true_hamiltonian)[0] )
-    probe_ids = sorted([t for t in list(probe_dict.keys()) if t[1] == true_model_num_qubits])
+    true_model_num_qubits = np.log2(np.shape(true_hamiltonian)[0])
+    probe_ids = sorted(
+        [t for t in list(probe_dict.keys()) if t[1] == true_model_num_qubits]
+    )
 
     # Plot
     fig, axes = plt.subplots(
@@ -309,34 +297,28 @@ def plot_evaluation_dataset(
         constrained_layout=True,
     )
 
-    nrows = 1 # TODO plot more than just a sample
+    nrows = 1  # TODO plot more than just a sample
     ncols = 2
-    gs = GridSpec(
-        nrows=nrows,
-        ncols=ncols,
-        width_ratios=[3, 1]
-    )
+    gs = GridSpec(nrows=nrows, ncols=ncols, width_ratios=[3, 1])
 
     row = 0
     dynamics_ax = fig.add_subplot(gs[row, 0])
-    bloch_ax = fig.add_subplot(gs[row, 1], projection='3d')
-
+    bloch_ax = fig.add_subplot(gs[row, 1], projection="3d")
 
     subset_probes = sorted(probe_ids[:num_probes_to_plot])
 
     plot_subset_eval_probes(
-        true_hamiltonian = true_hamiltonian, 
-        measurement_probability_function = measurement_probability_function,
-        subset_probes = subset_probes,
-        probe_dict = probe_dict, 
-        times = times, 
-        fig = fig,  
-        dynamics_ax = dynamics_ax, 
-        bloch_ax = bloch_ax, 
+        true_hamiltonian=true_hamiltonian,
+        measurement_probability_function=measurement_probability_function,
+        subset_probes=subset_probes,
+        probe_dict=probe_dict,
+        times=times,
+        fig=fig,
+        dynamics_ax=dynamics_ax,
+        bloch_ax=bloch_ax,
     )
 
     if save_to_file is not None:
         fig.savefig(save_to_file)
     else:
         plt.show()
-    

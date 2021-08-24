@@ -13,11 +13,9 @@ import qmla.redis_settings
 import qmla.logging
 
 pickle.HIGHEST_PROTOCOL = 4
-plt.switch_backend('agg')
+plt.switch_backend("agg")
 
-__all__ = [
-    'remote_learn_model_parameters'
-]
+__all__ = ["remote_learn_model_parameters"]
 
 
 def remote_learn_model_parameters(
@@ -27,10 +25,10 @@ def remote_learn_model_parameters(
     exploration_rule,
     qmla_core_info_dict=None,
     remote=False,
-    host_name='localhost',
+    host_name="localhost",
     port_number=6379,
     qid=0,
-    log_file='rq_output.log'
+    log_file="rq_output.log",
 ):
     """
     Standalone function to perform Quantum Hamiltonian Learning on individual models.
@@ -71,37 +69,35 @@ def remote_learn_model_parameters(
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=log_file,
-            log_identifier='RemoteLearnModel {}'.format(model_id)
+            log_identifier="RemoteLearnModel {}".format(model_id),
         )
 
-    log_print([
-        "Starting QHL for Model {} on branch {}".format(model_id, branch_id)
-    ])
+    log_print(["Starting QHL for Model {} on branch {}".format(model_id, branch_id)])
     time_start = time.time()
     num_redis_retries = 5
 
     # Access databases
     redis_databases = qmla.redis_settings.get_redis_databases_by_qmla_id(
-        host_name, port_number, qid)
-    qmla_core_info_database = redis_databases['qmla_core_info_database']
-    learned_models_info_db = redis_databases['learned_models_info_db']
-    learned_models_ids = redis_databases['learned_models_ids']
-    active_branches_learning_models = redis_databases['active_branches_learning_models']
-    any_job_failed_db = redis_databases['any_job_failed']
+        host_name, port_number, qid
+    )
+    qmla_core_info_database = redis_databases["qmla_core_info_database"]
+    learned_models_info_db = redis_databases["learned_models_info_db"]
+    learned_models_ids = redis_databases["learned_models_ids"]
+    active_branches_learning_models = redis_databases["active_branches_learning_models"]
+    any_job_failed_db = redis_databases["any_job_failed"]
 
     if qmla_core_info_dict is not None:
         # for local runs, qmla_core_info_dict passed, with probe_dict included
         # in it.
-        probe_dict = qmla_core_info_dict['probe_dict']
+        probe_dict = qmla_core_info_dict["probe_dict"]
     else:
-        qmla_core_info_dict = pickle.loads(
-            qmla_core_info_database['qmla_settings'])
-        probe_dict = pickle.loads(qmla_core_info_database['probes_system'])
+        qmla_core_info_dict = pickle.loads(qmla_core_info_database["qmla_settings"])
+        probe_dict = pickle.loads(qmla_core_info_database["probes_system"])
 
-    true_model_terms_matrices = qmla_core_info_dict['true_oplist']
-    qhl_plots = qmla_core_info_dict['qhl_plots']
-    plots_directory = qmla_core_info_dict['plots_directory']
-    long_id = qmla_core_info_dict['long_id']
+    true_model_terms_matrices = qmla_core_info_dict["true_oplist"]
+    qhl_plots = qmla_core_info_dict["qhl_plots"]
+    plots_directory = qmla_core_info_dict["plots_directory"]
+    long_id = qmla_core_info_dict["long_id"]
 
     # Generate model instance
     qml_instance = qmla.model_for_learning.ModelInstanceForLearning(
@@ -118,28 +114,32 @@ def remote_learn_model_parameters(
         # Learn parameters
         update_timer_start = time.time()
         qml_instance.update_model()
-        log_print([
-            "Time for update alone: {}".format(
-                time.time() - update_timer_start
-            )
-        ])
+        log_print(
+            ["Time for update alone: {}".format(time.time() - update_timer_start)]
+        )
 
         # Evaluate learned parameterisation
         # qml_instance.compute_likelihood_after_parameter_learning()
 
     except NameError:
-        log_print([
-            "Model learning failed. QHL failed for model id {}. Setting job failure construct_models.".format(
-                model_id)
-        ])
-        any_job_failed_db.set('Status', 1)
+        log_print(
+            [
+                "Model learning failed. QHL failed for model id {}. Setting job failure model_building_utilities.".format(
+                    model_id
+                )
+            ]
+        )
+        any_job_failed_db.set("Status", 1)
         raise
     except BaseException:
-        log_print([
-            "Model learning failed. QHL failed for model id {}. Setting job failure construct_models.".format(
-                model_id)
-        ])
-        any_job_failed_db.set('Status', 1)
+        log_print(
+            [
+                "Model learning failed. QHL failed for model id {}. Setting job failure model_building_utilities.".format(
+                    model_id
+                )
+            ]
+        )
+        any_job_failed_db.set("Status", 1)
         raise
 
     if qhl_plots:
@@ -149,47 +149,46 @@ def remote_learn_model_parameters(
                 qml_instance.plot_distribution_progression(
                     save_to_file=str(
                         plots_directory
-                        + 'qhl_distribution_progression_' + str(long_id) + '.png')
+                        + "qhl_distribution_progression_"
+                        + str(long_id)
+                        + ".png"
+                    )
                 )
 
                 qml_instance.plot_distribution_progression(
                     renormalise=False,
                     save_to_file=str(
                         plots_directory
-                        + 'qhl_distribution_progression_uniform_' + str(long_id) + '.png')
+                        + "qhl_distribution_progression_uniform_"
+                        + str(long_id)
+                        + ".png"
+                    ),
                 )
         except BaseException:
             pass
 
     # Throw away model instance; only need to store results.
-    updated_model_info = copy.deepcopy(
-        qml_instance.learned_info_dict()
-    )
-    compressed_info = pickle.dumps(
-        updated_model_info,
-        protocol=4
-    )
+    updated_model_info = copy.deepcopy(qml_instance.learned_info_dict())
+    compressed_info = pickle.dumps(updated_model_info, protocol=4)
 
     # Store the (compressed) result set on the redis database.
     for k in range(num_redis_retries):
         try:
-            learned_models_info_db.set(
-                str(model_id),
-                compressed_info
+            learned_models_info_db.set(str(model_id), compressed_info)
+            log_print(
+                [
+                    "learned_models_info_db added to db for model {} after {} attempts".format(
+                        str(model_id), k
+                    )
+                ]
             )
-            log_print([
-                "learned_models_info_db added to db for model {} after {} attempts".format(
-                    str(model_id),
-                    k
-                )
-            ])
             break
         except Exception as e:
             if k == num_redis_retries - 1:
-                log_print([
-                    "Model learning failed at the storage stage. Error: {}".format(e)
-                ])
-                any_job_failed_db.set('Status', 1)
+                log_print(
+                    ["Model learning failed at the storage stage. Error: {}".format(e)]
+                )
+                any_job_failed_db.set("Status", 1)
                 pass
 
     # Update databases to record that this model has finished.
@@ -197,28 +196,29 @@ def remote_learn_model_parameters(
         try:
             active_branches_learning_models.incr(int(branch_id), 1)
             learned_models_ids.set(str(model_id), 1)
-            log_print([
-                "Updated model/branch learned on redis db  {}/{}".format(
-                    model_id, 
-                    branch_id
-                )
-            ])
+            log_print(
+                [
+                    "Updated model/branch learned on redis db  {}/{}".format(
+                        model_id, branch_id
+                    )
+                ]
+            )
             break
         except Exception as e:
-            if k == num_redis_retries-1:
-                log_print([
-                    "Model learning failed to update branch info. Error: ", e
-                ])
-                any_job_failed_db.set('Status', 1)
+            if k == num_redis_retries - 1:
+                log_print(["Model learning failed to update branch info. Error: ", e])
+                any_job_failed_db.set("Status", 1)
 
     if remote:
         del updated_model_info
         del compressed_info
         del qml_instance
-        log_print([
-            "Learned model; remote time:", str(
-                np.round((time.time() - time_start), 2))
-        ])
+        log_print(
+            [
+                "Learned model; remote time:",
+                str(np.round((time.time() - time_start), 2)),
+            ]
+        )
         return None
     else:
         return updated_model_info

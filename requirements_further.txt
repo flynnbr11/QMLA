@@ -1,3 +1,3 @@
 expm==0.1.5
 git+git://github.com/ProjectQ-Framework/ProjectQ.git@master
-git+git://github.com/qutip/qutip.git@master
+git+git://github.com/qutip/qutip.git@master			#There has been difficulty installing and this can alternatively be done with pip install qutip==4.6.2

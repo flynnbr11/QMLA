@@ -1,59 +1,53 @@
 import numpy as np
 import sys
 import os
-import copy 
+import copy
 
 import glob
 import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
-import lfig 
+import lfig
 
 import qmla.get_exploration_strategy
-import qmla.construct_models
+import qmla.model_building_utilities
 from qmla.analysis.analysis_and_plot_functions import fill_between_sigmas
-plt.switch_backend('agg')
+
+plt.switch_backend("agg")
 
 __all__ = [
-    'average_parameters_across_instances',
-    'average_parameter_estimates',
-    'cluster_results_and_plot',
-    'plot_parameter_estimates',
-    'plot_terms_and_parameters'
+    "average_parameters_across_instances",
+    "average_parameter_estimates",
+    "cluster_results_and_plot",
+    "plot_parameter_estimates",
+    "plot_terms_and_parameters",
 ]
 
-def rank_models(n): 
+
+def rank_models(n):
     # from
     # https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
     return sorted(set(n), key=n.count)[::-1]
 
 
 def average_parameters_across_instances(
-    results_path,
-    file_to_store=None, 
-    top_number_models=3,
-    average_type='median'
+    results_path, file_to_store=None, top_number_models=3, average_type="median"
 ):
     r"""
     Find the median and standard deviation of parameters within all champion models
-    across instances in this results directory. 
+    across instances in this results directory.
 
-    :param results_path: path where results are stored in CSV. 
-    :param file_to_store: path which is used to store the resulting priors. 
-    :param top_number_models: Number of models to compute averages for 
-        (top by number of instance wins). 
+    :param results_path: path where results are stored in CSV.
+    :param file_to_store: path which is used to store the resulting priors.
+    :param top_number_models: Number of models to compute averages for
+        (top by number of instance wins).
 
     :returns learned_priors: priors (median + std dev) of parameters
         of champion models. Can be stored.
     """
 
-    results = pd.read_csv(
-        results_path,
-        index_col='QID'
-    )
-    all_winning_models = list(
-        results.loc[:, 'NameAlphabetical']
-    )
+    results = pd.read_csv(results_path, index_col="QID")
+    all_winning_models = list(results.loc[:, "NameAlphabetical"])
     winning_models = list(set(all_winning_models))
     if len(all_winning_models) > top_number_models:
         # restrict to the top N models, where N is user input
@@ -64,7 +58,7 @@ def average_parameters_across_instances(
     for mod in winning_models:
         params_dict[mod] = {}
         sigmas_dict[mod] = {}
-        params = qmla.construct_models.get_constituent_names_from_name(mod)
+        params = qmla.model_building_utilities.get_constituent_names_from_name(mod)
         for p in params:
             params_dict[mod][p] = []
             sigmas_dict[mod][p] = []
@@ -72,15 +66,9 @@ def average_parameters_across_instances(
     for i in range(len(winning_models)):
         mod = winning_models[i]
         learned_parameters = list(
-            results[
-                results['NameAlphabetical'] == mod
-            ]['LearnedParameters']
+            results[results["NameAlphabetical"] == mod]["LearnedParameters"]
         )
-        final_sigmas = list(
-            results[
-                results['NameAlphabetical'] == mod
-            ]['FinalSigmas']
-        )
+        final_sigmas = list(results[results["NameAlphabetical"] == mod]["FinalSigmas"])
         num_wins_for_mod = len(learned_parameters)
         for i in range(num_wins_for_mod):
             params = eval(learned_parameters[i])
@@ -98,7 +86,7 @@ def average_parameters_across_instances(
         avg_sigmas_dict[mod] = {}
         std_deviations[mod] = {}
         learned_priors[mod] = {}
-        params = qmla.construct_models.get_constituent_names_from_name(mod)
+        params = qmla.model_building_utilities.get_constituent_names_from_name(mod)
         for p in params:
             avg_sigmas_dict[mod][p] = np.median(sigmas_dict[mod][p])
             try:
@@ -106,40 +94,35 @@ def average_parameters_across_instances(
             except:
                 averaging_weight = 0
             average_params_dict[mod][p] = np.average(
-                params_dict[mod][p],
-                weights=sigmas_dict[mod][p]
+                params_dict[mod][p], weights=sigmas_dict[mod][p]
             )
             learned_priors[mod][p] = [
                 average_params_dict[mod][p],
-                avg_sigmas_dict[mod][p]
+                avg_sigmas_dict[mod][p],
             ]
 
     if file_to_store is not None:
-        pickle.dump(
-            learned_priors,
-            open(file_to_store, 'wb'),
-            protocol=4
-        )
+        pickle.dump(learned_priors, open(file_to_store, "wb"), protocol=4)
 
     return learned_priors
 
-def average_parameter_estimates(
 
+def average_parameter_estimates(
     directory_name,
     results_path,
-    results_file_name_start='results',
+    results_file_name_start="results",
     exploration_rule=None,
     unique_exploration_classes=None,
     top_number_models=2,
     true_params_dict=None,
     save_to_file=None,
     save_directory=None,
-    figure_format='png', 
-    plot_prefix='', 
+    figure_format="png",
+    plot_prefix="",
 ):
     r"""
     Plots progression of parameter estimates against experiment number
-    for the top models, i.e. those which win the most. 
+    for the top models, i.e. those which win the most.
 
     TODO: refactor this code - it should not need to unpickle
     all the files which have already been unpickled and stored in the summary
@@ -147,25 +130,23 @@ def average_parameter_estimates(
 
     :param directory_name: path to directory where results .p files are stored.
     :param results_patha: path to CSV with all results for this run.
-    :param exploration_rule: the name of the exploration strategy used. 
+    :param exploration_rule: the name of the exploration strategy used.
     :param unique_exploration_classes: dict with single instance of each exploration strategy class
         used in this run.
-    :param top_number_models: Number of models to compute averages for 
-        (top by number of instance wins). 
-    :param true_params_dict: dict with true parameter for each parameter in the 
+    :param top_number_models: Number of models to compute averages for
+        (top by number of instance wins).
+    :param true_params_dict: dict with true parameter for each parameter in the
         true model.
-    :param save_to_file: if not None, path to save PNG. 
+    :param save_to_file: if not None, path to save PNG.
 
     :returns None:
     """
 
     from matplotlib import cm
-    plt.switch_backend('agg')  # to try fix plt issue on BC
-    results = pd.read_csv(
-        results_path,
-        index_col='QID'
-    )
-    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
+
+    plt.switch_backend("agg")  # to try fix plt issue on BC
+    results = pd.read_csv(results_path, index_col="QID")
+    all_winning_models = list(results.loc[:, "NameAlphabetical"])
     if len(all_winning_models) > top_number_models:
         winning_models = rank_models(all_winning_models)[0:top_number_models]
     else:
@@ -184,21 +165,20 @@ def average_parameter_estimates(
     exploration_strategies = {}
 
     for f in pickled_files:
-        fname = directory_name + '/' + str(f)
-        result = pickle.load(open(fname, 'rb'))
-        track_parameter_estimates = result['Trackplot_parameter_estimates']
+        fname = directory_name + "/" + str(f)
+        result = pickle.load(open(fname, "rb"))
+        track_parameter_estimates = result["Trackplot_parameter_estimates"]
 
-        alph = result['NameAlphabetical']
+        alph = result["NameAlphabetical"]
         if alph in parameter_estimates_from_qmd.keys():
-            parameter_estimates_from_qmd[alph].append(
-                track_parameter_estimates)
+            parameter_estimates_from_qmd[alph].append(track_parameter_estimates)
         else:
             parameter_estimates_from_qmd[alph] = [track_parameter_estimates]
-            num_experiments_by_name[alph] = result['NumExperiments']
+            num_experiments_by_name[alph] = result["NumExperiments"]
 
         if alph not in list(exploration_strategies.keys()):
             try:
-                exploration_strategies[alph] = result['ExplorationRule']
+                exploration_strategies[alph] = result["ExplorationRule"]
             except BaseException:
                 exploration_strategies[alph] = exploration_rule
 
@@ -206,7 +186,9 @@ def average_parameter_estimates(
     exploration_classes = {}
     for g in list(exploration_strategies.keys()):
         try:
-            exploration_classes[g] = unique_exploration_classes[exploration_strategies[g]]
+            exploration_classes[g] = unique_exploration_classes[
+                exploration_strategies[g]
+            ]
         except BaseException:
             exploration_classes[g] = None
 
@@ -216,12 +198,11 @@ def average_parameter_estimates(
 
         parameters_for_this_name = parameter_estimates_from_qmd[name]
         num_wins_for_name = len(parameters_for_this_name)
-        terms = sorted(qmla.construct_models.get_constituent_names_from_name(name))
-        num_terms = len(terms)
-        lf = lfig.LatexFigure(
-            auto_label=False, 
-            auto_gridspec=num_terms
+        terms = sorted(
+            qmla.model_building_utilities.get_constituent_names_from_name(name)
         )
+        num_terms = len(terms)
+        lf = lfig.LatexFigure(auto_label=False, auto_gridspec=num_terms)
 
         cm_subsection = np.linspace(0, 0.8, num_terms)
         colours = [cm.Paired(x) for x in cm_subsection]
@@ -256,23 +237,15 @@ def average_parameter_estimates(
             ax = lf.new_axis()
 
             latex_terms[term] = exploration_classes[name].latex_name(term)
-            averages = np.array(
-                [avg_parameters[term][e] for e in epochs]
-            )
-            standard_dev = np.array(
-                [std_devs[term][e] for e in epochs]
-            )
+            averages = np.array([avg_parameters[term][e] for e in epochs])
+            standard_dev = np.array([std_devs[term][e] for e in epochs])
 
             param_lw = 3
             try:
                 true_val = true_params_dict[term]
                 true_term_latex = exploration_classes[name].latex_name(term)
                 ax.axhline(
-                    true_val,
-                    label=str('True'),
-                    ls='--',
-                    color='red',
-                    lw=param_lw
+                    true_val, label=str("True"), ls="--", color="red", lw=param_lw
                 )
             except BaseException:
                 pass
@@ -282,35 +255,34 @@ def average_parameter_estimates(
                 parameters[term],
                 epochs,
                 legend=False,
-                only_one_sigma=True, 
+                only_one_sigma=True,
             )
             ax.plot(
                 [e + 1 for e in epochs],
                 averages,
                 lw=param_lw,
                 label="Estimate",
-                color='blue'
+                color="blue",
             )
             latex_term = exploration_classes[name].latex_name(term)
             ax.set_title(str(latex_term))
 
-            if (ax.row == 0 and ax.col == lf.num_cols -1 ):
+            if ax.row == 0 and ax.col == lf.num_cols - 1:
                 ax.legend(bbox_to_anchor=(1.05, 0.85))
 
         latex_name = exploration_classes[name].latex_name(name)
-        lf.fig.text(0.45, -0.04, 'Experiment', ha='center')
-        lf.fig.text(-0.04, 0.5, 'Parameter', va='center', rotation='vertical')
-        
+        lf.fig.text(0.45, -0.04, "Experiment", ha="center")
+        lf.fig.text(-0.04, 0.5, "Parameter", va="center", rotation="vertical")
+
         if save_directory is not None:
             save_file = os.path.join(
-                save_directory, 
-                '{}params_{}'.format(plot_prefix, name)
+                save_directory, "{}params_{}".format(plot_prefix, name)
             )
             lf.save(save_file, file_format=figure_format)
 
 
 def cluster_results_and_plot(
-    path_to_results,  
+    path_to_results,
     true_expec_path,
     plot_probe_path,
     true_params_path,
@@ -319,30 +291,27 @@ def cluster_results_and_plot(
     save_param_clusters_to_file=None,
     save_param_values_to_file=None,
     save_redrawn_expectation_values=None,
-    save_directory=None, 
-    plot_prefix='', 
+    save_directory=None,
+    plot_prefix="",
 ):
     from matplotlib import cm
-    exploration_class = qmla.get_exploration_strategy.get_exploration_class(exploration_rule)
-    results_csv = pd.read_csv(path_to_results)
-    unique_champions = list(
-        set(list(results_csv['NameAlphabetical']))
-    )
 
-    true_info_dict = pickle.load(
-        open(true_params_path, 'rb')
+    exploration_class = qmla.get_exploration_strategy.get_exploration_class(
+        exploration_rule
     )
+    results_csv = pd.read_csv(path_to_results)
+    unique_champions = list(set(list(results_csv["NameAlphabetical"])))
+
+    true_info_dict = pickle.load(open(true_params_path, "rb"))
     try:
-        exploration_rule = true_info_dict['exploration_rule']
+        exploration_rule = true_info_dict["exploration_rule"]
     except BaseException:
         pass
 
-    true_params_dict = true_info_dict['params_dict']
+    true_params_dict = true_info_dict["params_dict"]
     if true_params_dict is not None:
         for k in list(true_params_dict.keys()):
-            latex_key = exploration_class.latex_name(
-                name=k
-            )
+            latex_key = exploration_class.latex_name(name=k)
             true_params_dict[latex_key] = true_params_dict[k]
             true_params_dict.pop(k)
 
@@ -351,44 +320,38 @@ def cluster_results_and_plot(
 
     for i in range(len(unique_champions)):
         champ = unique_champions[i]
-        all_learned_params[champ] = (
-            results_csv.loc[results_csv['NameAlphabetical']
-                            == champ]['LearnedParameters'].values
-        )
-        this_champs_params = sorted(
-            list(eval(all_learned_params[champ][0]).keys()))
+        all_learned_params[champ] = results_csv.loc[
+            results_csv["NameAlphabetical"] == champ
+        ]["LearnedParameters"].values
+        this_champs_params = sorted(list(eval(all_learned_params[champ][0]).keys()))
         champions_params[champ] = this_champs_params
 
     all_possible_params = []
     for p_list in champions_params.values():
         all_possible_params.extend(p_list)
 
-    all_possible_params = list(
-        set(list(all_possible_params))
-    )
+    all_possible_params = list(set(list(all_possible_params)))
     clusters = {}
     params_for_clustering = {}
     # this_champ = unique_champions[0]
     for this_champ in unique_champions:
         num_results_for_this_champ = len(all_learned_params[this_champ])
-        params_this_champ = sorted(
-            list(eval(all_learned_params[this_champ][0]).keys())
+        params_this_champ = sorted(list(eval(all_learned_params[this_champ][0]).keys()))
+        params = np.empty(
+            [num_results_for_this_champ, len(champions_params[this_champ])]
         )
-        params = np.empty([num_results_for_this_champ,
-                           len(champions_params[this_champ])])
         for i in range(num_results_for_this_champ):
             learned_param_dict = eval(all_learned_params[this_champ][i])
             test_list = [i for i in champions_params[this_champ]]
             params[i] = [
-                learned_param_dict[this_param] for this_param in champions_params[this_champ]
+                learned_param_dict[this_param]
+                for this_param in champions_params[this_champ]
             ]
 
         params_for_clustering[this_champ] = params
 
     for this_champ in unique_champions:
-        num_results_for_this_champ = len(
-            all_learned_params[this_champ]
-        )
+        num_results_for_this_champ = len(all_learned_params[this_champ])
         try:
             ms = MeanShift()
             ms.fit(params_for_clustering[this_champ])
@@ -403,8 +366,7 @@ def cluster_results_and_plot(
             # NOTE: in case where clusters can't be formed,
             # that model is represented only by the first set of results..
             # should they be averaged somehow?
-            clusters[this_champ] = np.array(
-                [params_for_clustering[this_champ][0]])
+            clusters[this_champ] = np.array([params_for_clustering[this_champ][0]])
 
     available_clustered_models = list(clusters.keys())
     clustered_parameters_this_model = {}
@@ -426,34 +388,24 @@ def cluster_results_and_plot(
                 single_cluster[terms[i]] = this_model_clusters[j][i]
                 try:
                     all_centroids_of_each_param[terms[i]].append(
-                        this_model_clusters[j][i])
+                        this_model_clusters[j][i]
+                    )
                 except BaseException:
-                    all_centroids_of_each_param[terms[i]] = [
-                        this_model_clusters[j][i]]
+                    all_centroids_of_each_param[terms[i]] = [this_model_clusters[j][i]]
 
-            latex_mod_name = exploration_class.latex_name(
-                name=mod
-            )
-            cluster_description = str(
-                latex_mod_name + ' (' + str(j) + ')'
-            )
+            latex_mod_name = exploration_class.latex_name(name=mod)
+            cluster_description = str(latex_mod_name + " (" + str(j) + ")")
             all_clusters_params.append(single_cluster)
-            all_clusters_descriptions.append(
-                cluster_description
-            )
+            all_clusters_descriptions.append(cluster_description)
             clusters_by_model[mod][cluster_description] = single_cluster
-            cluster_descriptions_by_model[mod].append(
-                cluster_description
-            )
+            cluster_descriptions_by_model[mod].append(cluster_description)
 
     for k in list(all_centroids_of_each_param.keys()):
         latex_term = exploration_class.latex_name(name=k)
         all_centroids_of_each_param[latex_term] = all_centroids_of_each_param[k]
         all_centroids_of_each_param.pop(k)
 
-    cm_subsection = np.linspace(
-        0, 0.8, len(all_possible_params)
-    )
+    cm_subsection = np.linspace(0, 0.8, len(all_possible_params))
     plot_colours = [cm.Paired(x) for x in cm_subsection]
 
     term_colours = {}
@@ -473,19 +425,12 @@ def cluster_results_and_plot(
     #######
     # Plot centroids by parameter
     #######
-    unique_latex_params = list(
-        set(list(all_centroids_of_each_param.keys()))
-    )
+    unique_latex_params = list(set(list(all_centroids_of_each_param.keys())))
     total_num_params = len(unique_latex_params)
     ncols = int(np.ceil(np.sqrt(total_num_params)))
     nrows = int(np.ceil(total_num_params / ncols))
 
-    fig, axes = plt.subplots(
-        figsize=(10, 7),
-        nrows=nrows,
-        ncols=ncols,
-        squeeze=False
-    )
+    fig, axes = plt.subplots(figsize=(10, 7), nrows=nrows, ncols=ncols, squeeze=False)
     row = 0
     col = 0
 
@@ -498,21 +443,14 @@ def cluster_results_and_plot(
         try:
             true_param = true_params_dict[param]
             ax.axhline(
-                true_param,
-                linestyle='--',
-                label='True',
-                color=term_colours[param]
+                true_param, linestyle="--", label="True", color=term_colours[param]
             )
         except BaseException:
             pass
 
         for v in this_param_values:
             if this_param_values.index(v) == 0:
-                ax.axhline(
-                    v,
-                    color=term_colours[param],
-                    label=param
-                )
+                ax.axhline(v, color=term_colours[param], label=param)
             else:
                 ax.axhline(
                     v,
@@ -526,10 +464,7 @@ def cluster_results_and_plot(
 
     if save_directory is not None:
         plt.savefig(
-            os.path.join(
-                save_directory, 
-                str(plot_prefix + 'clusters_by_param.png')
-            )
+            os.path.join(save_directory, str(plot_prefix + "clusters_by_param.png"))
         )
 
     # if save_param_values_to_file is not None:
@@ -542,31 +477,18 @@ def cluster_results_and_plot(
     ncols = int(np.ceil(np.sqrt(total_num_clusters)))
     nrows = int(np.ceil(total_num_clusters / ncols))
 
-    fig, axes = plt.subplots(
-        figsize=(10, 7),
-        nrows=nrows,
-        ncols=ncols,
-        squeeze=False
-    )
+    fig, axes = plt.subplots(figsize=(10, 7), nrows=nrows, ncols=ncols, squeeze=False)
     row = 0
     col = 0
 
     # from here below has to be put on an array layout
     for mod in sorted(clusters_by_model):
-        for cluster_description in sorted(
-            list(clusters_by_model[mod].keys())
-        ):
+        for cluster_description in sorted(list(clusters_by_model[mod].keys())):
             cluster = clusters_by_model[mod][cluster_description]
             ax = axes[row, col]
             for term in sorted(cluster.keys()):
-                label = exploration_class.latex_name(
-                    name=term
-                )
-                ax.axhline(
-                    cluster[term],
-                    label=label,
-                    color=term_colours[label]
-                )
+                label = exploration_class.latex_name(name=term)
+                ax.axhline(cluster[term], label=label, color=term_colours[label])
                 ax.set_title(cluster_description)
 
             col += 1
@@ -586,12 +508,9 @@ def cluster_results_and_plot(
     #     )
 
     if save_directory is not None:
-        plt.title('Parameter clusters')
+        plt.title("Parameter clusters")
         plt.savefig(
-            os.path.join(
-                save_directory, 
-                str(plot_prefix + 'clusters_by_model.png')
-            )
+            os.path.join(save_directory, str(plot_prefix + "clusters_by_model.png"))
         )
 
     replot_expectation_values(
@@ -602,8 +521,9 @@ def cluster_results_and_plot(
         exploration_rule=exploration_rule,
         upper_x_limit=upper_x_limit,  # can play with this
         save_to_file=save_redrawn_expectation_values,
-        save_directory = save_directory,
+        save_directory=save_directory,
     )
+
 
 def replot_expectation_values(
     params_dictionary_list,  # list of params_dicts
@@ -614,7 +534,7 @@ def replot_expectation_values(
     model_descriptions=None,
     save_to_file=None,
     save_directory=None,
-    plot_prefix='',
+    plot_prefix="",
 ):
     r"""
     Standalone function to redraw expectation values
@@ -632,8 +552,8 @@ def replot_expectation_values(
     exploration_class = qmla.get_exploration_strategy.get_exploration_class(
         exploration_rules=exploration_rule
     )
-    sim_colours = ['b', 'g', 'c', 'y', 'm', 'k']
-    plot_probes = pickle.load(open(plot_probe_path, 'rb'))
+    sim_colours = ["b", "g", "c", "y", "m", "k"]
+    plot_probes = pickle.load(open(plot_probe_path, "rb"))
     # true_expec_vals_path = str(
     #     directory_name + 'true_expec_vals.p'
     # )
@@ -641,7 +561,7 @@ def replot_expectation_values(
     #     "Reconstructed QHL with expectation value method:",
     #     measurement_method
     # )
-    true_exp_vals = pickle.load(open(true_expec_vals_path, 'rb'))
+    true_exp_vals = pickle.load(open(true_expec_vals_path, "rb"))
     exp_times = sorted(list(true_exp_vals.keys()))
 
     sim_times = copy.copy(exp_times)[0::5]
@@ -652,11 +572,7 @@ def replot_expectation_values(
     #     np.linspace(0, 2*max_time, num_times))
     # )
 
-    if (
-        upper_x_limit is not None
-        and
-        upper_x_limit > max(exp_times)
-    ):
+    if upper_x_limit is not None and upper_x_limit > max(exp_times):
         additional_sim_times = np.linspace(max(exp_times), upper_x_limit, 30)
         sim_times.extend(additional_sim_times)
         sim_times = sorted(sim_times)
@@ -668,12 +584,7 @@ def replot_expectation_values(
     ncols = int(np.ceil(np.sqrt(num_plots)))
     nrows = int(np.ceil(num_plots / ncols))
 
-    fig, axes = plt.subplots(
-        figsize=(10, 7),
-        nrows=nrows,
-        ncols=ncols,
-        squeeze=False
-    )
+    fig, axes = plt.subplots(figsize=(10, 7), nrows=nrows, ncols=ncols, squeeze=False)
     row = 0
     col = 0
 
@@ -681,27 +592,21 @@ def replot_expectation_values(
     for params_dict in params_dictionary_list:
         ax = axes[row, col]
         sim_ops_names = list(params_dict.keys())
-        sim_params = [
-            params_dict[k] for k in sim_ops_names
-        ]
-        sim_ops = [
-            qmla.construct_models.compute(k) for k in sim_ops_names
-        ]
+        sim_params = [params_dict[k] for k in sim_ops_names]
+        sim_ops = [qmla.model_building_utilities.compute(k) for k in sim_ops_names]
         sim_ham = np.tensordot(sim_params, sim_ops, axes=1)
 
-        sim_num_qubits = qmla.construct_models.get_num_qubits(sim_ops_names[0])
+        sim_num_qubits = qmla.model_building_utilities.get_num_qubits(sim_ops_names[0])
         # p_str=''
         # for i in range(2):
         #     p_str+='P'
-        p_str = 'P' * sim_num_qubits
+        p_str = "P" * sim_num_qubits
         probe = plot_probes[sim_num_qubits]
 
         sim_exp_vals = {}
         for t in sim_times:
             sim_exp_vals[t] = exploration_class.get_expectation_value(
-                ham=sim_ham,
-                state=probe,
-                t=t
+                ham=sim_ham, state=probe, t=t
             )
 
         sim_exp = [sim_exp_vals[t] for t in sim_times]
@@ -718,20 +623,14 @@ def replot_expectation_values(
         ax.plot(
             sim_times,
             sim_exp,
-            marker='o',
+            marker="o",
             markersize=3,
             markevery=5,
             label=str(model_label),
-            color=sim_colour
+            color=sim_colour,
         )
         ax.set_title(model_label)
-        ax.scatter(
-            exp_times,
-            true_exp,
-            label='True',
-            color='red',
-            s=3
-        )
+        ax.scatter(exp_times, true_exp, label="True", color="red", s=3)
         ax.set_xlim(0, upper_x_limit)
 
         col += 1
@@ -745,12 +644,9 @@ def replot_expectation_values(
     fig.suptitle("Expectation Value of clustered parameters.")
     if save_directory is not None:
         plt.savefig(
-            os.path.join(
-                save_directory, 
-                str(plot_prefix + 'clusters_expec_vals.png')
-            )
+            os.path.join(save_directory, str(plot_prefix + "clusters_expec_vals.png"))
         )
-    
+
     # if save_to_file is not None:
     #     plt.savefig(save_to_file, bbox_inches='tight')
     # else:
@@ -758,23 +654,22 @@ def replot_expectation_values(
 
 
 def plot_parameter_estimates(
-    qmd,
-    model_id,
-    use_experimental_data=False,
-    save_to_file=None
+    qmd, model_id, use_experimental_data=False, save_to_file=None
 ):
     from matplotlib import cm
+
     mod = qmd.get_model_storage_instance_by_id(model_id)
     name = mod.model_name
 
     if name not in list(qmd.model_name_id_map.values()):
         print(
-            "True model ", name,
+            "True model ",
+            name,
             "not in studied models",
-            list(qmd.model_name_id_map.values())
+            list(qmd.model_name_id_map.values()),
         )
         return False
-    terms = construct_models.get_constituent_names_from_name(name)
+    terms = model_building_utilities.get_constituent_names_from_name(name)
     num_terms = len(terms)
 
     term_positions = {}
@@ -786,41 +681,36 @@ def plot_parameter_estimates(
         term = terms[t]
         param_position = term_positions[term]
         param_estimates = mod.track_param_means[:, param_position]
-        #std_dev = mod.cov_matrix[param_position,param_position]
+        # std_dev = mod.cov_matrix[param_position,param_position]
         std_dev = mod.track_covariance_matrices[:, param_position, param_position]
         param_estimate_by_term[term] = param_estimates
         std_devs[term] = std_dev
 
     cm_subsection = np.linspace(0, 0.8, num_terms)
     colours = [cm.magma(x) for x in cm_subsection]
-#    colours = [ cm.Set1(x) for x in cm_subsection ]
+    #    colours = [ cm.Set1(x) for x in cm_subsection ]
 
-#    colours = ['b','r','g','orange', 'pink', 'grey']
+    #    colours = ['b','r','g','orange', 'pink', 'grey']
 
     # TODO use color map as list
     # num_epochs = qmd.num_experiments
     num_epochs = mod.num_experiments
-#    fig = plt.figure()
-#    ax = plt.subplot(111)
+    #    fig = plt.figure()
+    #    ax = plt.subplot(111)
 
     # ncols=3
     # nrows=3 # TODO  -- make safe
     ncols = int(np.ceil(np.sqrt(num_terms)))
     nrows = int(np.ceil(num_terms / ncols))
 
-#    nrows=int(np.ceil( num_terms/ncols ))
+    #    nrows=int(np.ceil( num_terms/ncols ))
 
-    fig, axes = plt.subplots(
-        figsize=(10, 7),
-        nrows=nrows,
-        ncols=ncols,
-        squeeze=False
-    )
+    fig, axes = plt.subplots(figsize=(10, 7), nrows=nrows, ncols=ncols, squeeze=False)
     row = 0
     col = 0
     axes_so_far = 0
     i = 0
-#    for term in list(param_estimate_by_term.keys()):
+    #    for term in list(param_estimate_by_term.keys()):
     for term in terms:
         ax = axes[row, col]
         colour = colours[i % len(colours)]
@@ -828,16 +718,11 @@ def plot_parameter_estimates(
         try:
             if use_experimental_data == False:
                 y_true = qmd.true_param_dict[term]
-                true_term_latex = qmd.exploration_class.latex_name(
-                    name=term
-                )
-                true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
+                true_term_latex = qmd.exploration_class.latex_name(name=term)
+                true_term_latex = true_term_latex[:-1] + "_{0}" + "$"
 
                 ax.axhline(
-                    y_true,
-                    label=str(true_term_latex),
-                    color='red',
-                    linestyle='--'
+                    y_true, label=str(true_term_latex), color="red", linestyle="--"
                 )
         except BaseException:
             pass
@@ -845,25 +730,18 @@ def plot_parameter_estimates(
         s = np.array(std_devs[term])
         x = range(1, 1 + len(param_estimate_by_term[term]))
         latex_term = mod.exploration_class.latex_name(term)
-        latex_term = latex_term[:-1] + r'^{\prime}' + '$'
+        latex_term = latex_term[:-1] + r"^{\prime}" + "$"
         # print("[pQMD] latex_term:", latex_term)
-        ax.scatter(
-            x,
-            y,
-            s=max(1, 50 / num_epochs),
-            label=str(latex_term),
-            color=colour
-        )
-#        ax.set_yscale('symlog')
+        ax.scatter(x, y, s=max(1, 50 / num_epochs), label=str(latex_term), color=colour)
+        #        ax.set_yscale('symlog')
         # print("[pQMD] scatter done" )
         ax.fill_between(
             x,
             y + s,
             y - s,
             alpha=0.2,
-            facecolor='green',
+            facecolor="green",
             # label='$\sigma$'
-
         )
         # print("[pQMD] fill between done")
         ax.legend(loc=1, fontsize=20)
@@ -875,9 +753,9 @@ def plot_parameter_estimates(
         # ax.set_title(str(latex_term))
         # print("[pQMD] title set")
 
-#    ax = plt.subplot(111)
-    plt.xlabel('Epoch', fontsize=20)
-    plt.ylabel('Parameter Estimate', fontsize=15)
+    #    ax = plt.subplot(111)
+    plt.xlabel("Epoch", fontsize=20)
+    plt.ylabel("Parameter Estimate", fontsize=15)
     # plt.legend(bbox_to_anchor=(1.1, 1.05))
     # # TODO put title at top; Epoch centred bottom; Estimate centre y-axis
 
@@ -885,25 +763,21 @@ def plot_parameter_estimates(
         print(
             "[plot_parameter_estimates] saving to file",
             save_to_file,
-            "type:", type(save_to_file)
+            "type:",
+            type(save_to_file),
         )
-        plt.savefig(
-            save_to_file,
-            bbox_inches='tight'
-        )
+        plt.savefig(save_to_file, bbox_inches="tight")
     # print("[pQMD] complete")
 
 
 # Terms and paramters together
 def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="png"):
-    storage_instances = glob.glob(results_path +'/' + 'storage*')
+    storage_instances = glob.glob(results_path + "/" + "storage*")
 
     all_learned_params = {}
 
     for s in storage_instances:
-        storage = pickle.load(
-            open(os.path.join(s), "rb")
-        )
+        storage = pickle.load(open(os.path.join(s), "rb"))
         learned_params = storage.LearnedParameters
 
         for p in learned_params:
@@ -912,16 +786,17 @@ def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="pn
             else:
                 all_learned_params[p].append(learned_params[p])
 
-
     run_info = pickle.load(open(os.path.join(results_path, "run_info.p"), "rb"))
-    exploration_strategy = qmla.get_exploration_strategy.get_exploration_class(run_info['exploration_rule'])
-    true_params = run_info['params_dict']
+    exploration_strategy = qmla.get_exploration_strategy.get_exploration_class(
+        run_info["exploration_rule"]
+    )
+    true_params = run_info["params_dict"]
 
     # Draw figure
     lf = lfig.LatexFigure(
-        auto_label=False, 
-        auto_gridspec = len(all_learned_params),
-        gridspec_params = {'wspace' : 0.15, 'hspace' : 0.3}
+        auto_label=False,
+        auto_gridspec=len(all_learned_params),
+        gridspec_params={"wspace": 0.15, "hspace": 0.3},
     )
     params = sorted(all_learned_params.keys())
     for p in params:
@@ -930,41 +805,38 @@ def plot_terms_and_parameters(results_path, save_to_file=None, figure_format="pn
         param_occurences = all_learned_params[p]
         label = r"$\hat{{t}} \in \hat{{H}}^{{\prime}}$"
 
-        ax.hist(
-            param_occurences,
-            color = 'grey',
-            label = label
-        )
+        ax.hist(param_occurences, color="grey", label=label)
 
         # median
         param_median = np.round(np.median(param_occurences), 1)
         ax.axvline(
-            param_median, 
-            color = 'blue', 
-            ls=':',
-            label = r"$\bar{{ \alpha^{{\prime}} }}$"
+            param_median, color="blue", ls=":", label=r"$\bar{{ \alpha^{{\prime}} }}$"
         )
 
         if p in true_params:
             true_p = np.round(true_params[p], 1)
-            ax.axvline(
-                true_p, 
-                color='red', 
-                ls='--', 
-                label = r"$\alpha_0$"
-            )
+            ax.axvline(true_p, color="red", ls="--", label=r"$\alpha_0$")
 
-        ax.set_title(
-            exploration_strategy.latex_name(p)
-        )
-        if ax.row == 0 and ax.col == lf.num_cols-1 :
+        ax.set_title(exploration_strategy.latex_name(p))
+        if ax.row == 0 and ax.col == lf.num_cols - 1:
             ax.legend(
-                bbox_to_anchor=(1.025, 0.85), 
+                bbox_to_anchor=(1.025, 0.85),
                 # ncol=3
             )
 
-    lf.fig.text(0.5, -0.12, r"Parameter ($\alpha$) value", ha='center', )
-    lf.fig.text(0.04, 0.5, "Occurences", va='center', rotation='vertical',)
-    
+    lf.fig.text(
+        0.5,
+        -0.12,
+        r"Parameter ($\alpha$) value",
+        ha="center",
+    )
+    lf.fig.text(
+        0.04,
+        0.5,
+        "Occurences",
+        va="center",
+        rotation="vertical",
+    )
+
     if save_to_file is not None:
         lf.save(save_to_file, file_format=figure_format)

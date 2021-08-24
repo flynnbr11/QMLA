@@ -28,35 +28,38 @@ from matplotlib.spines import Spine
 from matplotlib.projections.polar import PolarAxes
 from matplotlib.projections import register_projection
 from inspect import currentframe, getframeinfo
-import sklearn
 import seaborn as sns
 
 try:
     from lfig import LatexFigure
 except:
     from qmla.shared_functionality.latex_figure import LatexFigure
- 
+
 
 import qmla.get_exploration_strategy as get_exploration_strategy
 import qmla.shared_functionality.experimental_data_processing
 import qmla.shared_functionality.expectation_value_functions
-import qmla.construct_models as construct_models
+import qmla.model_building_utilities as model_building_utilities
 
 frameinfo = getframeinfo(currentframe())
 
 # __all__ = [
-#     'format_exponent', 
+#     'format_exponent',
 #     'flatten'
 # ]
 
-def flatten(l): return [item for sublist in l for item in sublist]
+
+def flatten(l):
+    return [item for sublist in l for item in sublist]
+
 
 def format_exponent(n):
-    a = '%E' % n
-    val = a.split('E')[0].rstrip('0').rstrip('.')
+    a = "%E" % n
+    val = a.split("E")[0].rstrip("0").rstrip(".")
     val = np.round(float(val), 2)
-    exponent = a.split('E')[1]
-    return str(val) + 'E' + exponent
+    exponent = a.split("E")[1]
+    return str(val) + "E" + exponent
+
 
 def fill_between_sigmas(
     ax,
@@ -78,71 +81,47 @@ def fill_between_sigmas(
     }
 
     upper_one_sigma = [
-        np.percentile(
-            np.array(
-                distribution[t]),
-            50 +
-            sigmas[1]) for t in times]
+        np.percentile(np.array(distribution[t]), 50 + sigmas[1]) for t in times
+    ]
     lower_one_sigma = [
-        np.percentile(
-            np.array(
-                distribution[t]),
-            50 -
-            sigmas[1]) for t in times]
+        np.percentile(np.array(distribution[t]), 50 - sigmas[1]) for t in times
+    ]
     upper_two_sigma = [
-        np.percentile(
-            np.array(
-                distribution[t]),
-            50 +
-            sigmas[1] +
-            sigmas[2]) for t in times]
+        np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2])
+        for t in times
+    ]
     lower_two_sigma = [
-        np.percentile(
-            np.array(
-                distribution[t]),
-            50 -
-            sigmas[1] -
-            sigmas[2]) for t in times]
+        np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2])
+        for t in times
+    ]
     upper_three_sigma = [
-        np.percentile(
-            np.array(
-                distribution[t]),
-            50 +
-            sigmas[1] +
-            sigmas[2] +
-            sigmas[3]) for t in times]
+        np.percentile(np.array(distribution[t]), 50 + sigmas[1] + sigmas[2] + sigmas[3])
+        for t in times
+    ]
     lower_three_sigma = [
-        np.percentile(
-            np.array(
-                distribution[t]),
-            50 -
-            sigmas[1] -
-            sigmas[2] -
-            sigmas[3]) for t in times]
+        np.percentile(np.array(distribution[t]), 50 - sigmas[1] - sigmas[2] - sigmas[3])
+        for t in times
+    ]
     upper_four_sigma = [
         np.percentile(
-            np.array(
-                distribution[t]),
-            50 +
-            sigmas[1] +
-            sigmas[2] +
-            sigmas[3] +
-            sigmas[4]) for t in times]
+            np.array(distribution[t]),
+            50 + sigmas[1] + sigmas[2] + sigmas[3] + sigmas[4],
+        )
+        for t in times
+    ]
     lower_four_sigma = [
         np.percentile(
-            np.array(
-                distribution[t]),
-            50 -
-            sigmas[1] -
-            sigmas[2] -
-            sigmas[3] -
-            sigmas[4]) for t in times]
+            np.array(distribution[t]),
+            50 - sigmas[1] - sigmas[2] - sigmas[3] - sigmas[4],
+        )
+        for t in times
+    ]
 
     fill_alpha = 0.3
-    one_sigma_colour = 'blue'
-    two_sigma_colour = 'green'
-    three_sigma_colour = 'orange'
-    four_sigma_colour = 'red'
+    one_sigma_colour = "blue"
+    two_sigma_colour = "green"
+    three_sigma_colour = "orange"
+    four_sigma_colour = "red"
     ax.fill_between(
         # times,
         [t + 1 for t in times],
@@ -150,7 +129,7 @@ def fill_between_sigmas(
         lower_one_sigma,
         alpha=fill_alpha,
         facecolor=one_sigma_colour,
-        label=r'$1 \sigma$ '
+        label=r"$1 \sigma$ ",
     )
 
     if only_one_sigma == False:
@@ -159,16 +138,16 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_two_sigma,
             upper_one_sigma,
-            alpha=fill_alpha/2, # less strong for smaller proportions
+            alpha=fill_alpha / 2,  # less strong for smaller proportions
             facecolor=two_sigma_colour,
-            label=r'$2 \sigma$ '
+            label=r"$2 \sigma$ ",
         )
         ax.fill_between(
             # times,
             [t + 1 for t in times],
             lower_one_sigma,
             lower_two_sigma,
-            alpha=fill_alpha/2,
+            alpha=fill_alpha / 2,
             facecolor=two_sigma_colour,
         )
 
@@ -177,16 +156,16 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_three_sigma,
             upper_two_sigma,
-            alpha=fill_alpha/2,
+            alpha=fill_alpha / 2,
             facecolor=three_sigma_colour,
-            label=r'$3 \sigma$ '
+            label=r"$3 \sigma$ ",
         )
         ax.fill_between(
             # times,
             [t + 1 for t in times],
             lower_two_sigma,
             lower_three_sigma,
-            alpha=fill_alpha/2,
+            alpha=fill_alpha / 2,
             facecolor=three_sigma_colour,
         )
 
@@ -195,44 +174,42 @@ def fill_between_sigmas(
             [t + 1 for t in times],
             upper_four_sigma,
             upper_three_sigma,
-            alpha=fill_alpha/2,
+            alpha=fill_alpha / 2,
             facecolor=four_sigma_colour,
-            label=r'$4 \sigma$ '
+            label=r"$4 \sigma$ ",
         )
         ax.fill_between(
             # times,
             [t + 1 for t in times],
             lower_three_sigma,
             lower_four_sigma,
-            alpha=fill_alpha/2,
+            alpha=fill_alpha / 2,
             facecolor=four_sigma_colour,
         )
 
     if legend == True:
         ax.legend(
-            loc='center right',
+            loc="center right",
             bbox_to_anchor=(1.5, 0.5),
             #             title=''
         )
 
 
-def plot_parameter_estimates(
-    qmd,
-    model_id,
-    save_to_file=None
-):
+def plot_parameter_estimates(qmd, model_id, save_to_file=None):
     from matplotlib import cm
+
     mod = qmd.get_model_storage_instance_by_id(model_id)
     name = mod.model_name
 
     if name not in list(qmd.model_name_id_map.values()):
         print(
-            "True model ", name,
+            "True model ",
+            name,
             "not in studied models",
-            list(qmd.model_name_id_map.values())
+            list(qmd.model_name_id_map.values()),
         )
         return False
-    terms = construct_models.get_constituent_names_from_name(name)
+    terms = model_building_utilities.get_constituent_names_from_name(name)
     num_terms = len(terms)
 
     term_positions = {}
@@ -244,7 +221,7 @@ def plot_parameter_estimates(
         term = terms[t]
         param_position = term_positions[term]
         param_estimates = mod.track_param_means[:, param_position]
-        #std_dev = mod.cov_matrix[param_position,param_position]
+        # std_dev = mod.cov_matrix[param_position,param_position]
         std_dev = mod.track_covariance_matrices[:, param_position, param_position]
         param_estimate_by_term[term] = param_estimates
         std_devs[term] = std_dev
@@ -255,59 +232,40 @@ def plot_parameter_estimates(
     num_epochs = mod.num_experiments
     ncols = int(np.ceil(np.sqrt(num_terms)))
     nrows = int(np.ceil(num_terms / ncols))
-    fig, axes = plt.subplots(
-        figsize=(10, 7),
-        nrows=nrows,
-        ncols=ncols,
-        squeeze=False
-    )
+    fig, axes = plt.subplots(figsize=(10, 7), nrows=nrows, ncols=ncols, squeeze=False)
     row = 0
     col = 0
     axes_so_far = 0
     i = 0
-#    for term in list(param_estimate_by_term.keys()):
+    #    for term in list(param_estimate_by_term.keys()):
     for term in terms:
         ax = axes[row, col]
         colour = colours[i % len(colours)]
         i += 1
         try:
             y_true = qmd.true_param_dict[term]
-            true_term_latex = qmd.exploration_class.latex_name(
-                name=term
-            )
-            true_term_latex = true_term_latex[:-1] + '_{0}' + '$'
+            true_term_latex = qmd.exploration_class.latex_name(name=term)
+            true_term_latex = true_term_latex[:-1] + "_{0}" + "$"
 
-            ax.axhline(
-                y_true,
-                label=str(true_term_latex),
-                color='red',
-                linestyle='--'
-            )
+            ax.axhline(y_true, label=str(true_term_latex), color="red", linestyle="--")
         except BaseException:
             pass
         y = np.array(param_estimate_by_term[term])
         s = np.array(std_devs[term])
         x = range(1, 1 + len(param_estimate_by_term[term]))
         latex_term = mod.exploration_class.latex_name(term)
-        latex_term = latex_term[:-1] + r'^{\prime}' + '$'
+        latex_term = latex_term[:-1] + r"^{\prime}" + "$"
         # print("[pQMD] latex_term:", latex_term)
-        ax.scatter(
-            x,
-            y,
-            s=max(1, 50 / num_epochs),
-            label=str(latex_term),
-            color=colour
-        )
-#        ax.set_yscale('symlog')
+        ax.scatter(x, y, s=max(1, 50 / num_epochs), label=str(latex_term), color=colour)
+        #        ax.set_yscale('symlog')
         # print("[pQMD] scatter done" )
         ax.fill_between(
             x,
             y + s,
             y - s,
             alpha=0.2,
-            facecolor='green',
+            facecolor="green",
             # label='$\sigma$'
-
         )
         # print("[pQMD] fill between done")
         ax.legend(loc=1, fontsize=20)
@@ -319,20 +277,18 @@ def plot_parameter_estimates(
         # ax.set_title(str(latex_term))
         # print("[pQMD] title set")
 
-#    ax = plt.subplot(111)
-    plt.xlabel('Epoch', fontsize=20)
-    plt.ylabel('Parameter Estimate', fontsize=15)
+    #    ax = plt.subplot(111)
+    plt.xlabel("Epoch", fontsize=20)
+    plt.ylabel("Parameter Estimate", fontsize=15)
 
     if save_to_file is not None:
         print(
             "[plot_parameter_estimates] saving to file",
             save_to_file,
-            "type:", type(save_to_file)
+            "type:",
+            type(save_to_file),
         )
-        plt.savefig(
-            save_to_file,
-            bbox_inches='tight'
-        )
+        plt.savefig(save_to_file, bbox_inches="tight")
     # print("[pQMD] complete")
 
 
@@ -343,46 +299,49 @@ def plot_learned_models_dynamics(
     include_bayes_factors=True,
     include_times_learned=True,
     include_param_estimates=False,
-    save_to_file=None
+    save_to_file=None,
 ):
 
     model_ids = list(sorted(set(model_ids)))  # only uniques values
     true_expec_vals = pickle.load(
-        open(qmd.qmla_controls.system_measurements_file, 'rb'))
+        open(qmd.qmla_controls.system_measurements_file, "rb")
+    )
     times_to_plot = list(sorted(true_expec_vals.keys()))
 
     # TODO this is overwritten within for loop below so that large
     # Hamiltonians don't have to work out each time step
     true_exp = [true_expec_vals[t] for t in times_to_plot]
-    qmd.log_print([
-        "[Dynamics plot] plot probe file:", qmd.qmla_controls.probes_plot_file,
-        "\n true expectation value path:", qmd.qmla_controls.system_measurements_file 
-    ])
-    plot_probes = pickle.load(
-        open(qmd.qmla_controls.probes_plot_file, 'rb')
+    qmd.log_print(
+        [
+            "[Dynamics plot] plot probe file:",
+            qmd.qmla_controls.probes_plot_file,
+            "\n true expectation value path:",
+            qmd.qmla_controls.system_measurements_file,
+        ]
     )
+    plot_probes = pickle.load(open(qmd.qmla_controls.probes_plot_file, "rb"))
     num_models_to_plot = len(model_ids)
     all_bayes_factors = qmd.all_bayes_factors
     max_time = max(times_to_plot)
     individual_terms_already_in_legend = []
 
-#     ncols = int(np.ceil(np.sqrt(num_models_to_plot)))
-# nrows = 3*int(np.ceil(num_models_to_plot/ncols)) + 1 # 1 extra row for
-# "master"
+    #     ncols = int(np.ceil(np.sqrt(num_models_to_plot)))
+    # nrows = 3*int(np.ceil(num_models_to_plot/ncols)) + 1 # 1 extra row for
+    # "master"
 
     ncols = (
-        include_expec_vals +
-        include_bayes_factors +
-        include_times_learned +
-        include_param_estimates
+        include_expec_vals
+        + include_bayes_factors
+        + include_times_learned
+        + include_param_estimates
     )
-#     ncols = 4
+    #     ncols = 4
     nrows = num_models_to_plot
 
     fig = plt.figure(
         figsize=(18, 10),
         # constrained_layout=True,
-        tight_layout=True
+        tight_layout=True,
     )
     gs = GridSpec(
         nrows,
@@ -394,45 +353,34 @@ def plot_learned_models_dynamics(
     col = 0
 
     for mod_id in model_ids:
-        qmd.log_print([
-            "Plotting dynamics for model {}".format(mod_id)
-        ])
+        qmd.log_print(["Plotting dynamics for model {}".format(mod_id)])
         reduced = qmd.get_model_storage_instance_by_id(mod_id)
-        reduced.compute_expectation_values(
-            times=qmd.times_to_plot
-        )
-#         exploration_rule = reduced.exploration_strategy_of_true_model
-        desc = str(
-            "ID:{}\n".format(mod_id) +
-            reduced.model_name_latex
-        )
+        reduced.compute_expectation_values(times=qmd.times_to_plot)
+        #         exploration_rule = reduced.exploration_strategy_of_true_model
+        desc = str("ID:{}\n".format(mod_id) + reduced.model_name_latex)
         times_to_plot = list(sorted(true_expec_vals.keys()))
-        plot_colour = 'blue'
-        name_colour = 'black'
+        plot_colour = "blue"
+        name_colour = "black"
         dynamics_label = str(mod_id)
         try:
             true_model_id = qmd.true_model_id
         except BaseException:
             true_model_id = -1
-        if (
-            mod_id == qmd.champion_model_id
-            and
-            mod_id == true_model_id
-        ):
-            plot_colour = 'green'
-            name_colour = 'green'
-            dynamics_label += ' [true + champ]'
-            desc += str('\n[True + Champ]')
+        if mod_id == qmd.champion_model_id and mod_id == true_model_id:
+            plot_colour = "green"
+            name_colour = "green"
+            dynamics_label += " [true + champ]"
+            desc += str("\n[True + Champ]")
         elif mod_id == qmd.champion_model_id:
-            plot_colour = 'orange'
-            name_colour = 'orange'
-            dynamics_label += ' [champ]'
-            desc += str('\n[Champ]')
+            plot_colour = "orange"
+            name_colour = "orange"
+            dynamics_label += " [champ]"
+            desc += str("\n[Champ]")
         elif mod_id == true_model_id:
-            plot_colour = 'green'
-            name_colour = 'green'
-            dynamics_label += ' [true]'
-            desc += str('\n[True]')
+            plot_colour = "green"
+            name_colour = "green"
+            dynamics_label += " [true]"
+            desc += str("\n[True]")
 
         ############ --------------- ############
         ############ Plot dynamics in left most column ############
@@ -443,10 +391,13 @@ def plot_learned_models_dynamics(
             probe = plot_probes[reduced.probe_num_qubits]
             qmd.log_print(
                 [
-                "[plot_learned_models_dynamics]",
-                "\n\tModel ", reduced.model_name_latex,
-                "\n\tnum qubits:", dim,
-                "\n\tprobe:", probe
+                    "[plot_learned_models_dynamics]",
+                    "\n\tModel ",
+                    reduced.model_name_latex,
+                    "\n\tnum qubits:",
+                    dim,
+                    "\n\tprobe:",
+                    probe,
                 ]
             )
             # expec_vals = {}
@@ -459,11 +410,7 @@ def plot_learned_models_dynamics(
             # choose an axis to plot on
             ax = fig.add_subplot(gs[row, col])
             # first plot true dynamics
-            ax.plot(
-                times_to_plot,
-                true_exp,
-                c='r'
-            )
+            ax.plot(times_to_plot, true_exp, c="r")
 
             # now plot learned dynamics
             expec_vals = reduced.expectation_values
@@ -478,22 +425,22 @@ def plot_learned_models_dynamics(
             ax.plot(
                 sim_times,
                 sim_exp,
-                marker='o',
+                marker="o",
                 markevery=10,
                 c=plot_colour,
                 # label = dynamics_label
-                label=desc
+                label=desc,
             )
             # qmd.log_print([
             #     "[Dynamics plot]",
             #     "sim_exp:", sim_exp[0:20],
             #     "true exp:", true_exp[0:20]
             # ])
-    #         ax.legend()
+            #         ax.legend()
             ax.set_ylim(-0.05, 1.05)
 
             if row == 0:
-                ax.set_title('Expectation Values')
+                ax.set_title("Expectation Values")
             if ncols == 1:
                 ax.legend()
 
@@ -514,17 +461,14 @@ def plot_learned_models_dynamics(
                         #     qmd.get_model_storage_instance_by_id(b).model_name_latex
                         # )
                         bayes_factors_this_mod.append(
-                            np.log10(all_bayes_factors[mod_id][b][-1]))
+                            np.log10(all_bayes_factors[mod_id][b][-1])
+                        )
                         bf_opponents.append(str(b))
             ax = fig.add_subplot(gs[row, col])
-            ax.bar(
-                bf_opponents,
-                bayes_factors_this_mod,
-                color=plot_colour
-            )
-            ax.axhline(0, color='black')
+            ax.bar(bf_opponents, bayes_factors_this_mod, color=plot_colour)
+            ax.axhline(0, color="black")
             if row == 0:
-                ax.set_title('Bayes Factors [$log_{10}$]')
+                ax.set_title("Bayes Factors [$log_{10}$]")
 
             col += 1
             if col == ncols:
@@ -536,34 +480,32 @@ def plot_learned_models_dynamics(
         if include_times_learned == True:
             ax = fig.add_subplot(gs[row, col])
             if row == 0:
-                ax.set_title('Times learned')
+                ax.set_title("Times learned")
             ax.yaxis.set_label_position("right")
 
-            times_learned_over = sorted(qmla.utilities.flatten(reduced.times_learned_over))
+            times_learned_over = sorted(
+                qmla.utilities.flatten(reduced.times_learned_over)
+            )
             qmd.log_print(["[single instance plot] Times for bin:", times_learned_over])
             n, bins, patches = ax.hist(
                 times_learned_over,
                 # histtype='step',
                 color=plot_colour,
                 # fill=False,
-                label=desc
+                label=desc,
             )
             ax.legend()
             # ax.semilogy()
             for bin_value in bins:
-                ax.axvline(
-                    bin_value,
-                    linestyle='--',
-                    alpha=0.3
-                )
+                ax.axvline(bin_value, linestyle="--", alpha=0.3)
             plot_time_max = max(times_to_plot)
             max_time = max(times_learned_over)
             if max_time > plot_time_max:
                 ax.axvline(
                     plot_time_max,
-                    color='red',
-                    linestyle='--',
-                    label='Dynamics plot cutoff'
+                    color="red",
+                    linestyle="--",
+                    label="Dynamics plot cutoff",
                 )
                 ax.legend()
             ax.set_xlim(0, max_time)
@@ -579,7 +521,7 @@ def plot_learned_models_dynamics(
         if include_param_estimates == True:
             ax = fig.add_subplot(gs[row, col])
             name = reduced.model_name
-            terms = construct_models.get_constituent_names_from_name(name)
+            terms = model_building_utilities.get_constituent_names_from_name(name)
             num_terms = len(terms)
 
             term_positions = {}
@@ -591,7 +533,7 @@ def plot_learned_models_dynamics(
                 term = terms[t]
                 param_position = term_positions[term]
                 param_estimates = reduced.track_param_means[:, param_position]
-                #std_dev = mod.cov_matrix[param_position,param_position]
+                # std_dev = mod.cov_matrix[param_position,param_position]
                 # std_dev = reduced.track_covariance_matrices[
                 #     :,param_position,param_position
                 # ]
@@ -605,79 +547,75 @@ def plot_learned_models_dynamics(
             num_epochs = reduced.num_experiments
 
             i = 0
-        #    for term in list(param_estimate_by_term.keys()):
+            #    for term in list(param_estimate_by_term.keys()):
             for term in terms:
                 colour = colours[i % len(colours)]
                 i += 1
                 try:
                     y_true = qmd.true_param_dict[term]
-                    true_term_latex = qmd.exploration_class.latex_name(
-                        name=term
-                    )
+                    true_term_latex = qmd.exploration_class.latex_name(name=term)
 
                     ax.axhline(
                         y_true,
-                        ls='--',
-                        label=str(
-                            true_term_latex +
-                            ' True'),
-                        color=colour)
+                        ls="--",
+                        label=str(true_term_latex + " True"),
+                        color=colour,
+                    )
                 except BaseException:
                     pass
                 y = np.array(param_estimate_by_term[term])
                 s = np.array(std_devs[term])
                 x = range(1, 1 + len(param_estimate_by_term[term]))
-                latex_term = qmd.exploration_class.latex_name(
-                    name=term
-                )
+                latex_term = qmd.exploration_class.latex_name(name=term)
                 if latex_term not in individual_terms_already_in_legend:
                     individual_terms_already_in_legend.append(latex_term)
                     plot_label = str(latex_term)
                 else:
-                    plot_label = ''
+                    plot_label = ""
                 # print("[pQMD] latex_term:", latex_term)
                 ax.plot(
                     x,
                     y,
                     #                 s=max(1,50/num_epochs),
                     label=plot_label,
-                    color=colour
+                    color=colour,
                 )
-        #        ax.set_yscale('symlog')
+                #        ax.set_yscale('symlog')
                 # print("[pQMD] scatter done" )
-    #             ax.fill_between(
-    #                 x,
-    #                 y+s,
-    #                 y-s,
-    #                 alpha=0.2,
-    #                 facecolor=colour
-    #             )
+                #             ax.fill_between(
+                #                 x,
+                #                 y+s,
+                #                 y-s,
+                #                 alpha=0.2,
+                #                 facecolor=colour
+                #             )
 
                 ax.legend()
             if row == 0:
-                ax.set_title('Parameter Estimates')
+                ax.set_title("Parameter Estimates")
 
             col += 1
             if col == ncols:
                 col = 0
                 row += 1
     if save_to_file is not None:
-        plt.savefig(
-            save_to_file,
-            bbox_inches='tight'
-        )
+        plt.savefig(save_to_file, bbox_inches="tight")
+
 
 def plot_distribution_progression(
     qmd,
-    model_id=None, true_model=False,
-    num_steps_to_show=2, show_means=True,
+    model_id=None,
+    true_model=False,
+    num_steps_to_show=2,
+    show_means=True,
     renormalise=True,
-    save_to_file=None
+    save_to_file=None,
 ):
     # Plots initial and final prior distribution over parameter space
     # with num_steps_to_show intermediate distributions
     # Note only safe/tested for QHL, ie on true model (single parameter).
     from scipy import stats
+
     plt.clf()
     if true_model:
         try:
@@ -687,9 +625,10 @@ def plot_distribution_progression(
     elif model_id is not None:
         mod = qmd.get_model_storage_instance_by_id(model_id)
     else:
-        print("Either provide a model id or set true_model=True to generate \
+        print(
+            "Either provide a model id or set true_model=True to generate \
               plot of distribution development."
-              )
+        )
     true_parameters = mod.true_model_params
     num_experiments = np.shape(mod.particles)[2]
     max_exp_num = num_experiments - 1
@@ -706,21 +645,17 @@ def plot_distribution_progression(
         steps_to_show.append(max_exp_num)
 
     # TODO use a colourmap insted of manual list
-    colours = ['gray', 'rosybrown', 'cadetblue']
-    true_colour = 'k'
-    initial_colour = 'b'
-    final_colour = 'r'
+    colours = ["gray", "rosybrown", "cadetblue"]
+    true_colour = "k"
+    initial_colour = "b"
+    final_colour = "r"
     steps_to_show = sorted(steps_to_show)
 
     ax = plt.subplot(111)
 
     if show_means:
         for t in true_parameters:
-            ax.axvline(
-                t,
-                label='True param',
-                c=true_colour,
-                linestyle='dashed')
+            ax.axvline(t, label="True param", c=true_colour, linestyle="dashed")
 
     for i in steps_to_show:
         # previous step which is shown on plot already
@@ -734,8 +669,7 @@ def plot_distribution_progression(
             # TODO if renormalise False, DON'T use a stat.pdf to model
             # distribution
             if renormalise:
-                fit = stats.norm.pdf(
-                    particles, np.mean(particles), np.std(particles))
+                fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
                 max_fit = max(fit)
                 fit = fit / max_fit
             else:
@@ -743,46 +677,47 @@ def plot_distribution_progression(
 
             if i == max_exp_num:
                 colour = final_colour
-                label = 'Final distribution'
+                label = "Final distribution"
                 if show_means:
-                    ax.axvline(np.mean(particles),
-                               label='Final Mean', color=colour, linestyle='dashed'
-                               )
+                    ax.axvline(
+                        np.mean(particles),
+                        label="Final Mean",
+                        color=colour,
+                        linestyle="dashed",
+                    )
             elif i == min(steps_to_show):
                 colour = initial_colour
                 if show_means:
-                    ax.axvline(np.mean(particles), label='Initial Mean',
-                               color=colour, linestyle='dashed'
-                               )
-                label = 'Initial distribution'
+                    ax.axvline(
+                        np.mean(particles),
+                        label="Initial Mean",
+                        color=colour,
+                        linestyle="dashed",
+                    )
+                label = "Initial distribution"
             else:
-                label = str('Step ' + str(i))
+                label = str("Step " + str(i))
 
             ax.plot(particles, fit, label=label, color=colour)
 
     plt.legend(bbox_to_anchor=(1.02, 1.02), ncol=1)
-    plt.xlabel('Parameter estimate')
-    plt.ylabel('Probability Density (relative)')
-    title = str(
-        'Probability density function of parameter for ' +
-        mod.model_name_latex)
+    plt.xlabel("Parameter estimate")
+    plt.ylabel("Probability Density (relative)")
+    title = str("Probability density function of parameter for " + mod.model_name_latex)
     plt.title(title)
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
 def plot_distribution_progression_of_model(
-    mod,
-    num_steps_to_show=2,
-    show_means=True,
-    renormalise=True,
-    save_to_file=None
+    mod, num_steps_to_show=2, show_means=True, renormalise=True, save_to_file=None
 ):
     # Plots initial and final prior distribution over parameter space
     # with num_steps_to_show intermediate distributions
     # Note only safe/tested for QHL, ie on true model (single parameter).
 
     from scipy import stats
+
     plt.clf()
 
     true_parameters = mod.true_model_params
@@ -805,35 +740,31 @@ def plot_distribution_progression_of_model(
         steps_to_show.append(max_exp_num)
 
     # TODO use a colourmap insted of manual list
-    colours = ['gray', 'rosybrown', 'cadetblue']
-    true_colour = 'k'
-    initial_colour = 'b'
-    final_colour = 'r'
+    colours = ["gray", "rosybrown", "cadetblue"]
+    true_colour = "k"
+    initial_colour = "b"
+    final_colour = "r"
     steps_to_show = sorted(steps_to_show)
     print(
         "[plot_distribution_progression]",
-        "num exp:", num_experiments,
-        "increment:", increment,
-        "steps to show", steps_to_show,
-        "resampled epochs:", mod.epochs_after_resampling,
+        "num exp:",
+        num_experiments,
+        "increment:",
+        increment,
+        "steps to show",
+        steps_to_show,
+        "resampled epochs:",
+        mod.epochs_after_resampling,
     )
 
     ax = plt.subplot(111)
 
     if show_means:
         for t in true_parameters:
-            ax.axvline(
-                t,
-                label='True param',
-                c=true_colour,
-                linestyle='dashed'
-            )
+            ax.axvline(t, label="True param", c=true_colour, linestyle="dashed")
 
     for i in steps_to_show:
-        print(
-            "[plot_distribution_progression]",
-            "i,", i
-        )
+        print("[plot_distribution_progression]", "i,", i)
 
         particles = mod.particles[:, :, i]
         particles = sorted(particles)
@@ -841,11 +772,7 @@ def plot_distribution_progression_of_model(
 
         # TODO if renormalise False, DON'T use a stat.pdf to model distribution
         if renormalise:
-            fit = stats.norm.pdf(
-                particles,
-                np.mean(particles),
-                np.std(particles)
-            )
+            fit = stats.norm.pdf(particles, np.mean(particles), np.std(particles))
             max_fit = max(fit)
             fit = fit / max_fit
         else:
@@ -853,39 +780,36 @@ def plot_distribution_progression_of_model(
 
         if i == max_exp_num:
             colour = final_colour
-            label = 'Final distribution'
+            label = "Final distribution"
             if show_means:
                 ax.axvline(
                     np.mean(particles),
-                    label='Final Mean',
+                    label="Final Mean",
                     color=colour,
-                    linestyle='dashed'
+                    linestyle="dashed",
                 )
         elif i == min(steps_to_show):
             colour = initial_colour
             if show_means:
                 ax.axvline(
                     np.mean(particles),
-                    label='Initial Mean',
+                    label="Initial Mean",
                     color=colour,
-                    linestyle='dashed'
+                    linestyle="dashed",
                 )
-            label = 'Initial distribution'
+            label = "Initial distribution"
         else:
-            label = str('Step ' + str(i))
+            label = str("Step " + str(i))
 
         ax.plot(particles, fit, label=label, color=colour)
 
     plt.legend(bbox_to_anchor=(1.02, 1.02), ncol=1)
-    plt.xlabel('Parameter estimate')
-    plt.ylabel('Probability Density (relative)')
-    title = str(
-        'Probability density function of parameter for ' +
-        mod.model_name_latex
-    )
+    plt.xlabel("Parameter estimate")
+    plt.ylabel("Probability Density (relative)")
+    title = str("Probability density function of parameter for " + mod.model_name_latex)
     plt.title(title)
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
 def r_squared_from_epoch_list(
@@ -900,19 +824,21 @@ def r_squared_from_epoch_list(
     if max_time is None:
         max_time = max(exp_times)
 
-    min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, 0)
-    max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(exp_times, max_time)
+    min_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
+        exp_times, 0
+    )
+    max_time = qmla.shared_functionality.experimental_data_processing.nearest_experimental_time_available(
+        exp_times, max_time
+    )
     min_data_idx = exp_times.index(min_time)
     max_data_idx = exp_times.index(max_time)
     exp_times = exp_times[min_data_idx:max_data_idx]
-    exp_data = [
-        qmd.experimental_measurements[t] for t in exp_times
-    ]
+    exp_data = [qmd.experimental_measurements[t] for t in exp_times]
     # plus = 1/np.sqrt(2) * np.array([1,1])
     # probe = np.array([0.5, 0.5, 0.5, 0.5+0j]) # TODO generalise probe
     # picking probe based on model instead
     datamean = np.mean(exp_data[0:max_data_idx])
-    datavar = np.sum((exp_data[0:max_data_idx] - datamean)**2)
+    datavar = np.sum((exp_data[0:max_data_idx] - datamean) ** 2)
 
     fig = plt.figure()
     ax = plt.subplot(111)
@@ -921,8 +847,12 @@ def r_squared_from_epoch_list(
         mod = qmd.get_model_storage_instance_by_id(model_id)
         r_squared_by_epoch = {}
 
-        mod_num_qubits = construct_models.get_num_qubits(mod.model_name)
-        probe = qmla.shared_functionality.expectation_value_functions.n_qubit_plus_state(mod_num_qubits)
+        mod_num_qubits = model_building_utilities.get_num_qubits(mod.model_name)
+        probe = (
+            qmla.shared_functionality.expectation_value_functions.n_qubit_plus_state(
+                mod_num_qubits
+            )
+        )
         epochs.extend([0, qmd.num_experiments - 1])
         if len(mod.epochs_after_resampling) > 0:
             epochs.extend(mod.epochs_after_resampling)
@@ -931,16 +861,16 @@ def r_squared_from_epoch_list(
         for epoch in epochs:
             # Construct new Hamiltonian to get R^2 from
             # Hamiltonian corresponds to parameters at that epoch
-            ham = np.tensordot(mod.track_param_means[epoch], mod.model_terms_matrices, axes=1)
+            ham = np.tensordot(
+                mod.track_param_means[epoch], mod.model_terms_matrices, axes=1
+            )
             sum_of_residuals = 0
             for t in exp_times:
                 sim = qmd.exploration_class.expectation - value(
-                    ham=ham,
-                    t=t,
-                    state=probe
+                    ham=ham, t=t, state=probe
                 )
                 true = qmd.experimental_measurements[t]
-                diff_squared = (sim - true)**2
+                diff_squared = (sim - true) ** 2
                 sum_of_residuals += diff_squared
 
             Rsq = 1 - sum_of_residuals / datavar
@@ -949,20 +879,18 @@ def r_squared_from_epoch_list(
         r_squareds = [r_squared_by_epoch[e] for e in epochs]
 
         plot_label = str(mod.model_name_latex)
-        ax.plot(epochs, r_squareds, label=plot_label, marker='o')
-    ax.legend(bbox_to_anchor=(1, 0.5),)
-    ax.set_ylabel('$R^2$')
-    ax.set_xlabel('Epoch')
-    ax.set_title('$R^2$ Vs Epoch (with resampling epochs)')
+        ax.plot(epochs, r_squareds, label=plot_label, marker="o")
+    ax.legend(
+        bbox_to_anchor=(1, 0.5),
+    )
+    ax.set_ylabel("$R^2$")
+    ax.set_xlabel("Epoch")
+    ax.set_title("$R^2$ Vs Epoch (with resampling epochs)")
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
-def plot_quadratic_loss(
-    qmd,
-    champs_or_all='champs',
-    save_to_file=None
-):
+def plot_quadratic_loss(qmd, champs_or_all="champs", save_to_file=None):
 
     # plot Quad loss for single QMD instance
     plt.clf()
@@ -970,42 +898,34 @@ def plot_quadratic_loss(
 
     if qmd.qhl_mode is True:
         to_plot_quad_loss = [qmd.true_model_id]
-        plot_title = str('Quadratic Loss for True operator (from QHL)')
-    elif champs_or_all == 'champs':
+        plot_title = str("Quadratic Loss for True operator (from QHL)")
+    elif champs_or_all == "champs":
         to_plot_quad_loss = qmd.branch_champions
-        plot_title = str('Quadratic Loss for Branch champions')
+        plot_title = str("Quadratic Loss for Branch champions")
     else:
         to_plot_quad_loss = qmd.model_name_id_map.keys()
-        plot_title = str('Quadratic Loss for all models')
+        plot_title = str("Quadratic Loss for all models")
 
     for i in sorted(list(to_plot_quad_loss)):
         mod = qmd.get_model_storage_instance_by_id(i)
         if len(mod.quadratic_losses_record) > 0:
             epochs = range(1, len(mod.quadratic_losses_record) + 1)
-            model_name = mod.exploration_class.latex_name(
-                name=qmd.model_name_id_map[i]
-            )
+            model_name = mod.exploration_class.latex_name(name=qmd.model_name_id_map[i])
             ax.plot(epochs, mod.quadratic_losses_record, label=str(model_name))
     ax.legend(bbox_to_anchor=(1, 1))
 
     ax.set_title(plot_title)
 
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
 def plot_volume_after_qhl(
-    qmd,
-    model_id=None,
-    true_model=True,
-    show_resamplings=True,
-    save_to_file=None
+    qmd, model_id=None, true_model=True, show_resamplings=True, save_to_file=None
 ):
     if true_model:
         try:
-            mod = qmd.get_model_storage_instance_by_id(
-                qmd.true_model_id
-            )
+            mod = qmd.get_model_storage_instance_by_id(qmd.true_model_id)
         except BaseException:
             print("True model not present in QMD models.")
     elif model_id is not None:
@@ -1022,21 +942,19 @@ def plot_volume_after_qhl(
     x = range(qmd.num_experiments)
 
     plt.clf()
-    plt.xlabel('Epoch')
-    plt.ylabel('Volume')
-    plt.semilogy(x, y, label='Volume')
+    plt.xlabel("Epoch")
+    plt.ylabel("Volume")
+    plt.semilogy(x, y, label="Volume")
 
     resamplings = mod.epochs_after_resampling
 
     if show_resamplings and len(resamplings) > 0:
-        plt.axvline(resamplings[0], linestyle='dashed',
-                    c='grey', label='Resample point'
-                    )
+        plt.axvline(
+            resamplings[0], linestyle="dashed", c="grey", label="Resample point"
+        )
         for r in resamplings[1:]:
-            plt.axvline(r, linestyle='dashed', c='grey')
+            plt.axvline(r, linestyle="dashed", c="grey")
 
     plt.legend()
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
-
-
+        plt.savefig(save_to_file, bbox_inches="tight")

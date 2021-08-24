@@ -1,7 +1,7 @@
 import os
-import sys 
-import numpy as np 
-import pandas as pd 
+import sys
+import numpy as np
+import pandas as pd
 
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
@@ -11,12 +11,12 @@ import seaborn as sns
 import qmla.get_exploration_strategy
 
 __all__ = [
-    'generational_analysis',
-    'r_sqaured_average',
-    'average_quadratic_losses',
-    'all_times_learned_histogram',
-    'volume_average',
-    'plot_bayes_factors_v_true_model'
+    "generational_analysis",
+    "r_sqaured_average",
+    "average_quadratic_losses",
+    "all_times_learned_histogram",
+    "volume_average",
+    "plot_bayes_factors_v_true_model",
 ]
 
 
@@ -32,9 +32,9 @@ def generational_analysis(combined_results, save_directory=None):
     generational_scores = None
 
     for k in combined_results.index:
-        single_instance_gen_ll = eval(combined_results['GenerationalLogLikelihoods'][k])
-        single_instance_gen_f_score= eval(combined_results['GenerationalFscore'][k])
-        instance_id = combined_results['QID'][k]
+        single_instance_gen_ll = eval(combined_results["GenerationalLogLikelihoods"][k])
+        single_instance_gen_f_score = eval(combined_results["GenerationalFscore"][k])
+        instance_id = combined_results["QID"][k]
 
         for gen in list(single_instance_gen_ll.keys()):
             this_gen_ll = single_instance_gen_ll[gen]
@@ -43,81 +43,64 @@ def generational_analysis(combined_results, save_directory=None):
             # this_gen_data = list(zip(this_gen_ll, this_gen_log_abs_ll, this_gen_f_score))
             this_gen_data = list(zip(this_gen_ll, this_gen_f_score))
 
-            df = pd.DataFrame(
-                data = this_gen_data,
-                columns = ['log_likelihood', 'f_score']
-            )
+            df = pd.DataFrame(data=this_gen_data, columns=["log_likelihood", "f_score"])
 
-            df['gen'] = gen
+            df["gen"] = gen
             # df['instance'] = k
-            df['instance'] = instance_id
+            df["instance"] = instance_id
             if generational_scores is None:
                 generational_scores = df
-            else: 
-                generational_scores = generational_scores.append(
-                    df, 
-                    ignore_index=True
-                )
+            else:
+                generational_scores = generational_scores.append(df, ignore_index=True)
 
     num_instances = len(generational_scores.instance.unique())
-    fig = plt.figure(
-        figsize=(15, 8),
-        tight_layout=True
-    )
+    fig = plt.figure(figsize=(15, 8), tight_layout=True)
     gs = GridSpec(
         2,
         1,
     )
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[1, 0])
-    
+
     sns.boxplot(
-        data = generational_scores, 
-        x = 'gen',
-        y = 'f_score',
-        showfliers=False, 
-        ax = ax1, 
+        data=generational_scores,
+        x="gen",
+        y="f_score",
+        showfliers=False,
+        ax=ax1,
     )
     # sns.swarmplot(
-    #     data = generational_scores, 
+    #     data = generational_scores,
     #     x = 'gen',
     #     y = 'f_score',
-    #     # showfliers=False, 
+    #     # showfliers=False,
     #     color='grey',
-    #     ax = ax1, 
+    #     ax = ax1,
     # )
 
-    ax1.set_ylabel('F score')
-    ax1.set_xlabel('Generation')
-    ax1.set_title('F score V Generation')
-    ax1.set_ylim(0,1)
-    ax1.axhline(0.5, ls='--',color='black')
+    ax1.set_ylabel("F score")
+    ax1.set_xlabel("Generation")
+    ax1.set_title("F score V Generation")
+    ax1.set_ylim(0, 1)
+    ax1.axhline(0.5, ls="--", color="black")
 
     sns.pointplot(
-        data = generational_scores, 
-        x = 'gen',
-        y = 'f_score',
-#         showfliers=False, 
-        hue='instance',
-        ci=None, 
-        ax = ax2, 
+        data=generational_scores,
+        x="gen",
+        y="f_score",
+        #         showfliers=False,
+        hue="instance",
+        ci=None,
+        ax=ax2,
     )
     ax2.set_title("F score individual instances")
-    ax2.axhline(0.5, ls='--', color='black')
-    ax2.set_ylim(0,1)
-    ax2.legend(
-        title='Instance',
-        ncol=min(8, num_instances)
-    )
+    ax2.axhline(0.5, ls="--", color="black")
+    ax2.set_ylim(0, 1)
+    ax2.legend(title="Instance", ncol=min(8, num_instances))
 
     if save_directory is not None:
-        plt.savefig(
-            os.path.join(
-                save_directory, 
-                "generational_measures_f_scores.png"
-            )
-        )
-        
+        plt.savefig(os.path.join(save_directory, "generational_measures_f_scores.png"))
+
     plt.clf()
     gs = GridSpec(
         2,
@@ -127,41 +110,35 @@ def generational_analysis(combined_results, save_directory=None):
     ax4 = fig.add_subplot(gs[1, 0])
 
     sns.boxplot(
-        data = generational_scores, 
-        x = 'gen',
-        y = 'log_likelihood',
-        showfliers=False, 
-        ax = ax3, 
+        data=generational_scores,
+        x="gen",
+        y="log_likelihood",
+        showfliers=False,
+        ax=ax3,
     )
 
-    ax3.set_title('Log likelihood V generation')
-    ax3.set_ylabel('Log likelihood')
-    ax3.set_xlabel('Generation')
+    ax3.set_title("Log likelihood V generation")
+    ax3.set_ylabel("Log likelihood")
+    ax3.set_xlabel("Generation")
 
     sns.pointplot(
-        data = generational_scores, 
-        x = 'gen',
-        y = 'log_likelihood',
-        # showfliers=False, 
-        ci=None, 
-        hue='instance',
-        ax = ax4, 
+        data=generational_scores,
+        x="gen",
+        y="log_likelihood",
+        # showfliers=False,
+        ci=None,
+        hue="instance",
+        ax=ax4,
     )
 
-    ax4.set_title('Log likelihood individual instances')
-    ax4.set_ylabel('Log likelihood')
-    ax4.set_xlabel('Generation')
-    ax4.legend(
-        title='Instance',
-        ncol=min(8, num_instances)
-    )
+    ax4.set_title("Log likelihood individual instances")
+    ax4.set_ylabel("Log likelihood")
+    ax4.set_xlabel("Generation")
+    ax4.legend(title="Instance", ncol=min(8, num_instances))
 
     if save_directory is not None:
         plt.savefig(
-            os.path.join(
-                save_directory, 
-                "generational_measures_log_likelihoods.png"
-            )
+            os.path.join(save_directory, "generational_measures_log_likelihoods.png")
         )
 
 
@@ -170,20 +147,21 @@ def r_sqaured_average(
     exploration_class,
     all_exploration_classes,
     top_number_models=2,
-    save_to_file=None
+    save_to_file=None,
 ):
     from matplotlib import cm
+
     plt.clf()
     fig = plt.figure()
     ax = plt.subplot(111)
 
     # results = pd.DataFrame.from_csv(
-    results = pd.read_csv(
-        results_path,
-        index_col='QID'
-    )
-    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
-    def rank_models(n): return sorted(set(n), key=n.count)[::-1]
+    results = pd.read_csv(results_path, index_col="QID")
+    all_winning_models = list(results.loc[:, "NameAlphabetical"])
+
+    def rank_models(n):
+        return sorted(set(n), key=n.count)[::-1]
+
     # from
     # https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
 
@@ -204,7 +182,7 @@ def r_sqaured_average(
     for i in range(len(names)):
         name = names[i]
         r_squared_values = list(
-            results[results['NameAlphabetical'] == name]['RSquaredByEpoch']
+            results[results["NameAlphabetical"] == name]["RSquaredByEpoch"]
         )
 
         r_squared_lists = {}
@@ -218,12 +196,8 @@ def r_sqaured_average(
                     r_squared_lists[t] = [rs[t]]
 
         times = sorted(list(r_squared_lists.keys()))
-        means = np.array(
-            [np.mean(r_squared_lists[t]) for t in times]
-        )
-        std_dev = np.array(
-            [np.std(r_squared_lists[t]) for t in times]
-        )
+        means = np.array([np.mean(r_squared_lists[t]) for t in times])
+        std_dev = np.array([np.std(r_squared_lists[t]) for t in times])
 
         gr_class = all_exploration_classes[name]
         # TODO need exploration strategy of given name to get proper latex term
@@ -231,32 +205,19 @@ def r_sqaured_average(
         # term = exploration_class.latex_name(name) # TODO need exploration strategy of given
         # name to get proper latex term
         r_sq_by_model[term] = means
-        plot_label = str(term + ' (' + str(num_wins) + ')')
+        plot_label = str(term + " (" + str(num_wins) + ")")
         colour = colours[i]
-        ax.plot(
-            times,
-            means,
-            label=plot_label,
-            marker='o'
-        )
-        ax.fill_between(
-            times,
-            means - std_dev,
-            means + std_dev,
-            alpha=0.2
-        )
-        ax.legend(
-            bbox_to_anchor=(1.0, 0.9),
-            title='Model (# instances)'
-        )
+        ax.plot(times, means, label=plot_label, marker="o")
+        ax.fill_between(times, means - std_dev, means + std_dev, alpha=0.2)
+        ax.legend(bbox_to_anchor=(1.0, 0.9), title="Model (# instances)")
     print("[AnalyseMultiple - r sq] r_sq_by_model:", r_sq_by_model)
 
-    plt.xlabel('Epoch')
-    plt.ylabel('$R^2$')
-    plt.title('$R^2$ average')
+    plt.xlabel("Epoch")
+    plt.ylabel("$R^2$")
+    plt.title("$R^2$ average")
 
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
 def average_quadratic_losses(
@@ -265,14 +226,12 @@ def average_quadratic_losses(
     exploration_rule,
     top_number_models=2,
     fill_alpha=0.3,  # to shade area of 1 std deviation
-    save_to_file=None
+    save_to_file=None,
 ):
     from matplotlib import cm
+
     # results = pd.DataFrame.from_csv(
-    results = pd.read_csv(
-        results_path,
-        index_col='QID'
-    )
+    results = pd.read_csv(results_path, index_col="QID")
     sigmas = {  # standard sigma values
         1: 34.13,
         2: 13.59,
@@ -280,8 +239,11 @@ def average_quadratic_losses(
         4: 0.1,
     }
 
-    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
-    def rank_models(n): return sorted(set(n), key=n.count)[::-1]
+    all_winning_models = list(results.loc[:, "NameAlphabetical"])
+
+    def rank_models(n):
+        return sorted(set(n), key=n.count)[::-1]
+
     # from
     # https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
 
@@ -290,9 +252,7 @@ def average_quadratic_losses(
     else:
         winning_models = list(set(all_winning_models))
 
-    cm_subsection = np.linspace(
-        0, 0.8, top_number_models
-    )
+    cm_subsection = np.linspace(0, 0.8, top_number_models)
     colour_list = [cm.Accent(x) for x in cm_subsection]
 
     plot_colours = {}
@@ -305,10 +265,9 @@ def average_quadratic_losses(
     ax = plt.subplot(111)
 
     for mod in winning_models:
-        winning_models_quadratic_losses[mod] = (
-            results.loc[results['NameAlphabetical']
-                        == mod]['QuadraticLosses'].values
-        )
+        winning_models_quadratic_losses[mod] = results.loc[
+            results["NameAlphabetical"] == mod
+        ]["QuadraticLosses"].values
 
         list_this_models_q_losses = []
         for i in range(len(winning_models_quadratic_losses[mod])):
@@ -316,9 +275,7 @@ def average_quadratic_losses(
                 eval(winning_models_quadratic_losses[mod][i])
             )
 
-        list_this_models_q_losses = np.array(
-            list_this_models_q_losses
-        )
+        list_this_models_q_losses = np.array(list_this_models_q_losses)
 
         num_experiments = np.shape(list_this_models_q_losses)[1]
         avg_q_losses = np.empty(num_experiments)
@@ -329,18 +286,15 @@ def average_quadratic_losses(
         latex_name = exploration_classes[exploration_rule].latex_name(name=mod)
         epochs = range(1, num_experiments + 1)
 
-        ax.semilogy(
-            epochs,
-            avg_q_losses,
-            label=latex_name,
-            color=plot_colours[mod]
-        )
+        ax.semilogy(epochs, avg_q_losses, label=latex_name, color=plot_colours[mod])
 
         upper_one_sigma = [
-            np.percentile(np.array(list_this_models_q_losses[:, t]), 50 + sigmas[1]) for t in range(num_experiments)
+            np.percentile(np.array(list_this_models_q_losses[:, t]), 50 + sigmas[1])
+            for t in range(num_experiments)
         ]
         lower_one_sigma = [
-            np.percentile(np.array(list_this_models_q_losses[:, t]), 50 - sigmas[1]) for t in range(num_experiments)
+            np.percentile(np.array(list_this_models_q_losses[:, t]), 50 - sigmas[1])
+            for t in range(num_experiments)
         ]
 
         ax.fill_between(
@@ -354,28 +308,27 @@ def average_quadratic_losses(
 
     ax.set_xlim(1, num_experiments)
     ax.legend(bbox_to_anchor=(1, 1))
-    plt.title('Quadratic Losses Averages')
+    plt.title("Quadratic Losses Averages")
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
 def all_times_learned_histogram(
-    results_path="combined_results.csv",
-    top_number_models=2,
-    save_to_file=None
+    results_path="combined_results.csv", top_number_models=2, save_to_file=None
 ):
     from matplotlib import cm
+
     plt.clf()
     fig = plt.figure()
     ax = plt.subplot(111)
 
     # results = pd.DataFrame.from_csv(
-    results = pd.read_csv(
-        results_path,
-        index_col='QID'
-    )
-    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
-    def rank_models(n): return sorted(set(n), key=n.count)[::-1]
+    results = pd.read_csv(results_path, index_col="QID")
+    all_winning_models = list(results.loc[:, "NameAlphabetical"])
+
+    def rank_models(n):
+        return sorted(set(n), key=n.count)[::-1]
+
     # from
     # https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
 
@@ -397,7 +350,7 @@ def all_times_learned_histogram(
         model_colour = colours[i]
         times_by_model[name] = []
         this_model_times_separate_runs = list(
-            results[results['NameAlphabetical'] == name]['TrackTimesLearned']
+            results[results["NameAlphabetical"] == name]["TrackTimesLearned"]
         )
 
         num_wins = len(this_model_times_separate_runs)
@@ -408,23 +361,24 @@ def all_times_learned_histogram(
                 max_time = max(this_run_times)
         times_this_model = times_by_model[name]
         model_label = str(
-            list(results[results['NameAlphabetical'] == name]['ChampLatex'])[0]
+            list(results[results["NameAlphabetical"] == name]["ChampLatex"])[0]
         )
 
         plt.hist(
             times_this_model,
             color=model_colour,
             # histtype='stepfilled',
-            histtype='step',
+            histtype="step",
             # histtype='bar',
             fill=False,
-            label=model_label
+            label=model_label,
         )
 
     # presuming all models used same heuristics .... TODO change if models can
     # use ones
     heuristic_type = list(
-        results[results['NameAlphabetical'] == names[0]]['Heuristic'])[0]
+        results[results["NameAlphabetical"] == names[0]]["Heuristic"]
+    )[0]
 
     plt.legend()
     plt.title("Times learned on [{}]".format(heuristic_type))
@@ -435,27 +389,25 @@ def all_times_learned_histogram(
     if max_time > 100:
         plt.semilogx()
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
 def volume_average(
-    results_path,
-    exploration_class,
-    top_number_models=2,
-    save_to_file=None
+    results_path, exploration_class, top_number_models=2, save_to_file=None
 ):
     from matplotlib import cm
+
     plt.clf()
     fig = plt.figure()
     ax = plt.subplot(111)
 
     # results = pd.DataFrame.from_csv(
-    results = pd.read_csv(
-        results_path,
-        index_col='QID'
-    )
-    all_winning_models = list(results.loc[:, 'NameAlphabetical'])
-    def rank_models(n): return sorted(set(n), key=n.count)[::-1]
+    results = pd.read_csv(results_path, index_col="QID")
+    all_winning_models = list(results.loc[:, "NameAlphabetical"])
+
+    def rank_models(n):
+        return sorted(set(n), key=n.count)[::-1]
+
     # from
     # https://codegolf.stackexchange.com/questions/17287/sort-the-distinct-elements-of-a-list-in-descending-order-by-frequency
 
@@ -474,7 +426,7 @@ def volume_average(
     for i in range(len(names)):
         name = names[i]
         volume_values = list(
-            results[results['NameAlphabetical'] == name]['TrackVolume']
+            results[results["NameAlphabetical"] == name]["TrackVolume"]
         )
 
         volume_lists = {}
@@ -488,69 +440,46 @@ def volume_average(
                     volume_lists[t] = [rs[t]]
 
         times = sorted(list(volume_lists.keys()))
-        means = np.array(
-            [np.mean(volume_lists[t]) for t in times]
-        )
+        means = np.array([np.mean(volume_lists[t]) for t in times])
 
-        std_dev = np.array(
-            [np.std(volume_lists[t]) for t in times]
-        )
+        std_dev = np.array([np.std(volume_lists[t]) for t in times])
 
         term = exploration_class.latex_name(name)
-        plot_label = str(term + ' (' + str(num_wins) + ')')
+        plot_label = str(term + " (" + str(num_wins) + ")")
         colour = colours[i]
-        ax.plot(
-            times,
-            means,
-            label=plot_label,
-            marker='o',
-            markevery=10
-        )
-        ax.fill_between(
-            times,
-            means - std_dev,
-            means + std_dev,
-            alpha=0.2
-        )
-        ax.legend(
-            bbox_to_anchor=(1.0, 0.9),
-            title='Model (number instances)'
-        )
+        ax.plot(times, means, label=plot_label, marker="o", markevery=10)
+        ax.fill_between(times, means - std_dev, means + std_dev, alpha=0.2)
+        ax.legend(bbox_to_anchor=(1.0, 0.9), title="Model (number instances)")
     plt.semilogy()
-    plt.xlabel('Epoch')
-    plt.ylabel('Volume')
-    plt.title('Volume average')
+    plt.xlabel("Epoch")
+    plt.ylabel("Volume")
+    plt.title("Volume average")
 
     if save_to_file is not None:
-        plt.savefig(save_to_file, bbox_inches='tight')
+        plt.savefig(save_to_file, bbox_inches="tight")
 
 
 def plot_bayes_factors_v_true_model(
     results_csv_path,
     correct_mod="xTiPPyTiPPzTiPPxTxPPyTyPPzTz",
     exploration_rule=None,
-    save_to_file=None
+    save_to_file=None,
 ):
 
     from matplotlib import cm
+
     # TODO saved fig is cut off on edges and don't have axes titles.
 
     exploration_class = qmla.get_exploration_strategy.get_exploration_class(
         exploration_rules=exploration_rule
     )
 
-    correct_mod = exploration_class.latex_name(
-        name=correct_mod
-    )
+    correct_mod = exploration_class.latex_name(name=correct_mod)
     results_csv = os.path.abspath(results_csv_path)
     # qmd_res = pd.DataFrame.from_csv(results_csv)
     qmd_res = pd.read_csv(results_csv)
 
-    mods = list(
-        set(list(
-            qmd_res.index
-        ))
-    )
+    mods = list(set(list(qmd_res.index)))
     if correct_mod not in mods:
         return False
 
@@ -581,7 +510,11 @@ def plot_bayes_factors_v_true_model(
             idx = row * ncols + col
             if idx < len(all_BFs):
                 hist, bins, _ = axes[row, col].hist(
-                    np.log10(all_BFs[idx]), n_bins, color=colors[idx], label=othermods[idx])
+                    np.log10(all_BFs[idx]),
+                    n_bins,
+                    color=colors[idx],
+                    label=othermods[idx],
+                )
 
                 try:
                     maxBF = 1.1 * np.max(np.abs(np.log10(all_BFs[idx])))
@@ -590,13 +523,12 @@ def plot_bayes_factors_v_true_model(
                 axes[row, col].legend()
                 axes[row, col].set_xlim(-maxBF, maxBF)
 
-
-#    fig.text(0.07, 0.5, 'Occurences', va='center', rotation='vertical')
-#    fig.text(0.5, 0.07, '$log_{10}$ Bayes Factor', ha='center')
+    #    fig.text(0.07, 0.5, 'Occurences', va='center', rotation='vertical')
+    #    fig.text(0.5, 0.07, '$log_{10}$ Bayes Factor', ha='center')
 
     plt.title("Bayes factors of true model.")
     if save_to_file is not None:
         print("Saving BF V true model to {}".format(save_to_file))
-        fig.savefig(save_to_file, bbox_inches='tight')
-    else: 
+        fig.savefig(save_to_file, bbox_inches="tight")
+    else:
         print("BF V true model -- save to file is None")

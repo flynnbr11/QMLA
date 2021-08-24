@@ -16,18 +16,15 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 import qmla.logging
-import qmla.construct_models
+import qmla.model_building_utilities
 
 pickle.HIGHEST_PROTOCOL = 4
-plt.switch_backend('agg')
+plt.switch_backend("agg")
 
-__all__ = [
-    'ExplorationTree',
-    'BranchQMLA'
-]
+__all__ = ["ExplorationTree", "BranchQMLA"]
 
 
-class ExplorationTree():
+class ExplorationTree:
     r"""
     Tree corresponding to an exploration strategy for management within QMLA.
 
@@ -81,52 +78,56 @@ class ExplorationTree():
         # Get models to learn
         if self.exploration_class.initial_models is None:
             # call generate_models if not explicitly set by ES
-            self.log_print([
-                "Initial models not set; retrieving from generate_models"
-            ])
-            self.initial_models = self.exploration_class.generate_models(
-                model_list=[]
-            )
+            self.log_print(["Initial models not set; retrieving from generate_models"])
+            self.initial_models = self.exploration_class.generate_models(model_list=[])
         else:
             self.initial_models = self.exploration_class.initial_models
 
         # Get comparisons: pairs of models to compare on the first layer
-        if self.exploration_class.branch_comparison_strategy == 'all':
-            pairs_to_compare = 'all'
-        elif self.exploration_class.branch_comparison_strategy == 'optimal_graph':
-            self.log_print(["Getting optimal comparison graph for {} models".format(
-                len(self.initial_models))])
+        if self.exploration_class.branch_comparison_strategy == "all":
+            pairs_to_compare = "all"
+        elif self.exploration_class.branch_comparison_strategy == "optimal_graph":
+            self.log_print(
+                [
+                    "Getting optimal comparison graph for {} models".format(
+                        len(self.initial_models)
+                    )
+                ]
+            )
             # pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
             #     model_names=self.initial_models
             # )
-            pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.generate_random_regular_graph(
+            (
+                pairs_to_compare,
+                graph,
+            ) = qmla.shared_functionality.model_pairing_strategies.generate_random_regular_graph(
                 model_list=self.initial_models
             )
 
-            self.log_print([
-                "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
-                    len(pairs_to_compare)),
-            ])
+            self.log_print(
+                [
+                    "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
+                        len(pairs_to_compare)
+                    ),
+                ]
+            )
             # self.log_print(["Got pairs to compare:", pairs_to_compare])
             self.graphs[self.spawn_step] = graph
-        elif self.exploration_class.branch_comparison_strategy == 'minimal':
+        elif self.exploration_class.branch_comparison_strategy == "minimal":
             # TODO very few connections, only used to avoid crash
             model_list = self.initial_models
-            first_half = model_list[  : int(len(model_list)/2) ]
-            second_half = model_list[  int(len(model_list)/2) : ]
+            first_half = model_list[: int(len(model_list) / 2)]
+            second_half = model_list[int(len(model_list) / 2) :]
             pairs_to_compare = list(zip(first_half, second_half))
 
-        elif self.exploration_class.branch_comparison_strategy == 'sparse_connection':
+        elif self.exploration_class.branch_comparison_strategy == "sparse_connection":
             pairs_to_compare = []
         else:
-            pairs_to_compare = 'all'
+            pairs_to_compare = "all"
 
         return self.initial_models, pairs_to_compare
 
-    def next_layer(
-        self,
-        **kwargs
-    ):
+    def next_layer(self, **kwargs):
         r"""
         Determine the next set of models, for the next branch of this exploration strategy tree.
 
@@ -160,55 +161,58 @@ class ExplorationTree():
             to perform comparisons between.
         """
 
-        if not self.exploration_class.check_tree_completed(
-                spawn_step=self.spawn_step):
+        if not self.exploration_class.check_tree_completed(spawn_step=self.spawn_step):
             self.spawn_step += 1
             self.exploration_class.spawn_step = self.spawn_step
             self.log_print(["Next layer - spawn"])
             model_list = self.exploration_class.generate_models(
-                spawn_step=self.spawn_step,
-                **kwargs
+                spawn_step=self.spawn_step, **kwargs
             )
-            if self.exploration_class.branch_comparison_strategy == 'all':
-                pairs_to_compare = 'all'
-            elif self.exploration_class.branch_comparison_strategy == 'optimal_graph':
-                self.log_print([
-                    "Getting graph for restricted comparisons"
-                ])
-                
+            if self.exploration_class.branch_comparison_strategy == "all":
+                pairs_to_compare = "all"
+            elif self.exploration_class.branch_comparison_strategy == "optimal_graph":
+                self.log_print(["Getting graph for restricted comparisons"])
+
                 # pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.find_efficient_comparison_pairs(
                 #     model_names=model_list
                 # )
-                pairs_to_compare, graph = qmla.shared_functionality.model_pairing_strategies.generate_random_regular_graph(
+                (
+                    pairs_to_compare,
+                    graph,
+                ) = qmla.shared_functionality.model_pairing_strategies.generate_random_regular_graph(
                     model_list=model_list
                 )
-                self.log_print([
-                    "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
-                        len(pairs_to_compare))])
+                self.log_print(
+                    [
+                        "Using optimal graph to select subset of model pairs to compare. ({} pairs)".format(
+                            len(pairs_to_compare)
+                        )
+                    ]
+                )
                 self.graphs[self.spawn_step] = graph
-            elif self.exploration_class.branch_comparison_strategy == 'minimal':
+            elif self.exploration_class.branch_comparison_strategy == "minimal":
                 # TODO very few connections, only used to avoid crash
-                first_half = model_list[  : int(len(model_list)/2) ]
-                second_half = model_list[  int(len(model_list)/2) : ]
+                first_half = model_list[: int(len(model_list) / 2)]
+                second_half = model_list[int(len(model_list) / 2) :]
                 pairs_to_compare = list(zip(first_half, second_half))
             else:
-                pairs_to_compare = 'all'
+                pairs_to_compare = "all"
 
         elif not self.exploration_class.check_tree_pruned(prune_step=self.prune_step):
             self.prune_step += 1
             self.log_print(["Next layer - prune"])
             model_list, pairs_to_compare = self.exploration_class.tree_pruning(
-                previous_prune_branch=kwargs['called_by_branch']
+                previous_prune_branch=kwargs["called_by_branch"]
             )
         else:
-            self.log_print([
-                "Trying to generate next layer but neither pruning or spawning."
-            ])
+            self.log_print(
+                ["Trying to generate next layer but neither pruning or spawning."]
+            )
 
         model_list = list(set(model_list))
-        model_list = [qmla.construct_models.alph(mod) for mod in model_list]
+        model_list = [qmla.model_building_utilities.alph(mod) for mod in model_list]
         if isinstance(pairs_to_compare, list):
-            pairs_to_compare = [ (min(p), max(p) ) for p in pairs_to_compare ]
+            pairs_to_compare = [(min(p), max(p)) for p in pairs_to_compare]
         return model_list, pairs_to_compare
 
     def finalise_tree(self, **kwargs):
@@ -217,12 +221,10 @@ class ExplorationTree():
         """
 
         last_branch = self.branches[max(self.branches.keys())]
-        kwargs['evaluation_log_likelihoods'] = last_branch.evaluation_log_likelihoods
-        kwargs['branch_model_points'] = last_branch.bayes_points
+        kwargs["evaluation_log_likelihoods"] = last_branch.evaluation_log_likelihoods
+        kwargs["branch_model_points"] = last_branch.bayes_points
 
-        self.exploration_class.finalise_model_learning(
-            **kwargs
-        )
+        self.exploration_class.finalise_model_learning(**kwargs)
 
     def nominate_champions(
         self,
@@ -300,11 +302,9 @@ class ExplorationTree():
         """
 
         # Check both spawning and pruning stages complete.
-        tree_complete = (
-            self.exploration_class.check_tree_completed(spawn_step=self.spawn_step)
-            and
-            self.exploration_class.check_tree_pruned(prune_step=self.prune_step)
-        )
+        tree_complete = self.exploration_class.check_tree_completed(
+            spawn_step=self.spawn_step
+        ) and self.exploration_class.check_tree_pruned(prune_step=self.prune_step)
 
         # If initially complete, don't need any further iterations.
         if self.exploration_class.tree_completed_initially:
@@ -324,11 +324,11 @@ class ExplorationTree():
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=self.log_file,
-            log_identifier='Tree {}'.format(self.exploration_strategy)
+            log_identifier="Tree {}".format(self.exploration_strategy),
         )
 
 
-class BranchQMLA():
+class BranchQMLA:
     def __init__(
         self,
         branch_id,
@@ -375,19 +375,22 @@ class BranchQMLA():
         self.exploration_class = self.tree.exploration_class
         self.exploration_strategy = self.exploration_class.exploration_rules
 
-        self.log_print([
-            "Branch {} on tree {}".format(self.branch_id, self.tree),
-        ])
+        self.log_print(
+            [
+                "Branch {} on tree {}".format(self.branch_id, self.tree),
+            ]
+        )
 
         # Get parent branch of this branch
         try:
             self.parent_branch = self.tree.branches[spawning_branch]
-            self.log_print([
-                "Setting parent branch of {} -> parent is {}".format(
-                    self.branch_id,
-                    self.parent_branch.branch_id
-                )
-            ])
+            self.log_print(
+                [
+                    "Setting parent branch of {} -> parent is {}".format(
+                        self.branch_id, self.parent_branch.branch_id
+                    )
+                ]
+            )
         except BaseException:
             self.parent_branch = None
             self.log_print(["Failed to set parent branch for ", branch_id])
@@ -397,33 +400,22 @@ class BranchQMLA():
         self.model_storage_instances = model_storage_instances
         self.models = models
         self.models_by_id = models
-        self.model_id_by_name = {
-            self.models_by_id[m] : m
-            for m in self.models_by_id
-        }
+        self.model_id_by_name = {self.models_by_id[m]: m for m in self.models_by_id}
         self.resident_model_ids = sorted(self.models_by_id.keys())
         self.resident_models = list(self.models_by_id.values())
         self.num_models = len(self.resident_models)
 
         # Choose models to compare within this branch
-        if pairs_to_compare == 'all':
-            self.log_print([
-                "All pairs to be compared on branch ", self.branch_id
-            ])
+        if pairs_to_compare == "all":
+            self.log_print(["All pairs to be compared on branch ", self.branch_id])
             self.pairs_to_compare = list(
-                itertools.combinations(
-                    self.resident_model_ids, 2
-                )
+                itertools.combinations(self.resident_model_ids, 2)
             )
         else:
-            self.log_print([
-                "Comparison pairs passed:", pairs_to_compare
-            ])
+            self.log_print(["Comparison pairs passed:", pairs_to_compare])
             self.pairs_to_compare = pairs_to_compare
         # order pairs so they read (low, high)
-        self.pairs_to_compare = [ 
-            ( min(p), max(p) ) for p in self.pairs_to_compare 
-        ]
+        self.pairs_to_compare = [(min(p), max(p)) for p in self.pairs_to_compare]
         self.num_model_pairs = len(self.pairs_to_compare)
 
         # Models already considered on a previous branch
@@ -440,22 +432,15 @@ class BranchQMLA():
         self.rankings = []  # ordered from best to worst
         self.result_counter = 0
 
-        self.log_print([
-            "New branch {}; models: {}".format(
-                self.branch_id,
-                self.models
-            )
-        ])
+        self.log_print(
+            ["New branch {}; models: {}".format(self.branch_id, self.models)]
+        )
 
     ##########
     # Section: Interact with QMLA instance
     ##########
 
-    def update_branch(
-        self,
-        pair_list,
-        models_points=None
-    ):
+    def update_branch(self, pair_list, models_points=None):
         r"""
         Process results for this branch.
 
@@ -463,7 +448,9 @@ class BranchQMLA():
         :param dict models_points: results of comparisons
         """
 
-        self.log_print(["Updating branch {}. \n pair_list: {}".format(self.branch_id, pair_list)])
+        self.log_print(
+            ["Updating branch {}. \n pair_list: {}".format(self.branch_id, pair_list)]
+        )
         # Track calls to this method for this branch
         self.result_counter += 1
 
@@ -475,19 +462,20 @@ class BranchQMLA():
                 for k in self.resident_model_ids
             }
         else:
-            self.log_print([
-                "Reconsidering branch {} [{} considerations so far] champion with pairs {}".format(
-                    self.branch_id, self.result_counter, pair_list)
-            ])
+            self.log_print(
+                [
+                    "Reconsidering branch {} [{} considerations so far] champion with pairs {}".format(
+                        self.branch_id, self.result_counter, pair_list
+                    )
+                ]
+            )
 
         # Inspect the pairwise comparisons;
-        pair_list = [
-            (int(min(pair)), int(max(pair))) 
-            for pair in pair_list
-        ]
+        pair_list = [(int(min(pair)), int(max(pair))) for pair in pair_list]
         bayes_factors = {
-            pair:
-            self.model_storage_instances[min(pair)].model_bayes_factors[max(pair)][-1]
+            pair: self.model_storage_instances[min(pair)].model_bayes_factors[
+                max(pair)
+            ][-1]
             for pair in pair_list
         }
 
@@ -496,29 +484,32 @@ class BranchQMLA():
         self.exploration_class.ratings_class.batch_update(
             model_pairs_bayes_factors=bayes_factors,
             spawn_step=self.tree.spawn_step,
-            force_new_rating=True # try to force new ratings
+            force_new_rating=True,  # try to force new ratings
         )
 
         # Use exploration strategy's reasoning to decide if a champion can be set
         self.log_print(["Selecting champion(s) for branch {}".format(self.branch_id)])
-        if self.exploration_class.branch_champion_selection_stratgey == 'number_comparison_wins':
-            self.log_print(
-                ["Choosing champion from number of wins on branch."])
+        if (
+            self.exploration_class.branch_champion_selection_stratgey
+            == "number_comparison_wins"
+        ):
+            self.log_print(["Choosing champion from number of wins on branch."])
 
             max_points = max(models_points.values())
             models_with_max_points = [
-                key for key, val in models_points.items()
-                if val == max_points
+                key for key, val in models_points.items() if val == max_points
             ]
 
             if len(models_with_max_points) > 1:
                 # if multiple models have same number of wins,
                 # can't declare a branch champion yet
-                self.log_print([
-                    "Multiple models have same number of points within branch {}:\n{} \nPoints:\n{}".format(
-                        self.branch_id, models_with_max_points, models_points
-                    )
-                ])
+                self.log_print(
+                    [
+                        "Multiple models have same number of points within branch {}:\n{} \nPoints:\n{}".format(
+                            self.branch_id, models_with_max_points, models_points
+                        )
+                    ]
+                )
                 # Set joint champions so QMLA can re-compare the subset
                 self.joint_branch_champions = models_with_max_points
                 self.is_branch_champion_set = False
@@ -526,9 +517,7 @@ class BranchQMLA():
             else:
                 # champion is model with most points
                 self.ranked_models = sorted(
-                    models_points,
-                    key=models_points.get,
-                    reverse=True
+                    models_points, key=models_points.get, reverse=True
                 )
                 # TODO rankings for models should be set as they are distinguished
                 # ie 10 models at first which are reduced to a competition bw 3,
@@ -536,7 +525,7 @@ class BranchQMLA():
                 self.is_branch_champion_set = True
                 self.joint_branch_champions = None
 
-        elif self.exploration_class.branch_champion_selection_stratgey == 'ratings':
+        elif self.exploration_class.branch_champion_selection_stratgey == "ratings":
             # TODO check if multiple models have exactly same rating (unlikely)
             self.ranked_models = self.exploration_class.ratings_class.get_rankings(
                 model_list=self.resident_model_ids
@@ -544,40 +533,49 @@ class BranchQMLA():
             self.log_print(["Champion set by ratings"])
             self.is_branch_champion_set = True
 
-        elif self.exploration_class.branch_champion_selection_stratgey == 'fitness':
+        elif self.exploration_class.branch_champion_selection_stratgey == "fitness":
             # using a genetic algorithm - so we can now analyse the generation because it has finished
             ranked_models_by_name = self.exploration_class.analyse_generation(
-                model_points = models_points,
+                model_points=models_points,
                 model_names_ids=self.models_by_id,
             )
-            self.log_print(["ranked_models_by_name:", ranked_models_by_name, "\n model IDs:\n", self.model_id_by_name])
-            self.ranked_models = [ 
-                self.model_id_by_name[m]
-                for m in ranked_models_by_name
-            ] # get id from name
-            self.log_print(["Champion set by fitness. Ranked models:", self.ranked_models])
+            self.log_print(
+                [
+                    "ranked_models_by_name:",
+                    ranked_models_by_name,
+                    "\n model IDs:\n",
+                    self.model_id_by_name,
+                ]
+            )
+            self.ranked_models = [
+                self.model_id_by_name[m] for m in ranked_models_by_name
+            ]  # get id from name
+            self.log_print(
+                ["Champion set by fitness. Ranked models:", self.ranked_models]
+            )
             self.is_branch_champion_set = True
 
         if self.result_counter > 1 and not self.is_branch_champion_set:
-            self.log_print([
-                "On branch {}, no outright champion after {} considerations. \
+            self.log_print(
+                [
+                    "On branch {}, no outright champion after {} considerations. \
                     Forcing selection.".format(
-                    self.branch_id, self.result_counter
-                )
-            ])
+                        self.branch_id, self.result_counter
+                    )
+                ]
+            )
             self.is_branch_champion_set = True
             self.ranked_models = sorted(
-                models_points,
-                key=models_points.get,
-                reverse=True
+                models_points, key=models_points.get, reverse=True
             )
 
         # Update branch with results of competition
         if self.is_branch_champion_set:
             self.champion_id = int(self.ranked_models[0])
             self.champion_name = self.models[self.champion_id]
-            self.log_print(["Branch {} champion ID: {}".format(
-                self.branch_id, self.champion_id)])
+            self.log_print(
+                ["Branch {} champion ID: {}".format(self.branch_id, self.champion_id)]
+            )
 
     ##########
     # Section: Utilities
@@ -587,5 +585,5 @@ class BranchQMLA():
         qmla.logging.print_to_log(
             to_print_list=to_print_list,
             log_file=self.log_file,
-            log_identifier='Branch {}'.format(self.branch_id)
+            log_identifier="Branch {}".format(self.branch_id),
         )

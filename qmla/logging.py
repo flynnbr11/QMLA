@@ -1,8 +1,6 @@
 import datetime
 
-__all__ = [
-    'print_to_log'
-]
+__all__ = ["print_to_log"]
 
 
 def _time_seconds():
@@ -10,21 +8,17 @@ def _time_seconds():
     now = datetime.date.today()
     time = str(
         "{}_{}/{}:{}:{}".format(
-            now.strftime("%b"), 
-            now.day, 
-            datetime.datetime.now().hour, 
-            datetime.datetime.now().minute, 
-            datetime.datetime.now().second
+            now.strftime("%b"),
+            now.day,
+            datetime.datetime.now().hour,
+            datetime.datetime.now().minute,
+            datetime.datetime.now().second,
         )
     )
     return time
 
 
-def print_to_log(
-    to_print_list,
-    log_file,
-    log_identifier=''
-):
+def print_to_log(to_print_list, log_file, log_identifier=""):
     """
     Writes to the log file, registering the time and identifier.
 
@@ -42,11 +36,9 @@ def print_to_log(
     """
     if not isinstance(to_print_list, list):
         to_print_list = list(to_print_list)
-    identifier = str(str(_time_seconds()) +
-                     " [" + log_identifier + "]"
-                     )
+    identifier = str(str(_time_seconds()) + " [" + log_identifier + "]")
 
     print_strings = [str(s) for s in to_print_list]
     to_print = " ".join(print_strings)
-    with open(log_file, 'a') as write_log_file:
+    with open(log_file, "a") as write_log_file:
         print(identifier, str(to_print), file=write_log_file, flush=True)

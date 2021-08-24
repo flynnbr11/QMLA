@@ -130,8 +130,11 @@ exploration_rule = arguments.exploration_rules
 gather_summary_results = bool(arguments.gather_summary_results)
 true_exploration_class = qmla.get_exploration_class(
     exploration_rules=exploration_rule,
+    true_params_path=arguments.run_info_file,
+    plot_probes_path=arguments.probes_plot_file,
     log_file=log_file
 )
+true_exploration_class.get_true_parameters()
 latex_mapping_file = arguments.latex_mapping_file
 figure_format = arguments.figure_format
 probes_plot_file = arguments.probes_plot_file
@@ -209,8 +212,12 @@ unique_exploration_strategies = true_params_info['all_exploration_strategies']
 for g in unique_exploration_strategies:
     try:
         unique_exploration_classes[g] = qmla.get_exploration_class(
-            exploration_rules=g
+            exploration_rules=g,
+            true_params_path=arguments.run_info_file,
+            plot_probes_path=arguments.probes_plot_file,
+            log_file=log_file
         )
+        unique_exploration_classes[g].get_true_parameters()
     except BaseException:
         unique_exploration_classes[g] = None
 

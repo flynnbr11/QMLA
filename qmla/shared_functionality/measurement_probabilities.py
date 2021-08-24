@@ -40,7 +40,7 @@ def log_print(to_print_list, log_file, log_identifier="ExpectationValue"):
 # Default expectation value calculations
 
 
-def default_expectation_value(
+def default_measurement_probability(
     ham, t, state, log_file="qmla_log.log", log_identifier="Expecation Value"
 ):
     """

@@ -20,23 +20,19 @@ This method is quite slow - useful information is stored in dictionaries and
 pickled to redis. Pickling and unpickling is quite slow, so should be minimised.
 """
 
-__all__ = [
-    'databases_required',
-    'get_redis_databases_by_qmla_id',
-    'get_seed'
-]
+__all__ = ["databases_required", "get_redis_databases_by_qmla_id", "get_seed"]
 
 
 databases_required = [
-    'qmla_core_info_database',
-    'learned_models_info_db',
-    'learned_models_ids',
-    'bayes_factors_db',
-    'bayes_factors_winners_db',
-    'active_branches_learning_models',
-    'active_branches_bayes',
-    'active_interbranch_bayes',  # TODO unused?
-    'any_job_failed'
+    "qmla_core_info_database",
+    "learned_models_info_db",
+    "learned_models_ids",
+    "bayes_factors_db",
+    "bayes_factors_winners_db",
+    "active_branches_learning_models",
+    "active_branches_bayes",
+    "active_interbranch_bayes",  # TODO unused?
+    "any_job_failed",
 ]
 
 
@@ -66,10 +62,7 @@ def get_redis_databases_by_qmla_id(
 
     database_dict = {}
     # Seed this QMLA instance's database ID's
-    seed = get_seed(
-        host_name=host_name,
-        port_number=port_number,
-        qmla_id=qmla_id)
+    seed = get_seed(host_name=host_name, port_number=port_number, qmla_id=qmla_id)
     # TODO is seed always 0 since port=6300+qmla_id? possibly remove if so,
     # doesn't provide extra protection
 
@@ -78,9 +71,7 @@ def get_redis_databases_by_qmla_id(
         new_db = databases_required[i]
         # place a new database for this data set on the redis database
         database_dict[new_db] = redis.StrictRedis(
-            host=host_name,
-            port=port_number,
-            db=seed + i
+            host=host_name, port=port_number, db=seed + i
         )
 
     return database_dict
@@ -114,22 +105,22 @@ def get_seed(host_name, port_number, qmla_id):
     seed_db_keys = [a.decode() for a in qid_seeds.keys()]
     first_qmla_id = False
 
-    if 'max' not in seed_db_keys:
+    if "max" not in seed_db_keys:
         # ie the database has not been set yet
-        qid_seeds.set('max', 1)
+        qid_seeds.set("max", 1)
         first_qmla_id = True
 
     if str(qmla_id) in seed_db_keys:
         seed = int(qid_seeds.get(qmla_id))
 
     elif qmla_id not in seed_db_keys:
-        max_seed = int(qid_seeds.get('max'))
+        max_seed = int(qid_seeds.get("max"))
         if first_qmla_id:
             new_qid_seed = 1
         else:
             new_qid_seed = max_seed + len(databases_required)
         qid_seeds.set(qmla_id, int(new_qid_seed))
-        qid_seeds.set('max', new_qid_seed)
+        qid_seeds.set("max", new_qid_seed)
 
         seed = new_qid_seed
     return int(seed)
