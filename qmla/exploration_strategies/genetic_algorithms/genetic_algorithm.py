@@ -312,6 +312,7 @@ class GeneticAlgorithmQMLA:
     def random_models_sorted_by_f_score(
         self,
         num_models=14,
+        return_dict=False,
     ):
         r"""
         Generate a set of random models and sort them by F score.
@@ -333,7 +334,8 @@ class GeneticAlgorithmQMLA:
         sorted_models = list(sorted_models)
         just_f = np.array(models_w_f)[:, 1]
         just_f = [float(a) for a in just_f]
-
+        if return_dict:
+            return models_w_f
         return sorted_models
 
     ######################

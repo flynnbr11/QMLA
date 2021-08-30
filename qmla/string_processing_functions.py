@@ -139,7 +139,6 @@ def process_multipauli_term(term):
     # b is operator on site k
     # N is total number of sites
     # e.g. pauliSet_xJy_1J3_d4
-    print("PROCESSING MULTIPAULI")
 
     components = term.split("_")
     components.remove("pauliSet")

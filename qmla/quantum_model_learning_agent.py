@@ -1753,9 +1753,22 @@ class QuantumModelLearningAgent:
         """
 
         if model_id is None:
-            model_id = self.champion_model_id
+            if self.champion_model_id != -1:
+                model_id = self.champion_model_id
+            elif self.true_model_id != -1:
+                model_id = self.true_model_id
+            else:
+                model_id = 1
+                self.log_print(
+                    ["No model id passed to get_results_dict; defaulting to 1"]
+                )
 
-        mod = self.get_model_storage_instance_by_id(model_id)
+        try:
+            mod = self.get_model_storage_instance_by_id(model_id)
+        except:
+            self.log_print(
+                ["Could not get model storage instance for model {}".format(model_id)]
+            )
         model_name = mod.model_name
 
         # Get expectation values of this model
@@ -2245,7 +2258,7 @@ class QuantumModelLearningAgent:
             model_list=model_names,
         )
         self.qhl_mode_multiple_models = True
-        self.champion_model_id = (-1,)  # TODO just so not to crash during dynamics plot
+        self.champion_model_id = -1  # TODO just so not to crash during dynamics plot
         self.qhl_mode_multiple_models_model_ids = [
             self._get_model_id_from_name(model_name=mod_name)
             for mod_name in model_names
@@ -2553,7 +2566,6 @@ class QuantumModelLearningAgent:
             name = mod.model_name
             results_file = str(
                 self.qmla_controls.results_directory
-                + output_prefix
                 + "results_"
                 + str("m{}_q{}.p".format(int(mid), self.qmla_controls.long_id))
             )

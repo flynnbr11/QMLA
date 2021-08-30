@@ -61,7 +61,7 @@ class HeisenbergGeneticXYZ(GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms)
         self.num_sites = qmla.model_building_utilities.get_num_qubits(self.true_model)
 
         self.num_probes = 50
-        self.max_num_qubits = 7
+        self.max_num_qubits = self.num_sites
         self.num_possible_models = 2 ** len(self.true_chromosome)
         self.max_num_probe_qubits = self.num_sites
 
@@ -94,11 +94,10 @@ class HeisenbergGeneticXYZ(GeneticAlgorithmQMLAFullyConnectedLikewisePauliTerms)
         self.fraction_opponents_experiments_for_bf = 0.4
 
         # Parameter learning
-        self.max_time_to_consider = 15
+        self.max_time_to_consider = 25
         self.min_param = 0.25
         self.max_param = 0.75
         self.force_evaluation = False
-        self.max_time_to_consider = 60
         self.iqle_mode = True
 
         # Timing info for cluster
@@ -126,6 +125,7 @@ class TestHeisenbergGeneticXYZ(HeisenbergGeneticXYZ):
             num_models=self.initial_num_models
         )
 
+
 class HeisenbergGeneticSingleLayer(HeisenbergGeneticXYZ):
     def __init__(
         self, exploration_rules, true_model=None, **kwargs  # using that set by parent
@@ -137,7 +137,6 @@ class HeisenbergGeneticSingleLayer(HeisenbergGeneticXYZ):
 
         test_fitness_models = [
             # TODO these models F1-score is with respect to Ising model - find equivalent for Heis
-
             # F=0
             "pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5",
             # 'pauliSet_2J4_zJz_d5+pauliSet_3J4_zJz_d5+pauliSet_4J5_zJz_d5',
@@ -171,14 +170,16 @@ class HeisenbergGeneticSingleLayer(HeisenbergGeneticXYZ):
 
         self.initial_models = list(
             np.random.choice(
-                test_fitness_models, len(test_fitness_models), replace=False
+                test_fitness_models,
+                4,  # len(test_fitness_models), # TODO restore full list
+                replace=False,
             )
         )
         if self.true_model not in self.initial_models:
             rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
             self.initial_models[rand_idx] = self.true_model
 
-        self.branch_comparison_strategy = "optimal_graph" # 'all'
+        self.branch_comparison_strategy = "all"
         self.tree_completed_initially = True
         if self.tree_completed_initially:
             self.max_spawn_depth = 1
@@ -191,6 +192,7 @@ class HeisenbergGeneticSingleLayer(HeisenbergGeneticXYZ):
         self.num_processes_to_parallelise_over = 16
         self.timing_insurance_factor = 0.75
 
+
 class HeisenbergGeneticTest(HeisenbergGeneticXYZ):
     def __init__(
         self, exploration_rules, true_model=None, **kwargs  # using that set by parent
@@ -201,3 +203,98 @@ class HeisenbergGeneticTest(HeisenbergGeneticXYZ):
         )
         self.iqle_mode = True
 
+
+class HeisenbergTestDynamicsReproduction(HeisenbergGeneticXYZ):
+    def __init__(
+        self, exploration_rules, true_model=None, **kwargs  # using that set by parent
+    ):
+        true_model = "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4"
+        super().__init__(
+            exploration_rules=exploration_rules, true_model=true_model, **kwargs
+        )
+
+        test_fitness_models = [
+            "pauliSet_1J2_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4",
+            "pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_2J4_xJx_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4",
+            "pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_zJz_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J3_xJx_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_yJy_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_yJy_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J3_yJy_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_1J4_zJz_d4+pauliSet_2J3_xJx_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_yJy_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_zJz_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_xJx_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_2J4_zJz_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_xJx_d4+pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_xJx_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+            "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
+        ]
+
+        # self.initial_models = list(
+        #     np.random.choice(
+        #         test_fitness_models,
+        #         len(test_fitness_models),  # TODO restore full list
+        #         replace=False,
+        #     )
+        # )
+        self.initial_models = [
+            qmla.model_building_utilities.alph(m) for m in self.initial_models
+        ]
+        if self.true_model not in self.initial_models:
+            rand_idx = self.initial_models.index(np.random.choice(self.initial_models))
+            self.initial_models[rand_idx] = self.true_model
+        self.qhl_models = self.initial_models
+
+        self.branch_comparison_strategy = "optimal_graph"  # "all"
+        self.fraction_particles_for_bf = 0.01  # don't care about comparisons
+        self.fraction_own_experiments_for_bf = 0.01
+        self.fraction_opponents_experiments_for_bf = 0.01
+        self.tree_completed_initially = True
+        if self.tree_completed_initially:
+            self.max_spawn_depth = 1
+        self.initial_num_models = len(self.initial_models)
+        self.max_num_models_by_shape = {
+            self.num_sites: (len(self.initial_models) * self.max_spawn_depth) / 8,
+            "other": 0,
+        }
+
+        self.num_processes_to_parallelise_over = 16
+        self.timing_insurance_factor = 0.75

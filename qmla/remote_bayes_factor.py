@@ -261,15 +261,18 @@ def remote_bayes_factor_calculation(
 
     # Plot dynamics on which models were compared
     if plot_level >= 4:
-        log_print(["Plotting dynamics of models involved."])
-        plot_dynamics_from_models(
-            models=[model_a, model_b],
-            exp_msmts=qmla_core_info_dict["experimental_measurements"],
-            bayes_factor=bayes_factor,
-            bf_times=model_a.bf_times,  # same as model_b.bf_times
-            save_directory=bf_data_folder,
-            figure_format=figure_format,
-        )
+        try:
+            log_print(["Plotting dynamics of models involved."])
+            plot_dynamics_from_models(
+                models=[model_a, model_b],
+                exp_msmts=qmla_core_info_dict["experimental_measurements"],
+                bayes_factor=bayes_factor,
+                bf_times=model_a.bf_times,  # same as model_b.bf_times
+                save_directory=bf_data_folder,
+                figure_format=figure_format,
+            )
+        except:
+            log_print(["plot failure: plot_dynamics_from_models"])
     else:
         log_print(["NOT Plotting dynamics of models involved."])
 

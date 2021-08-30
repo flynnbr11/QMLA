@@ -165,17 +165,17 @@ class ModelInstanceForComparison:
         else:
             self.is_true_model = False
 
-        self.model_terms_matrices = self.model_constructor.terms_matrices
-        self.model_terms_parameters_final = np.array(self.final_learned_params)
         self.exploration_class = qmla.get_exploration_strategy.get_exploration_class(
             exploration_rules=self.exploration_strategy_of_this_model,
             log_file=self.log_file,
             qmla_id=self.qmla_id,
         )
         self.model_constructor = self.exploration_class.model_constructor(
-            name=model_name
+            name=self.model_name
         )
         self.model_name_latex = self.model_constructor.name_latex
+        self.model_terms_matrices = self.model_constructor.terms_matrices
+        self.model_terms_parameters_final = np.array(self.final_learned_params)
         # self.model_name_latex = self.exploration_class.latex_name(self.model_name)
 
         # New instances of model and updater used by QInfer
