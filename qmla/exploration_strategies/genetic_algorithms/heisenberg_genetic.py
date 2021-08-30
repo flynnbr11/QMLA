@@ -268,13 +268,13 @@ class HeisenbergTestDynamicsReproduction(HeisenbergGeneticXYZ):
             "pauliSet_1J2_yJy_d4+pauliSet_1J2_zJz_d4+pauliSet_1J3_zJz_d4+pauliSet_1J4_yJy_d4+pauliSet_2J3_xJx_d4+pauliSet_2J3_yJy_d4+pauliSet_2J4_xJx_d4+pauliSet_3J4_xJx_d4+pauliSet_3J4_zJz_d4",
         ]
 
-        # self.initial_models = list(
-        #     np.random.choice(
-        #         test_fitness_models,
-        #         len(test_fitness_models),  # TODO restore full list
-        #         replace=False,
-        #     )
-        # )
+        self.initial_models = list(
+            np.random.choice(
+                test_fitness_models,
+                len(test_fitness_models),  # TODO restore full list
+                replace=False,
+            )
+        )
         self.initial_models = [
             qmla.model_building_utilities.alph(m) for m in self.initial_models
         ]
@@ -297,4 +297,4 @@ class HeisenbergTestDynamicsReproduction(HeisenbergGeneticXYZ):
         }
 
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 0.75
+        self.timing_insurance_factor = 10
