@@ -297,4 +297,4 @@ class HeisenbergTestDynamicsReproduction(HeisenbergGeneticXYZ):
         }
 
         self.num_processes_to_parallelise_over = 16
-        self.timing_insurance_factor = 10
+        self.timing_insurance_factor = 6
