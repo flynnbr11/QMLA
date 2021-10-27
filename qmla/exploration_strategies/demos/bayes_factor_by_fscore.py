@@ -61,9 +61,9 @@ class DemoBayesFactorsByFscore(GeneticAlgorithmQMLAFullyConnectedLikewisePauliTe
         self.genetic_algorithm.terminate_early_if_top_model_unchanged = True
         self.branch_comparison_strategy = "all"
         self.tree_completed_initially = True
-        self.fraction_particles_for_bf = 1
-        self.fraction_own_experiments_for_bf = 1
-        self.fraction_opponents_experiments_for_bf = 1
+        self.fraction_particles_for_bf = 0.5
+        self.fraction_own_experiments_for_bf = 0.5
+        self.fraction_opponents_experiments_for_bf = 0.5
         self.iqle_mode = True
 
         self.max_time_to_consider = 15
@@ -98,6 +98,11 @@ class DemoBayesFactorsByFscore(GeneticAlgorithmQMLAFullyConnectedLikewisePauliTe
             # 0.9 <= f < 1
             "pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5",
             # F = 1
+            "pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5",  # F=1
+        ]
+
+        test_fitness_models = [  # TODO reinstate longer list above for full plot
+            "pauliSet_1J2_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5",
             "pauliSet_1J2_zJz_d5+pauliSet_1J3_zJz_d5+pauliSet_2J3_zJz_d5+pauliSet_2J5_zJz_d5+pauliSet_3J5_zJz_d5",  # F=1
         ]
 
