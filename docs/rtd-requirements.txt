@@ -9,7 +9,7 @@ QInfer==1.0
 Cython==0.27.3  #might be required to operate a pre-install of Cython
 docutils==0.14
 matplotlib==3.0.3
-redis==2.10.6
+redis==4.5.3
 rq==0.10.0
 lfig==0.1.1
 seaborn==0.9.0
